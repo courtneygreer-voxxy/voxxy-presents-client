@@ -4,14 +4,17 @@
 > Read this at the START of every coding session and again BEFORE opening a PR.
 >
 > **Two modes:**
+>
 > 1. **SESSION_START** — Rebase, load context, run tests, produce status summary.
 > 2. **PRE_PR** — Validate code against rules/style, run full test suite, produce readiness summary.
 >
 > **How to invoke:** Tell your agent:
-> - *"Read docs/SESSION_GUIDE.md and run SESSION_START mode"*
-> - *"Read docs/SESSION_GUIDE.md and run PRE_PR mode"*
+>
+> - _"Read docs/SESSION_GUIDE.md and run SESSION_START mode"_
+> - _"Read docs/SESSION_GUIDE.md and run PRE_PR mode"_
 
 **Repo locations (adjust if your layout differs):**
+
 - Frontend: `~/Development/voxxy-presents-client`
 - Backend: `~/Development/voxxy-rails-react`
 
@@ -25,51 +28,51 @@
 
 ### Styling Rules
 
-| ID | Rule | Source |
-|------|------|--------|
-| RL-001 | Never use raw hex values in `.tsx` files. Use CSS tokens or `--voxxy-*` variables. | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §9 |
-| RL-002 | Never add inline `style={{ backgroundImage: ... }}`. Use a `voxxy-btn-*` or `voxxy-gradient-*` class. | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §9 |
-| RL-003 | Never use `backdrop-blur` on cards inside an already-blurred container — it breaks `z-index` for dropdowns. | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §9 |
-| RL-004 | Never set `border: 1px solid transparent` on gradient-fill buttons — creates a visible tinted edge. Use `border: none`. | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §9 |
-| RL-005 | Always update BOTH `:root` and `.dark` blocks in `src/index.css` when adding a new CSS token. | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §1 |
+| ID     | Rule                                                                                                                                                                    | Source                                |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| RL-001 | Never use raw hex values in `.tsx` files. Use CSS tokens or `--voxxy-*` variables.                                                                                      | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §9 |
+| RL-002 | Never add inline `style={{ backgroundImage: ... }}`. Use a `voxxy-btn-*` or `voxxy-gradient-*` class.                                                                   | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §9 |
+| RL-003 | Never use `backdrop-blur` on cards inside an already-blurred container — it breaks `z-index` for dropdowns.                                                             | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §9 |
+| RL-004 | Never set `border: 1px solid transparent` on gradient-fill buttons — creates a visible tinted edge. Use `border: none`.                                                 | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §9 |
+| RL-005 | Always update BOTH `:root` and `.dark` blocks in `src/index.css` when adding a new CSS token.                                                                           | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §1 |
 | RL-006 | Public pages must always force dark mode. Wrap with `<div className="dark voxxy-public-page ...">`. Never rely on `--background`/`--foreground` tokens on public pages. | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §6 |
 
 ### Auth & API Rules
 
-| ID | Rule | Source |
-|------|------|--------|
-| RL-007 | The auth token key is `railsAuthToken`, NOT `authToken`. Always use `getAuthToken()` from `src/services/auth.ts`. | [TESTING_ROADMAP.md](./TESTING_ROADMAP.md) §1.7 |
-| RL-008 | All API calls must go through `src/services/api.ts` using `fetchApi()`. Never use raw `fetch()` with hand-built headers. | [CONTRIBUTING.md](./CONTRIBUTING.md) |
-| RL-009 | Never use TypeScript `any`. The project uses `"strict": true` in tsconfig. | [CONTRIBUTING.md](./CONTRIBUTING.md) |
+| ID     | Rule                                                                                                                     | Source                                          |
+| ------ | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| RL-007 | The auth token key is `railsAuthToken`, NOT `authToken`. Always use `getAuthToken()` from `src/services/auth.ts`.        | [TESTING_ROADMAP.md](./TESTING_ROADMAP.md) §1.7 |
+| RL-008 | All API calls must go through `src/services/api.ts` using `fetchApi()`. Never use raw `fetch()` with hand-built headers. | [CONTRIBUTING.md](./CONTRIBUTING.md)            |
+| RL-009 | Never use TypeScript `any`. The project uses `"strict": true` in tsconfig.                                               | [CONTRIBUTING.md](./CONTRIBUTING.md)            |
 
 ### Component & Architecture Rules
 
-| ID | Rule | Source |
-|------|------|--------|
-| RL-010 | All producer-app form fields must use `voxxy-input-frost` class. Do not use raw shadcn Input styling. | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §5 |
-| RL-011 | New Voxxy-specific CSS utility classes must be prefixed with `voxxy-` and defined in `@layer components` in `src/index.css`. | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §5 |
-| RL-012 | Modals should use standardised shell: `max-w-2xl max-h-[82vh]` with gradient header and scrollable body, unless a wider size is justified. | [GLASS_MODAL_DESIGN_SYSTEM.md](./design/GLASS_MODAL_DESIGN_SYSTEM.md) |
-| RL-013 | When removing a duplicate guard (like fee-type dedup), check if it should be narrowed rather than fully removed. Only `early_bird_price` allows multiples. | [KNOWN_BUGS.md](./KNOWN_BUGS.md) Bug 2 |
+| ID     | Rule                                                                                                                                                       | Source                                                                |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| RL-010 | All producer-app form fields must use `voxxy-input-frost` class. Do not use raw shadcn Input styling.                                                      | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §5                                 |
+| RL-011 | New Voxxy-specific CSS utility classes must be prefixed with `voxxy-` and defined in `@layer components` in `src/index.css`.                               | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §5                                 |
+| RL-012 | Modals should use standardised shell: `max-w-2xl max-h-[82vh]` with gradient header and scrollable body, unless a wider size is justified.                 | [GLASS_MODAL_DESIGN_SYSTEM.md](./design/GLASS_MODAL_DESIGN_SYSTEM.md) |
+| RL-013 | When removing a duplicate guard (like fee-type dedup), check if it should be narrowed rather than fully removed. Only `early_bird_price` allows multiples. | [KNOWN_BUGS.md](./KNOWN_BUGS.md) Bug 2                                |
 
 ### Backend Rules
 
-| ID | Rule | Source |
-|------|------|--------|
-| RL-014 | Always run `bin/rails db:migrate` after pulling changes. Pending migrations block login and API calls. | [KNOWN_BUGS.md](./KNOWN_BUGS.md) Bug 3 |
-| RL-015 | When adding a new model attribute, update BOTH `strong_params` (permit) AND the serialiser method. Missing serialiser output is a silent bug. | [KNOWN_BUGS.md](./KNOWN_BUGS.md) Bug 1 |
-| RL-016 | Sidekiq workers run on a 5-minute cron cycle. Test email jobs with `EmailSenderWorker.new.perform` in rails console rather than waiting for cron. | Backend email docs |
-| RL-017 | Verify SendGrid template IDs match between environments. Staging and production use different template sets. | Backend email docs |
-| RL-018 | Use FactoryBot for test data in RSpec. Never create records with raw `Model.create!` in specs. | Backend TESTING.md |
-| RL-019 | Database cleaner uses transaction strategy by default. System/feature specs need truncation strategy. | Backend TESTING.md |
+| ID     | Rule                                                                                                                                              | Source                                 |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| RL-014 | Always run `bin/rails db:migrate` after pulling changes. Pending migrations block login and API calls.                                            | [KNOWN_BUGS.md](./KNOWN_BUGS.md) Bug 3 |
+| RL-015 | When adding a new model attribute, update BOTH `strong_params` (permit) AND the serialiser method. Missing serialiser output is a silent bug.     | [KNOWN_BUGS.md](./KNOWN_BUGS.md) Bug 1 |
+| RL-016 | Sidekiq workers run on a 5-minute cron cycle. Test email jobs with `EmailSenderWorker.new.perform` in rails console rather than waiting for cron. | Backend email docs                     |
+| RL-017 | Verify SendGrid template IDs match between environments. Staging and production use different template sets.                                      | Backend email docs                     |
+| RL-018 | Use FactoryBot for test data in RSpec. Never create records with raw `Model.create!` in specs.                                                    | Backend TESTING.md                     |
+| RL-019 | Database cleaner uses transaction strategy by default. System/feature specs need truncation strategy.                                             | Backend TESTING.md                     |
 
 ### Git & Process Rules
 
-| ID | Rule | Source |
-|------|------|--------|
-| RL-020 | Use conventional commit format: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`. | [CONTRIBUTING.md](./CONTRIBUTING.md) |
-| RL-021 | Feature branches rebase onto `dev`. Hotfix branches are based on `main`. Never merge directly to `main`. | [BRANCHING_STRATEGY.md](./development/BRANCHING_STRATEGY.md) |
-| RL-022 | Use the 3-stage pipeline: feature → dev → staging → main. Do not deploy individual features directly to main. | [CONTRIBUTING.md](./CONTRIBUTING.md) |
-| RL-023 | Never push directly to `main`, `staging`, or `dev`. Always open a PR into active branches. Force-push is only acceptable on your own feature/fix branch to update an open PR. | SESSION_GUIDE §1 |
+| ID     | Rule                                                                                                                                                                          | Source                                                       |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| RL-020 | Use conventional commit format: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`.                                                                                     | [CONTRIBUTING.md](./CONTRIBUTING.md)                         |
+| RL-021 | Feature branches rebase onto `dev`. Hotfix branches are based on `main`. Never merge directly to `main`.                                                                      | [BRANCHING_STRATEGY.md](./development/BRANCHING_STRATEGY.md) |
+| RL-022 | Use the 3-stage pipeline: feature → dev → staging → main. Do not deploy individual features directly to main.                                                                 | [CONTRIBUTING.md](./CONTRIBUTING.md)                         |
+| RL-023 | Never push directly to `main`, `staging`, or `dev`. Always open a PR into active branches. Force-push is only acceptable on your own feature/fix branch to update an open PR. | SESSION_GUIDE §1                                             |
 
 ---
 
@@ -78,12 +81,14 @@
 **Full guide:** [docs/STYLE_GUIDE.md](./STYLE_GUIDE.md) (14.7 KB)
 
 **Read the full guide if your task involves:**
+
 - Creating or modifying UI components
 - Adding new CSS tokens, gradients, or colour values
 - Working on public-facing pages
 - Building modals, forms, tables, or buttons
 
 **Quick reference (do not skip the full guide for UI work):**
+
 - **Theme:** Dark-first, class-based (`html.dark`). Tokens in `src/index.css`.
 - **Buttons:** `.voxxy-btn-brand` (primary CTA), `.voxxy-btn-cta` (internal primary), `.voxxy-btn-solid` (secondary).
 - **Inputs:** `.voxxy-input-frost` for producer app, `.voxxy-input-public-dark` for public pages.
@@ -92,6 +97,7 @@
 - **Glass layering:** body gradient → glass-card → input-frost → focus ring. Each layer must be visually distinct.
 
 **Additional design docs:**
+
 - [GLASS_MODAL_DESIGN_SYSTEM.md](./design/GLASS_MODAL_DESIGN_SYSTEM.md) — Modal styling standards
 - [STYLING_UPDATE_SESSION.md](./design/STYLING_UPDATE_SESSION.md) — Recent styling session notes
 
@@ -175,6 +181,7 @@ bin/rubocop
 Based on your task, read the relevant docs from the **Extended Doc References** (Section 5 below).
 
 At minimum, always read:
+
 - This file (you are reading it now)
 - [docs/KNOWN_BUGS.md](./KNOWN_BUGS.md) — Current sprint status and known bugs
 
@@ -195,6 +202,7 @@ Scan your changed files against every rule in the tables above. Flag any violati
 ### Step 2: Style guide compliance check
 
 If your PR touches `.tsx`, `.css`, or `.ts` files in `src/components/` or `src/pages/`:
+
 - Re-read [docs/STYLE_GUIDE.md](./STYLE_GUIDE.md)
 - Verify: no raw hex values in TSX files
 - Verify: no inline `style={{ backgroundImage }}`
@@ -226,12 +234,14 @@ bundle exec rspec           # Tests
 ### Step 4: Check the HANDOFF known bugs list
 
 Read [docs/KNOWN_BUGS.md](./KNOWN_BUGS.md) "Known Bugs" section.
+
 - If your PR resolves any listed bug, note it in the summary and in the PR description.
 - If your PR introduces changes that interact with a known bug, flag the risk.
 
 ### Step 5: Verify commit format
 
 All commits on your branch should follow conventional commit format:
+
 ```
 feat(scope): description
 fix(scope): description
@@ -239,6 +249,7 @@ docs(scope): description
 ```
 
 Review with:
+
 ```bash
 git log --oneline dev..HEAD
 ```
@@ -255,36 +266,36 @@ Read only the docs relevant to your current task.
 
 ### By Topic
 
-| Topic | Read These | When |
-|-------|-----------|------|
-| **UI / Styling** | [STYLE_GUIDE.md](./STYLE_GUIDE.md), [GLASS_MODAL_DESIGN_SYSTEM.md](./design/GLASS_MODAL_DESIGN_SYSTEM.md) | Any component or page work |
-| **Architecture** | [ARCHITECTURE_SUMMARY.md](./architecture/ARCHITECTURE_SUMMARY.md), [IMPLEMENTATION_PATTERNS.md](./architecture/IMPLEMENTATION_PATTERNS.md) | New features, refactors |
-| **Auth** | [ARCHITECTURE_SUMMARY.md §1](./architecture/ARCHITECTURE_SUMMARY.md), [AUTH_QUICK_REFERENCE.md](./guides/AUTH_QUICK_REFERENCE.md) | Auth changes, protected routes |
-| **API** | [API_CONFIGURATION.md](./architecture/API_CONFIGURATION.md), `src/services/api.ts` | New endpoints, API changes |
-| **Email System** | [EMAIL_DOCUMENTATION_INDEX.md](./email-system/EMAIL_DOCUMENTATION_INDEX.md) | Any email work |
-| **Events / Wizard** | [KNOWN_BUGS.md](./KNOWN_BUGS.md), Step2/Step3 source files | Event creation changes |
-| **Network / CRM** | [KNOWN_BUGS.md](./KNOWN_BUGS.md) Network section | Contact management work |
-| **Payments** | [PAYMENT_DEADLINE_FEATURE.md](./features/PAYMENT_DEADLINE_FEATURE.md), [PAYMENT_SYSTEM.md](./PAYMENT_SYSTEM.md) | Payment config |
-| **Testing** | [TESTING_ROADMAP.md](./TESTING_ROADMAP.md), `vitest.config.ts` | Adding tests, CI changes |
-| **Git / Release** | [CONTRIBUTING.md](./CONTRIBUTING.md), [BRANCHING_STRATEGY.md](./development/BRANCHING_STRATEGY.md) | Branch management, PRs |
-| **Deployment** | [DEPLOYMENT.md](./deployment/DEPLOYMENT.md), [RUNBOOK.md](./development/RUNBOOK.md) | Deployment issues |
-| **Backend** | `../voxxy-rails-react/docs/README.md`, [LOCAL_DEVELOPMENT_GUIDE.md (backend)](../voxxy-rails-react/docs/development/LOCAL_DEVELOPMENT_GUIDE.md) | Backend changes |
-| **Roles / Permissions** | [ROLE_MAPPING.md](./architecture/ROLE_MAPPING.md) | Role-based features |
-| **Current Sprint** | [KNOWN_BUGS.md](./KNOWN_BUGS.md) | **Always read this** |
+| Topic                   | Read These                                                                                                                                      | When                           |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| **UI / Styling**        | [STYLE_GUIDE.md](./STYLE_GUIDE.md), [GLASS_MODAL_DESIGN_SYSTEM.md](./design/GLASS_MODAL_DESIGN_SYSTEM.md)                                       | Any component or page work     |
+| **Architecture**        | [ARCHITECTURE_SUMMARY.md](./architecture/ARCHITECTURE_SUMMARY.md), [IMPLEMENTATION_PATTERNS.md](./architecture/IMPLEMENTATION_PATTERNS.md)      | New features, refactors        |
+| **Auth**                | [ARCHITECTURE_SUMMARY.md §1](./architecture/ARCHITECTURE_SUMMARY.md), [AUTH_QUICK_REFERENCE.md](./guides/AUTH_QUICK_REFERENCE.md)               | Auth changes, protected routes |
+| **API**                 | [API_CONFIGURATION.md](./architecture/API_CONFIGURATION.md), `src/services/api.ts`                                                              | New endpoints, API changes     |
+| **Email System**        | [EMAIL_DOCUMENTATION_INDEX.md](./email-system/EMAIL_DOCUMENTATION_INDEX.md)                                                                     | Any email work                 |
+| **Events / Wizard**     | [KNOWN_BUGS.md](./KNOWN_BUGS.md), Step2/Step3 source files                                                                                      | Event creation changes         |
+| **Network / CRM**       | [KNOWN_BUGS.md](./KNOWN_BUGS.md) Network section                                                                                                | Contact management work        |
+| **Payments**            | [PAYMENT_DEADLINE_FEATURE.md](./features/PAYMENT_DEADLINE_FEATURE.md), [PAYMENT_SYSTEM.md](./PAYMENT_SYSTEM.md)                                 | Payment config                 |
+| **Testing**             | [TESTING_ROADMAP.md](./TESTING_ROADMAP.md), `vitest.config.ts`                                                                                  | Adding tests, CI changes       |
+| **Git / Release**       | [CONTRIBUTING.md](./CONTRIBUTING.md), [BRANCHING_STRATEGY.md](./development/BRANCHING_STRATEGY.md)                                              | Branch management, PRs         |
+| **Deployment**          | [DEPLOYMENT.md](./deployment/DEPLOYMENT.md), [RUNBOOK.md](./development/RUNBOOK.md)                                                             | Deployment issues              |
+| **Backend**             | `../voxxy-rails-react/docs/README.md`, [LOCAL_DEVELOPMENT_GUIDE.md (backend)](../voxxy-rails-react/docs/development/LOCAL_DEVELOPMENT_GUIDE.md) | Backend changes                |
+| **Roles / Permissions** | [ROLE_MAPPING.md](./architecture/ROLE_MAPPING.md)                                                                                               | Role-based features            |
+| **Current Sprint**      | [KNOWN_BUGS.md](./KNOWN_BUGS.md)                                                                                                                | **Always read this**           |
 
 ### Key Source Files
 
-| File | When to Read |
-|------|-------------|
-| `src/App.tsx` | Routing changes, new pages |
-| `src/contexts/AuthContext.tsx` | Auth state, role checks |
-| `src/services/api.ts` | Any API integration |
-| `src/index.css` | New tokens, component classes |
-| `tailwind.config.ts` | Colour/font/animation config |
-| `src/components/Navigation.tsx` | Nav changes |
-| `src/components/producer/Network/NetworkPage.tsx` | Network/CRM work |
-| `src/components/producer/CreateEventWizard/` | Wizard changes |
-| `src/components/producer/Email/` | Email system UI |
+| File                                              | When to Read                  |
+| ------------------------------------------------- | ----------------------------- |
+| `src/App.tsx`                                     | Routing changes, new pages    |
+| `src/contexts/AuthContext.tsx`                    | Auth state, role checks       |
+| `src/services/api.ts`                             | Any API integration           |
+| `src/index.css`                                   | New tokens, component classes |
+| `tailwind.config.ts`                              | Colour/font/animation config  |
+| `src/components/Navigation.tsx`                   | Nav changes                   |
+| `src/components/producer/Network/NetworkPage.tsx` | Network/CRM work              |
+| `src/components/producer/CreateEventWizard/`      | Wizard changes                |
+| `src/components/producer/Email/`                  | Email system UI               |
 
 ---
 
@@ -292,27 +303,27 @@ Read only the docs relevant to your current task.
 
 ### Frontend (`voxxy-presents-client`)
 
-| Command | Purpose |
-|---------|---------|
-| `npm run dev` | Start Vite dev server (localhost:5173) |
-| `npm run typecheck` | TypeScript check (`tsc --noEmit`) |
-| `npm run lint` | ESLint |
-| `npm run precheck` | Typecheck + lint combined |
-| `npm run test:run` | Vitest — single run, CI mode |
-| `npm run test` | Vitest — watch mode |
-| `npm run build` | Production build |
-| `npm run build:check` | tsc + production build |
+| Command               | Purpose                                |
+| --------------------- | -------------------------------------- |
+| `npm run dev`         | Start Vite dev server (localhost:5173) |
+| `npm run typecheck`   | TypeScript check (`tsc --noEmit`)      |
+| `npm run lint`        | ESLint                                 |
+| `npm run precheck`    | Typecheck + lint combined              |
+| `npm run test:run`    | Vitest — single run, CI mode           |
+| `npm run test`        | Vitest — watch mode                    |
+| `npm run build`       | Production build                       |
+| `npm run build:check` | tsc + production build                 |
 
 ### Backend (`voxxy-rails-react`)
 
-| Command | Purpose |
-|---------|---------|
-| `rails s -p 3001` | Start Rails server |
-| `bundle exec rspec` | Run RSpec test suite |
-| `bin/rubocop` | Ruby linting |
-| `bin/brakeman --no-pager` | Security scan |
-| `RAILS_ENV=test rails db:test:prepare` | Prepare test database |
-| `bin/rails db:migrate` | Run pending migrations |
+| Command                                | Purpose                |
+| -------------------------------------- | ---------------------- |
+| `rails s -p 3001`                      | Start Rails server     |
+| `bundle exec rspec`                    | Run RSpec test suite   |
+| `bin/rubocop`                          | Ruby linting           |
+| `bin/brakeman --no-pager`              | Security scan          |
+| `RAILS_ENV=test rails db:test:prepare` | Prepare test database  |
+| `bin/rails db:migrate`                 | Run pending migrations |
 
 ### Combined precheck (copy-paste)
 
@@ -421,7 +432,7 @@ After completing PRE_PR mode, output this:
 
 ## 8. Document Changelog
 
-| Date | Change | Author |
-|------|--------|--------|
-| 2026-05-07 | Initial creation with 22 rules seeded from STYLE_GUIDE, HANDOFF, TESTING_ROADMAP, CONTRIBUTING | Team |
-| 2026-06-02 | Updated git workflow references from staging to dev (3-stage pipeline: dev → staging → main) | Team |
+| Date       | Change                                                                                         | Author |
+| ---------- | ---------------------------------------------------------------------------------------------- | ------ |
+| 2026-05-07 | Initial creation with 22 rules seeded from STYLE_GUIDE, HANDOFF, TESTING_ROADMAP, CONTRIBUTING | Team   |
+| 2026-06-02 | Updated git workflow references from staging to dev (3-stage pipeline: dev → staging → main)   | Team   |

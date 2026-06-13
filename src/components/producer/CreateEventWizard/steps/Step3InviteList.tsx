@@ -1,11 +1,22 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Users, Search, Building2, Mail, Phone, MapPin, Instagram, Edit, Trash2, AlertTriangle } from 'lucide-react';
-import { WizardStepProps } from '../types';
-import { vendorContactsApi, contactListsApi, VendorContact, ContactList } from '@/services/api';
-import { DebugPanel } from '../../DebugPanel';
+import { useState, useEffect, useRef, useCallback } from 'react'
+import {
+  Users,
+  Search,
+  Building2,
+  Mail,
+  Phone,
+  MapPin,
+  Instagram,
+  Edit,
+  Trash2,
+  AlertTriangle,
+} from 'lucide-react'
+import { WizardStepProps } from '../types'
+import { vendorContactsApi, contactListsApi, VendorContact, ContactList } from '@/services/api'
+import { DebugPanel } from '../../DebugPanel'
 
 interface Step3InviteListProps extends WizardStepProps {
-  organizationId: number;
+  organizationId: number
 }
 
 /**
@@ -63,17 +74,17 @@ export default function Step3InviteList({
   organizationId,
   isAdmin,
 }: Step3InviteListProps) {
-  const [contacts, setContacts] = useState<VendorContact[]>([]);
-  const [lists, setLists] = useState<ContactList[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [loadingLists, setLoadingLists] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedContactIds, setSelectedContactIds] = useState<number[]>([]);
-  const [inviteAllSelected, setInviteAllSelected] = useState(false);
-  const [selectedListIds, setSelectedListIds] = useState<number[]>([]);
-  const [totalContactsCount, setTotalContactsCount] = useState(0);
-  const perPage = 50;
+  const [contacts, setContacts] = useState<VendorContact[]>([])
+  const [lists, setLists] = useState<ContactList[]>([])
+  const [loading, setLoading] = useState(false)
+  const [loadingLists, setLoadingLists] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [selectedContactIds, setSelectedContactIds] = useState<number[]>([])
+  const [inviteAllSelected, setInviteAllSelected] = useState(false)
+  const [selectedListIds, setSelectedListIds] = useState<number[]>([])
+  const [totalContactsCount, setTotalContactsCount] = useState(0)
+  const perPage = 50
 
   // PHASE 4: Backend pagination state (like Network page)
   const [paginationMeta, setPaginationMeta] = useState({
@@ -81,21 +92,21 @@ export default function Step3InviteList({
     total_pages: 1,
     total_count: 0,
     per_page: perPage,
-  });
+  })
 
   // Track which IDs we've already fetched to avoid redundant requests
-  const fetchedIdsRef = useRef<string>('');
+  const fetchedIdsRef = useRef<string>('')
 
-  const { inviteList } = wizardState;
-  const invitedContactIds = inviteList.invitedContactIds ?? [];
+  const { inviteList } = wizardState
+  const invitedContactIds = inviteList.invitedContactIds ?? []
 
   // Stable serialized key for the invited IDs — avoids re-running effect on ref changes
-  const invitedIdsKey = JSON.stringify(invitedContactIds);
+  const invitedIdsKey = JSON.stringify(invitedContactIds)
 
   // Load contact lists on mount
   useEffect(() => {
-    fetchLists();
-  }, [organizationId]);
+    fetchLists()
+  }, [organizationId])
 
   // PERFORMANCE FIX: Disabled to prevent double-fetching
   // Contacts are now set directly in handleAutoImport instead of fetching twice
@@ -113,121 +124,118 @@ export default function Step3InviteList({
 
   const fetchLists = async () => {
     try {
-      setLoadingLists(true);
+      setLoadingLists(true)
       const [listsResponse, contactsResponse] = await Promise.all([
         contactListsApi.getAll(organizationId),
-        vendorContactsApi.getAll(organizationId, { page: 1, per_page: 1 })
-      ]);
-      setLists(listsResponse?.contact_lists || []);
-      setTotalContactsCount(contactsResponse?.meta?.total_count || 0);
+        vendorContactsApi.getAll(organizationId, { page: 1, per_page: 1 }),
+      ])
+      setLists(listsResponse?.contact_lists || [])
+      setTotalContactsCount(contactsResponse?.meta?.total_count || 0)
     } catch (err) {
-      console.error('Failed to fetch lists:', err);
-      setLists([]);
-      setTotalContactsCount(0);
+      console.error('Failed to fetch lists:', err)
+      setLists([])
+      setTotalContactsCount(0)
     } finally {
-      setLoadingLists(false);
+      setLoadingLists(false)
     }
-  };
+  }
 
   // PHASE 4: Fetch contacts page by page (backend pagination like Network page)
   const fetchContactsPage = async (page: number, contactIds?: number[]) => {
-    const idsToFetch = contactIds || invitedContactIds;
+    const idsToFetch = contactIds || invitedContactIds
 
     if (idsToFetch.length === 0) {
-      setContacts([]);
-      setPaginationMeta({ current_page: 1, total_pages: 1, total_count: 0, per_page: perPage });
-      return;
+      setContacts([])
+      setPaginationMeta({ current_page: 1, total_pages: 1, total_count: 0, per_page: perPage })
+      return
     }
 
     try {
-      setLoading(true);
+      setLoading(true)
 
       // Calculate which subset of IDs to fetch for this page
-      const startIndex = (page - 1) * perPage;
-      const endIndex = startIndex + perPage;
-      const pageIds = idsToFetch.slice(startIndex, endIndex);
+      const startIndex = (page - 1) * perPage
+      const endIndex = startIndex + perPage
+      const pageIds = idsToFetch.slice(startIndex, endIndex)
 
       // Use Phase 3's by_ids endpoint to fetch only this page
       const response = await vendorContactsApi.getByIds(organizationId, pageIds, {
         per_page: perPage,
-      });
+      })
 
-      const contactsData = response?.vendor_contacts || [];
+      const contactsData = response?.vendor_contacts || []
 
       // Calculate pagination metadata
-      const totalCount = idsToFetch.length;
-      const totalPages = Math.ceil(totalCount / perPage);
+      const totalCount = idsToFetch.length
+      const totalPages = Math.ceil(totalCount / perPage)
 
-      setContacts(contactsData);
+      setContacts(contactsData)
       setPaginationMeta({
         current_page: page,
         total_pages: totalPages,
         total_count: totalCount,
         per_page: perPage,
-      });
-      setCurrentPage(page);
+      })
+      setCurrentPage(page)
     } catch (err) {
-      console.error('Failed to fetch contacts page:', err);
-      setContacts([]);
+      console.error('Failed to fetch contacts page:', err)
+      setContacts([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const fetchContactDetails = useCallback(async () => {
     try {
-      setLoading(true);
+      setLoading(true)
 
       // Fetch page 1 to get total_pages, then remaining pages in parallel
       const firstPage = await vendorContactsApi.getAll(organizationId, {
         page: 1,
         per_page: 200,
-      });
+      })
 
-      let allContacts: VendorContact[] = firstPage?.vendor_contacts || [];
-      const totalPages = firstPage?.meta?.total_pages || 1;
+      let allContacts: VendorContact[] = firstPage?.vendor_contacts || []
+      const totalPages = firstPage?.meta?.total_pages || 1
 
       if (totalPages > 1) {
         // Fetch remaining pages in parallel
-        const remainingPages = Array.from(
-          { length: totalPages - 1 },
-          (_, i) => i + 2
-        );
+        const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2)
         const pageResults = await Promise.all(
           remainingPages.map((page) =>
-            vendorContactsApi.getAll(organizationId, { page, per_page: 200 })
-          )
-        );
+            vendorContactsApi.getAll(organizationId, { page, per_page: 200 }),
+          ),
+        )
         for (const result of pageResults) {
-          allContacts = allContacts.concat(result?.vendor_contacts || []);
+          allContacts = allContacts.concat(result?.vendor_contacts || [])
         }
       }
 
       // Filter to only invited contacts using a Set for O(1) lookups
-      const invitedSet = new Set(invitedContactIds);
-      const invitedContacts = allContacts.filter((c) => invitedSet.has(c.id));
-      setContacts(invitedContacts);
-      fetchedIdsRef.current = invitedIdsKey;
+      const invitedSet = new Set(invitedContactIds)
+      const invitedContacts = allContacts.filter((c) => invitedSet.has(c.id))
+      setContacts(invitedContacts)
+      fetchedIdsRef.current = invitedIdsKey
     } catch (err) {
-      console.error('Failed to fetch contact details:', err);
-      setContacts([]);
+      console.error('Failed to fetch contact details:', err)
+      setContacts([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [organizationId, invitedIdsKey]);
+  }, [organizationId, invitedIdsKey])
 
   // Import contacts immediately when selection changes
   useEffect(() => {
     if (invitedContactIds.length === 0) {
       // Only auto-import if we're in selection mode (not already imported)
-      handleAutoImport();
+      handleAutoImport()
     }
-  }, []);
+  }, [])
 
   // PHASE 4: Refactored to only fetch IDs (like Network page)
   const handleAutoImport = async (inviteAll?: boolean, listIds?: number[]) => {
-    const shouldInviteAll = inviteAll ?? false;
-    const selectedLists = listIds ?? [];
+    const shouldInviteAll = inviteAll ?? false
+    const selectedLists = listIds ?? []
 
     if (!shouldInviteAll && selectedLists.length === 0) {
       // Clear selection
@@ -236,49 +244,49 @@ export default function Step3InviteList({
           ...inviteList,
           invitedContactIds: [],
         },
-      });
-      setContacts([]);
-      setPaginationMeta({ current_page: 1, total_pages: 1, total_count: 0, per_page: perPage });
-      fetchedIdsRef.current = '';
-      return;
+      })
+      setContacts([])
+      setPaginationMeta({ current_page: 1, total_pages: 1, total_count: 0, per_page: perPage })
+      fetchedIdsRef.current = ''
+      return
     }
 
     try {
-      setLoading(true);
-      let contactIds: number[] = [];
+      setLoading(true)
+      let contactIds: number[] = []
 
       if (shouldInviteAll) {
         // PHASE 4: Only fetch IDs (fast!)
-        const result = await vendorContactsApi.getAllIds(organizationId, {});
-        contactIds = result.ids;
+        const result = await vendorContactsApi.getAllIds(organizationId, {})
+        contactIds = result.ids
       } else if (selectedLists.length > 0) {
         // PHASE 4: Only fetch IDs from lists (not full contacts)
         const listContactPromises = selectedLists.map(async (listId) => {
           // Fetch first page to get total pages
-          const firstPage = await contactListsApi.getContacts(listId, 1, 100);
-          let allContacts: any[] = firstPage.vendor_contacts || [];
-          const totalPages = firstPage?.meta?.total_pages || 1;
+          const firstPage = await contactListsApi.getContacts(listId, 1, 100)
+          let allContacts: any[] = firstPage.vendor_contacts || []
+          const totalPages = firstPage?.meta?.total_pages || 1
 
           // Fetch remaining pages in parallel (if any)
           if (totalPages > 1) {
-            const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
+            const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2)
             const pageResults = await Promise.all(
-              remainingPages.map(page => contactListsApi.getContacts(listId, page, 100))
-            );
+              remainingPages.map((page) => contactListsApi.getContacts(listId, page, 100)),
+            )
             for (const result of pageResults) {
-              allContacts = allContacts.concat(result.vendor_contacts || []);
+              allContacts = allContacts.concat(result.vendor_contacts || [])
             }
           }
 
-          return allContacts;
-        });
+          return allContacts
+        })
 
-        const listContactArrays = await Promise.all(listContactPromises);
-        const allListContacts = listContactArrays.flat();
+        const listContactArrays = await Promise.all(listContactPromises)
+        const allListContacts = listContactArrays.flat()
 
         // De-duplicate by contact ID (only store IDs)
-        const uniqueIds = Array.from(new Set(allListContacts.map(contact => contact.id)));
-        contactIds = uniqueIds;
+        const uniqueIds = Array.from(new Set(allListContacts.map((contact) => contact.id)))
+        contactIds = uniqueIds
       }
 
       // Update wizard state with IDs
@@ -287,113 +295,108 @@ export default function Step3InviteList({
           ...inviteList,
           invitedContactIds: contactIds,
         },
-      });
+      })
 
       // PHASE 4: Fetch first page of contacts (backend pagination)
-      await fetchContactsPage(1, contactIds);
-      fetchedIdsRef.current = JSON.stringify(contactIds);
+      await fetchContactsPage(1, contactIds)
+      fetchedIdsRef.current = JSON.stringify(contactIds)
     } catch (err) {
-      console.error('Failed to import contacts:', err);
+      console.error('Failed to import contacts:', err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleToggleInviteAll = () => {
-    const newInviteAll = !inviteAllSelected;
-    setInviteAllSelected(newInviteAll);
+    const newInviteAll = !inviteAllSelected
+    setInviteAllSelected(newInviteAll)
 
     if (newInviteAll) {
       // Deselect all lists when selecting "Invite All"
-      setSelectedListIds([]);
-      handleAutoImport(true, []);
+      setSelectedListIds([])
+      handleAutoImport(true, [])
     } else {
       // Clear selection
-      handleAutoImport(false, []);
+      handleAutoImport(false, [])
     }
-  };
+  }
 
   const handleToggleList = (listId: number) => {
     // Deselect "Invite All" when selecting a list
     if (inviteAllSelected) {
-      setInviteAllSelected(false);
+      setInviteAllSelected(false)
     }
 
     const newSelectedLists = selectedListIds.includes(listId)
       ? selectedListIds.filter((id) => id !== listId)
-      : [...selectedListIds, listId];
+      : [...selectedListIds, listId]
 
-    setSelectedListIds(newSelectedLists);
-    handleAutoImport(false, newSelectedLists);
-  };
+    setSelectedListIds(newSelectedLists)
+    handleAutoImport(false, newSelectedLists)
+  }
 
   const handleRemoveContact = (contactId: number) => {
-    const newContactIds = invitedContactIds.filter((id) => id !== contactId);
+    const newContactIds = invitedContactIds.filter((id) => id !== contactId)
 
     updateWizardState({
       inviteList: {
         ...inviteList,
         invitedContactIds: newContactIds,
       },
-    });
+    })
 
     // PHASE 4: Re-fetch current page with updated IDs
-    setSelectedContactIds((prev) => prev.filter((id) => id !== contactId));
-    fetchedIdsRef.current = JSON.stringify(newContactIds);
-    fetchContactsPage(paginationMeta.current_page, newContactIds);
-  };
+    setSelectedContactIds((prev) => prev.filter((id) => id !== contactId))
+    fetchedIdsRef.current = JSON.stringify(newContactIds)
+    fetchContactsPage(paginationMeta.current_page, newContactIds)
+  }
 
   const handleToggleSelect = (contactId: number) => {
     setSelectedContactIds((prev) =>
-      prev.includes(contactId)
-        ? prev.filter((id) => id !== contactId)
-        : [...prev, contactId]
-    );
-  };
+      prev.includes(contactId) ? prev.filter((id) => id !== contactId) : [...prev, contactId],
+    )
+  }
 
   const handleSelectAll = () => {
     if (selectedContactIds.length === paginatedContacts.length) {
-      setSelectedContactIds([]);
+      setSelectedContactIds([])
     } else {
-      setSelectedContactIds(paginatedContacts.map((c) => c.id));
+      setSelectedContactIds(paginatedContacts.map((c) => c.id))
     }
-  };
+  }
 
   const handleDeleteSelected = () => {
-    const newContactIds = invitedContactIds.filter((id) => !selectedContactIds.includes(id));
+    const newContactIds = invitedContactIds.filter((id) => !selectedContactIds.includes(id))
 
     updateWizardState({
       inviteList: {
         ...inviteList,
         invitedContactIds: newContactIds,
       },
-    });
+    })
 
     // PHASE 4: Re-fetch current page with updated IDs
-    setSelectedContactIds([]);
-    fetchedIdsRef.current = JSON.stringify(newContactIds);
-    fetchContactsPage(paginationMeta.current_page, newContactIds);
-  };
+    setSelectedContactIds([])
+    fetchedIdsRef.current = JSON.stringify(newContactIds)
+    fetchContactsPage(paginationMeta.current_page, newContactIds)
+  }
 
   // PHASE 4: Client-side search on current page (fast since only 50 contacts loaded)
   const filteredContacts = contacts.filter((contact) => {
-    if (!searchTerm.trim()) return true;
-    const search = searchTerm.toLowerCase();
+    if (!searchTerm.trim()) return true
+    const search = searchTerm.toLowerCase()
     return (
       contact.contact_name.toLowerCase().includes(search) ||
       contact.business_name?.toLowerCase().includes(search) ||
       contact.email.toLowerCase().includes(search)
-    );
-  });
+    )
+  })
 
-  const paginatedContacts = filteredContacts;
+  const paginatedContacts = filteredContacts
 
   // Calculate unsubscribed contacts count (from current page only)
-  const unsubscribedContacts = filteredContacts.filter(
-    (c) => c.unsubscribe_status?.is_unsubscribed
-  );
-  const unsubscribedCount = unsubscribedContacts.length;
-
+  const unsubscribedContacts = filteredContacts.filter((c) => c.unsubscribe_status?.is_unsubscribed)
+  const unsubscribedCount = unsubscribedContacts.length
 
   // Selection UI - no contacts invited yet
   if (invitedContactIds.length === 0) {
@@ -401,7 +404,9 @@ export default function Step3InviteList({
       <div className="space-y-6">
         <div className="bg-background/5 rounded-2xl p-6 lg:p-8">
           <div className="mb-6">
-            <h2 className="text-xl font-semibold text-foreground mb-2">Select Contacts to Invite</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-2">
+              Select Contacts to Invite
+            </h2>
             <p className="text-foreground/60 text-sm">
               Choose who will receive invitations for this event
             </p>
@@ -431,9 +436,7 @@ export default function Step3InviteList({
                   <Users className="w-4 h-4 text-primary" />
                   <span className="text-sm font-medium text-foreground">Invite All Contacts</span>
                 </div>
-                <div className="text-xs text-foreground/60">
-                  ({totalContactsCount})
-                </div>
+                <div className="text-xs text-foreground/60">({totalContactsCount})</div>
               </label>
 
               {/* Contact Lists */}
@@ -455,16 +458,16 @@ export default function Step3InviteList({
                   <div className="flex-1">
                     <div className="text-sm font-medium text-foreground">{list.name}</div>
                   </div>
-                  <div className="text-xs text-foreground/60">
-                    ({list.contacts_count || 0})
-                  </div>
+                  <div className="text-xs text-foreground/60">({list.contacts_count || 0})</div>
                 </label>
               ))}
 
               {lists.length === 0 && (
                 <div className="text-center py-8 bg-background/5 rounded-lg border border-border">
                   <p className="text-foreground/50 text-sm">No contact lists available</p>
-                  <p className="text-foreground/40 text-xs mt-1">Create lists in your Network page</p>
+                  <p className="text-foreground/40 text-xs mt-1">
+                    Create lists in your Network page
+                  </p>
                 </div>
               )}
             </div>
@@ -481,7 +484,7 @@ export default function Step3InviteList({
           )}
         </div>
       </div>
-    );
+    )
   }
 
   // Table view - contacts have been imported
@@ -504,11 +507,16 @@ export default function Step3InviteList({
                     ...inviteList,
                     invitedContactIds: [],
                   },
-                });
-                setContacts([]);
-                setPaginationMeta({ current_page: 1, total_pages: 1, total_count: 0, per_page: perPage });
-                setSearchTerm('');
-                fetchedIdsRef.current = '';
+                })
+                setContacts([])
+                setPaginationMeta({
+                  current_page: 1,
+                  total_pages: 1,
+                  total_count: 0,
+                  per_page: perPage,
+                })
+                setSearchTerm('')
+                fetchedIdsRef.current = ''
               }}
               className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors flex items-center gap-2"
             >
@@ -520,7 +528,8 @@ export default function Step3InviteList({
           {/* Info Banner */}
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
             <p className="text-sm text-blue-800 dark:text-blue-300">
-              <strong>Note:</strong> Select who's invited - you can edit this list later before going live
+              <strong>Note:</strong> Select who's invited - you can edit this list later before
+              going live
             </p>
           </div>
 
@@ -531,10 +540,13 @@ export default function Step3InviteList({
                 <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-700 dark:text-yellow-400" />
                 <div>
                   <p className="text-sm text-amber-800 dark:text-yellow-300">
-                    <strong>Warning:</strong> {unsubscribedCount} {unsubscribedCount === 1 ? 'contact is' : 'contacts are'} unsubscribed and won't receive invitations
+                    <strong>Warning:</strong> {unsubscribedCount}{' '}
+                    {unsubscribedCount === 1 ? 'contact is' : 'contacts are'} unsubscribed and won't
+                    receive invitations
                   </p>
                   <p className="mt-1 text-xs text-amber-700 dark:text-yellow-300/70">
-                    Unsubscribed contacts are highlighted below. They opted out at the global or organization level.
+                    Unsubscribed contacts are highlighted below. They opted out at the global or
+                    organization level.
                   </p>
                 </div>
               </div>
@@ -583,7 +595,10 @@ export default function Step3InviteList({
                     <div className="flex items-center justify-center">
                       <input
                         type="checkbox"
-                        checked={selectedContactIds.length === paginatedContacts.length && paginatedContacts.length > 0}
+                        checked={
+                          selectedContactIds.length === paginatedContacts.length &&
+                          paginatedContacts.length > 0
+                        }
                         onChange={handleSelectAll}
                         className="w-3.5 h-3.5 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
                       />
@@ -603,16 +618,16 @@ export default function Step3InviteList({
                 {/* Table Body */}
                 <div>
                   {paginatedContacts.map((contact) => {
-                    const isSelected = selectedContactIds.includes(contact.id);
-                    const isUnsubscribed = contact.unsubscribe_status?.is_unsubscribed;
-                    const unsubscribeScope = contact.unsubscribe_status?.scope;
+                    const isSelected = selectedContactIds.includes(contact.id)
+                    const isUnsubscribed = contact.unsubscribe_status?.is_unsubscribed
+                    const unsubscribeScope = contact.unsubscribe_status?.scope
 
                     // Determine background color based on selection and unsubscribe status
-                    let bgClass = '';
+                    let bgClass = ''
                     if (isSelected) {
-                      bgClass = 'bg-primary/10';
+                      bgClass = 'bg-primary/10'
                     } else if (isUnsubscribed) {
-                      bgClass = 'bg-red-500/5';
+                      bgClass = 'bg-red-500/5'
                     }
 
                     return (
@@ -745,7 +760,7 @@ export default function Step3InviteList({
                           )}
                         </div>
                       </div>
-                    );
+                    )
                   })}
                 </div>
               </div>
@@ -754,7 +769,9 @@ export default function Step3InviteList({
               <div className="bg-background/5 border-t border-border px-3 py-2">
                 <div className="flex items-center justify-between text-[11px]">
                   <div className="text-foreground/60">
-                    Showing {(paginationMeta.current_page - 1) * perPage + 1}-{Math.min(paginationMeta.current_page * perPage, paginationMeta.total_count)} of {paginationMeta.total_count}
+                    Showing {(paginationMeta.current_page - 1) * perPage + 1}-
+                    {Math.min(paginationMeta.current_page * perPage, paginationMeta.total_count)} of{' '}
+                    {paginationMeta.total_count}
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -795,5 +812,5 @@ export default function Step3InviteList({
         isAdmin={isAdmin}
       />
     </>
-  );
+  )
 }

@@ -1,11 +1,11 @@
-import { CheckCircle2, Sparkles } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { CheckCircle2, Sparkles } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface SuccessMessageProps {
-  title?: string;
-  message?: string;
-  onComplete?: () => void;
-  autoCloseDelay?: number; // milliseconds
+  title?: string
+  message?: string
+  onComplete?: () => void
+  autoCloseDelay?: number // milliseconds
 }
 
 export default function SuccessMessage({
@@ -14,22 +14,22 @@ export default function SuccessMessage({
   onComplete,
   autoCloseDelay,
 }: SuccessMessageProps) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     // Animate in
-    setTimeout(() => setIsVisible(true), 50);
+    setTimeout(() => setIsVisible(true), 50)
 
     // Auto close if specified
     if (autoCloseDelay && onComplete) {
       const timer = setTimeout(() => {
-        setIsVisible(false);
-        setTimeout(onComplete, 300); // Wait for fade out animation
-      }, autoCloseDelay);
+        setIsVisible(false)
+        setTimeout(onComplete, 300) // Wait for fade out animation
+      }, autoCloseDelay)
 
-      return () => clearTimeout(timer);
+      return () => clearTimeout(timer)
     }
-  }, [autoCloseDelay, onComplete]);
+  }, [autoCloseDelay, onComplete])
 
   return (
     <div
@@ -46,9 +46,7 @@ export default function SuccessMessage({
           </div>
 
           {/* Sparkles */}
-          <Sparkles
-            className="absolute -top-2 -right-2 w-6 h-6 text-yellow-400 animate-spin-slow"
-          />
+          <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-yellow-400 animate-spin-slow" />
           <Sparkles
             className="absolute -bottom-2 -left-2 w-5 h-5 text-primary animate-spin-slow"
             style={{ animationDelay: '0.5s' }}
@@ -57,10 +55,11 @@ export default function SuccessMessage({
 
         {/* Success Message */}
         <div className="space-y-2">
-          <h3 className="text-2xl font-bold text-foreground animate-fade-in-up">
-            {title}
-          </h3>
-          <p className="text-foreground/70 text-sm animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+          <h3 className="text-2xl font-bold text-foreground animate-fade-in-up">{title}</h3>
+          <p
+            className="text-foreground/70 text-sm animate-fade-in-up"
+            style={{ animationDelay: '0.1s' }}
+          >
             {message}
           </p>
         </div>
@@ -80,5 +79,5 @@ export default function SuccessMessage({
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import {
   Check,
   Sparkles,
@@ -12,11 +12,11 @@ import {
   Zap,
   CreditCard,
   ArrowRight,
-  Loader2
-} from "lucide-react"
-import { useAuth } from "@/contexts/AuthContext"
-import { stripeService } from "@/services/stripeService"
-import { useNavigate } from "react-router-dom"
+  Loader2,
+} from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { stripeService } from '@/services/stripeService'
+import { useNavigate } from 'react-router-dom'
 import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function PaymentOnboardingPage() {
@@ -48,34 +48,34 @@ export default function PaymentOnboardingPage() {
   const features = [
     {
       icon: Calendar,
-      title: "Unlimited Events",
-      description: "Create and manage as many events as you need"
+      title: 'Unlimited Events',
+      description: 'Create and manage as many events as you need',
     },
     {
       icon: Users,
-      title: "Vendor Management",
-      description: "Accept and manage vendor applications with ease"
+      title: 'Vendor Management',
+      description: 'Accept and manage vendor applications with ease',
     },
     {
       icon: Mail,
-      title: "Automated Email Campaigns",
-      description: "Send targeted emails to vendors and attendees"
+      title: 'Automated Email Campaigns',
+      description: 'Send targeted emails to vendors and attendees',
     },
     {
       icon: BarChart3,
-      title: "Analytics & Reporting",
-      description: "Track registrations, payments, and engagement"
+      title: 'Analytics & Reporting',
+      description: 'Track registrations, payments, and engagement',
     },
     {
       icon: Zap,
-      title: "Payment Integration",
-      description: "Sync with Eventbrite and track vendor payments"
+      title: 'Payment Integration',
+      description: 'Sync with Eventbrite and track vendor payments',
     },
     {
       icon: CreditCard,
-      title: "Custom Branding",
-      description: "Customize your event pages and application forms"
-    }
+      title: 'Custom Branding',
+      description: 'Customize your event pages and application forms',
+    },
   ]
 
   return (
@@ -89,20 +89,15 @@ export default function PaymentOnboardingPage() {
 
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-4xl space-y-8">
-
           {/* Welcome Header */}
           <div className="text-center space-y-4">
             <Badge className="border border-primary/30 bg-primary/20 px-4 py-2 text-sm font-medium text-violet-950 dark:text-primary">
               <Sparkles className="h-4 w-4 mr-2" />
               Producer Account Setup
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-              Welcome to Voxxy
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground">Welcome to Voxxy</h1>
             {userProfile?.name && (
-              <p className="text-xl text-muted-foreground">
-                Hi {userProfile.name}! 👋
-              </p>
+              <p className="text-xl text-muted-foreground">Hi {userProfile.name}! 👋</p>
             )}
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               You're one step away from unlocking the complete event producer platform
@@ -193,7 +188,8 @@ export default function PaymentOnboardingPage() {
                   </p>
                   {userProfile.organization_id && (
                     <p className="text-sm text-muted-foreground text-center mt-1">
-                      <strong className="text-foreground">Organization ID:</strong> {userProfile.organization_id}
+                      <strong className="text-foreground">Organization ID:</strong>{' '}
+                      {userProfile.organization_id}
                     </p>
                   )}
                 </div>

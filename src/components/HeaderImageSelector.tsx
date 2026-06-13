@@ -1,6 +1,6 @@
 import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Image, Check } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Image, Check } from 'lucide-react'
 
 interface HeaderImageSelectorProps {
   currentImage?: string
@@ -14,38 +14,38 @@ const PRESET_IMAGES = [
     id: 'abstract-1',
     url: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&h=300&fit=crop',
     name: 'Abstract Gradient',
-    description: 'Colorful abstract gradient'
+    description: 'Colorful abstract gradient',
   },
   {
-    id: 'music-1', 
+    id: 'music-1',
     url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&h=300&fit=crop',
     name: 'Music Vibes',
-    description: 'Musical instruments and lights'
+    description: 'Musical instruments and lights',
   },
   {
     id: 'city-1',
     url: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1f?w=1200&h=300&fit=crop',
     name: 'City Lights',
-    description: 'Urban cityscape at night'
+    description: 'Urban cityscape at night',
   },
   {
     id: 'nature-1',
     url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=300&fit=crop',
     name: 'Mountain Vista',
-    description: 'Scenic mountain landscape'
+    description: 'Scenic mountain landscape',
   },
   {
     id: 'creative-1',
     url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=1200&h=300&fit=crop',
     name: 'Creative Space',
-    description: 'Artistic workspace'
+    description: 'Artistic workspace',
   },
   {
     id: 'community-1',
     url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1200&h=300&fit=crop',
     name: 'Community',
-    description: 'People gathering together'
-  }
+    description: 'People gathering together',
+  },
 ]
 
 export function HeaderImageSelector({ currentImage, onImageSelect }: HeaderImageSelectorProps) {
@@ -56,28 +56,22 @@ export function HeaderImageSelector({ currentImage, onImageSelect }: HeaderImage
           <Image className="h-5 w-5" />
           Header Image
         </CardTitle>
-        <CardDescription>
-          Choose a header image for your organization page
-        </CardDescription>
+        <CardDescription>Choose a header image for your organization page</CardDescription>
       </CardHeader>
-      
+
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {PRESET_IMAGES.map((image) => (
             <div key={image.id} className="relative group cursor-pointer">
-              <div 
+              <div
                 className={`relative overflow-hidden rounded-lg border-2 transition-all ${
-                  currentImage === image.url 
-                    ? 'border-primary ring-2 ring-primary/30' 
+                  currentImage === image.url
+                    ? 'border-primary ring-2 ring-primary/30'
                     : 'border-border hover:border-primary/50'
                 }`}
                 onClick={() => onImageSelect(image.url)}
               >
-                <img
-                  src={image.url}
-                  alt={image.name}
-                  className="w-full h-24 object-cover"
-                />
+                <img src={image.url} alt={image.name} className="w-full h-24 object-cover" />
                 {currentImage === image.url && (
                   <div className="absolute inset-0 bg-primary/30 flex items-center justify-center">
                     <Check className="h-6 w-6 text-primary bg-background/20 backdrop-blur-sm rounded-full p-1" />
@@ -91,13 +85,13 @@ export function HeaderImageSelector({ currentImage, onImageSelect }: HeaderImage
             </div>
           ))}
         </div>
-        
+
         {currentImage && (
           <div className="mt-6 p-4 bg-background/5 backdrop-blur-sm border border-border rounded-lg">
             <h4 className="text-sm font-medium text-foreground mb-2">Current Selection</h4>
-            <img 
-              src={currentImage} 
-              alt="Current header" 
+            <img
+              src={currentImage}
+              alt="Current header"
               className="w-full h-16 object-cover rounded border border-border"
             />
           </div>

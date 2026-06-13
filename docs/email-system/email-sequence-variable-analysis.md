@@ -3,6 +3,7 @@
 ## Variables Found in Default Email Sequence
 
 ### ✅ **EXISTING Variables** (Already in EMAIL_VARIABLES):
+
 1. `[firstName]` - ✅ Exists
 2. `[eventName]` - ✅ Exists
 3. `[eventVenue]` - ✅ Exists

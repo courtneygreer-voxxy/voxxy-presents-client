@@ -34,6 +34,7 @@ git tag -a v1.2.0 -m "Release v1.2.0: Multi-feature batch"
 ```
 
 ### **Key Changes from Old Process:**
+
 - Features stay in branches longer (until release batch)
 - Multiple features deploy together as versions
 - More comprehensive staging testing of feature interactions
@@ -43,7 +44,7 @@ git tag -a v1.2.0 -m "Release v1.2.0: Multi-feature batch"
 
 - **TypeScript**: Strict types, no `any`
 - **Components**: Functional components with hooks
-- **Error Handling**: Try/catch with user-friendly messages  
+- **Error Handling**: Try/catch with user-friendly messages
 - **Security**: Validate inputs, sanitize data, protect secrets
 
 ## 📝 Commit Format

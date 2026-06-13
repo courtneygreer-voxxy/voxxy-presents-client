@@ -1,87 +1,87 @@
-import { useState, useEffect } from 'react';
-import { Plus, Edit, Eye, Calendar, Link2, Check, DollarSign, Tag } from 'lucide-react';
-import { vendorApplicationsApi } from '@/services/api';
-import CreateApplicationForm from './CreateApplicationForm';
-import ViewApplicationSubmissions from './ViewApplicationSubmissions';
-import { formatEventDate } from '@/utils/dateHelpers';
+import { useState, useEffect } from 'react'
+import { Plus, Edit, Eye, Calendar, Link2, Check, DollarSign, Tag } from 'lucide-react'
+import { vendorApplicationsApi } from '@/services/api'
+import CreateApplicationForm from './CreateApplicationForm'
+import ViewApplicationSubmissions from './ViewApplicationSubmissions'
+import { formatEventDate } from '@/utils/dateHelpers'
 
 interface VendorApplication {
-  id: number;
-  name: string;
-  description?: string;
-  status: 'active' | 'inactive';
-  categories: string[];
-  submissions_count: number;
-  shareable_code: string;
-  shareable_url: string;
-  created_at: string;
-  updated_at: string;
+  id: number
+  name: string
+  description?: string
+  status: 'active' | 'inactive'
+  categories: string[]
+  submissions_count: number
+  shareable_code: string
+  shareable_url: string
+  created_at: string
+  updated_at: string
   pricing?: {
-    booth_price: number;
-    currency: string;
-  };
-  install_date?: string;
-  install_start_time?: string;
-  install_end_time?: string;
-  payment_link?: string;
-  application_tags?: string;
+    booth_price: number
+    currency: string
+  }
+  install_date?: string
+  install_start_time?: string
+  install_end_time?: string
+  payment_link?: string
+  application_tags?: string
 }
 
 interface Event {
-  slug: string;
-  title: string;
-  event_date?: string;
-  location?: string;
+  slug: string
+  title: string
+  event_date?: string
+  location?: string
 }
 
 interface ApplicationsTabProps {
-  eventSlug: string;
-  event: Event;
+  eventSlug: string
+  event: Event
 }
 
-type View = 'list' | 'create' | 'edit' | 'submissions';
+type View = 'list' | 'create' | 'edit' | 'submissions'
 
 export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabProps) {
-  const [applications, setApplications] = useState<VendorApplication[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<View>('list');
-  const [selectedApplication, setSelectedApplication] = useState<VendorApplication | null>(null);
-  const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [applications, setApplications] = useState<VendorApplication[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [currentView, setCurrentView] = useState<View>('list')
+  const [selectedApplication, setSelectedApplication] = useState<VendorApplication | null>(null)
+  const [copiedId, setCopiedId] = useState<number | null>(null)
 
   useEffect(() => {
-    fetchApplications();
-  }, [eventSlug]);
+    fetchApplications()
+  }, [eventSlug])
 
   const fetchApplications = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const data = await vendorApplicationsApi.getByEvent(eventSlug);
-      setApplications(data);
+      setLoading(true)
+      setError(null)
+      const data = await vendorApplicationsApi.getByEvent(eventSlug)
+      setApplications(data)
     } catch (err: any) {
-      console.error('Failed to fetch applications:', err);
-      setError(err.message || 'Failed to load applications');
+      console.error('Failed to fetch applications:', err)
+      setError(err.message || 'Failed to load applications')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleSuccess = () => {
-    fetchApplications();
-    setCurrentView('list');
-    setSelectedApplication(null);
-  };
+    fetchApplications()
+    setCurrentView('list')
+    setSelectedApplication(null)
+  }
 
   const handleCopyLink = async (application: VendorApplication) => {
     try {
-      await navigator.clipboard.writeText(application.shareable_url);
-      setCopiedId(application.id);
-      setTimeout(() => setCopiedId(null), 2000);
+      await navigator.clipboard.writeText(application.shareable_url)
+      setCopiedId(application.id)
+      setTimeout(() => setCopiedId(null), 2000)
     } catch (err) {
-      console.error('Failed to copy link:', err);
+      console.error('Failed to copy link:', err)
     }
-  };
+  }
 
   // Show create/edit form
   if (currentView === 'create' || currentView === 'edit') {
@@ -89,13 +89,13 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
       <CreateApplicationForm
         event={event}
         onBack={() => {
-          setCurrentView('list');
-          setSelectedApplication(null);
+          setCurrentView('list')
+          setSelectedApplication(null)
         }}
         onSuccess={handleSuccess}
         existingApplication={currentView === 'edit' ? selectedApplication || undefined : undefined}
       />
-    );
+    )
   }
 
   // Show submissions view
@@ -104,11 +104,11 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
       <ViewApplicationSubmissions
         application={selectedApplication}
         onBack={() => {
-          setCurrentView('list');
-          setSelectedApplication(null);
+          setCurrentView('list')
+          setSelectedApplication(null)
         }}
       />
-    );
+    )
   }
 
   if (loading) {
@@ -116,7 +116,7 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
       <div className="flex items-center justify-center py-20">
         <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -132,7 +132,7 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -176,9 +176,7 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-foreground">
-                      {application.name}
-                    </h3>
+                    <h3 className="text-lg font-semibold text-foreground">{application.name}</h3>
                     <span
                       className={`px-2 py-1 rounded text-xs font-medium ${
                         application.status === 'active'
@@ -205,7 +203,9 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                   </div>
 
                   {/* Application Details */}
-                  {(application.install_date || application.payment_link || application.application_tags) && (
+                  {(application.install_date ||
+                    application.payment_link ||
+                    application.application_tags) && (
                     <div className="bg-background/5 border border-border rounded-lg p-3 mb-3 space-y-2">
                       {/* Install Info */}
                       {application.install_date && (
@@ -213,7 +213,9 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                           <Calendar className="w-4 h-4 text-foreground/60 mt-0.5 flex-shrink-0" />
                           <div className="flex-1">
                             <span className="text-foreground/60">Install Date:</span>{' '}
-                            <span className="text-foreground">{formatEventDate(application.install_date, 'MMM d, yyyy')}</span>
+                            <span className="text-foreground">
+                              {formatEventDate(application.install_date, 'MMM d, yyyy')}
+                            </span>
                           </div>
                         </div>
                       )}
@@ -262,8 +264,10 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                   <div className="bg-background/5 border border-border rounded-lg p-4 space-y-3">
                     <div>
                       <p className="text-sm font-medium text-foreground mb-2">Application Link</p>
-                      <p className="text-xs text-foreground/60 mb-3">Share this link with vendors to apply for this category:</p>
-                      
+                      <p className="text-xs text-foreground/60 mb-3">
+                        Share this link with vendors to apply for this category:
+                      </p>
+
                       {/* Preview Message */}
                       <div className="bg-black/20 rounded-lg p-3 mb-3 border border-border">
                         <p className="text-xs text-foreground/50 mb-1">Preview:</p>
@@ -271,7 +275,7 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                           Apply to {application.name} - {event.title}
                         </p>
                       </div>
-                      
+
                       {/* URL */}
                       <div className="flex items-center gap-2">
                         <code className="flex-1 text-sm text-primary font-mono bg-black/30 px-3 py-2 rounded overflow-x-auto">
@@ -301,8 +305,8 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
-                      setSelectedApplication(application);
-                      setCurrentView('edit');
+                      setSelectedApplication(application)
+                      setCurrentView('edit')
                     }}
                     className="px-3 py-2 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all text-sm flex items-center gap-2"
                   >
@@ -311,8 +315,8 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                   </button>
                   <button
                     onClick={() => {
-                      setSelectedApplication(application);
-                      setCurrentView('submissions');
+                      setSelectedApplication(application)
+                      setCurrentView('submissions')
                     }}
                     className="px-3 py-2 rounded-lg bg-background/10 text-foreground hover:bg-background/20 transition-all text-sm flex items-center gap-2"
                   >
@@ -326,5 +330,5 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
         </div>
       )}
     </div>
-  );
+  )
 }

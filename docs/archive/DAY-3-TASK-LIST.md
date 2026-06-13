@@ -12,6 +12,7 @@
 Build the core application system so vendors can apply to events and producers can review applications.
 
 **Success Criteria**:
+
 - [ ] Vendor can submit application to an event
 - [ ] Producer can view all applications for their event
 - [ ] Vendor can view their submitted applications
@@ -27,6 +28,7 @@ Build the core application system so vendors can apply to events and producers c
 **Goal**: Create vendorApplications collection with proper security and indexes
 
 **Subtasks**:
+
 - [ ] Review VendorApplication interface in [main spec](../v3-migration/VOXXY_PRESENTS_MVP_TECHNICAL_REQUIREMENTS_V3.md#1-vendorapplications-critical---phase-1)
 - [ ] Update `firestore.rules` with application collection rules
   - Vendors can create applications
@@ -46,9 +48,11 @@ Build the core application system so vendors can apply to events and producers c
 - [ ] Create test data: 2-3 sample applications in Firestore
 
 **Files**:
+
 - `firestore.rules`
 
 **Verification**:
+
 - Use Firebase Console to verify rules work
 - Try reading/writing as different user roles
 
@@ -59,6 +63,7 @@ Build the core application system so vendors can apply to events and producers c
 **Goal**: Define type-safe interfaces for applications
 
 **Subtasks**:
+
 - [ ] Create `src/types/application.ts`
 - [ ] Define `ApplicationStatus` type
 - [ ] Define `VendorApplication` interface
@@ -67,6 +72,7 @@ Build the core application system so vendors can apply to events and producers c
 - [ ] Export all types
 
 **Example**:
+
 ```typescript
 export type ApplicationStatus = 'pending' | 'accepted' | 'rejected' | 'waitlisted' | 'withdrawn'
 
@@ -106,9 +112,11 @@ export interface UpdateApplicationRequest {
 ```
 
 **Files**:
+
 - `src/types/application.ts`
 
 **Verification**:
+
 - Import in another file, verify TypeScript autocomplete works
 
 ---
@@ -122,6 +130,7 @@ export interface UpdateApplicationRequest {
 **Subtasks**:
 
 #### Endpoint 1: Submit Application
+
 - [ ] `POST /api/events/:eventId/applications`
 - [ ] Auth: Required (vendor role)
 - [ ] Validate: vendor hasn't already applied to this event
@@ -130,18 +139,21 @@ export interface UpdateApplicationRequest {
 - [ ] Return created application
 
 #### Endpoint 2: Get Applications for Event
+
 - [ ] `GET /api/events/:eventId/applications`
 - [ ] Auth: Required (producer role, must own event)
 - [ ] Optional query param: `?status=pending`
 - [ ] Return array of applications with populated vendor info
 
 #### Endpoint 3: Get Vendor's Applications
+
 - [ ] `GET /api/vendors/:vendorId/applications`
 - [ ] Auth: Required (vendor role, must be own profile)
 - [ ] Optional query param: `?status=pending`
 - [ ] Return array of applications with populated event info
 
 #### Endpoint 4: Update Application Status
+
 - [ ] `PATCH /api/applications/:applicationId`
 - [ ] Auth: Required (producer role, must own event)
 - [ ] Validate status transition is valid
@@ -150,19 +162,23 @@ export interface UpdateApplicationRequest {
 - [ ] Return updated application
 
 #### Endpoint 5: Withdraw Application (Optional - Lower Priority)
+
 - [ ] `DELETE /api/applications/:applicationId`
 - [ ] Auth: Required (vendor role, must own application)
 - [ ] Set status to 'withdrawn'
 - [ ] Return success message
 
 **Files to Create**:
+
 - `voxxy-presents-api/src/routes/applications.ts`
 - `voxxy-presents-api/src/services/applicationService.ts` (optional, for business logic)
 
 **Files to Modify**:
+
 - `voxxy-presents-api/src/app.ts` (register routes)
 
 **Testing**:
+
 ```bash
 # Submit application
 curl -X POST http://localhost:3001/api/events/EVENT_ID/applications \
@@ -179,6 +195,7 @@ curl -X PATCH http://localhost:3001/api/applications/APP_ID \
 ```
 
 **Verification**:
+
 - All endpoints return 200 for valid requests
 - Proper error codes for invalid requests (400, 401, 403, 404)
 - Data appears correctly in Firestore
@@ -192,6 +209,7 @@ curl -X PATCH http://localhost:3001/api/applications/APP_ID \
 **Goal**: Create client-side service for calling application APIs
 
 **Subtasks**:
+
 - [ ] Create `src/services/applicationService.ts`
 - [ ] Implement `submitApplication(eventId, data)` method
 - [ ] Implement `getApplicationsForEvent(eventId, status?)` method
@@ -201,17 +219,21 @@ curl -X PATCH http://localhost:3001/api/applications/APP_ID \
 - [ ] Use getApiBaseUrl() for environment-specific URLs
 
 **Example**:
+
 ```typescript
 class ApplicationService {
   private API_BASE_URL = getApiBaseUrl()
 
-  async submitApplication(eventId: string, data: CreateApplicationRequest): Promise<VendorApplication> {
+  async submitApplication(
+    eventId: string,
+    data: CreateApplicationRequest,
+  ): Promise<VendorApplication> {
     console.log('📝 Submitting application to event:', eventId)
 
     const response = await fetch(`${this.API_BASE_URL}/events/${eventId}/applications`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
 
     if (!response.ok) {
@@ -231,9 +253,11 @@ export default new ApplicationService()
 ```
 
 **Files**:
+
 - `src/services/applicationService.ts`
 
 **Verification**:
+
 - Import in a test file, verify methods exist
 - Call methods with test data, check network requests in DevTools
 
@@ -244,6 +268,7 @@ export default new ApplicationService()
 **Goal**: Add application-related fields to Event type
 
 **Subtasks**:
+
 - [ ] Update `src/types/database.ts` Event interface:
   ```typescript
   interface Event {
@@ -260,6 +285,7 @@ export default new ApplicationService()
 - [ ] Update event creation/edit forms to include these fields (later)
 
 **Files**:
+
 - `src/types/database.ts`
 
 ---
@@ -273,12 +299,14 @@ export default new ApplicationService()
 **Repository**: `voxxy-presents-api`
 
 **Subtasks**:
+
 - [ ] Add `savedVendorIds: string[]` to organizations collection
 - [ ] Create `POST /api/organizations/:id/save-vendor` endpoint
 - [ ] Create `DELETE /api/organizations/:id/save-vendor/:vendorId` endpoint
 - [ ] Create `GET /api/organizations/:id/saved-vendors` endpoint
 
 **Files**:
+
 - `voxxy-presents-api/src/routes/organizations.ts` (modify)
 
 ---
@@ -286,6 +314,7 @@ export default new ApplicationService()
 ### Task 3.2: Saved Vendors Frontend (2-3h)
 
 **Subtasks**:
+
 - [ ] Update `src/types/database.ts` - Add `savedVendorIds` to Organization
 - [ ] Create vendor service methods: `saveVendor()`, `unsaveVendor()`, `getSavedVendors()`
 - [ ] Add "Save Vendor" button to `VendorProfilePage.tsx`
@@ -293,6 +322,7 @@ export default new ApplicationService()
 - [ ] Show saved/unsaved state visually (heart icon filled/unfilled)
 
 **Files**:
+
 - `src/types/database.ts`
 - `src/services/vendorService.ts`
 - `src/pages/VendorProfilePage.tsx`
@@ -305,6 +335,7 @@ export default new ApplicationService()
 ### Task 4.1: Vendor Application Form (3-4h)
 
 **Subtasks**:
+
 - [ ] Create `src/components/vendor/VendorApplicationForm.tsx`
 - [ ] Form fields: message (textarea)
 - [ ] Auto-populate vendor info from logged-in user
@@ -313,6 +344,7 @@ export default new ApplicationService()
 - [ ] Error: Show user-friendly error message
 
 **Integration**:
+
 - Add "Apply to Event" button on event detail pages when vendor is logged in
 - Open modal or navigate to application form
 
@@ -321,6 +353,7 @@ export default new ApplicationService()
 ### Task 4.2: Vendor Event Browser (Optional - 2-3h)
 
 **Subtasks**:
+
 - [ ] Create `src/pages/VendorEventBrowserPage.tsx`
 - [ ] Fetch events with `listedToVendorNetwork: true`
 - [ ] Display event cards (name, date, budget, vendor types needed)
@@ -332,6 +365,7 @@ export default new ApplicationService()
 ## ✅ Definition of Done
 
 An item is "done" when:
+
 - [ ] Code is written and follows existing patterns
 - [ ] TypeScript compiles with no errors
 - [ ] Feature works locally (tested manually)
@@ -372,18 +406,21 @@ Before wrapping up, verify:
 ## 🚀 Success Metrics
 
 **Minimum Viable (Must Have)**:
+
 - ✅ vendorApplications collection created in Firestore
 - ✅ 3+ API endpoints working (submit, get for event, get for vendor)
 - ✅ Application service created in client
 - ✅ Can submit application via Postman/curl
 
 **Target (Should Have)**:
+
 - ✅ All 5 API endpoints working
 - ✅ Application form UI component created
 - ✅ Vendor can submit application via UI
 - ✅ Producer can view applications list
 
 **Stretch (Nice to Have)**:
+
 - ✅ Vendor discovery (save/unsave) working
 - ✅ Vendor event browser page started
 - ✅ Application status update working in UI
@@ -402,6 +439,6 @@ If you get stuck, ask about:
 
 ---
 
-*See also*: [Engineer Onboarding Guide](../ENGINEER_ONBOARDING.md) for setup instructions and code patterns.
+_See also_: [Engineer Onboarding Guide](../ENGINEER_ONBOARDING.md) for setup instructions and code patterns.
 
-*Last Updated*: October 29, 2025, 2:30 AM
+_Last Updated_: October 29, 2025, 2:30 AM

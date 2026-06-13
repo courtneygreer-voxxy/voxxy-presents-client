@@ -30,6 +30,7 @@ end
 ```
 
 **Existing Monitoring:**
+
 - Background job failures (`config/initializers/monitoring.rb:64-79`)
 - 404 errors
 - Slow requests (>3 seconds)
@@ -54,6 +55,7 @@ end
 **File:** `/app/services/email_sender_service.rb`
 
 **Current Code (Lines 48-62):**
+
 ```ruby
 begin
   send_to_registration(registration)
@@ -70,6 +72,7 @@ end
 ```
 
 **Add After Line 50:**
+
 ```ruby
 begin
   send_to_registration(registration)
@@ -117,6 +120,7 @@ end
 ```
 
 **Add Helper Method (End of Class):**
+
 ```ruby
 private
 
@@ -132,6 +136,7 @@ end
 **File:** `/app/services/invitation_reminder_service.rb`
 
 **Similar pattern at Lines 46-61:**
+
 ```ruby
 rescue => e
   Rails.logger.error("❌ INVITATION EMAIL SEND FAILED")
@@ -164,11 +169,13 @@ end
 **File:** `/app/services/registration_email_service.rb`
 
 **Multiple rescue blocks at:**
+
 - Lines 11-14 (send_confirmation)
 - Lines 93-97 (send_approval)
 - Lines 117-118 (send_rejection)
 
 **Pattern for all:**
+
 ```ruby
 rescue StandardError => e
   Rails.logger.error "Failed to send registration #{email_type} email: #{e.message}"
@@ -203,6 +210,7 @@ end
 **File:** `/app/workers/email_sender_worker.rb`
 
 **Current Code (Lines 34-48):**
+
 ```ruby
 begin
   send_scheduled_email(scheduled_email)
@@ -218,6 +226,7 @@ end
 ```
 
 **Enhanced with Sentry:**
+
 ```ruby
 begin
   send_scheduled_email(scheduled_email)
@@ -253,6 +262,7 @@ end
 ```
 
 **Add Zero-Recipient Warning (After Line 65):**
+
 ```ruby
 # Add at line 66, after routing validation
 def send_scheduled_email(scheduled_email)
@@ -302,6 +312,7 @@ end
 **File:** `/app/workers/email_delivery_processor_job.rb`
 
 **Webhook Processing Failures (Lines 41-74):**
+
 ```ruby
 def perform(event_data)
   event_type = event_data['event']
@@ -359,6 +370,7 @@ end
 ```
 
 **Delivery Record Creation Fallback (Lines 217-221):**
+
 ```ruby
 # If we couldn't find existing delivery, create from webhook data
 delivery ||= create_delivery_from_webhook(event_data)
@@ -391,6 +403,7 @@ end
 **File:** `/app/controllers/api/v1/sendgrid_webhooks_controller.rb`
 
 **Current Catch-All (Lines 15-18):**
+
 ```ruby
 rescue => e
   Rails.logger.error "SendGrid webhook error: #{e.message}\n#{e.backtrace.join("\n")}"
@@ -399,6 +412,7 @@ end
 ```
 
 **Enhanced:**
+
 ```ruby
 rescue => e
   Sentry.capture_exception(e,
@@ -585,6 +599,7 @@ end
 ```
 
 **Usage in Services:**
+
 ```ruby
 class EmailSenderService
   def send_emails
@@ -685,7 +700,7 @@ end
 ### Alert Rule 1: Critical Email Failures
 
 ```yaml
-Name: "Critical Email Send Failures"
+Name: 'Critical Email Send Failures'
 When: An event is first seen
 Conditions:
   - The issue's tags match: email_type is any of scheduled, invitation, notification
@@ -697,7 +712,7 @@ Frequency: On every new issue
 ### Alert Rule 2: High-Volume Failures
 
 ```yaml
-Name: "Email Failure Spike"
+Name: 'Email Failure Spike'
 When: An event is seen
 Conditions:
   - The issue's tags match: sendgrid_error is true
@@ -709,7 +724,7 @@ Frequency: Once per hour maximum
 ### Alert Rule 3: Zero Recipients Warning
 
 ```yaml
-Name: "Zero Recipients Detected"
+Name: 'Zero Recipients Detected'
 When: An event is first seen
 Conditions:
   - The issue's fingerprint contains: zero-recipients
@@ -720,7 +735,7 @@ Frequency: On every new issue
 ### Alert Rule 4: SendGrid API Errors
 
 ```yaml
-Name: "SendGrid API Issues"
+Name: 'SendGrid API Issues'
 When: An event is first seen
 Conditions:
   - The issue's tags match: api_error is true
@@ -751,6 +766,7 @@ EMAIL_ALERT_THRESHOLD=10       # Max failures before alert
 ## Cost Estimate
 
 **Sentry Events per Month (Estimated):**
+
 - Email send attempts: ~10,000/month (production)
 - Failed sends (2% failure rate): ~200/month
 - Webhook events: ~9,800/month (successful deliveries)
@@ -758,6 +774,7 @@ EMAIL_ALERT_THRESHOLD=10       # Max failures before alert
 - **Total Sentry events: ~10,000/month**
 
 **Sentry Plan:**
+
 - Free tier: 5k events/month (insufficient)
 - **Team plan: $26/month** (50k events) ✅ Recommended
 - Business plan: $80/month (100k events)
@@ -767,16 +784,19 @@ EMAIL_ALERT_THRESHOLD=10       # Max failures before alert
 ## Success Metrics
 
 ### Week 1
+
 - ✅ All email errors captured in Sentry
 - ✅ Discord alerts configured and tested
 - ✅ <5 minutes from error to alert
 
 ### Week 4
+
 - ✅ Email failure rate <2%
 - ✅ Zero undetected email failures
 - ✅ Average error resolution time <2 hours
 
 ### Month 3
+
 - ✅ Email delivery success rate >98%
 - ✅ Bounce rate <1%
 - ✅ Zero critical errors unresolved >1 hour

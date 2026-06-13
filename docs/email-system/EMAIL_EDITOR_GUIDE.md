@@ -23,6 +23,7 @@
 ### Where to Find Email Editor
 
 **From Command Center:**
+
 1. Click on your event card from the Producer Dashboard
 2. Command Center modal opens
 3. Click **"Mail"** tab at the top
@@ -31,6 +32,7 @@
 ### First Time Setup
 
 **If you haven't generated emails yet:**
+
 1. Click **"Generate Emails from Template"** button
 2. System creates 17 pre-written emails for your event
 3. All emails are editable and customizable
@@ -43,23 +45,28 @@
 ### Two Editor Types
 
 #### 1. Quick Edit Modal (Plain Text)
+
 **When you see it:** Click "Edit" from the Mail tab dropdown
 
 **Features:**
+
 - Fast, simple editor
 - Plain text subject and body
 - Variable insertion buttons
 - Perfect for quick changes
 
 **Limitations:**
+
 - No HTML formatting
 - No bold/italic
 - No images
 
 #### 2. Rich Text Editor (HTML)
+
 **When you see it:** Click "Template Builder" or edit from template page
 
 **Features:**
+
 - Full HTML editor (WYSIWYG)
 - Bold, italic, underline
 - Bullet lists, numbered lists
@@ -76,6 +83,7 @@
 Variables are placeholders that automatically fill in with real data when emails are sent.
 
 **Example:**
+
 ```
 What you type: Hi [greetingName], welcome to [eventName]!
 What they see: Hi John's Tacos, welcome to Summer Market 2025!
@@ -97,6 +105,7 @@ What they see: Hi John's Tacos, welcome to Summer Market 2025!
 #### Method 2: Type Manually
 
 Type the variable name in `[brackets]`:
+
 ```
 [eventName]
 [firstName]
@@ -108,7 +117,9 @@ Type the variable name in `[brackets]`:
 ### Variable Categories
 
 #### Event Info (Purple)
+
 Use these for event details:
+
 - `[eventName]` - "Summer Market 2025"
 - `[eventDate]` - "Saturday, June 15, 2025"
 - `[eventTime]` - "10:00 AM - 6:00 PM"
@@ -116,17 +127,21 @@ Use these for event details:
 - `[categoryList]` - Shows all vendor categories with bullet points
 
 #### Vendor Info (Pink)
+
 Use these for personalization:
+
 - `[greetingName]` - Smart greeting (business name or first name)
 - `[firstName]` - Vendor's first name
 - `[email]` - Vendor's email address
 - `[phone]` - Vendor's phone number
 
 #### Your Organization (Blue)
+
 - `[organizationName]` - "Voxxy Presents"
 - `[organizationEmail]` - "hello@voxxypresents.com"
 
 #### Links (Green)
+
 - `[eventLink]` - Public event page
 - `[dashboardLink]` - Vendor portal
 - `[artistApplicationLink]` - Artist application link
@@ -136,7 +151,9 @@ Use these for personalization:
 ### Which Variables Work Where?
 
 #### ✅ Invitation Emails (Position 1)
+
 **Available:** 34 variables
+
 - ✅ Event info (names, dates, locations)
 - ✅ Contact info (names, email, phone)
 - ✅ Public links (event page, applications, portal)
@@ -145,7 +162,9 @@ Use these for personalization:
 **Why?** Because vendors haven't applied yet!
 
 #### ✅ Registration Emails (Positions 2-17)
+
 **Available:** All 48 variables
+
 - ✅ Everything from invitations
 - ✅ Category-specific (booth price, setup times, payment links)
 - ✅ Application details (booth number, application date)
@@ -163,17 +182,20 @@ Use these for personalization:
 **Purpose:** Invite vendors to apply to your event
 
 **Safe Variables to Use:**
+
 - Event details: `[eventName]`, `[eventDate]`, `[eventLocation]`
 - Greetings: `[greetingName]`, `[firstName]`
 - Links: `[eventLink]`, `[applicationLink]`
 - Categories: `[categoryList]`
 
 **DON'T Use:**
+
 - `[boothPrice]` - Won't work (they haven't picked a category)
 - `[vendorCategory]` - Won't work (they haven't applied)
 - `[boothNumber]` - Won't work (not assigned yet)
 
 **Example Invitation:**
+
 ```
 Subject: [greetingName], you're invited to [eventName]!
 
@@ -201,10 +223,12 @@ Unsubscribe: [unsubscribeLink]
 **Purpose:** Confirmations, reminders, updates
 
 **All Variables Work:**
+
 - Everything from Position 1
 - Plus: `[boothPrice]`, `[vendorCategory]`, `[installTime]`, etc.
 
 **Example Registration Email:**
+
 ```
 Subject: Application Approved - [eventName]
 
@@ -234,12 +258,14 @@ Questions? [organizationEmail]
 ### 1. Always Use Personalization
 
 **❌ Generic:**
+
 ```
 Subject: Event Update
 Body: Hello, this is an update about the event.
 ```
 
 **✅ Personalized:**
+
 ```
 Subject: [greetingName], Update for [eventName]
 Body: Hi [greetingName], we have an important update about [eventName]...
@@ -248,12 +274,14 @@ Body: Hi [greetingName], we have an important update about [eventName]...
 ### 2. Include Event Context
 
 **❌ Missing Context:**
+
 ```
 Subject: Reminder
 Body: Don't forget to pay!
 ```
 
 **✅ Clear Context:**
+
 ```
 Subject: Payment Reminder - [eventName]
 Body: Hi [greetingName], friendly reminder that your [boothPrice] payment for [eventName] is due by [paymentDueDate].
@@ -262,11 +290,13 @@ Body: Hi [greetingName], friendly reminder that your [boothPrice] payment for [e
 ### 3. Provide Clear Next Steps
 
 **❌ Vague:**
+
 ```
 Please complete your application.
 ```
 
 **✅ Specific:**
+
 ```
 Next Steps:
 1. Pay your booth fee: [categoryPaymentLink]
@@ -277,6 +307,7 @@ Next Steps:
 ### 4. Always Include Contact Info
 
 **✅ Every email should have:**
+
 ```
 Questions? Email us at [organizationEmail]
 
@@ -311,6 +342,7 @@ Visit our event page to learn more and apply:
 ```
 
 **Result:**
+
 ```
 We have the following options available:
 • Artist Booth
@@ -334,6 +366,7 @@ Please arrive promptly at [installStartTime].
 ```
 
 **Result for Food Vendor:**
+
 ```
 Your setup time for Food:
 Friday, June 14, 2025 from 2:00 PM to 4:00 PM
@@ -351,6 +384,7 @@ Hi [greetingName], excited to have you at [eventName]!
 ```
 
 **Results:**
+
 - If business name exists: "Hi John's Tacos, excited to..."
 - If only first name: "Hi John, excited to..."
 - If nothing: "Hi there, excited to..."
@@ -414,11 +448,13 @@ See you soon!
 **Symptoms:** Sent email shows "Hi , your booth is " (missing data)
 
 **Causes:**
+
 1. Used post-application variable in invitation email
 2. Variable name misspelled
 3. Data not available for recipient
 
 **Solutions:**
+
 1. Check you're using invitation-safe variables (see [Variable Reference](./EMAIL_VARIABLES_REFERENCE.md))
 2. Verify exact spelling: `[eventName]` not `[EventName]`
 3. Preview email before sending to catch issues
@@ -448,6 +484,7 @@ See you soon!
 **Symptoms:** No variable buttons when editing
 
 **Solution:**
+
 1. Click INTO the subject or body field (must be focused)
 2. Variable buttons appear on the side
 3. If still missing, refresh the page
@@ -457,6 +494,7 @@ See you soon!
 **Symptoms:** Preview shows Artist prices but vendor is Food
 
 **Solution:**
+
 1. In preview modal, select correct category from dropdown
 2. Preview updates with category-specific data
 3. Note: Invitations can't show category-specific data (vendor hasn't applied yet)
@@ -467,18 +505,18 @@ See you soon!
 
 ### Most Common Variables
 
-| Use Case | Variable | Example |
-|----------|----------|---------|
-| Greeting | `[greetingName]` | "John's Tacos" or "John" |
-| Event name | `[eventName]` | "Summer Market 2025" |
-| Event date | `[eventDate]` | "Saturday, June 15, 2025" |
-| Event time | `[eventTime]` | "10:00 AM - 6:00 PM" |
-| Location | `[eventLocation]` | "Piedmont Park, Atlanta" |
-| Application deadline | `[applicationDeadline]` | "May 30, 2025" |
-| Event page link | `[eventLink]` | Full URL |
-| Vendor portal | `[dashboardLink]` | Full URL |
-| Unsubscribe | `[unsubscribeLink]` | Full URL (required!) |
-| Your email | `[organizationEmail]` | Your contact email |
+| Use Case             | Variable                | Example                   |
+| -------------------- | ----------------------- | ------------------------- |
+| Greeting             | `[greetingName]`        | "John's Tacos" or "John"  |
+| Event name           | `[eventName]`           | "Summer Market 2025"      |
+| Event date           | `[eventDate]`           | "Saturday, June 15, 2025" |
+| Event time           | `[eventTime]`           | "10:00 AM - 6:00 PM"      |
+| Location             | `[eventLocation]`       | "Piedmont Park, Atlanta"  |
+| Application deadline | `[applicationDeadline]` | "May 30, 2025"            |
+| Event page link      | `[eventLink]`           | Full URL                  |
+| Vendor portal        | `[dashboardLink]`       | Full URL                  |
+| Unsubscribe          | `[unsubscribeLink]`     | Full URL (required!)      |
+| Your email           | `[organizationEmail]`   | Your contact email        |
 
 ### Variable Color Code
 

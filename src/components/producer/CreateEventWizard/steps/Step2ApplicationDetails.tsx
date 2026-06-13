@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Tag, Zap, Plus, X } from 'lucide-react';
-import { WizardStepProps, ApplicationRow, PaymentPriceType } from '../types';
-import { Category } from '@/types/category';
-import { categoriesApi } from '@/services/api';
-import { CategoryBadge } from '@/components/shared/CategoryBadge';
-import { isDevOrStaging } from '@/config/environments';
-import { DebugPanel } from '../../DebugPanel';
+import { useState, useEffect } from 'react'
+import { Tag, Zap, Plus, X } from 'lucide-react'
+import { WizardStepProps, ApplicationRow, PaymentPriceType } from '../types'
+import { Category } from '@/types/category'
+import { categoriesApi } from '@/services/api'
+import { CategoryBadge } from '@/components/shared/CategoryBadge'
+import { isDevOrStaging } from '@/config/environments'
+import { DebugPanel } from '../../DebugPanel'
 
 interface Step2Props extends WizardStepProps {
-  organizationId: number;
+  organizationId: number
 }
 
 /**
@@ -41,75 +41,76 @@ export default function Step2ApplicationDetails({
   isAdmin,
   organizationId,
 }: Step2Props) {
-  const { applicationDetails, eventDetails } = wizardState;
+  const { applicationDetails, eventDetails } = wizardState
 
   // Local state
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
-  const [tagInputs, setTagInputs] = useState<Record<string, string>>({});
-  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [createCategoryError, setCreateCategoryError] = useState('');
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loadingCategories, setLoadingCategories] = useState(true)
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([])
+  const [tagInputs, setTagInputs] = useState<Record<string, string>>({})
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [createCategoryError, setCreateCategoryError] = useState('')
 
   // Load categories on mount
   useEffect(() => {
-    loadCategories();
-  }, [organizationId]);
+    loadCategories()
+  }, [organizationId])
 
   // Sync selectedCategoryIds with applications
   useEffect(() => {
     const categoryIds = applicationDetails.applications
-      .filter(app => app.category_id)
-      .map(app => app.category_id!);
-    setSelectedCategoryIds(categoryIds);
-  }, [applicationDetails.applications]);
+      .filter((app) => app.category_id)
+      .map((app) => app.category_id!)
+    setSelectedCategoryIds(categoryIds)
+  }, [applicationDetails.applications])
 
   const loadCategories = async () => {
-    setLoadingCategories(true);
+    setLoadingCategories(true)
     try {
-      const response = await categoriesApi.getAll(organizationId, true);
-      setCategories(response.categories);
+      const response = await categoriesApi.getAll(organizationId, true)
+      setCategories(response.categories)
     } catch (error) {
-      console.error('Failed to load categories:', error);
+      console.error('Failed to load categories:', error)
     } finally {
-      setLoadingCategories(false);
+      setLoadingCategories(false)
     }
-  };
+  }
 
   // Handle category toggle
   const toggleCategory = (categoryId: number) => {
-    const isSelected = selectedCategoryIds.includes(categoryId);
+    const isSelected = selectedCategoryIds.includes(categoryId)
     const newSelectedIds = isSelected
-      ? selectedCategoryIds.filter(id => id !== categoryId)
-      : [...selectedCategoryIds, categoryId];
+      ? selectedCategoryIds.filter((id) => id !== categoryId)
+      : [...selectedCategoryIds, categoryId]
 
-    handleCategoryChange(newSelectedIds);
-  };
+    handleCategoryChange(newSelectedIds)
+  }
 
   // Handle category selection changes
   const handleCategoryChange = (categoryIds: number[]) => {
-    const newApps: ApplicationRow[] = [];
+    const newApps: ApplicationRow[] = []
 
     // Keep existing applications for still-selected categories
     for (const catId of categoryIds) {
-      const existingApp = applicationDetails.applications.find(app => app.category_id === catId);
-      const category = categories.find(c => c.id === catId);
+      const existingApp = applicationDetails.applications.find((app) => app.category_id === catId)
+      const category = categories.find((c) => c.id === catId)
 
       if (existingApp) {
         // Keep existing application data
-        newApps.push(existingApp);
+        newApps.push(existingApp)
       } else if (category) {
         // Create new application using category values with precedence logic
         // Precedence: manual booth_price > default_booth_price (from last event) > 0
-        const boothPrice = category.booth_price ?? category.default_booth_price ?? 0;
-        const description = category.description || category.default_description || '';
+        const boothPrice = category.booth_price ?? category.default_booth_price ?? 0
+        const description = category.description || category.default_description || ''
 
         // Only show "Pre-filled from..." if using smart defaults (not manually set values)
-        const usingSmartDefaults = !category.booth_price && category.default_booth_price && category.default_booth_price > 0;
+        const usingSmartDefaults =
+          !category.booth_price && category.default_booth_price && category.default_booth_price > 0
 
         // Default install_date to event date (installs typically happen day-of)
-        const installDateDefault = eventDetails.event_date || '';
+        const installDateDefault = eventDetails.event_date || ''
 
         newApps.push({
           id: crypto.randomUUID(),
@@ -131,21 +132,24 @@ export default function Step2ApplicationDetails({
           prefilled_from_event_id: usingSmartDefaults ? category.last_used_event_id : undefined,
           // Payment config initialized for Step 3
           // If category has saved payment_preferences, use them as the starting point
-          payment_prices: (category.payment_preferences && category.payment_preferences.length > 0)
-            ? category.payment_preferences.map(pref => ({
-                type: pref.type as PaymentPriceType,
-                label: pref.label,
-                amount: pref.amount,
-                is_percentage: pref.is_percentage,
-              }))
-            : [{
-                type: 'booth_price' as PaymentPriceType,
-                label: 'Booth Fee',
-                amount: boothPrice,
-                is_percentage: false,
-              }],
+          payment_prices:
+            category.payment_preferences && category.payment_preferences.length > 0
+              ? category.payment_preferences.map((pref) => ({
+                  type: pref.type as PaymentPriceType,
+                  label: pref.label,
+                  amount: pref.amount,
+                  is_percentage: pref.is_percentage,
+                }))
+              : [
+                  {
+                    type: 'booth_price' as PaymentPriceType,
+                    label: 'Booth Fee',
+                    amount: boothPrice,
+                    is_percentage: false,
+                  },
+                ],
           payment_engines: [],
-        });
+        })
       }
     }
 
@@ -153,62 +157,62 @@ export default function Step2ApplicationDetails({
       applicationDetails: {
         applications: newApps,
       },
-    });
+    })
 
-    setSelectedCategoryIds(categoryIds);
-  };
+    setSelectedCategoryIds(categoryIds)
+  }
 
   // Handle creating new category inline
   const handleCreateNewCategory = async () => {
     if (!newCategoryName.trim()) {
-      setCreateCategoryError('Category name is required');
-      return;
+      setCreateCategoryError('Category name is required')
+      return
     }
 
     try {
-      setCreateCategoryError('');
+      setCreateCategoryError('')
       const newCategory = await categoriesApi.create(organizationId, {
         name: newCategoryName.trim(),
-      });
+      })
 
       // Add to categories list
-      setCategories(prev => [...prev, newCategory]);
+      setCategories((prev) => [...prev, newCategory])
 
       // Auto-select the new category (no longer async)
-      toggleCategory(newCategory.id);
+      toggleCategory(newCategory.id)
 
       // Reset form
-      setNewCategoryName('');
-      setIsCreatingCategory(false);
+      setNewCategoryName('')
+      setIsCreatingCategory(false)
     } catch (error: any) {
-      setCreateCategoryError(error.message || 'Failed to create category');
+      setCreateCategoryError(error.message || 'Failed to create category')
     }
-  };
+  }
 
   // Handle application field changes
   const handleApplicationChange = (
     id: string,
     field: keyof ApplicationRow,
-    value: string | number
+    value: string | number,
   ) => {
     const updatedApplications = applicationDetails.applications.map((app) =>
-      app.id === id ? { ...app, [field]: value } : app
-    );
+      app.id === id ? { ...app, [field]: value } : app,
+    )
 
     updateWizardState({
       applicationDetails: {
         applications: updatedApplications,
       },
-    });
+    })
 
     // Clear related errors
-    const errorKey = `application_${id}_${field}`;
+    const errorKey = `application_${id}_${field}`
     if (errors[errorKey]) {
-      const newErrors = { ...errors };
-      delete newErrors[errorKey];
-      setErrors(newErrors);
+      const newErrors = { ...errors }
+      delete newErrors[errorKey]
+      setErrors(newErrors)
     }
-  };
+  }
 
   // Handle application deadline change
   const handleDeadlineChange = (value: string) => {
@@ -217,62 +221,60 @@ export default function Step2ApplicationDetails({
         ...eventDetails,
         application_deadline: value,
       },
-    });
+    })
 
     if (errors.application_deadline) {
-      const newErrors = { ...errors };
-      delete newErrors.application_deadline;
-      setErrors(newErrors);
+      const newErrors = { ...errors }
+      delete newErrors.application_deadline
+      setErrors(newErrors)
     }
-  };
+  }
 
   // Tag management
   const addTag = (appId: string) => {
-    const tagValue = tagInputs[appId]?.trim();
-    if (!tagValue) return;
+    const tagValue = tagInputs[appId]?.trim()
+    if (!tagValue) return
 
-    const app = applicationDetails.applications.find((a) => a.id === appId);
-    if (!app) return;
+    const app = applicationDetails.applications.find((a) => a.id === appId)
+    if (!app) return
 
-    const currentTags = app.application_tags || [];
-    if (currentTags.includes(tagValue)) return;
+    const currentTags = app.application_tags || []
+    if (currentTags.includes(tagValue)) return
 
     const updatedApplications = applicationDetails.applications.map((a) =>
-      a.id === appId
-        ? { ...a, application_tags: [...currentTags, tagValue] }
-        : a
-    );
+      a.id === appId ? { ...a, application_tags: [...currentTags, tagValue] } : a,
+    )
 
     updateWizardState({
       applicationDetails: {
         applications: updatedApplications,
       },
-    });
+    })
 
-    setTagInputs((prev) => ({ ...prev, [appId]: '' }));
-  };
+    setTagInputs((prev) => ({ ...prev, [appId]: '' }))
+  }
 
   const removeTag = (appId: string, tagToRemove: string) => {
-    const app = applicationDetails.applications.find((a) => a.id === appId);
-    if (!app) return;
+    const app = applicationDetails.applications.find((a) => a.id === appId)
+    if (!app) return
 
-    const updatedTags = (app.application_tags || []).filter((tag) => tag !== tagToRemove);
+    const updatedTags = (app.application_tags || []).filter((tag) => tag !== tagToRemove)
 
     const updatedApplications = applicationDetails.applications.map((a) =>
-      a.id === appId ? { ...a, application_tags: updatedTags } : a
-    );
+      a.id === appId ? { ...a, application_tags: updatedTags } : a,
+    )
 
     updateWizardState({
       applicationDetails: {
         applications: updatedApplications,
       },
-    });
-  };
+    })
+  }
 
   // Clear pre-filled data for an application
   const clearPrefilledData = (appId: string) => {
-    const app = applicationDetails.applications.find((a) => a.id === appId);
-    if (!app) return;
+    const app = applicationDetails.applications.find((a) => a.id === appId)
+    if (!app) return
 
     const updatedApplications = applicationDetails.applications.map((a) =>
       a.id === appId
@@ -288,82 +290,85 @@ export default function Step2ApplicationDetails({
             application_tags: [],
             prefilled_from_event: undefined,
             prefilled_from_event_id: undefined,
-            payment_prices: [{ type: 'booth_price' as const, label: 'Booth Fee', amount: 0, is_percentage: false }],
+            payment_prices: [
+              { type: 'booth_price' as const, label: 'Booth Fee', amount: 0, is_percentage: false },
+            ],
             payment_engines: [],
           }
-        : a
-    );
+        : a,
+    )
 
     updateWizardState({
       applicationDetails: {
         applications: updatedApplications,
       },
-    });
-  };
+    })
+  }
 
   // DEV: Prefill test data
   const handlePrefill = async () => {
     // Create test categories if needed
-    const testCategoryNames = ['Food Vendor', 'Artist', 'Sponsor'];
-    const createdCategories: Category[] = [];
+    const testCategoryNames = ['Food Vendor', 'Artist', 'Sponsor']
+    const createdCategories: Category[] = []
 
     for (const name of testCategoryNames) {
-      const existing = categories.find(c => c.name === name);
+      const existing = categories.find((c) => c.name === name)
       if (existing) {
-        createdCategories.push(existing);
+        createdCategories.push(existing)
       } else {
         try {
-          const newCat = await categoriesApi.create(organizationId, { name });
-          createdCategories.push(newCat);
-          setCategories(prev => [...prev, newCat]);
+          const newCat = await categoriesApi.create(organizationId, { name })
+          createdCategories.push(newCat)
+          setCategories((prev) => [...prev, newCat])
         } catch (error) {
-          console.error('Failed to create test category:', error);
+          console.error('Failed to create test category:', error)
         }
       }
     }
 
     // Calculate dates
-    const eventDate = eventDetails.event_date
-      ? new Date(eventDetails.event_date)
-      : new Date();
-    const today = new Date();
-    const applicationDeadline = new Date(eventDate);
-    applicationDeadline.setDate(eventDate.getDate() - 14);
+    const eventDate = eventDetails.event_date ? new Date(eventDetails.event_date) : new Date()
+    const today = new Date()
+    const applicationDeadline = new Date(eventDate)
+    applicationDeadline.setDate(eventDate.getDate() - 14)
     if (applicationDeadline < today) {
-      applicationDeadline.setDate(today.getDate() + 7);
+      applicationDeadline.setDate(today.getDate() + 7)
     }
 
-    const paymentDeadline = new Date(eventDate);
-    paymentDeadline.setDate(eventDate.getDate() - 7);
+    const paymentDeadline = new Date(eventDate)
+    paymentDeadline.setDate(eventDate.getDate() - 7)
     if (paymentDeadline < today) {
-      paymentDeadline.setDate(today.getDate() + 3);
+      paymentDeadline.setDate(today.getDate() + 3)
     }
 
-    const installDate = new Date(eventDate);
-    installDate.setDate(eventDate.getDate() - 1);
+    const installDate = new Date(eventDate)
+    installDate.setDate(eventDate.getDate() - 1)
 
     // Create applications for test categories
-    const boothPrices = [350, 200, 500];
+    const boothPrices = [350, 200, 500]
     const sampleApplications: ApplicationRow[] = createdCategories.map((cat, idx) => ({
       id: crypto.randomUUID(),
       category_id: cat.id,
       category_name: cat.name,
       name: cat.name,
       booth_price: boothPrices[idx] || 200,
-      description: ['Full food service booth', 'Standard 10x10 booth', 'Premium corner booth'][idx] || '',
+      description:
+        ['Full food service booth', 'Standard 10x10 booth', 'Premium corner booth'][idx] || '',
       install_date: installDate.toISOString().split('T')[0],
       install_start_time: '08:00',
       install_end_time: '10:00',
       payment_link: '',
       application_tags: [],
-      payment_prices: [{
-        type: 'booth_price' as const,
-        label: 'Booth Fee',
-        amount: boothPrices[idx] || 200,
-        is_percentage: false,
-      }],
+      payment_prices: [
+        {
+          type: 'booth_price' as const,
+          label: 'Booth Fee',
+          amount: boothPrices[idx] || 200,
+          is_percentage: false,
+        },
+      ],
       payment_engines: [],
-    }));
+    }))
 
     updateWizardState({
       eventDetails: {
@@ -377,10 +382,10 @@ export default function Step2ApplicationDetails({
       applicationDetails: {
         applications: sampleApplications,
       },
-    });
+    })
 
-    setErrors({});
-  };
+    setErrors({})
+  }
 
   return (
     <div className="space-y-4">
@@ -390,7 +395,9 @@ export default function Step2ApplicationDetails({
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-amber-700 dark:text-yellow-400 shrink-0" />
-              <span className="text-xs font-medium text-amber-950 dark:text-yellow-200">Dev Mode</span>
+              <span className="text-xs font-medium text-amber-950 dark:text-yellow-200">
+                Dev Mode
+              </span>
             </div>
             <button
               onClick={handlePrefill}
@@ -406,7 +413,8 @@ export default function Step2ApplicationDetails({
         <div className="mb-3">
           <h2 className="text-base font-semibold text-foreground">Applicant Categories</h2>
           <p className="text-foreground/60 text-xs mt-0.5">
-            Choose applicant categories and configure details for each. Pricing is set in the next step.
+            Choose applicant categories and configure details for each. Pricing is set in the next
+            step.
           </p>
         </div>
 
@@ -418,7 +426,8 @@ export default function Step2ApplicationDetails({
                 Select Application Categories *
               </label>
               <p className="text-foreground/50 text-xs mt-0.5">
-                Click categories to add them to your event. Each will have its own pricing and details.
+                Click categories to add them to your event. Each will have its own pricing and
+                details.
               </p>
             </div>
             <button
@@ -443,18 +452,18 @@ export default function Step2ApplicationDetails({
                       type="text"
                       value={newCategoryName}
                       onChange={(e) => {
-                        setNewCategoryName(e.target.value);
-                        setCreateCategoryError('');
+                        setNewCategoryName(e.target.value)
+                        setCreateCategoryError('')
                       }}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleCreateNewCategory();
+                          e.preventDefault()
+                          handleCreateNewCategory()
                         }
                         if (e.key === 'Escape') {
-                          setIsCreatingCategory(false);
-                          setNewCategoryName('');
-                          setCreateCategoryError('');
+                          setIsCreatingCategory(false)
+                          setNewCategoryName('')
+                          setCreateCategoryError('')
                         }
                       }}
                       placeholder="Enter category name (e.g., Food Vendor, Artist)"
@@ -471,9 +480,9 @@ export default function Step2ApplicationDetails({
                     <button
                       type="button"
                       onClick={() => {
-                        setIsCreatingCategory(false);
-                        setNewCategoryName('');
-                        setCreateCategoryError('');
+                        setIsCreatingCategory(false)
+                        setNewCategoryName('')
+                        setCreateCategoryError('')
                       }}
                       className="px-3 py-2 text-sm rounded-lg bg-background/5 hover:bg-background/10 text-foreground/70 transition-colors"
                     >
@@ -490,7 +499,7 @@ export default function Step2ApplicationDetails({
               {categories.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   {categories.map((category) => {
-                    const isSelected = selectedCategoryIds.includes(category.id);
+                    const isSelected = selectedCategoryIds.includes(category.id)
                     return (
                       <button
                         key={category.id}
@@ -498,9 +507,10 @@ export default function Step2ApplicationDetails({
                         onClick={() => toggleCategory(category.id)}
                         className={`
                           relative px-4 py-3 rounded-lg border-2 transition-all text-left
-                          ${isSelected
-                            ? 'border-primary bg-primary/20 shadow-lg shadow-primary/20'
-                            : 'border-border bg-background/5 hover:border-border hover:bg-background/10'
+                          ${
+                            isSelected
+                              ? 'border-primary bg-primary/20 shadow-lg shadow-primary/20'
+                              : 'border-border bg-background/5 hover:border-border hover:bg-background/10'
                           }
                         `}
                       >
@@ -511,16 +521,17 @@ export default function Step2ApplicationDetails({
                                 className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                                 style={{ backgroundColor: category.color || '#9054e3' }}
                               />
-                              {category.icon && (
-                                <span className="text-lg">{category.icon}</span>
-                              )}
+                              {category.icon && <span className="text-lg">{category.icon}</span>}
                               <span className="text-sm font-medium text-foreground truncate">
                                 {category.name}
                               </span>
                             </div>
                             {category.usage && (
                               <p className="text-xs text-foreground/40">
-                                Used in {category.usage.applications_count} {category.usage.applications_count === 1 ? 'application' : 'applications'}
+                                Used in {category.usage.applications_count}{' '}
+                                {category.usage.applications_count === 1
+                                  ? 'application'
+                                  : 'applications'}
                               </p>
                             )}
                           </div>
@@ -531,13 +542,15 @@ export default function Step2ApplicationDetails({
                           )}
                         </div>
                       </button>
-                    );
+                    )
                   })}
                 </div>
               ) : (
                 <div className="py-8 text-center">
                   <p className="text-sm text-foreground/60 mb-3">No categories yet</p>
-                  <p className="text-xs text-foreground/40">Click "New Category" to create your first one</p>
+                  <p className="text-xs text-foreground/40">
+                    Click "New Category" to create your first one
+                  </p>
                 </div>
               )}
             </>
@@ -554,7 +567,7 @@ export default function Step2ApplicationDetails({
             <h3 className="text-sm font-semibold text-foreground">Configure Each Category</h3>
 
             {applicationDetails.applications.map((app) => {
-              const category = categories.find(c => c.id === app.category_id);
+              const category = categories.find((c) => c.id === app.category_id)
 
               return (
                 <div
@@ -572,7 +585,8 @@ export default function Step2ApplicationDetails({
                       <div className="flex items-center gap-2">
                         <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
                         <p className="text-xs text-blue-300">
-                          Pre-filled from: <span className="font-medium">{app.prefilled_from_event}</span>
+                          Pre-filled from:{' '}
+                          <span className="font-medium">{app.prefilled_from_event}</span>
                         </p>
                       </div>
                       <button
@@ -593,7 +607,9 @@ export default function Step2ApplicationDetails({
                     </label>
                     <textarea
                       value={app.description}
-                      onChange={(e) => handleApplicationChange(app.id, 'description', e.target.value)}
+                      onChange={(e) =>
+                        handleApplicationChange(app.id, 'description', e.target.value)
+                      }
                       placeholder="Describe this booth type..."
                       rows={2}
                       className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"
@@ -609,7 +625,9 @@ export default function Step2ApplicationDetails({
                       <input
                         type="date"
                         value={app.install_date || ''}
-                        onChange={(e) => handleApplicationChange(app.id, 'install_date', e.target.value)}
+                        onChange={(e) =>
+                          handleApplicationChange(app.id, 'install_date', e.target.value)
+                        }
                         className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                       />
                     </div>
@@ -620,7 +638,9 @@ export default function Step2ApplicationDetails({
                       <input
                         type="time"
                         value={app.install_start_time || ''}
-                        onChange={(e) => handleApplicationChange(app.id, 'install_start_time', e.target.value)}
+                        onChange={(e) =>
+                          handleApplicationChange(app.id, 'install_start_time', e.target.value)
+                        }
                         className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                       />
                     </div>
@@ -631,7 +651,9 @@ export default function Step2ApplicationDetails({
                       <input
                         type="time"
                         value={app.install_end_time || ''}
-                        onChange={(e) => handleApplicationChange(app.id, 'install_end_time', e.target.value)}
+                        onChange={(e) =>
+                          handleApplicationChange(app.id, 'install_end_time', e.target.value)
+                        }
                         className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                       />
                     </div>
@@ -648,11 +670,13 @@ export default function Step2ApplicationDetails({
                         <input
                           type="text"
                           value={tagInputs[app.id] || ''}
-                          onChange={(e) => setTagInputs(prev => ({ ...prev, [app.id]: e.target.value }))}
+                          onChange={(e) =>
+                            setTagInputs((prev) => ({ ...prev, [app.id]: e.target.value }))
+                          }
                           onKeyPress={(e) => {
                             if (e.key === 'Enter') {
-                              e.preventDefault();
-                              addTag(app.id);
+                              e.preventDefault()
+                              addTag(app.id)
                             }
                           }}
                           placeholder="e.g., handmade, food"
@@ -691,7 +715,7 @@ export default function Step2ApplicationDetails({
                     )}
                   </div>
                 </div>
-              );
+              )
             })}
           </div>
         )}
@@ -709,5 +733,5 @@ export default function Step2ApplicationDetails({
         isAdmin={isAdmin}
       />
     </div>
-  );
+  )
 }

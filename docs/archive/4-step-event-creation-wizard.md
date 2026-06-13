@@ -7,6 +7,7 @@
 ---
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Current State](#current-state)
 3. [Desired State](#desired-state)
@@ -24,12 +25,14 @@
 ## Overview
 
 Transform the event creation experience from a single form into a guided 4-step wizard that allows producers to:
+
 - Create event details
 - Set up vendor applications with pricing (multiple at once)
 - Invite users from their network (future feature)
 - Configure automatic event-based emails (future feature)
 
 **Goals:**
+
 - Improve UX by breaking complex creation into digestible steps
 - Enable batch creation of vendor applications during event setup
 - Lay foundation for invite and messaging features
@@ -40,6 +43,7 @@ Transform the event creation experience from a single form into a guided 4-step 
 ## Current State
 
 ### Event Creation Flow
+
 ```
 ProducerDashboard
   └─> "Create Event" button
@@ -54,6 +58,7 @@ ProducerDashboard
 **File:** `/src/components/producer/CreateEventForm.tsx` (217 lines)
 
 ### Vendor Application Creation Flow
+
 ```
 ProducerDashboard
   └─> Select Event
@@ -67,10 +72,12 @@ ProducerDashboard
 ```
 
 **Files:**
+
 - `/src/components/producer/ApplicationsTab.tsx`
 - `/src/components/producer/CreateApplicationForm.tsx`
 
 **Key Issues:**
+
 - Applications created AFTER event exists in separate workflow
 - Cannot create multiple applications at once
 - No application deadline on events
@@ -122,39 +129,39 @@ ProducerDashboard
 
 ```typescript
 interface WizardState {
-  currentStep: 1 | 2 | 3 | 4;
+  currentStep: 1 | 2 | 3 | 4
 
   // Step 1: Event Details
   eventDetails: {
-    title: string;
-    description: string;
-    event_date: string;
-    location: string;
-  };
+    title: string
+    description: string
+    event_date: string
+    location: string
+  }
 
   // Step 2: Application Details
   applicationDetails: {
-    application_deadline: string; // ISO date string
-    applications: ApplicationRow[];
-  };
+    application_deadline: string // ISO date string
+    applications: ApplicationRow[]
+  }
 
   // Step 3: Invite List (future)
   inviteList: {
-    invitedUsers: string[]; // User IDs or emails
-  };
+    invitedUsers: string[] // User IDs or emails
+  }
 
   // Step 4: Automatic Messages (future)
   automaticMessages: {
-    messages: EmailTemplate[]; // Future structure
-  };
+    messages: EmailTemplate[] // Future structure
+  }
 }
 
 interface ApplicationRow {
-  id: string; // Temporary client-side ID
-  name: string; // Application title (e.g., "Artist Booth")
-  booth_price: number; // Price for this booth type
-  description: string; // Optional description
-  categories?: string[]; // Optional vendor categories (TBD)
+  id: string // Temporary client-side ID
+  name: string // Application title (e.g., "Artist Booth")
+  booth_price: number // Price for this booth type
+  description: string // Optional description
+  categories?: string[] // Optional vendor categories (TBD)
 }
 ```
 
@@ -163,18 +170,22 @@ interface ApplicationRow {
 ```typescript
 const navigation = {
   canGoNext: (step: number) => {
-    switch(step) {
-      case 1: return validateEventDetails();
-      case 2: return validateApplicationDetails();
-      case 3: return true; // Placeholder, always valid
-      case 4: return false; // Last step, no next
+    switch (step) {
+      case 1:
+        return validateEventDetails()
+      case 2:
+        return validateApplicationDetails()
+      case 3:
+        return true // Placeholder, always valid
+      case 4:
+        return false // Last step, no next
     }
   },
 
   canGoBack: (step: number) => step > 1,
 
   canSubmit: (step: number) => step === 4,
-};
+}
 ```
 
 ---
@@ -186,6 +197,7 @@ const navigation = {
 **Purpose:** Collect basic event information
 
 **Fields:**
+
 - **Event Name** (text, required)
   - Validation: Non-empty, min 3 chars
   - Example: "Downtown Art Market"
@@ -211,6 +223,7 @@ const navigation = {
 **Purpose:** Set application deadline and create multiple vendor application types
 
 **New Event Field:**
+
 - **Application Deadline** (date picker, required)
   - When vendor applications close
   - Validation: Must be before or equal to event_date
@@ -220,19 +233,21 @@ const navigation = {
 
 Each row represents a vendor application type:
 
-| Field | Type | Required | Description | Example |
-|-------|------|----------|-------------|---------|
-| Title | text | Yes | Booth/application type name | "Artist Booth" |
-| Booth Price | number | Yes | Price for this booth | 150.00 |
-| Description | textarea | No | Details about this booth type | "For visual artists selling original artwork" |
+| Field       | Type     | Required | Description                   | Example                                       |
+| ----------- | -------- | -------- | ----------------------------- | --------------------------------------------- |
+| Title       | text     | Yes      | Booth/application type name   | "Artist Booth"                                |
+| Booth Price | number   | Yes      | Price for this booth          | 150.00                                        |
+| Description | textarea | No       | Details about this booth type | "For visual artists selling original artwork" |
 
 **Interactions:**
+
 - "Add Another Row" button - Creates new empty row
 - "Remove" button on each row - Deletes that row
 - Minimum: 0 rows (can skip application creation)
 - Maximum: 20 rows (reasonable limit)
 
 **Validation:**
+
 - If any rows exist:
   - All rows must have title and booth_price
   - Booth price must be > 0
@@ -240,6 +255,7 @@ Each row represents a vendor application type:
 - If no rows: Valid (skip application creation)
 
 **UI Mock:**
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ Application Details                                    │
@@ -291,6 +307,7 @@ Each row represents a vendor application type:
 **Current Implementation:** Placeholder only
 
 **UI:**
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ Invite Vendors                                         │
@@ -308,6 +325,7 @@ Each row represents a vendor application type:
 ```
 
 **Future Implementation:**
+
 - Network/contacts system
 - Multi-select vendor list
 - Bulk email invitations
@@ -322,6 +340,7 @@ Each row represents a vendor application type:
 **Current Implementation:** Placeholder only
 
 **UI:**
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ Automatic Messages                                     │
@@ -343,6 +362,7 @@ Each row represents a vendor application type:
 ```
 
 **Future Implementation:**
+
 - Email template editor
 - Trigger configuration (time-based, event-based)
 - Preview functionality
@@ -360,32 +380,28 @@ When user clicks final "Create Event" button on Step 4:
 async function handleWizardSubmit(wizardState: WizardState) {
   try {
     // 1. Create the event
-    const event = await eventsApi.create(
-      organizationSlug,
-      {
-        title: wizardState.eventDetails.title,
-        description: wizardState.eventDetails.description,
-        event_date: wizardState.eventDetails.event_date,
-        location: wizardState.eventDetails.location,
-        application_deadline: wizardState.applicationDetails.application_deadline, // NEW
-      }
-    );
+    const event = await eventsApi.create(organizationSlug, {
+      title: wizardState.eventDetails.title,
+      description: wizardState.eventDetails.description,
+      event_date: wizardState.eventDetails.event_date,
+      location: wizardState.eventDetails.location,
+      application_deadline: wizardState.applicationDetails.application_deadline, // NEW
+    })
 
     // 2. Batch create vendor applications
-    const applicationPromises = wizardState.applicationDetails.applications.map(
-      (app) => vendorApplicationsApi.create(event.slug, {
+    const applicationPromises = wizardState.applicationDetails.applications.map((app) =>
+      vendorApplicationsApi.create(event.slug, {
         name: app.name,
         booth_price: app.booth_price, // NEW (mocked for now)
         description: app.description,
         status: 'active',
-      })
-    );
+      }),
+    )
 
-    await Promise.all(applicationPromises);
+    await Promise.all(applicationPromises)
 
     // 3. Redirect to CommandCenter
-    navigate(`/events/${event.slug}/command-center`);
-
+    navigate(`/events/${event.slug}/command-center`)
   } catch (error) {
     // Handle errors appropriately
     // Show error message to user
@@ -397,6 +413,7 @@ async function handleWizardSubmit(wizardState: WizardState) {
 ### Error Handling
 
 **Scenarios:**
+
 1. **Event creation fails** → Show error, stay on wizard, allow retry
 2. **Some applications fail** → Event created, show partial success message, allow manual creation of failed apps
 3. **All applications fail** → Event created, show warning, redirect to CommandCenter
@@ -420,6 +437,7 @@ end
 ```
 
 **Notes:**
+
 - Optional field (can be nil)
 - Should be validated to be <= event_date if present
 - Mocked in frontend until backend implements
@@ -438,6 +456,7 @@ end
 ```
 
 **Notes:**
+
 - Optional field for backwards compatibility
 - Use decimal type for currency (avoids float precision issues)
 - Mocked in frontend until backend implements
@@ -447,30 +466,34 @@ end
 ### API Endpoint Updates
 
 #### Events API
+
 **Endpoint:** `POST /api/v1/presents/organizations/:slug/events`
 
 **Updated Request Body:**
+
 ```json
 {
   "title": "Downtown Art Market",
   "description": "Annual art market...",
   "event_date": "2025-06-15",
   "location": "Central Park Plaza",
-  "application_deadline": "2025-06-01"  // NEW
+  "application_deadline": "2025-06-01" // NEW
 }
 ```
 
 ---
 
 #### Vendor Applications API
+
 **Endpoint:** `POST /api/v1/presents/events/:event_slug/vendor_applications`
 
 **Updated Request Body:**
+
 ```json
 {
   "name": "Artist Booth",
   "description": "For visual artists...",
-  "booth_price": 150.00,  // NEW
+  "booth_price": 150.0, // NEW
   "status": "active",
   "categories": ["Jewelry", "Pottery"]
 }
@@ -503,6 +526,7 @@ src/components/producer/
 ### Component Responsibilities
 
 #### `CreateEventWizard.tsx`
+
 - Manages wizard state (all 4 steps' data)
 - Handles step navigation
 - Validates each step before allowing progression
@@ -510,22 +534,26 @@ src/components/producer/
 - Error handling and loading states
 
 #### `WizardProgress.tsx`
+
 - Visual step indicator (1 → 2 → 3 → 4)
 - Shows current step, completed steps, upcoming steps
 - Click to navigate to completed steps
 
 #### `WizardNavigation.tsx`
+
 - Back button (disabled on step 1)
 - Next button (disabled on step 4, validates before proceeding)
 - Submit button (only visible on step 4)
 - Cancel button (all steps)
 
 #### `Step1EventDetails.tsx`
+
 - Reuses existing form fields from `CreateEventForm.tsx`
 - Validates: all fields required
 - Emits data upward to wizard
 
 #### `Step2ApplicationDetails.tsx`
+
 - Application deadline date picker
 - Dynamic form rows for application types
 - Add/remove row functionality
@@ -533,11 +561,13 @@ src/components/producer/
 - Emits data upward to wizard
 
 #### `Step3InviteList.tsx`
+
 - Simple placeholder component
 - "Coming soon" message
 - No data collection yet
 
 #### `Step4AutoMessages.tsx`
+
 - Simple placeholder component
 - "Coming soon" message
 - No data collection yet
@@ -547,6 +577,7 @@ src/components/producer/
 ## Implementation Phases
 
 ### Phase 1: Foundation (Days 1-2)
+
 - [ ] Create wizard component structure
 - [ ] Build `CreateEventWizard.tsx` with state management
 - [ ] Build `WizardProgress.tsx` progress indicator
@@ -558,6 +589,7 @@ src/components/producer/
 ---
 
 ### Phase 2: Step 1 - Event Details (Day 2)
+
 - [ ] Create `Step1EventDetails.tsx`
 - [ ] Refactor existing `CreateEventForm` fields into Step 1
 - [ ] Implement validation
@@ -568,6 +600,7 @@ src/components/producer/
 ---
 
 ### Phase 3: Step 2 - Application Details (Days 3-4)
+
 - [ ] Create `Step2ApplicationDetails.tsx`
 - [ ] Build application deadline picker
 - [ ] Build dynamic application row component
@@ -580,6 +613,7 @@ src/components/producer/
 ---
 
 ### Phase 4: Steps 3 & 4 - Placeholders (Day 4)
+
 - [ ] Create `Step3InviteList.tsx` placeholder
 - [ ] Create `Step4AutoMessages.tsx` placeholder
 - [ ] Design placeholder UI/messaging
@@ -589,6 +623,7 @@ src/components/producer/
 ---
 
 ### Phase 5: Integration & Submission (Day 5)
+
 - [ ] Update API service for new fields (mocked)
 - [ ] Implement wizard submission logic
 - [ ] Batch create applications after event creation
@@ -600,6 +635,7 @@ src/components/producer/
 ---
 
 ### Phase 6: Testing & Polish (Day 6)
+
 - [ ] End-to-end testing of complete flow
 - [ ] Edge case testing (no applications, many applications, errors)
 - [ ] Accessibility testing (keyboard navigation, screen readers)
@@ -611,6 +647,7 @@ src/components/producer/
 ---
 
 ### Phase 7: Deployment & Monitoring (Day 7)
+
 - [ ] Replace old `CreateEventForm` with wizard in `ProducerDashboard`
 - [ ] Deploy to staging
 - [ ] QA testing
@@ -624,11 +661,13 @@ src/components/producer/
 ## Open Questions
 
 ### 1. Categories Field
+
 **Question:** What happens to the existing "categories" array field on vendor applications?
 
 **Current behavior:** Applications have a `categories: string[]` field representing vendor category options (e.g., ["Jewelry", "Pottery", "Textiles"])
 
 **Options:**
+
 - A) Keep it - add categories field to each row in Step 2
 - B) Remove it - replace with booth types/titles
 - C) Separate it - set categories at event level, not application level
@@ -638,9 +677,11 @@ src/components/producer/
 ---
 
 ### 2. Minimum Applications
+
 **Question:** Should producers be required to create at least 1 application in Step 2?
 
 **Options:**
+
 - A) Required - Force at least 1 application
 - B) Optional - Allow skipping application creation (can add later in CommandCenter)
 
@@ -649,9 +690,11 @@ src/components/producer/
 ---
 
 ### 3. Edit Flow
+
 **Question:** Should existing events be able to use this wizard for editing?
 
 **Options:**
+
 - A) Yes - Convert `EditEventForm` to multi-step wizard too
 - B) No - Wizard only for new events, keep simple edit form for existing
 - C) Hybrid - Wizard for creation, but allow editing deadline/applications in CommandCenter
@@ -661,11 +704,13 @@ src/components/producer/
 ---
 
 ### 4. Backend Timing
+
 **Question:** When will backend changes be implemented?
 
 **Current plan:** Mock new fields (`application_deadline`, `booth_price`) in frontend
 
 **Action items:**
+
 - Define mock data structure
 - Add TypeScript types for new fields
 - Comment code showing where backend integration needed
@@ -674,9 +719,11 @@ src/components/producer/
 ---
 
 ### 5. Application Row Limit
+
 **Question:** What's the maximum number of application types a producer can create?
 
 **Considerations:**
+
 - UX: Too many rows becomes unwieldy
 - Performance: Batch API calls
 - Business logic: Reasonable number of booth types
@@ -686,6 +733,7 @@ src/components/producer/
 ---
 
 ### 6. Pricing Display
+
 **Question:** Should booth prices be displayed publicly on event pages?
 
 **Impact:** If yes, need to update `PublicEventDetailPage` to show prices
@@ -697,6 +745,7 @@ src/components/producer/
 ## Testing Strategy
 
 ### Unit Tests
+
 - [ ] Wizard state management
 - [ ] Step validation logic
 - [ ] Application row add/remove logic
@@ -704,12 +753,14 @@ src/components/producer/
 - [ ] Error handling
 
 ### Integration Tests
+
 - [ ] Step navigation (Next/Back)
 - [ ] Data persistence across steps
 - [ ] Form submission
 - [ ] API error scenarios
 
 ### E2E Tests
+
 ```typescript
 describe('Event Creation Wizard', () => {
   it('should create event with applications', async () => {
@@ -723,13 +774,13 @@ describe('Event Creation Wizard', () => {
     // Verify event created
     // Verify 2 applications created
     // Verify redirect to CommandCenter
-  });
+  })
 
   it('should handle validation errors', async () => {
     // Try to proceed without filling required fields
     // Verify error messages shown
     // Verify cannot proceed
-  });
+  })
 
   it('should allow going back and editing', async () => {
     // Fill all steps
@@ -737,11 +788,12 @@ describe('Event Creation Wizard', () => {
     // Edit event name
     // Proceed to Step 4
     // Verify edited data persisted
-  });
-});
+  })
+})
 ```
 
 ### Manual Testing Checklist
+
 - [ ] Create event with 0 applications
 - [ ] Create event with 1 application
 - [ ] Create event with 10+ applications
@@ -759,16 +811,19 @@ describe('Event Creation Wizard', () => {
 ## Success Metrics
 
 **User Experience:**
+
 - Time to create event (target: < 3 minutes)
 - Wizard completion rate (target: > 80%)
 - Error rate during submission (target: < 5%)
 
 **Technical:**
+
 - API success rate for batch application creation (target: > 95%)
 - Page load time (target: < 2 seconds)
 - Zero regression bugs in existing flows
 
 **Business:**
+
 - % of events created with applications (measure adoption of Step 2)
 - Average # of application types per event
 - Reduction in support requests about event creation
@@ -778,18 +833,21 @@ describe('Event Creation Wizard', () => {
 ## Future Enhancements
 
 ### Short-term (Next Quarter)
+
 - Implement Step 3: Network invites functionality
 - Implement Step 4: Automatic messages functionality
 - Add booth price display on public event pages
 - Convert edit flow to wizard
 
 ### Medium-term (6 months)
+
 - Event templates (save wizard state as template)
 - Duplicate event functionality
 - Bulk event creation
 - Event preview before submission
 
 ### Long-term (1 year)
+
 - AI-assisted event description generation
 - Recommended pricing based on similar events
 - Vendor matching suggestions
@@ -800,6 +858,7 @@ describe('Event Creation Wizard', () => {
 ## Appendix
 
 ### Related Files
+
 - Current event creation: `/src/components/producer/CreateEventForm.tsx`
 - Current application creation: `/src/components/producer/CreateApplicationForm.tsx`
 - Applications tab: `/src/components/producer/ApplicationsTab.tsx`
@@ -807,6 +866,7 @@ describe('Event Creation Wizard', () => {
 - API services: `/src/services/api.ts`
 
 ### Related API Endpoints
+
 - `POST /api/v1/presents/organizations/:slug/events`
 - `PATCH /api/v1/presents/events/:slug`
 - `DELETE /api/v1/presents/events/:slug`
@@ -814,6 +874,7 @@ describe('Event Creation Wizard', () => {
 - `PATCH /api/v1/presents/vendor_applications/:id`
 
 ### Design Resources
+
 - Current UI screenshots: (Add links to design files)
 - Figma mocks: (Add Figma links when available)
 - Brand guidelines: (Add link to brand assets)

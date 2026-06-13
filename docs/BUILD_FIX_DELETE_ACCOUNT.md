@@ -92,12 +92,14 @@ end
 ## Build Results
 
 **Before Fix:**
+
 ```
 error TS2339: Property 'deleteAccount' does not exist on type 'authApi'
 Exited with status 2
 ```
 
 **After Fix:**
+
 ```
 ✓ built in 6.91s
 dist/assets/BetaPendingPage-BzLIBa_v.js  16.76 kB │ gzip: 4.73 kB
@@ -119,14 +121,17 @@ Build now succeeds! ✅
 ## Related Files
 
 **Frontend:**
+
 - `/src/services/api.ts` - API service with deleteAccount method
 - `/src/pages/BetaPendingPage.tsx` - Uses deleteAccount method
 
 **Backend:**
+
 - `/app/controllers/users_controller.rb` - destroy action
 - `/config/routes.rb` - DELETE /users/:id route
 
 **Documentation:**
+
 - `BETA_PENDING_PAGE_DEBUG_FEATURES.md` - Feature documentation
 
 ---

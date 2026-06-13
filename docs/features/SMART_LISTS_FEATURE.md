@@ -20,6 +20,7 @@ The Smart Lists feature allows producers to organize their vendor contacts into 
 ### Backend (Rails)
 
 #### 1. Database Schema
+
 **File:** `/Users/beaulazear/Desktop/voxxy-rails/db/migrate/20260118190827_create_contact_lists.rb`
 
 ```ruby
@@ -37,19 +38,23 @@ end
 ```
 
 **Indexes:**
+
 - Unique: `organization_id + name`
 - Performance: `list_type`, `filters` (GIN index)
 
 #### 2. ContactList Model
+
 **File:** `/Users/beaulazear/Desktop/voxxy-rails/app/models/contact_list.rb`
 
 **Key Features:**
+
 - Smart list resolution with OR logic for filters
 - Manual list resolution from contact_ids array
 - Counter cache support for contacts_count
 - Validation for filters (smart lists) and contact_ids (manual lists)
 
 **Smart List Filter Logic:**
+
 ```ruby
 # Matches ANY selected category/location/tag (OR within filter type)
 # AND between different filter types
@@ -59,9 +64,11 @@ end
 **Bug Fix Applied:** Changed from AND to OR logic for category/tag matching to align with frontend preview counts.
 
 #### 3. ContactListsController
+
 **File:** `/Users/beaulazear/Desktop/voxxy-rails/app/controllers/api/v1/presents/contact_lists_controller.rb`
 
 **Endpoints:**
+
 - `GET /api/v1/presents/organizations/:organization_id/contact_lists` - List all lists
 - `POST /api/v1/presents/organizations/:organization_id/contact_lists` - Create list
 - `GET /api/v1/presents/contact_lists/:id` - Get list details
@@ -72,14 +79,17 @@ end
 **Authorization:** Requires venue_owner role + organization ownership
 
 #### 4. Routes
+
 **File:** `/Users/beaulazear/Desktop/voxxy-rails/config/routes.rb`
 
 Added nested routes under `/api/v1/presents/` namespace with organization scoping.
 
 #### 5. Pagination Enhancement
+
 **File:** `/Users/beaulazear/Desktop/voxxy-rails/app/controllers/api/v1/presents/vendor_contacts_controller.rb`
 
 **New Features:**
+
 - Pagination support (100 contacts per page)
 - `GET /ids` endpoint for "Select All" across pages
 - Meta response with pagination info
@@ -87,6 +97,7 @@ Added nested routes under `/api/v1/presents/` namespace with organization scopin
 ### Frontend (React + TypeScript)
 
 #### 1. Type Definitions
+
 **File:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/services/api.ts`
 
 ```typescript
@@ -114,9 +125,11 @@ export interface ContactListsResponse {
 ```
 
 #### 2. API Client
+
 **File:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/services/api.ts`
 
 **Methods:**
+
 - `contactListsApi.getAll(organizationId)` - Fetch all lists
 - `contactListsApi.getById(listId)` - Get list details
 - `contactListsApi.getContacts(listId, page, perPage)` - Get list contacts
@@ -128,18 +141,22 @@ export interface ContactListsResponse {
 #### 3. UI Components
 
 ##### NetworkPage with Tabs
+
 **File:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/components/producer/Network/NetworkPage.tsx`
 
 **Changes:**
+
 - Added "All Contacts" and "Lists" tabs
 - Tab switching with gradient active indicator
 - Pagination for contacts (100 per page)
 - "Select All" across all pages functionality
 
 ##### ListsManagement Component
+
 **File:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/components/producer/Network/Lists/ListsManagement.tsx`
 
 **Features:**
+
 - Grid view of all saved lists
 - Empty state with helpful list type explanations
 - List cards showing:
@@ -151,9 +168,11 @@ export interface ContactListsResponse {
 - Stats summary header
 
 ##### CreateListModal Component
+
 **File:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/components/producer/Network/Lists/CreateListModal.tsx`
 
 **Features:**
+
 - Two-step wizard:
   - **Step 1:** Choose list type (Smart vs Manual)
   - **Step 2:** Configure list (name, description, filters/contacts)
@@ -163,9 +182,11 @@ export interface ContactListsResponse {
 - Loading states during creation
 
 ##### SmartListBuilder Component
+
 **File:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/components/producer/Network/Lists/SmartListBuilder.tsx`
 
 **Features:**
+
 - Multi-select checkboxes for:
   - Categories (Artist, Food & Beverage, Table Vendor, Sponsor)
   - Locations (all unique cities from contacts)
@@ -176,9 +197,11 @@ export interface ContactListsResponse {
 - Info banner explaining OR logic
 
 ##### ManualListBuilder Component
+
 **File:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/components/producer/Network/Lists/ManualListBuilder.tsx`
 
 **Features:**
+
 - Search by name, business, or email
 - Filter by category and location
 - Multi-select with checkboxes
@@ -192,9 +215,11 @@ export interface ContactListsResponse {
   - Featured badge for Voxxy Cards
 
 ##### Pagination Component
+
 **File:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/components/producer/Network/Pagination.tsx`
 
 **Features:**
+
 - Smart page number display (shows ... for large ranges)
 - "Showing X to Y of Z contacts" info
 - Previous/Next navigation
@@ -205,11 +230,13 @@ export interface ContactListsResponse {
 ## 🐛 Bugs Fixed
 
 ### 1. Smart List Count Showing 0
+
 **Issue:** Smart lists showed 0 contacts after creation, even though preview showed 28.
 
 **Root Cause:** Backend used AND logic for multiple categories (must match ALL), but frontend preview used OR logic (match ANY).
 
 **Fix:** Updated `ContactList#resolve_smart_list` to use OR logic within each filter type:
+
 ```ruby
 # OLD (wrong)
 filters["categories"].each { |cat| scope = scope.by_category(cat) }
@@ -220,19 +247,23 @@ scope = scope.where(category_conditions, *category_values)
 ```
 
 ### 2. Modal Footer Not Visible
+
 **Issue:** "Create List" button hidden on smaller screens.
 
 **Fix:**
+
 - Changed modal height to `max-h-[calc(100vh-4rem)]`
 - Made footer sticky with upward shadow
 - Added `overflow-y-auto` to modal backdrop
 
 ### 3. Empty State Modal Not Opening
+
 **Issue:** Clicking "Create Your First List" did nothing.
 
 **Fix:** Empty state component returned early without rendering modal. Wrapped in fragment and included modal rendering.
 
 ### 4. TypeScript Build Errors
+
 **Issue 1:** `fetchContacts` function signature mismatch with onClick handler
 **Fix:** Wrapped in arrow function: `onClick={() => fetchContacts()}`
 
@@ -246,9 +277,11 @@ scope = scope.where(category_conditions, *category_values)
 ### Phase 3: Event Wizard Integration
 
 #### 1. Update Event Wizard Step 3
+
 **File:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/components/producer/CreateEventWizard/InvitationsStep.tsx`
 
 **Requirements:**
+
 - Add "Use Saved List" button/section
 - Show all available lists for the organization
 - Allow multiple list selection
@@ -258,6 +291,7 @@ scope = scope.where(category_conditions, *category_values)
 - Show which contacts come from which list (optional)
 
 **UI Design:**
+
 ```
 ┌─────────────────────────────────────┐
 │ Invite Vendors to Your Event        │
@@ -283,9 +317,11 @@ scope = scope.where(category_conditions, *category_values)
 ```
 
 #### 2. Implement List Selection Logic
+
 **Component:** New `ListSelector.tsx` component
 
 **Features:**
+
 - Fetch organization's lists
 - Multi-select with checkboxes
 - Show contact count per list
@@ -294,7 +330,9 @@ scope = scope.where(category_conditions, *category_values)
 - Real-time count updates
 
 #### 3. Implement Contact Merging
+
 **Logic:**
+
 - Fetch contacts from all selected lists
 - De-duplicate by contact ID
 - Combine with manually selected contacts
@@ -302,9 +340,11 @@ scope = scope.where(category_conditions, *category_values)
 - Maintain source tracking (which list each contact came from)
 
 #### 4. Add Exclusion Functionality
+
 **Component:** ContactExclusionList.tsx
 
 **Features:**
+
 - Only show when lists are selected
 - Display all contacts from selected lists
 - Allow unchecking individual contacts to exclude
@@ -312,9 +352,11 @@ scope = scope.where(category_conditions, *category_values)
 - Visual indicator for excluded contacts
 
 #### 5. Update Invitation Sending
+
 **File:** Event creation submission logic
 
 **Changes:**
+
 - Accept contact IDs from lists
 - Handle de-duplication
 - Update list `last_used_at` timestamp after use
@@ -323,9 +365,11 @@ scope = scope.where(category_conditions, *category_values)
 ### Phase 4: Additional Enhancements
 
 #### 1. View List Modal
+
 **Component:** `ViewListModal.tsx`
 
 **Features:**
+
 - Display all contacts in a list
 - Pagination for large lists
 - Quick actions (edit, delete, use in event)
@@ -333,27 +377,33 @@ scope = scope.where(category_conditions, *category_values)
 - Show list statistics
 
 #### 2. Edit List Modal
+
 **Component:** `EditListModal.tsx`
 
 **Features:**
+
 - Reuse CreateListModal with edit mode
 - Pre-populate existing data
 - Update instead of create
 - Show "last modified" info
 
 #### 3. List Usage Analytics
+
 **Backend Enhancement:**
 
 **Features:**
+
 - Track which events used each list
 - Count total invitations sent from list
 - Response rate analytics per list
 - Popular lists dashboard
 
 #### 4. List Sharing (Future)
+
 **Multi-organization Feature:**
 
 **Features:**
+
 - Share lists between organizations
 - Public vendor directory lists
 - Import lists from other organizations
@@ -363,6 +413,7 @@ scope = scope.where(category_conditions, *category_values)
 ## 🧪 Testing Checklist
 
 ### Backend Tests Needed
+
 - [ ] ContactList model validations
 - [ ] Smart list resolution with various filters
 - [ ] Manual list resolution
@@ -372,6 +423,7 @@ scope = scope.where(category_conditions, *category_values)
 - [ ] Update contacts_count cache
 
 ### Frontend Tests Needed
+
 - [ ] ListsManagement empty state
 - [ ] CreateListModal step navigation
 - [ ] SmartListBuilder filter selection
@@ -382,6 +434,7 @@ scope = scope.where(category_conditions, *category_values)
 - [ ] Pagination navigation
 
 ### Integration Tests Needed
+
 - [ ] Create smart list → verify count matches
 - [ ] Create manual list → verify contacts persisted
 - [ ] Update list → verify changes reflected
@@ -401,6 +454,7 @@ ContactList (1) ──< (many) Event (through usage tracking)
 ```
 
 **Storage Strategy:**
+
 - **Smart Lists:** Store filters as JSONB, resolve dynamically
 - **Manual Lists:** Store contact_ids as integer array, resolve statically
 - **Counter Cache:** contacts_count updated on create/update for manual lists
@@ -411,12 +465,14 @@ ContactList (1) ──< (many) Event (through usage tracking)
 ## 🎯 Success Metrics
 
 ### User Experience Metrics
+
 - Time to create first list: Target < 30 seconds
 - Lists created per producer: Target 3-5 lists
 - List reuse rate: Target 70%+ of events use saved lists
 - Contact management efficiency: Target 50% reduction in manual selection time
 
 ### Technical Metrics
+
 - Smart list query performance: Target < 100ms for 1000 contacts
 - UI responsiveness: Target < 50ms for filter changes
 - Modal load time: Target < 200ms
@@ -436,21 +492,25 @@ ContactList (1) ──< (many) Event (through usage tracking)
 ## 🗺️ Future Roadmap
 
 ### Q1 2026
+
 - ✅ Core list management (DONE)
 - 🚧 Event wizard integration (IN PROGRESS)
 - 📅 List usage analytics
 
 ### Q2 2026
+
 - 📅 CSV export/import for lists
 - 📅 List templates (pre-configured smart lists)
 - 📅 Bulk edit contacts in list
 
 ### Q3 2026
+
 - 📅 List sharing between organizations
 - 📅 Public vendor directory integration
 - 📅 AI-powered list suggestions
 
 ### Q4 2026
+
 - 📅 List performance optimization for 10K+ contacts
 - 📅 Advanced filtering (custom fields, date ranges)
 - 📅 List versioning and history
@@ -469,12 +529,14 @@ ContactList (1) ──< (many) Event (through usage tracking)
 ---
 
 **Status Summary:**
+
 - ✅ Backend: 100% Complete
 - ✅ List Management UI: 100% Complete
 - 🚧 Event Wizard Integration: 0% Complete (next phase)
 - 📅 Analytics & Enhancements: Planned
 
 **Next Steps:**
+
 1. Update Event Wizard Step 3 to show saved lists
 2. Implement multi-list selection
 3. Add contact exclusion functionality

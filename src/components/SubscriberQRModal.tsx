@@ -1,8 +1,14 @@
 import React, { useState, useRef } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { QrCode, Download, Share2, Copy, CheckCircle } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { QrCode, Download, Share2, Copy, CheckCircle } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 import { QRCodeCanvas } from 'qrcode.react'
 
 interface SubscriberQRModalProps {
@@ -28,8 +34,8 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
       link.click()
 
       toast({
-        title: "QR Code Downloaded!",
-        description: "Save this and print it for your events."
+        title: 'QR Code Downloaded!',
+        description: 'Save this and print it for your events.',
       })
     }
   }
@@ -39,15 +45,15 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
       await navigator.clipboard.writeText(subscribeUrl)
       setCopied(true)
       toast({
-        title: "Link Copied!",
-        description: "Share this link to let people subscribe."
+        title: 'Link Copied!',
+        description: 'Share this link to let people subscribe.',
       })
       setTimeout(() => setCopied(false), 2000)
     } catch {
       toast({
-        variant: "destructive",
-        title: "Failed to copy",
-        description: "Please copy the link manually."
+        variant: 'destructive',
+        title: 'Failed to copy',
+        description: 'Please copy the link manually.',
       })
     }
   }
@@ -58,7 +64,7 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
         await navigator.share({
           title: `Subscribe to ${organizationName}`,
           text: `Join ${organizationName} to get updates about events!`,
-          url: subscribeUrl
+          url: subscribeUrl,
         })
       } catch {
         // User cancelled share
@@ -91,12 +97,7 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
           {/* QR Code Display */}
           <div className="flex justify-center">
             <div className="bg-background p-6 rounded-xl shadow-2xl" ref={qrRef}>
-              <QRCodeCanvas
-                value={subscribeUrl}
-                size={256}
-                level="H"
-                includeMargin={true}
-              />
+              <QRCodeCanvas value={subscribeUrl} size={256} level="H" includeMargin={true} />
             </div>
           </div>
 
@@ -135,17 +136,11 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
 
           {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-3">
-            <Button
-              onClick={handleDownload}
-              className="voxxy-btn-solid"
-            >
+            <Button onClick={handleDownload} className="voxxy-btn-solid">
               <Download className="h-4 w-4 mr-2" />
               Download
             </Button>
-            <Button
-              onClick={handleShare}
-              className="bg-pink-600 hover:bg-pink-700 text-foreground"
-            >
+            <Button onClick={handleShare} className="bg-pink-600 hover:bg-pink-700 text-foreground">
               <Share2 className="h-4 w-4 mr-2" />
               Share
             </Button>
@@ -153,8 +148,12 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
 
           {/* Tips */}
           <div className="text-xs text-primary space-y-1">
-            <p>💡 <strong>Tip:</strong> Download and print this for your venue</p>
-            <p>📲 <strong>Mobile:</strong> Save this page as a bookmark for quick access</p>
+            <p>
+              💡 <strong>Tip:</strong> Download and print this for your venue
+            </p>
+            <p>
+              📲 <strong>Mobile:</strong> Save this page as a bookmark for quick access
+            </p>
           </div>
         </div>
       </DialogContent>

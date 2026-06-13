@@ -11,8 +11,8 @@ The guidebook trigger logic used localStorage to track if the guide had been sho
 ```typescript
 if (localStorage.getItem('voxxy_guidebook_seen') !== 'true') {
   // Show guide
-  setGuidebookOpen(true);
-  localStorage.setItem('voxxy_guidebook_seen', 'true');
+  setGuidebookOpen(true)
+  localStorage.setItem('voxxy_guidebook_seen', 'true')
 }
 ```
 
@@ -58,26 +58,35 @@ Improved the guide trigger to show for **new users with zero events**, even if t
 useEffect(() => {
   if (!loadingOrg && !loadingEvents && organization) {
     try {
-      const hasSeenGuide = localStorage.getItem('voxxy_guidebook_seen') === 'true';
-      const isNewUser = events.length === 0;
+      const hasSeenGuide = localStorage.getItem('voxxy_guidebook_seen') === 'true'
+      const isNewUser = events.length === 0
 
       // Show guide if:
       // 1. Never seen before, OR
       // 2. New user with no events (just finished payment)
       if (!hasSeenGuide || isNewUser) {
         const timer = setTimeout(() => {
-          setGuidebookOpen(true);
-          localStorage.setItem('voxxy_guidebook_seen', 'true');
-          console.log('🎯 Opening guidebook for user (newUser:', isNewUser, ', seenBefore:', hasSeenGuide, ')');
-        }, 500);
-        return () => clearTimeout(timer);
+          setGuidebookOpen(true)
+          localStorage.setItem('voxxy_guidebook_seen', 'true')
+          console.log(
+            '🎯 Opening guidebook for user (newUser:',
+            isNewUser,
+            ', seenBefore:',
+            hasSeenGuide,
+            ')',
+          )
+        }, 500)
+        return () => clearTimeout(timer)
       }
-    } catch { /* localStorage not available */ }
+    } catch {
+      /* localStorage not available */
+    }
   }
-}, [loadingOrg, loadingEvents, organization, events.length]);
+}, [loadingOrg, loadingEvents, organization, events.length])
 ```
 
 **Logic**:
+
 - Show guide if **never seen before** (`!hasSeenGuide`)
 - **OR** show guide if **new user with zero events** (`isNewUser`)
 - This catches users who just completed payment and haven't created their first event yet
@@ -118,6 +127,7 @@ If you're testing the payment flow repeatedly:
 ## Testing Checklist
 
 ### Test 1: New User Flow
+
 - [ ] Sign up as venue_owner
 - [ ] Complete email verification
 - [ ] Complete payment (sandbox mode)
@@ -127,11 +137,13 @@ If you're testing the payment flow repeatedly:
 - [ ] **Guidebook should popup after ~500ms** ✅
 
 ### Test 2: User With Events
+
 - [ ] Log in as existing user (has events)
 - [ ] Navigate to Dashboard
 - [ ] **Guidebook should NOT show** ✅
 
 ### Test 3: Repeated Payment Testing
+
 - [ ] Delete existing test account (or create new one)
 - [ ] Complete full signup → payment flow
 - [ ] Guidebook should show
@@ -139,6 +151,7 @@ If you're testing the payment flow repeatedly:
 - [ ] Guidebook should show again (flag cleared on payment)
 
 ### Test 4: Manual Trigger
+
 - [ ] Click "Guide" button in top-right of Dashboard
 - [ ] **Guidebook should open** ✅
 
@@ -147,11 +160,13 @@ If you're testing the payment flow repeatedly:
 Added console logs to help debug:
 
 **PaymentSuccessPage**:
+
 ```
 ✅ Cleared guidebook flag for new user onboarding
 ```
 
 **Dashboard**:
+
 ```
 🎯 Opening guidebook for user (newUser: true, seenBefore: false)
 ```
@@ -172,6 +187,7 @@ Check browser console to verify the trigger logic is running correctly.
 ## Build Status
 
 ✅ Build successful:
+
 ```
 ✓ 2647 modules transformed.
 ✓ built in 6.69s

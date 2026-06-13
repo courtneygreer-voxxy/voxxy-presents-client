@@ -114,11 +114,7 @@
       hsl(265 22% 96.5%),
       hsl(240 20% 96.5%)
     );
-    --voxxy-grad-nav: linear-gradient(
-      to right,
-      rgba(218, 207, 231, 0.94),
-      rgba(152, 51, 214, 0.6)
-    );
+    --voxxy-grad-nav: linear-gradient(to right, rgba(218, 207, 231, 0.94), rgba(152, 51, 214, 0.6));
     --voxxy-grad-cta: linear-gradient(
       to bottom,
       rgba(218, 207, 231, 0.49),
@@ -272,7 +268,7 @@
 
     /* Input field surfaces — lifted charcoal, distinct from glass-card bg */
     --voxxy-input-frost-bg: rgb(52 36 80 / 0.82);
-    --voxxy-input-frost-bg-focus: rgb(60 42 92 / 0.90);
+    --voxxy-input-frost-bg-focus: rgb(60 42 92 / 0.9);
     --voxxy-input-frost-border: rgb(255 255 255 / 0.18);
     --voxxy-input-frost-border-focus: hsl(262 72% 72% / 0.7);
     --voxxy-input-frost-ring: hsl(262 72% 72% / 0.28);
@@ -440,7 +436,9 @@
   .dark .voxxy-application-highlight {
     background-color: rgb(31 22 52 / 0.92);
     border-color: hsl(var(--primary) / 0.5);
-    box-shadow: var(--voxxy-dark-inset-line), 0 12px 32px rgb(0 0 0 / 0.25);
+    box-shadow:
+      var(--voxxy-dark-inset-line),
+      0 12px 32px rgb(0 0 0 / 0.25);
   }
 
   /* —— Buttons & CTAs —— */
@@ -589,10 +587,10 @@
   .dark.voxxy-public-page .text-muted-foreground {
     color: rgb(224 217 245 / 0.78);
   }
-  .dark.voxxy-public-page [class*="text-foreground/85"] {
+  .dark.voxxy-public-page [class*='text-foreground/85'] {
     color: rgb(244 240 255 / 0.88);
   }
-  .dark.voxxy-public-page [class*="text-foreground/80"] {
+  .dark.voxxy-public-page [class*='text-foreground/80'] {
     color: rgb(236 231 248 / 0.82);
   }
   .dark.voxxy-public-page .glass-card {
@@ -703,7 +701,9 @@
   .dark .voxxy-input-frost:focus {
     background-color: var(--voxxy-input-frost-bg-focus);
     border-color: var(--voxxy-input-frost-border-focus);
-    box-shadow: 0 0 0 3px var(--voxxy-input-frost-ring), inset 0 1px 0 rgb(255 255 255 / 0.06);
+    box-shadow:
+      0 0 0 3px var(--voxxy-input-frost-ring),
+      inset 0 1px 0 rgb(255 255 255 / 0.06);
   }
 
   /* —— Prefixed input group (e.g. "https://" or "instagram.com/") —— */
@@ -722,7 +722,9 @@
   .dark .voxxy-input-frost-group:focus-within {
     background-color: var(--voxxy-input-frost-bg-focus);
     border-color: var(--voxxy-input-frost-border-focus);
-    box-shadow: 0 0 0 3px var(--voxxy-input-frost-ring), inset 0 1px 0 rgb(255 255 255 / 0.06);
+    box-shadow:
+      0 0 0 3px var(--voxxy-input-frost-ring),
+      inset 0 1px 0 rgb(255 255 255 / 0.06);
   }
   .voxxy-input-frost-prefix {
     @apply flex items-center px-2.5 border-r border-border text-muted-foreground text-sm whitespace-nowrap select-none;
@@ -826,7 +828,7 @@
     border-color: rgb(255 255 255 / 0.35);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.18),
-      0 0 24px rgb(144 84 227 / 0.30),
+      0 0 24px rgb(144 84 227 / 0.3),
       0 8px 24px rgb(0 0 0 / 0.18);
   }
 
@@ -869,7 +871,9 @@
   }
 
   .voxxy-image-elevated {
-    box-shadow: 0 20px 60px rgba(101, 26, 233, 0.25), 0 0 40px rgba(204, 48, 232, 0.15);
+    box-shadow:
+      0 20px 60px rgba(101, 26, 233, 0.25),
+      0 0 40px rgba(204, 48, 232, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }

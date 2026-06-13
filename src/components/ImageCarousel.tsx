@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { Button } from '@/components/ui/button'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface ImageCarouselProps {
   images: string[]
@@ -8,13 +8,15 @@ interface ImageCarouselProps {
   className?: string
 }
 
-export default function ImageCarousel({ images, altText, className = "" }: ImageCarouselProps) {
+export default function ImageCarousel({ images, altText, className = '' }: ImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   // If no images, show placeholder
   if (!images || images.length === 0) {
     return (
-      <div className={`bg-muted rounded-lg shadow-lg flex items-center justify-center ${className}`}>
+      <div
+        className={`bg-muted rounded-lg shadow-lg flex items-center justify-center ${className}`}
+      >
         <div className="text-center text-gray-500 p-8">
           <p className="text-lg font-medium">No images yet</p>
           <p className="text-sm">Images will appear here once added</p>
@@ -37,15 +39,11 @@ export default function ImageCarousel({ images, altText, className = "" }: Image
   }
 
   const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    )
+    setCurrentIndex((prevIndex) => (prevIndex === 0 ? images.length - 1 : prevIndex - 1))
   }
 
   const goToNext = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
-    )
+    setCurrentIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1))
   }
 
   const goToSlide = (index: number) => {
@@ -88,8 +86,8 @@ export default function ImageCarousel({ images, altText, className = "" }: Image
           <button
             key={index}
             className={`w-2 h-2 rounded-full transition-all ${
-              index === currentIndex 
-                ? 'bg-background scale-125' 
+              index === currentIndex
+                ? 'bg-background scale-125'
                 : 'bg-background/50 hover:bg-background/75'
             }`}
             onClick={() => goToSlide(index)}

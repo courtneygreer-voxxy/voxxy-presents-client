@@ -11,7 +11,7 @@ interface LoadingTransitionProps {
  */
 export function LoadingTransition({
   message = 'Loading...',
-  submessage = 'This will only take a moment...'
+  submessage = 'This will only take a moment...',
 }: LoadingTransitionProps) {
   return (
     <div className="min-h-screen voxxy-gradient-page-alt flex items-center justify-center">
@@ -22,9 +22,7 @@ export function LoadingTransition({
       <div className="relative text-center">
         <Loader className="h-12 w-12 text-primary animate-spin mx-auto mb-4" />
         <p className="text-foreground text-xl font-semibold">{message}</p>
-        {submessage && (
-          <p className="text-muted-foreground text-sm mt-2">{submessage}</p>
-        )}
+        {submessage && <p className="text-muted-foreground text-sm mt-2">{submessage}</p>}
       </div>
     </div>
   )

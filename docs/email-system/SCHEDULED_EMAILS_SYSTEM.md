@@ -41,6 +41,7 @@ The Scheduled Emails System allows **Producers** (venue owners) to create, custo
 ### Access Point
 
 **Navigation Path:**
+
 ```
 Producer Dashboard
   → Click Event Card
@@ -86,18 +87,21 @@ Producer Dashboard
 ### Technology Stack
 
 **Frontend:**
+
 - React 18.3.1 + TypeScript
 - React Hook Form + Zod validation
 - date-fns for date formatting
 - Radix UI components
 
 **Backend:**
+
 - Rails 7.2.2
 - PostgreSQL (JSONB for filter_criteria)
 - SendGrid (email delivery)
 - Sidekiq (background jobs)
 
 **Services:**
+
 - `ScheduledEmailGenerator` - Generate emails from templates
 - `EmailScheduleCalculator` - Calculate scheduled_for times
 - `EmailVariableResolver` - Resolve {{variables}} in content
@@ -149,44 +153,44 @@ end
 
 ```typescript
 export interface ScheduledEmail {
-  id: number;
-  event_id: number;
+  id: number
+  event_id: number
 
   // Template tracking
-  email_campaign_template_id: number | null;
-  email_template_item_id: number | null;
+  email_campaign_template_id: number | null
+  email_template_item_id: number | null
 
   // Email content
-  name: string;
-  subject_template: string;
-  body_template: string; // HTML
+  name: string
+  subject_template: string
+  body_template: string // HTML
 
   // Scheduling
-  trigger_type: TriggerType;
-  trigger_value: number | null;
-  trigger_time: string | null; // HH:MM
-  scheduled_for: string; // ISO datetime
+  trigger_type: TriggerType
+  trigger_value: number | null
+  trigger_time: string | null // HH:MM
+  scheduled_for: string // ISO datetime
 
   // Filtering
-  filter_criteria: FilterCriteria;
+  filter_criteria: FilterCriteria
 
   // Status
-  status: ScheduledEmailStatus; // 'scheduled' | 'paused' | 'sent' | 'failed' | 'cancelled'
-  sent_at: string | null;
-  recipient_count: number;
-  error_message: string | null;
+  status: ScheduledEmailStatus // 'scheduled' | 'paused' | 'sent' | 'failed' | 'cancelled'
+  sent_at: string | null
+  recipient_count: number
+  error_message: string | null
 
   // Timestamps
-  created_at: string;
-  updated_at: string;
+  created_at: string
+  updated_at: string
 
   // Optional relations
-  latest_delivery?: EmailDelivery;
-  email_deliveries?: EmailDelivery[];
-  delivery_status?: DeliveryStatus;
+  latest_delivery?: EmailDelivery
+  email_deliveries?: EmailDelivery[]
+  delivery_status?: DeliveryStatus
 
   // Frontend-only
-  isInvitationAnnouncement?: boolean; // Virtual email flag
+  isInvitationAnnouncement?: boolean // Virtual email flag
 }
 ```
 
@@ -196,17 +200,17 @@ A collection of up to 40 email definitions that can be cloned and reused.
 
 ```typescript
 export interface EmailCampaignTemplate {
-  id: number;
-  template_type: 'system' | 'user';
-  organization_id: number | null; // null for system templates
-  name: string;
-  description: string | null;
-  is_default: boolean;
-  email_count: number;
-  events_count: number;
-  created_at: string;
-  updated_at: string;
-  email_template_items?: EmailTemplateItem[];
+  id: number
+  template_type: 'system' | 'user'
+  organization_id: number | null // null for system templates
+  name: string
+  description: string | null
+  is_default: boolean
+  email_count: number
+  events_count: number
+  created_at: string
+  updated_at: string
+  email_template_items?: EmailTemplateItem[]
 }
 ```
 
@@ -216,28 +220,28 @@ Individual email definition within a template.
 
 ```typescript
 export interface EmailTemplateItem {
-  id: number;
-  email_campaign_template_id: number;
-  name: string;
-  description: string | null;
-  category: EmailCategory;
-  position: number; // 1-40
+  id: number
+  email_campaign_template_id: number
+  name: string
+  description: string | null
+  category: EmailCategory
+  position: number // 1-40
 
   // Content
-  subject_template: string;
-  body_template: string; // HTML
+  subject_template: string
+  body_template: string // HTML
 
   // Scheduling
-  trigger_type: TriggerType;
-  trigger_value: number | null;
-  trigger_time: string | null; // HH:MM
+  trigger_type: TriggerType
+  trigger_value: number | null
+  trigger_time: string | null // HH:MM
 
   // Filtering
-  filter_criteria: FilterCriteria;
-  enabled_by_default: boolean;
+  filter_criteria: FilterCriteria
+  enabled_by_default: boolean
 
-  created_at: string;
-  updated_at: string;
+  created_at: string
+  updated_at: string
 }
 ```
 
@@ -247,35 +251,35 @@ SendGrid delivery tracking (updated via webhooks).
 
 ```typescript
 export interface EmailDelivery {
-  id: number;
-  scheduled_email_id: number;
-  event_id: number;
-  registration_id: number;
+  id: number
+  scheduled_email_id: number
+  event_id: number
+  registration_id: number
 
   // SendGrid tracking
-  sendgrid_message_id: string;
-  recipient_email: string;
-  status: DeliveryStatus;
+  sendgrid_message_id: string
+  recipient_email: string
+  status: DeliveryStatus
 
   // Bounce handling
-  bounce_type: 'soft' | 'hard' | null;
-  bounce_reason: string | null;
-  drop_reason: string | null;
+  bounce_type: 'soft' | 'hard' | null
+  bounce_reason: string | null
+  drop_reason: string | null
 
   // Timestamps (from SendGrid)
-  sent_at: string | null;
-  delivered_at: string | null;
-  bounced_at: string | null;
-  dropped_at: string | null;
-  unsubscribed_at: string | null;
+  sent_at: string | null
+  delivered_at: string | null
+  bounced_at: string | null
+  dropped_at: string | null
+  unsubscribed_at: string | null
 
   // Retry logic
-  retry_count: number;
-  next_retry_at: string | null;
-  max_retries: number;
+  retry_count: number
+  next_retry_at: string | null
+  max_retries: number
 
-  created_at: string;
-  updated_at: string;
+  created_at: string
+  updated_at: string
 }
 ```
 
@@ -285,13 +289,13 @@ JSONB field for recipient filtering.
 
 ```typescript
 export interface FilterCriteria {
-  status?: RegistrationStatus[];        // ['approved', 'confirmed']
-  exclude_status?: RegistrationStatus[]; // ['rejected', 'cancelled']
-  vendor_category?: string[];            // ['Food', 'Beverage']
-  location_city?: string[];              // ['Atlanta', 'Decatur']
-  location_state?: string[];             // ['GA', 'FL']
-  tags?: string[];                       // Custom tags
-  payment_status?: PaymentStatus[];      // ['paid', 'unpaid'] (future)
+  status?: RegistrationStatus[] // ['approved', 'confirmed']
+  exclude_status?: RegistrationStatus[] // ['rejected', 'cancelled']
+  vendor_category?: string[] // ['Food', 'Beverage']
+  location_city?: string[] // ['Atlanta', 'Decatur']
+  location_state?: string[] // ['GA', 'FL']
+  tags?: string[] // Custom tags
+  payment_status?: PaymentStatus[] // ['paid', 'unpaid'] (future)
 }
 ```
 
@@ -419,6 +423,7 @@ CommandCenter.tsx (Producer Dashboard Modal)
 **Location:** `/src/components/producer/Email/EmailAutomationTab.tsx` (465 lines)
 
 **Responsibilities:**
+
 - Load scheduled emails for event
 - Display statistics dashboard
 - Manage search & filtering
@@ -427,6 +432,7 @@ CommandCenter.tsx (Producer Dashboard Modal)
 - Create virtual "Invitation Announcement" email
 
 **Key State:**
+
 ```typescript
 const [emails, setEmails] = useState<ScheduledEmail[]>([])
 const [isLoading, setIsLoading] = useState(true)
@@ -438,32 +444,35 @@ const [statusFilter, setStatusFilter] = useState<FilterType>('all')
 ```
 
 **Key Functions:**
+
 ```typescript
-loadEmails()              // Fetch from API
-handleEdit(email)         // Open edit modal
-handlePreview(email)      // Open preview modal
-handlePause(emailId)      // Pause email
-handleResume(emailId)     // Resume email
-handleSendNow(emailId)    // Send immediately
-handleDelete(emailId)     // Delete email
-handleGenerateEmails()    // Generate from template
-handleSaveEdit(id, data)  // Save edits
+loadEmails() // Fetch from API
+handleEdit(email) // Open edit modal
+handlePreview(email) // Open preview modal
+handlePause(emailId) // Pause email
+handleResume(emailId) // Resume email
+handleSendNow(emailId) // Send immediately
+handleDelete(emailId) // Delete email
+handleGenerateEmails() // Generate from template
+handleSaveEdit(id, data) // Save edits
 ```
 
 **Empty State:**
+
 - Shows when `emails.length === 0`
 - Sparkles icon
 - "No Scheduled Emails Yet" heading
 - "Generate Emails from Template" button
 
 **Statistics Display:**
+
 ```typescript
 const stats = {
   total: emails.length,
-  scheduled: emails.filter(e => e.status === 'scheduled').length,
-  paused: emails.filter(e => e.status === 'paused').length,
-  sent: emails.filter(e => e.status === 'sent').length,
-  failed: emails.filter(e => e.status === 'failed').length,
+  scheduled: emails.filter((e) => e.status === 'scheduled').length,
+  paused: emails.filter((e) => e.status === 'paused').length,
+  sent: emails.filter((e) => e.status === 'sent').length,
+  failed: emails.filter((e) => e.status === 'failed').length,
 }
 ```
 
@@ -474,6 +483,7 @@ const stats = {
 **Current Implementation:**
 
 **Form Fields:**
+
 1. **Email Name** (text input)
    - Current: Simple text input
    - Validation: Required, min 1 character
@@ -504,6 +514,7 @@ const stats = {
    - Current: Plain textarea, no WYSIWYG
 
 **Validation Schema:**
+
 ```typescript
 const editEmailSchema = z.object({
   name: z.string().min(1, 'Email name is required'),
@@ -511,11 +522,15 @@ const editEmailSchema = z.object({
   body_template: z.string().min(1, 'Email body is required'),
   trigger_type: z.string().min(1, 'Trigger type is required'),
   trigger_value: z.number().min(0, 'Must be 0 or greater').optional(),
-  trigger_time: z.string().regex(/^\d{2}:\d{2}$/, 'Time must be in HH:MM format').optional(),
+  trigger_time: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/, 'Time must be in HH:MM format')
+    .optional(),
 })
 ```
 
 **Submit Flow:**
+
 ```typescript
 onSubmit(data) {
   // Build update request
@@ -535,6 +550,7 @@ onSubmit(data) {
 ```
 
 **Restrictions:**
+
 - Cannot edit if `email.status === 'sent'`
 - Shows warning banner for sent emails
 - Save button disabled for sent emails
@@ -544,6 +560,7 @@ onSubmit(data) {
 **Location:** `/src/components/producer/Email/EmailTable.tsx` & `EmailRow.tsx`
 
 **Display:**
+
 - Table layout with columns: Name, Subject, Schedule, Recipients, Status, Actions
 - Each row is clickable (opens edit modal if editable)
 - Status badge with color coding
@@ -562,6 +579,7 @@ onSubmit(data) {
 **Alternative View:** Card-based layout (used in ScheduledEmailList.tsx, not currently in main tab)
 
 **Display:**
+
 - Card with hover effect
 - Status badge
 - Edit icon (shows on hover if editable)
@@ -578,6 +596,7 @@ onSubmit(data) {
 **Location:** `/app/controllers/api/v1/presents/scheduled_emails_controller.rb` (248 lines)
 
 **Routes:**
+
 ```ruby
 # GET /api/v1/presents/events/:event_id/scheduled_emails
 def index # List all scheduled emails for event
@@ -608,6 +627,7 @@ def preview # Preview with resolved variables
 ```
 
 **Update Logic (Critical):**
+
 ```ruby
 def update
   # Check if trigger fields changed
@@ -895,6 +915,7 @@ end
 ## API Reference
 
 ### Base URL
+
 ```
 https://www.voxxyai.com/api/v1/presents/events/:event_slug/scheduled_emails
 ```
@@ -902,6 +923,7 @@ https://www.voxxyai.com/api/v1/presents/events/:event_slug/scheduled_emails
 ### Endpoints
 
 #### List Emails
+
 ```http
 GET /api/v1/presents/events/:event_slug/scheduled_emails
 
@@ -913,6 +935,7 @@ Response: ScheduledEmail[]
 ```
 
 #### Get Single Email
+
 ```http
 GET /api/v1/presents/events/:event_slug/scheduled_emails/:id
 
@@ -920,6 +943,7 @@ Response: ScheduledEmail (with email_deliveries included)
 ```
 
 #### Generate Emails
+
 ```http
 POST /api/v1/presents/events/:event_slug/scheduled_emails/generate
 
@@ -938,6 +962,7 @@ Response: {
 ```
 
 #### Update Email
+
 ```http
 PATCH /api/v1/presents/events/:event_slug/scheduled_emails/:id
 
@@ -959,6 +984,7 @@ Note: If trigger fields change, backend automatically recalculates scheduled_for
 ```
 
 #### Pause Email
+
 ```http
 PATCH /api/v1/presents/events/:event_slug/scheduled_emails/:id/pause
 
@@ -969,6 +995,7 @@ Response: {
 ```
 
 #### Resume Email
+
 ```http
 PATCH /api/v1/presents/events/:event_slug/scheduled_emails/:id/resume
 
@@ -979,6 +1006,7 @@ Response: {
 ```
 
 #### Send Now
+
 ```http
 POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/send_now
 
@@ -991,6 +1019,7 @@ Response: {
 ```
 
 #### Preview Email
+
 ```http
 POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/preview
 
@@ -1007,6 +1036,7 @@ Response: {
 ```
 
 #### Delete Email
+
 ```http
 DELETE /api/v1/presents/events/:event_slug/scheduled_emails/:id
 
@@ -1014,6 +1044,7 @@ Response: 204 No Content
 ```
 
 #### Save as Template
+
 ```http
 POST /api/v1/presents/events/:event_slug/scheduled_emails/save_as_template
 
@@ -1035,10 +1066,12 @@ Response: EmailCampaignTemplate (newly created)
 **Backend (What's Saved):** `{{event_title}}`, `{{business_name}}` - snake_case, technical
 
 The system automatically converts between formats:
+
 - **Loading:** Backend `{{}}` → Frontend `[]`
 - **Saving:** Frontend `[]` → Backend `{{}}`
 
 **Benefits:**
+
 - Users don't need to remember backend variable names
 - Clickable buttons for easy insertion
 - Clear, readable variable names
@@ -1047,46 +1080,52 @@ The system automatically converts between formats:
 ### Available Variables
 
 #### Event Variables
-| User Sees (Frontend) | Backend Saves | Example Output |
-|---------------------|---------------|----------------|
-| `[eventName]` | `{{event_title}}` | "Summer Market 2025" |
-| `[eventDate]` | `{{event_date}}` | "June 15, 2025" |
-| `[eventTime]` | `{{event_time}}` | "10:00 AM - 6:00 PM" |
-| `[eventLocation]` | `{{event_location}}` | "Piedmont Park, Atlanta, GA" |
-| `[applicationDeadline]` | `{{application_deadline}}` | "May 30, 2025" |
-| `[boothPrice]` | `{{booth_price}}` | "$150.00" |
+
+| User Sees (Frontend)    | Backend Saves              | Example Output               |
+| ----------------------- | -------------------------- | ---------------------------- |
+| `[eventName]`           | `{{event_title}}`          | "Summer Market 2025"         |
+| `[eventDate]`           | `{{event_date}}`           | "June 15, 2025"              |
+| `[eventTime]`           | `{{event_time}}`           | "10:00 AM - 6:00 PM"         |
+| `[eventLocation]`       | `{{event_location}}`       | "Piedmont Park, Atlanta, GA" |
+| `[applicationDeadline]` | `{{application_deadline}}` | "May 30, 2025"               |
+| `[boothPrice]`          | `{{booth_price}}`          | "$150.00"                    |
 
 #### Organization Variables
-| User Sees (Frontend) | Backend Saves | Example Output |
-|---------------------|---------------|----------------|
-| `[organizationName]` | `{{organization_name}}` | "Voxxy Presents" |
+
+| User Sees (Frontend)  | Backend Saves            | Example Output            |
+| --------------------- | ------------------------ | ------------------------- |
+| `[organizationName]`  | `{{organization_name}}`  | "Voxxy Presents"          |
 | `[organizationEmail]` | `{{organization_email}}` | "hello@voxxypresents.com" |
 
 #### Vendor Variables
-| User Sees (Frontend) | Backend Saves | Example Output |
-|---------------------|---------------|----------------|
-| `[vendorName]` | `{{vendor_name}}` | "John Doe" |
-| `[firstName]` | `{{first_name}}` | "John" |
-| `[businessName]` | `{{business_name}}` | "John's Tacos" |
-| `[vendorCategory]` | `{{vendor_category}}` | "Food" |
-| `[boothNumber]` | `{{booth_number}}` | "A-12" (if assigned) |
+
+| User Sees (Frontend) | Backend Saves         | Example Output       |
+| -------------------- | --------------------- | -------------------- |
+| `[vendorName]`       | `{{vendor_name}}`     | "John Doe"           |
+| `[firstName]`        | `{{first_name}}`      | "John"               |
+| `[businessName]`     | `{{business_name}}`   | "John's Tacos"       |
+| `[vendorCategory]`   | `{{vendor_category}}` | "Food"               |
+| `[boothNumber]`      | `{{booth_number}}`    | "A-12" (if assigned) |
 
 #### Computed Variables
-| User Sees (Frontend) | Backend Saves | Example Output |
-|---------------------|---------------|----------------|
-| `[eventUrl]` | `{{event_url}}` | "https://voxxypresents.com/events/summer-market-2025" |
-| `[unsubscribeLink]` | `{{unsubscribe_link}}` | "https://voxxypresents.com/unsubscribe/abc123" |
+
+| User Sees (Frontend) | Backend Saves          | Example Output                                        |
+| -------------------- | ---------------------- | ----------------------------------------------------- |
+| `[eventUrl]`         | `{{event_url}}`        | "https://voxxypresents.com/events/summer-market-2025" |
+| `[unsubscribeLink]`  | `{{unsubscribe_link}}` | "https://voxxypresents.com/unsubscribe/abc123"        |
 
 ### Usage in Templates
 
 **What Users Type (Frontend):**
 
 **Subject Line:**
+
 ```
 Reminder: [eventName] is Tomorrow! - [vendorName]
 ```
 
 **Body (Plain Text):**
+
 ```
 Hi [vendorName],
 
@@ -1104,11 +1143,13 @@ To unsubscribe: [unsubscribeLink]
 **What Backend Receives (After Conversion):**
 
 **Subject Line:**
+
 ```
 Reminder: {{event_title}} is Tomorrow! - {{vendor_name}}
 ```
 
 **Body:**
+
 ```
 Hi {{vendor_name}},
 
@@ -1148,6 +1189,7 @@ To unsubscribe: {{unsubscribe_link}}
    - EmailVariableResolver replaces with actual values
 
 **Example Resolution (Backend):**
+
 ```ruby
 template = "Hi {{vendor_name}}, your booth at {{event_title}} is {{booth_number}}."
 registration = Registration.find(123) # John's Tacos, Booth A-12
@@ -1169,54 +1211,65 @@ resolved = resolver.resolve(template)
 Triggers determine **when** an email is sent relative to event dates.
 
 #### 1. `days_before_event`
+
 - Sends X days **before** the event date
 - Requires: `trigger_value` (number of days)
 - Example: `trigger_value: 3` → Send 3 days before event
 
 #### 2. `days_after_event`
+
 - Sends X days **after** the event date
 - Requires: `trigger_value` (number of days)
 - Example: `trigger_value: 2` → Send 2 days after event
 
 #### 3. `days_before_deadline`
+
 - Sends X days **before** application deadline
 - Requires: `trigger_value` (number of days)
 - Example: `trigger_value: 7` → Send 1 week before deadline
 
 #### 4. `on_event_date`
+
 - Sends **on** the event date
 - No trigger_value needed
 - Uses `trigger_time` to set time
 
 #### 5. `on_application_open`
+
 - Sends **immediately** when event is created
 - No trigger_value needed
 - Used for announcement emails
 
 #### 6. `days_before_payment_deadline`
+
 - Sends X days **before** payment deadline
 - Requires: `trigger_value` (number of days)
 - Requires event to have `payment_deadline` set
 
 #### 7. `on_payment_deadline`
+
 - Sends **on** payment deadline date
 - No trigger_value needed
 
 #### 8. `days_after_deadline`
+
 - Sends X days **after** application deadline
 - Requires: `trigger_value` (number of days)
 
 #### 9. `on_application_submit`
+
 - Sends when vendor submits application (transactional)
 - Not used in scheduled emails (immediate trigger)
 
 #### 10. `on_approval`
+
 - Sends when producer approves application (transactional)
 - Not used in scheduled emails (immediate trigger)
 
 ### Calculation Logic
 
 **Example 1: 3 Days Before Event**
+
 ```
 Event Date: 2025-06-15
 Trigger Type: days_before_event
@@ -1233,6 +1286,7 @@ Result: 2025-06-12 09:00:00 UTC
 ```
 
 **Example 2: On Event Date**
+
 ```
 Event Date: 2025-06-15
 Trigger Type: on_event_date
@@ -1249,6 +1303,7 @@ Result: 2025-06-15 07:00:00 UTC
 ```
 
 **Example 3: 2 Days After Event**
+
 ```
 Event Date: 2025-06-15
 Trigger Type: days_after_event
@@ -1277,12 +1332,14 @@ Result: 2025-06-17 10:00:00 UTC
 ### Overview
 
 Recipients are filtered based on `filter_criteria` (JSONB field). Filters are applied when:
+
 1. Calculating `recipient_count` (dynamically)
 2. Sending emails (EmailSenderService)
 
 ### Filter Fields
 
 #### `status` (include)
+
 Include only registrations with these statuses.
 
 ```json
@@ -1294,6 +1351,7 @@ Include only registrations with these statuses.
 **Result:** Only sends to approved or confirmed vendors
 
 #### `exclude_status` (exclude)
+
 Exclude registrations with these statuses.
 
 ```json
@@ -1305,6 +1363,7 @@ Exclude registrations with these statuses.
 **Result:** Sends to all EXCEPT rejected/cancelled
 
 #### `vendor_category`
+
 Filter by vendor category.
 
 ```json
@@ -1316,6 +1375,7 @@ Filter by vendor category.
 **Result:** Only sends to Food or Beverage vendors
 
 #### `location_city`
+
 Filter by city (future - registration model doesn't have city yet).
 
 ```json
@@ -1325,6 +1385,7 @@ Filter by city (future - registration model doesn't have city yet).
 ```
 
 #### `location_state`
+
 Filter by state (future).
 
 ```json
@@ -1334,6 +1395,7 @@ Filter by state (future).
 ```
 
 #### `payment_status` (future)
+
 Filter by payment status (not yet implemented).
 
 ```json
@@ -1359,6 +1421,7 @@ Multiple filters are **AND**ed together.
 ### Implementation
 
 **Backend (RecipientFilterService):**
+
 ```ruby
 def filter_recipients
   scope = @event.registrations.where(email_unsubscribed: false)
@@ -1388,12 +1451,12 @@ Emails are sent via SendGrid API. Each send creates an `EmailDelivery` record.
 
 ```typescript
 type DeliveryStatus =
-  | 'pending'      // Not sent yet
-  | 'queued'       // Queued in SendGrid
-  | 'sent'         // Sent to recipient's server
-  | 'delivered'    // Successfully delivered
-  | 'bounced'      // Hard or soft bounce
-  | 'dropped'      // Rejected by SendGrid (e.g., unsubscribed)
+  | 'pending' // Not sent yet
+  | 'queued' // Queued in SendGrid
+  | 'sent' // Sent to recipient's server
+  | 'delivered' // Successfully delivered
+  | 'bounced' // Hard or soft bounce
+  | 'dropped' // Rejected by SendGrid (e.g., unsubscribed)
   | 'unsubscribed' // Recipient unsubscribed
 ```
 
@@ -1424,21 +1487,25 @@ type DeliveryStatus =
 ### Bounce Retry Logic
 
 **Soft Bounces:** Temporary failures (mailbox full, server down)
+
 - Automatically retried up to `max_retries` (default: 3)
 - `next_retry_at` calculated with exponential backoff
 
 **Hard Bounces:** Permanent failures (invalid email, domain doesn't exist)
+
 - No retry attempted
 - Marks delivery as permanently failed
 
 ### Viewing Delivery Status
 
 **In UI:**
+
 - ScheduledEmailCard shows delivery status badge for sent emails
 - Email details shows delivery count: "X delivered"
 - Future: Click to see per-recipient delivery details
 
 **In API:**
+
 ```http
 GET /api/v1/presents/events/:event_slug/scheduled_emails/:id
 
@@ -1658,6 +1725,7 @@ Response includes:
    - Improved field labels ("Email Message" instead of "Email Body (HTML)")
 
 **Technical Details:**
+
 - Added refs for cursor position tracking (`subjectRef`, `bodyRef`)
 - State management for active field (`activeField`)
 - `insertVariableAtCursor()` helper for smart insertion
@@ -1665,6 +1733,7 @@ Response includes:
 - Zero backend changes required
 
 **Files Modified:**
+
 - NEW: `/src/utils/emailVariables.ts` (220 lines)
 - UPDATED: `/src/components/producer/Email/EditScheduledEmailModal.tsx` (478 lines)
 - UPDATED: `/SCHEDULED_EMAILS_SYSTEM.md` (this file)
@@ -1672,6 +1741,7 @@ Response includes:
 ---
 
 ### 2026-01-17 (Earlier)
+
 - Initial documentation created
 - Documented current state of EditScheduledEmailModal
 - Identified limitations and proposed enhancements
@@ -1715,12 +1785,14 @@ Response includes:
 ### Code References
 
 **Frontend:**
+
 - Main Tab: `/src/components/producer/Email/EmailAutomationTab.tsx`
 - Edit Modal: `/src/components/producer/Email/EditScheduledEmailModal.tsx`
 - Types: `/src/types/email.ts`
 - API Client: `/src/services/api.ts` (lines 1085-1195)
 
 **Backend:**
+
 - Model: `/app/models/scheduled_email.rb`
 - Controller: `/app/controllers/api/v1/presents/scheduled_emails_controller.rb`
 - Generator: `/app/services/scheduled_email_generator.rb`

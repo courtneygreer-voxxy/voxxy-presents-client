@@ -11,6 +11,7 @@ Updated the **BetaPendingPage** ("Welcome to Voxxy - Complete the steps below to
 **Added**: Blue-highlighted section showing auto-created organization details for venue_owner users.
 
 **Features:**
+
 - **Organization Name**: Shows the auto-generated name (e.g., "John Smith's Venue")
 - **Slug**: Displays the URL-friendly slug
 - **Email**: Shows organization email (same as user email)
@@ -21,6 +22,7 @@ Updated the **BetaPendingPage** ("Welcome to Voxxy - Complete the steps below to
 **Location**: Appears at the top of the card content, before account information.
 
 **Conditional Rendering:**
+
 - Only shows for `venue_owner` or `producer` roles
 - Only displays when organization data is successfully loaded
 - Shows loading spinner while fetching organization
@@ -30,6 +32,7 @@ Updated the **BetaPendingPage** ("Welcome to Voxxy - Complete the steps below to
 **Added**: Account deletion button at the bottom of the page.
 
 **Features:**
+
 - **Initial State**: Small button with trash icon saying "Delete Account"
 - **Confirmation Flow**: Clicking shows a red warning box with:
   - Warning icon and "Are you sure?" heading
@@ -42,6 +45,7 @@ Updated the **BetaPendingPage** ("Welcome to Voxxy - Complete the steps below to
 **Location**: Bottom of the card, in a new section below "Sign Out".
 
 **Safety Features:**
+
 - Two-step confirmation prevents accidental deletion
 - Clear warning about permanent data loss
 - Visual distinction (red color scheme)
@@ -49,12 +53,14 @@ Updated the **BetaPendingPage** ("Welcome to Voxxy - Complete the steps below to
 ### 3. API Integration
 
 **New API Call:**
+
 ```typescript
 // Fetches organization for current user
 const orgData = await organizationsApi.getMine()
 ```
 
 **New State Variables:**
+
 ```typescript
 const [organization, setOrganization] = useState<any>(null)
 const [isLoadingOrg, setIsLoadingOrg] = useState(false)
@@ -65,6 +71,7 @@ const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 ## Visual Appearance
 
 ### Organization Details Section
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ 🏢 Your Organization (Auto-Created)   [🔍 Debugging Info] │
@@ -81,12 +88,14 @@ const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 ```
 
 ### Delete Account Section (Default)
+
 ```
 Want to start over or made a mistake during signup?
 [ 🗑️ Delete Account ]
 ```
 
 ### Delete Account Section (Confirmation)
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ ⚠️ Are you sure?                                        │
@@ -101,22 +110,26 @@ Want to start over or made a mistake during signup?
 ## File Changes
 
 **Modified File:**
+
 - `/Users/beaulazear/Desktop/voxxy-presents-client/src/pages/BetaPendingPage.tsx`
 
 **Lines Changed:**
+
 - Original: ~587 lines
 - Updated: 646 lines
 - Added: ~59 lines
 
 **Imports Added:**
+
 ```typescript
-import { Building2, Trash2, Info } from "lucide-react"
+import { Building2, Trash2, Info } from 'lucide-react'
 import { organizationsApi } from '@/services/api'
 ```
 
 ## Testing Checklist
 
 ### Test Organization Display
+
 - [ ] Sign up as venue_owner
 - [ ] After signup, verify organization section appears
 - [ ] Check that all fields display correctly:
@@ -128,10 +141,12 @@ import { organizationsApi } from '@/services/api'
 - [ ] Verify helper text is present
 
 ### Test Loading State
+
 - [ ] On slow network, verify loading spinner appears
 - [ ] Verify organization section appears after loading completes
 
 ### Test Delete Account
+
 - [ ] Click "Delete Account" button
 - [ ] Verify confirmation dialog appears
 - [ ] Click "Cancel" - should hide confirmation
@@ -142,6 +157,7 @@ import { organizationsApi } from '@/services/api'
 - [ ] Verify cannot log in with deleted credentials
 
 ### Test Consumer/Vendor Accounts
+
 - [ ] Sign up as consumer
 - [ ] Verify organization section does NOT appear
 - [ ] Sign up as vendor
@@ -150,12 +166,14 @@ import { organizationsApi } from '@/services/api'
 ## Usage During Development
 
 ### Viewing Organization Details
+
 1. Sign up as venue_owner
 2. Complete email verification
 3. Before payment, organization details will be visible at top of page
 4. Take note of organization slug, name, and status
 
 ### Deleting Test Accounts
+
 1. Navigate to BetaPendingPage (onboarding page)
 2. Scroll to bottom
 3. Click "Delete Account"
@@ -165,11 +183,13 @@ import { organizationsApi } from '@/services/api'
 ## Production Considerations
 
 **IMPORTANT**: These debug features should be:
+
 - ✅ Kept in staging environment for testing
 - ⚠️ Reviewed before production deployment
 - 🤔 Consider removing or hiding behind feature flag in production
 
 ### Potential Production Changes:
+
 1. **Organization Display**:
    - Remove "Debugging Info" badge
    - Consider hiding in production
@@ -183,15 +203,18 @@ import { organizationsApi } from '@/services/api'
 ## Related Files
 
 **Backend:**
+
 - `/Users/beaulazear/Desktop/voxxy-rails/app/models/user.rb` - Auto-creates organization
 - `/Users/beaulazear/Desktop/voxxy-rails/app/controllers/api/v1/presents/organizations_controller.rb` - Organization API
 - `/Users/beaulazear/Desktop/voxxy-rails/scripts/utilities/create_missing_organizations.rb` - Migration script
 
 **Frontend:**
+
 - `/Users/beaulazear/Desktop/voxxy-presents-client/src/pages/BetaPendingPage.tsx` - This file
 - `/Users/beaulazear/Desktop/voxxy-presents-client/src/services/api.ts` - API service
 
 **Documentation:**
+
 - `/Users/beaulazear/Desktop/voxxy-rails/docs/deployment/ORGANIZATION_AUTO_CREATE_DEPLOYMENT.md` - Backend deployment guide
 
 ## Screenshots Locations

@@ -12,13 +12,9 @@ interface EnvConfig {
   VITE_ENVIRONMENT?: string
 }
 
-const REQUIRED_ENV_VARS: (keyof EnvConfig)[] = [
-  'VITE_API_BASE_URL',
-]
+const REQUIRED_ENV_VARS: (keyof EnvConfig)[] = ['VITE_API_BASE_URL']
 
-const RECOMMENDED_ENV_VARS: (keyof EnvConfig)[] = [
-  'VITE_ENVIRONMENT',
-]
+const RECOMMENDED_ENV_VARS: (keyof EnvConfig)[] = ['VITE_ENVIRONMENT']
 
 export function validateEnv(): void {
   const missing: string[] = []
@@ -45,7 +41,7 @@ export function validateEnv(): void {
     const errorMessage = `
 🚨 MISSING REQUIRED ENVIRONMENT VARIABLES:
 
-${missing.map(v => `  - ${v}`).join('\n')}
+${missing.map((v) => `  - ${v}`).join('\n')}
 
 Please create a .env file with these variables.
 See .env.example for reference.
@@ -65,7 +61,7 @@ See .env.example for reference.
     console.warn(`
 ⚠️ MISSING RECOMMENDED ENVIRONMENT VARIABLES:
 
-${warnings.map(v => `  - ${v}`).join('\n')}
+${warnings.map((v) => `  - ${v}`).join('\n')}
 
 Some features may not work correctly.
     `)

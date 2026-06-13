@@ -7,19 +7,22 @@ A **venue_owner** is an event producer who manages events and vendor application
 ## Key Flows
 
 ### Authentication
+
 ```
 Login/Signup → JWT Token → Fetch User Profile (role: 'venue_owner')
 → Redirect to /producer/pending (Producer Dashboard)
 ```
 
 ### Create Event
+
 ```
-Dashboard → Click "Create New Event" 
+Dashboard → Click "Create New Event"
 → Fill form (title, date, location, description)
 → Submit → Event appears in list
 ```
 
 ### Manage Vendors
+
 ```
 Event → Command Center → Applications Tab
 → Create vendor application form
@@ -30,20 +33,22 @@ Event → Command Center → Applications Tab
 
 ## Routes & Pages
 
-| Route | Component | Purpose |
-|-------|-----------|---------|
-| `/login` | LoginPage | Login with email/password |
-| `/producer/pending` | ProducerDashboard | Main dashboard - events & settings |
-| `/events/{slug}/apply` | VendorApplicationForm | Public vendor application (no auth) |
-| `/applications/track/{code}` | ApplicationTrackingPage | Check application status (no auth) |
+| Route                        | Component               | Purpose                             |
+| ---------------------------- | ----------------------- | ----------------------------------- |
+| `/login`                     | LoginPage               | Login with email/password           |
+| `/producer/pending`          | ProducerDashboard       | Main dashboard - events & settings  |
+| `/events/{slug}/apply`       | VendorApplicationForm   | Public vendor application (no auth) |
+| `/applications/track/{code}` | ApplicationTrackingPage | Check application status (no auth)  |
 
 ## Main Components
 
 **Dashboard Navigation:**
+
 - **Events Tab** - Create, edit, delete events
 - **Settings Tab** - Profile & notification preferences
 
 **Event Command Center** (4 tabs):
+
 1. **Messages** - Post announcements (mock data, pending backend)
 2. **Applications** - Create vendor application forms & see submissions
 3. **Vendors** - Manage vendor approvals & rejections
@@ -52,11 +57,13 @@ Event → Command Center → Applications Tab
 ## Key Features
 
 ### Event Management (Full CRUD)
+
 - Create event with: title, description, date, location
 - Edit or delete events
 - Status: draft, published, cancelled, completed
 
 ### Vendor Applications
+
 - Create custom vendor application forms
 - Define vendor categories (catering, photography, etc.)
 - Generate shareable links (format: `/apply/{code}`)
@@ -64,6 +71,7 @@ Event → Command Center → Applications Tab
 - Track submissions with status: pending → approved/rejected/waitlist/confirmed
 
 ### Organization
+
 - Auto-created on first login
 - Contains all user's events
 - Can view/update org details
@@ -71,6 +79,7 @@ Event → Command Center → Applications Tab
 ## API Calls Quick Reference
 
 ### Authentication
+
 ```typescript
 POST /login → Get JWT token
 GET /me → Get current user (includes role)
@@ -78,6 +87,7 @@ DELETE /logout → Clear session
 ```
 
 ### Organizations
+
 ```typescript
 GET /api/v1/presents/me/organization → Get my org
 POST /api/v1/presents/organizations → Create org (auto on first login)
@@ -85,6 +95,7 @@ PATCH /api/v1/presents/organizations/:slug → Update org
 ```
 
 ### Events
+
 ```typescript
 GET /api/v1/presents/organizations/:slug/events → List my events
 POST /api/v1/presents/organizations/:slug/events → Create event
@@ -93,6 +104,7 @@ DELETE /api/v1/presents/events/:slug → Delete event
 ```
 
 ### Vendor Applications
+
 ```typescript
 GET /api/v1/presents/events/:slug/vendor_applications → List applications
 POST /api/v1/presents/events/:slug/vendor_applications → Create application
@@ -101,6 +113,7 @@ PATCH /api/v1/presents/registrations/:id → Approve/reject vendor
 ```
 
 ### Public (No Auth Required)
+
 ```typescript
 GET /api/v1/presents/vendor_applications/lookup/:code → Get event by code
 POST /api/v1/presents/events/:slug/registrations → Submit vendor application
@@ -170,14 +183,15 @@ Venue Owner                          Backend
 // Available in components
 const { userProfile, isProducer, isVendor, isAuthenticated } = useAuth()
 
-isProducer  // true if role is 'producer' or 'venue_owner'
-isVendor    // true if role is 'vendor'
-hasRole('venue_owner')  // Check specific role
+isProducer // true if role is 'producer' or 'venue_owner'
+isVendor // true if role is 'vendor'
+hasRole('venue_owner') // Check specific role
 ```
 
 ---
 
 **Files to Know:**
+
 - Dashboard: `/src/pages/ProducerDashboard.tsx`
 - Auth: `/src/contexts/AuthContext.tsx`
 - Components: `/src/components/producer/`

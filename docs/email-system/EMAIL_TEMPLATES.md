@@ -27,32 +27,33 @@ These placeholders can be used in any email subject or body. The system will aut
 
 ### Available Fields
 
-| Field | Backend Variable | Description | Example |
-|-------|------------------|-------------|---------|
-| `[firstName]` | `{{vendor_name}}` | Recipient's first name | "John" |
-| `[lastName]` | `{{vendor_last_name}}` | Recipient's last name | "Doe" |
-| `[vendorName]` | `{{business_name}}` | Business or artist name | "John's Tacos" |
-| `[eventName]` | `{{event_title}}` | Name of the event | "Summer Market 2025" |
-| `[eventDate]` | `{{event_date}}` | Date of the event | "June 15, 2025" |
-| `[eventTime]` | `{{event_time}}` | Start time of the event | "10:00 AM" |
-| `[eventVenue]` | `{{event_venue}}` | Event venue name and address | "Piedmont Park" |
-| `[eventLocation]` | `{{event_location}}` | City, State of the event | "Atlanta, GA" |
-| `[categoryName]` | `{{vendor_category}}` | Vendor/artist category | "Food" |
-| `[categoryPrice]` | `{{booth_price}}` | Category booth/application price | "$150.00" |
-| `[paymentLink]` | `{{payment_url}}` | Link to payment page | "https://..." |
-| `[applicationDeadline]` | `{{application_deadline}}` | Deadline to apply | "May 30, 2025" |
-| `[paymentDeadline]` | `{{payment_deadline}}` | Deadline to pay | "June 1, 2025" |
-| `[installDate]` | `{{setup_date}}` | Setup/install date | "June 14, 2025" |
-| `[installTime]` | `{{setup_time}}` | Setup/install time | "8:00 AM" |
-| `[producerName]` | `{{organization_name}}` | Event producer's name | "Voxxy Presents" |
-| `[producerEmail]` | `{{organization_email}}` | Producer's contact email | "events@voxxyai.com" |
-| `[bulletinLink]` | `{{bulletin_url}}` | Link to event bulletin board | "https://..." |
+| Field                   | Backend Variable           | Description                      | Example              |
+| ----------------------- | -------------------------- | -------------------------------- | -------------------- |
+| `[firstName]`           | `{{vendor_name}}`          | Recipient's first name           | "John"               |
+| `[lastName]`            | `{{vendor_last_name}}`     | Recipient's last name            | "Doe"                |
+| `[vendorName]`          | `{{business_name}}`        | Business or artist name          | "John's Tacos"       |
+| `[eventName]`           | `{{event_title}}`          | Name of the event                | "Summer Market 2025" |
+| `[eventDate]`           | `{{event_date}}`           | Date of the event                | "June 15, 2025"      |
+| `[eventTime]`           | `{{event_time}}`           | Start time of the event          | "10:00 AM"           |
+| `[eventVenue]`          | `{{event_venue}}`          | Event venue name and address     | "Piedmont Park"      |
+| `[eventLocation]`       | `{{event_location}}`       | City, State of the event         | "Atlanta, GA"        |
+| `[categoryName]`        | `{{vendor_category}}`      | Vendor/artist category           | "Food"               |
+| `[categoryPrice]`       | `{{booth_price}}`          | Category booth/application price | "$150.00"            |
+| `[paymentLink]`         | `{{payment_url}}`          | Link to payment page             | "https://..."        |
+| `[applicationDeadline]` | `{{application_deadline}}` | Deadline to apply                | "May 30, 2025"       |
+| `[paymentDeadline]`     | `{{payment_deadline}}`     | Deadline to pay                  | "June 1, 2025"       |
+| `[installDate]`         | `{{setup_date}}`           | Setup/install date               | "June 14, 2025"      |
+| `[installTime]`         | `{{setup_time}}`           | Setup/install time               | "8:00 AM"            |
+| `[producerName]`        | `{{organization_name}}`    | Event producer's name            | "Voxxy Presents"     |
+| `[producerEmail]`       | `{{organization_email}}`   | Producer's contact email         | "events@voxxyai.com" |
+| `[bulletinLink]`        | `{{bulletin_url}}`         | Link to event bulletin board     | "https://..."        |
 
 ### Button Syntax
 
 Use `{{Button Text}}` to create a call-to-action button in the email.
 
 **Example:**
+
 ```
 {{Apply Now}}
 {{Pay Now}}
@@ -79,6 +80,7 @@ Producers can edit the subject, body, timing, and recipient filters for these em
 ### 1.1 Immediate Announcement
 
 **Database Fields:**
+
 - **ID:** `immediate_announcement`
 - **Name:** "Immediate Announcement - Applications Open"
 - **Position:** 1
@@ -86,15 +88,17 @@ Producers can edit the subject, body, timing, and recipient filters for these em
 - **Trigger Type:** `on_application_open` (or `on_event_create` if applications are already open)
 - **Trigger Value:** `0`
 - **Trigger Time:** `09:00`
-- **Recipient Filter:** `{}`  (All vendors in network)
+- **Recipient Filter:** `{}` (All vendors in network)
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 You're Invited: [eventName] - Apply Now!
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -109,10 +113,14 @@ You're Invited: [eventName] - Apply Now!
 <p>This is a great opportunity to showcase your work and connect with the community.</p>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="{{event_url}}" style="background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Apply Now</a>
+  <a
+    href="{{event_url}}"
+    style="background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;"
+    >Apply Now</a
+  >
 </p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -120,6 +128,7 @@ You're Invited: [eventName] - Apply Now!
 ### 1.2 10 Weeks Before Deadline
 
 **Database Fields:**
+
 - **ID:** `10_weeks_before_deadline`
 - **Name:** "10 Weeks Before Application Deadline"
 - **Position:** 2
@@ -131,11 +140,13 @@ You're Invited: [eventName] - Apply Now!
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 Don't Miss Out: [eventName] Applications Open!
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -150,10 +161,14 @@ Don't Miss Out: [eventName] Applications Open!
 <p>Spots fill up fast—apply early to secure your place.</p>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="{{event_url}}" style="background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Apply Now</a>
+  <a
+    href="{{event_url}}"
+    style="background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;"
+    >Apply Now</a
+  >
 </p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -161,6 +176,7 @@ Don't Miss Out: [eventName] Applications Open!
 ### 1.3 8 Weeks Before Deadline
 
 **Database Fields:**
+
 - **ID:** `8_weeks_before_deadline`
 - **Name:** "8 Weeks Before Application Deadline"
 - **Position:** 3
@@ -172,11 +188,13 @@ Don't Miss Out: [eventName] Applications Open!
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 Still Time to Apply - [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -191,10 +209,14 @@ Still Time to Apply - [eventName]
 <p>We'd love to see you there. Submit your application today.</p>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="{{event_url}}" style="background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Apply Now</a>
+  <a
+    href="{{event_url}}"
+    style="background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;"
+    >Apply Now</a
+  >
 </p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -202,6 +224,7 @@ Still Time to Apply - [eventName]
 ### 1.4 12 Days Before Deadline
 
 **Database Fields:**
+
 - **ID:** `12_days_before_deadline`
 - **Name:** "12 Days Before Application Deadline"
 - **Position:** 4
@@ -213,11 +236,13 @@ Still Time to Apply - [eventName]
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 ⏰ Application Deadline Approaching - [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -232,10 +257,14 @@ Still Time to Apply - [eventName]
 <p>Don't wait—submit your application before it's too late.</p>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="{{event_url}}" style="background: #ef4444; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Apply Now - Last Chance</a>
+  <a
+    href="{{event_url}}"
+    style="background: #ef4444; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;"
+    >Apply Now - Last Chance</a
+  >
 </p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -250,6 +279,7 @@ Still Time to Apply - [eventName]
 ### 2.1 Application Received
 
 **Database Fields:**
+
 - **ID:** `application_received`
 - **Name:** "Application Received Confirmation"
 - **Position:** 5
@@ -261,11 +291,13 @@ Still Time to Apply - [eventName]
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 Application Received - [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -277,9 +309,11 @@ Application Received - [eventName]
   <li>🏷️ <strong>Category:</strong> [categoryName]</li>
 </ul>
 
-<p>We'll review your application and get back to you soon. Keep an eye on your inbox for updates.</p>
+<p>
+  We'll review your application and get back to you soon. Keep an eye on your inbox for updates.
+</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -294,6 +328,7 @@ Application Received - [eventName]
 ### 3.1 Payment Details
 
 **Database Fields:**
+
 - **ID:** `payment_details`
 - **Name:** "Payment Details After Acceptance"
 - **Position:** 6
@@ -305,11 +340,13 @@ Application Received - [eventName]
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 Payment Details for [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -322,12 +359,16 @@ Payment Details for [eventName]
 </ul>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="[paymentLink]" style="background: #10b981; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Pay Now</a>
+  <a
+    href="[paymentLink]"
+    style="background: #10b981; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;"
+    >Pay Now</a
+  >
 </p>
 
 <p>Please ensure payment is received by the deadline to secure your spot.</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -335,6 +376,7 @@ Payment Details for [eventName]
 ### 3.2 1 Week Before Payment Due
 
 **Database Fields:**
+
 - **ID:** `payment_1_week`
 - **Name:** "Payment Reminder - 1 Week Before Due"
 - **Position:** 7
@@ -346,11 +388,13 @@ Payment Details for [eventName]
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 Payment Reminder - 1 Week Left for [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -362,12 +406,16 @@ Payment Reminder - 1 Week Left for [eventName]
 </ul>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="[paymentLink]" style="background: #10b981; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Pay Now</a>
+  <a
+    href="[paymentLink]"
+    style="background: #10b981; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;"
+    >Pay Now</a
+  >
 </p>
 
 <p>Please ensure payment is received by the deadline to keep your spot.</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -375,6 +423,7 @@ Payment Reminder - 1 Week Left for [eventName]
 ### 3.3 3 Days Before Payment Due
 
 **Database Fields:**
+
 - **ID:** `payment_3_days`
 - **Name:** "Payment Reminder - 3 Days Before Due"
 - **Position:** 8
@@ -386,11 +435,13 @@ Payment Reminder - 1 Week Left for [eventName]
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 ⏰ 3 Days Until Payment Deadline - [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -402,12 +453,16 @@ Payment Reminder - 1 Week Left for [eventName]
 </ul>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="[paymentLink]" style="background: #f59e0b; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Pay Now</a>
+  <a
+    href="[paymentLink]"
+    style="background: #f59e0b; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;"
+    >Pay Now</a
+  >
 </p>
 
 <p>Act now to secure your spot!</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -415,6 +470,7 @@ Payment Reminder - 1 Week Left for [eventName]
 ### 3.4 Payment Due Today
 
 **Database Fields:**
+
 - **ID:** `payment_due_today`
 - **Name:** "Payment Due Today - Final Notice"
 - **Position:** 9
@@ -426,27 +482,36 @@ Payment Reminder - 1 Week Left for [eventName]
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 ⚡ FINAL NOTICE - Payment Due Today for [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
-<p><strong>This is your FINAL payment reminder.</strong> Payment for <strong>[eventName]</strong> is due TODAY.</p>
+<p>
+  <strong>This is your FINAL payment reminder.</strong> Payment for <strong>[eventName]</strong> is
+  due TODAY.
+</p>
 
 <p style="font-size: 18px; text-align: center; margin: 20px 0;">
   💰 <strong>Amount:</strong> [categoryPrice]
 </p>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="[paymentLink]" style="background: #ef4444; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Pay Now</a>
+  <a
+    href="[paymentLink]"
+    style="background: #ef4444; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;"
+    >Pay Now</a
+  >
 </p>
 
 <p><strong>Unpaid spots may be released to waitlisted applicants.</strong></p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -461,6 +526,7 @@ Payment Reminder - 1 Week Left for [eventName]
 ### 4.1 33 Days Before Event
 
 **Database Fields:**
+
 - **ID:** `33_days_before`
 - **Name:** "33 Days Before Event"
 - **Position:** 10
@@ -472,24 +538,30 @@ Payment Reminder - 1 Week Left for [eventName]
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 [eventName] is Coming Up - 33 Days Out!
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
-<p><strong>[eventName]</strong> is just 33 days away! We're getting excited and hope you are too.</p>
+<p>
+  <strong>[eventName]</strong> is just 33 days away! We're getting excited and hope you are too.
+</p>
 
 <ul>
   <li>📅 <strong>Event Date:</strong> [eventDate]</li>
   <li>📍 <strong>Location:</strong> [eventVenue], [eventLocation]</li>
 </ul>
 
-<p>Start preparing your inventory and materials. We'll send more details as the event approaches.</p>
+<p>
+  Start preparing your inventory and materials. We'll send more details as the event approaches.
+</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -497,6 +569,7 @@ Payment Reminder - 1 Week Left for [eventName]
 ### 4.2 23 Days Before Event
 
 **Database Fields:**
+
 - **ID:** `23_days_before`
 - **Name:** "23 Days Before Event"
 - **Position:** 11
@@ -508,11 +581,13 @@ Payment Reminder - 1 Week Left for [eventName]
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 [eventName] - 23 Days to Go!
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -526,7 +601,7 @@ Payment Reminder - 1 Week Left for [eventName]
 
 <p>Make sure you have everything ready. More details coming soon.</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -534,6 +609,7 @@ Payment Reminder - 1 Week Left for [eventName]
 ### 4.3 10 Days Before Event
 
 **Database Fields:**
+
 - **ID:** `10_days_before`
 - **Name:** "10 Days Before Event"
 - **Position:** 12
@@ -545,11 +621,13 @@ Payment Reminder - 1 Week Left for [eventName]
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 10 Days Until [eventName]!
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -563,7 +641,7 @@ Payment Reminder - 1 Week Left for [eventName]
 
 <p>Time to finalize your preparations. Let us know if you have any questions.</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -571,6 +649,7 @@ Payment Reminder - 1 Week Left for [eventName]
 ### 4.4 4 Days Before Event
 
 **Database Fields:**
+
 - **ID:** `4_days_before`
 - **Name:** "4 Days Before Event"
 - **Position:** 13
@@ -582,11 +661,13 @@ Payment Reminder - 1 Week Left for [eventName]
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 [eventName] This Week - 4 Days Out!
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -600,7 +681,7 @@ Payment Reminder - 1 Week Left for [eventName]
 
 <p>Final prep time! Make sure you have everything packed and ready to go.</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -608,6 +689,7 @@ Payment Reminder - 1 Week Left for [eventName]
 ### 4.5 2 Days Before Event
 
 **Database Fields:**
+
 - **ID:** `2_days_before`
 - **Name:** "2 Days Before Event"
 - **Position:** 14
@@ -619,11 +701,13 @@ Payment Reminder - 1 Week Left for [eventName]
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 Almost There - [eventName] in 2 Days!
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -637,7 +721,7 @@ Almost There - [eventName] in 2 Days!
 
 <p>Double-check your load-in details and make sure you're all set.</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -645,6 +729,7 @@ Almost There - [eventName] in 2 Days!
 ### 4.6 Day of Event
 
 **Database Fields:**
+
 - **ID:** `day_of_event`
 - **Name:** "Day of Event - Morning Reminder"
 - **Position:** 15
@@ -656,11 +741,13 @@ Almost There - [eventName] in 2 Days!
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 🌟 Today's the Day - [eventName]!
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -673,12 +760,16 @@ Almost There - [eventName] in 2 Days!
 </ul>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="[bulletinLink]" style="background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">View Event Info</a>
+  <a
+    href="[bulletinLink]"
+    style="background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;"
+    >View Event Info</a
+  >
 </p>
 
 <p>Have a fantastic show! We're here if you need anything.</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -686,6 +777,7 @@ Almost There - [eventName] in 2 Days!
 ### 4.7 Day After Event
 
 **Database Fields:**
+
 - **ID:** `day_after_event`
 - **Name:** "Day After Event - Thank You"
 - **Position:** 16
@@ -697,27 +789,40 @@ Almost There - [eventName] in 2 Days!
 - **Enabled by Default:** `true`
 
 **Subject:**
+
 ```
 Thank You for Being Part of [eventName]!
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
-<p>Thank you so much for being part of <strong>[eventName]</strong>! We hope you had an amazing experience.</p>
+<p>
+  Thank you so much for being part of <strong>[eventName]</strong>! We hope you had an amazing
+  experience.
+</p>
 
-<p>Your participation helped make this event a success, and we couldn't have done it without you.</p>
+<p>
+  Your participation helped make this event a success, and we couldn't have done it without you.
+</p>
 
-<p>We'd love to hear your feedback! Let us know what went well and what we can improve for next time.</p>
+<p>
+  We'd love to hear your feedback! Let us know what went well and what we can improve for next time.
+</p>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="{{feedback_url}}" style="background: #10b981; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Share Feedback</a>
+  <a
+    href="{{feedback_url}}"
+    style="background: #10b981; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;"
+    >Share Feedback</a
+  >
 </p>
 
 <p>Looking forward to seeing you at future events!</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 ---
@@ -735,6 +840,7 @@ These are hard-coded into the application logic and sent via service classes, no
 ## System Email 1: Application Accepted
 
 **Database Fields:**
+
 - **ID:** `application_accepted`
 - **Name:** "Application Accepted - System Email"
 - **Category:** `system_emails`
@@ -745,15 +851,20 @@ These are hard-coded into the application logic and sent via service classes, no
 - **Can Delete:** ❌ NO
 
 **Subject:**
+
 ```
 🎉 Congratulations! You're In - [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
-<p><strong>Great news!</strong> Your application for <strong>[eventName]</strong> has been <strong>ACCEPTED!</strong></p>
+<p>
+  <strong>Great news!</strong> Your application for <strong>[eventName]</strong> has been
+  <strong>ACCEPTED!</strong>
+</p>
 
 <p>We're thrilled to have you join us.</p>
 
@@ -767,16 +878,23 @@ These are hard-coded into the application logic and sent via service classes, no
 <h3>Next Steps:</h3>
 <ol>
   <li>Complete your payment by <strong>[paymentDeadline]</strong></li>
-  <li>Mark your calendar for install on <strong>[installDate]</strong> at <strong>[installTime]</strong></li>
+  <li>
+    Mark your calendar for install on <strong>[installDate]</strong> at
+    <strong>[installTime]</strong>
+  </li>
 </ol>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="[paymentLink]" style="background: #10b981; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Complete Payment</a>
+  <a
+    href="[paymentLink]"
+    style="background: #10b981; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;"
+    >Complete Payment</a
+  >
 </p>
 
 <p>Questions? Reply to this email.</p>
 
-<p>See you there!<br>[producerName]</p>
+<p>See you there!<br />[producerName]</p>
 ```
 
 **Implementation Note:**
@@ -787,6 +905,7 @@ This email is sent by `RegistrationEmailService` when a producer changes a regis
 ## System Email 2: Waitlist / Not Accepted
 
 **Database Fields:**
+
 - **ID:** `waitlist_not_accepted`
 - **Name:** "Application Waitlisted or Rejected - System Email"
 - **Category:** `system_emails`
@@ -795,17 +914,22 @@ This email is sent by `RegistrationEmailService` when a producer changes a regis
 - **Editable:** ❌ NO
 
 **Subject:**
+
 ```
 Update on Your Application - [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
 <p>Thank you for your interest in <strong>[eventName]</strong>.</p>
 
-<p>After careful review, we're unable to offer you a spot at this time. However, you've been added to our waitlist. If a spot opens up, we'll contact you right away.</p>
+<p>
+  After careful review, we're unable to offer you a spot at this time. However, you've been added to
+  our waitlist. If a spot opens up, we'll contact you right away.
+</p>
 
 <ul>
   <li>📅 <strong>Event:</strong> [eventDate]</li>
@@ -814,7 +938,7 @@ Update on Your Application - [eventName]
 
 <p>We truly appreciate your interest and encourage you to apply to future events.</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 **Implementation Note:**
@@ -825,6 +949,7 @@ Sent when status changes to 'waitlist' or 'rejected'.
 ## System Email 3: Moved to Waitlist (Non-Payment)
 
 **Database Fields:**
+
 - **ID:** `moved_to_waitlist_nonpayment`
 - **Name:** "Moved to Waitlist - Payment Missed - System Email"
 - **Category:** `system_emails`
@@ -833,21 +958,29 @@ Sent when status changes to 'waitlist' or 'rejected'.
 - **Editable:** ❌ NO
 
 **Subject:**
+
 ```
 Update: Your Spot for [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
 <p>We noticed payment wasn't received by the deadline for <strong>[eventName]</strong>.</p>
 
-<p>Your spot has been moved to the waitlist. If a spot becomes available and you'd still like to participate, we'll reach out.</p>
+<p>
+  Your spot has been moved to the waitlist. If a spot becomes available and you'd still like to
+  participate, we'll reach out.
+</p>
 
-<p>If you believe this is an error, please contact us immediately at <a href="mailto:[producerEmail]">[producerEmail]</a>.</p>
+<p>
+  If you believe this is an error, please contact us immediately at
+  <a href="mailto:[producerEmail]">[producerEmail]</a>.
+</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 **Implementation Note:**
@@ -858,6 +991,7 @@ Triggered by a background job or manual action when payment deadline passes and 
 ## System Email 4: Payment Confirmed
 
 **Database Fields:**
+
 - **ID:** `payment_confirmed`
 - **Name:** "Payment Confirmed - System Email"
 - **Category:** `system_emails`
@@ -866,22 +1000,26 @@ Triggered by a background job or manual action when payment deadline passes and 
 - **Editable:** ❌ NO
 
 **Subject:**
+
 ```
 ✅ Payment Confirmed - [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
-<p><strong>Great news!</strong> Your payment for <strong>[eventName]</strong> has been confirmed.</p>
+<p>
+  <strong>Great news!</strong> Your payment for <strong>[eventName]</strong> has been confirmed.
+</p>
 
 <ul>
   <li>🏷️ <strong>Category:</strong> [categoryName]</li>
   <li>💰 <strong>Amount Paid:</strong> [categoryPrice]</li>
 </ul>
 
-<hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+<hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;" />
 
 <ul>
   <li>📅 <strong>Event:</strong> [eventDate]</li>
@@ -891,7 +1029,7 @@ Triggered by a background job or manual action when payment deadline passes and 
 
 <p>You're all set! We'll send more details as the event approaches.</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 **Implementation Note:**
@@ -902,6 +1040,7 @@ Sent when payment_status changes to 'paid'.
 ## System Email 5: Category Changed
 
 **Database Fields:**
+
 - **ID:** `category_changed`
 - **Name:** "Category Changed - System Email"
 - **Category:** `system_emails`
@@ -910,21 +1049,29 @@ Sent when payment_status changes to 'paid'.
 - **Editable:** ❌ NO
 
 **Subject:**
+
 ```
 Category Update - [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
-<p>Your category for <strong>[eventName]</strong> has been updated to: <strong>[categoryName]</strong></p>
+<p>
+  Your category for <strong>[eventName]</strong> has been updated to:
+  <strong>[categoryName]</strong>
+</p>
 
 <p><strong>New pricing:</strong> [categoryPrice]</p>
 
-<p>If you have questions about this change, please contact <a href="mailto:[producerEmail]">[producerEmail]</a>.</p>
+<p>
+  If you have questions about this change, please contact
+  <a href="mailto:[producerEmail]">[producerEmail]</a>.
+</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 **Implementation Note:**
@@ -935,6 +1082,7 @@ Sent when vendor_category field is updated on a registration.
 ## System Email 6: Event Details Changed
 
 **Database Fields:**
+
 - **ID:** `event_details_changed`
 - **Name:** "Event Details Changed - System Email"
 - **Category:** `system_emails`
@@ -943,15 +1091,19 @@ Sent when vendor_category field is updated on a registration.
 - **Editable:** ❌ NO
 
 **Subject:**
+
 ```
 📝 Event Update - [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
-<p>There has been an update to <strong>[eventName]</strong>. Please review the latest event details:</p>
+<p>
+  There has been an update to <strong>[eventName]</strong>. Please review the latest event details:
+</p>
 
 <ul>
   <li>📅 <strong>Event Date:</strong> [eventDate]</li>
@@ -963,7 +1115,7 @@ Sent when vendor_category field is updated on a registration.
 
 <p>If you have questions, contact <a href="mailto:[producerEmail]">[producerEmail]</a>.</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 **Implementation Note:**
@@ -974,6 +1126,7 @@ Sent when event_date, event_location, or event_time fields are updated (CEO Deci
 ## System Email 7: Event Canceled
 
 **Database Fields:**
+
 - **ID:** `event_canceled`
 - **Name:** "Event Canceled - System Email"
 - **Category:** `system_emails`
@@ -982,23 +1135,31 @@ Sent when event_date, event_location, or event_time fields are updated (CEO Deci
 - **Editable:** ❌ NO
 
 **Subject:**
+
 ```
 ❌ Event Canceled - [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
 <p>We regret to inform you that <strong>[eventName]</strong> has been canceled.</p>
 
-<p>We sincerely apologize for any inconvenience this may cause. If you have already made a payment, you will receive a full refund within 5-7 business days.</p>
+<p>
+  We sincerely apologize for any inconvenience this may cause. If you have already made a payment,
+  you will receive a full refund within 5-7 business days.
+</p>
 
-<p>For any questions regarding refunds or future events, please contact <a href="mailto:[producerEmail]">[producerEmail]</a>.</p>
+<p>
+  For any questions regarding refunds or future events, please contact
+  <a href="mailto:[producerEmail]">[producerEmail]</a>.
+</p>
 
 <p>Thank you for your understanding, and we hope to see you at a future event.</p>
 
-<p>Best,<br>[producerName]</p>
+<p>Best,<br />[producerName]</p>
 ```
 
 **Implementation Note:**
@@ -1009,6 +1170,7 @@ Sent when event status changes to 'cancelled'.
 ## System Email 8: Bulletin Board Update
 
 **Database Fields:**
+
 - **ID:** `bulletin_board_update`
 - **Name:** "Bulletin Board Update - System Email"
 - **Category:** `system_emails`
@@ -1017,11 +1179,13 @@ Sent when event status changes to 'cancelled'.
 - **Editable:** ❌ NO
 
 **Subject:**
+
 ```
 📢 New Update from [producerName] - [eventName]
 ```
 
 **Body (HTML):**
+
 ```html
 <p>Hi [firstName],</p>
 
@@ -1030,10 +1194,14 @@ Sent when event status changes to 'cancelled'.
 <p>Head over to your event dashboard to view the full message and any important details.</p>
 
 <p style="text-align: center; margin: 30px 0;">
-  <a href="[bulletinLink]" style="background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">View Bulletin Board</a>
+  <a
+    href="[bulletinLink]"
+    style="background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;"
+    >View Bulletin Board</a
+  >
 </p>
 
-<p>Best,<br>The Voxxy Team</p>
+<p>Best,<br />The Voxxy Team</p>
 ```
 
 **Implementation Note:**
@@ -1221,10 +1389,12 @@ end
 ## Summary
 
 **Total Templates: 24**
+
 - **16 Editable** (stored in `email_template_items`, can be customized per template)
 - **8 System** (hard-coded in app logic, triggered by status/action changes)
 
 **Categories:**
+
 - Event Announcements: 4
 - Application Updates: 1
 - Payment Reminders: 4
@@ -1232,6 +1402,7 @@ end
 - System Emails: 8
 
 **Trigger Types Used:**
+
 - `on_application_open` - When applications open
 - `days_before_deadline` - X days before application deadline
 - `on_application_submit` - When vendor submits application

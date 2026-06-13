@@ -1,12 +1,12 @@
-import { Bulletin } from '../../../types/bulletin';
-import { BulletinCard } from './BulletinCard';
+import { Bulletin } from '../../../types/bulletin'
+import { BulletinCard } from './BulletinCard'
 
 interface BulletinsListProps {
-  bulletins: Bulletin[];
-  onEdit: (bulletin: Bulletin) => void;
-  onDelete: (id: number) => void;
-  onTogglePin: (id: number) => void;
-  isProducer: boolean;
+  bulletins: Bulletin[]
+  onEdit: (bulletin: Bulletin) => void
+  onDelete: (id: number) => void
+  onTogglePin: (id: number) => void
+  isProducer: boolean
 }
 
 export function BulletinsList({
@@ -14,7 +14,7 @@ export function BulletinsList({
   onEdit,
   onDelete,
   onTogglePin,
-  isProducer
+  isProducer,
 }: BulletinsListProps) {
   if (bulletins.length === 0) {
     return (
@@ -24,24 +24,24 @@ export function BulletinsList({
           Create your first bulletin to share updates with vendors
         </p>
       </div>
-    );
+    )
   }
 
   // Separate pinned and regular bulletins, sorting each by created_at (newest first)
   const pinnedBulletins = bulletins
-    .filter(b => b.pinned)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    .filter((b) => b.pinned)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   const regularBulletins = bulletins
-    .filter(b => !b.pinned)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    .filter((b) => !b.pinned)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   return (
     <div className="space-y-4">
       {/* Pinned Bulletins */}
       {pinnedBulletins.length > 0 && (
         <div className="space-y-4">
-          {pinnedBulletins.map(bulletin => (
+          {pinnedBulletins.map((bulletin) => (
             <BulletinCard
               key={bulletin.id}
               bulletin={bulletin}
@@ -57,7 +57,7 @@ export function BulletinsList({
       {/* Regular Bulletins */}
       {regularBulletins.length > 0 && (
         <div className="space-y-4">
-          {regularBulletins.map(bulletin => (
+          {regularBulletins.map((bulletin) => (
             <BulletinCard
               key={bulletin.id}
               bulletin={bulletin}
@@ -70,5 +70,5 @@ export function BulletinsList({
         </div>
       )}
     </div>
-  );
+  )
 }

@@ -15,22 +15,27 @@
 ## Documentation Index
 
 ### Engineering Process
+
 - **[TESTING_ROADMAP.md](./TESTING_ROADMAP.md)** -- Testing strategy, task tracker, and progress
 - **[CONTRIBUTING.md](./CONTRIBUTING.md)** -- Development workflow and release process
 
 ### Architecture & Development
+
 - **[architecture/](./architecture/)** -- System design, API config, role mapping, implementation patterns
 - **[development/](./development/)** -- Branching strategy, runbook, backend email setup, tracking plan
 
 ### Deployment
+
 - **[deployment/](./deployment/)** -- Render config, environment setup, platform integration
 
 ### Features
+
 - **[email-system/](./email-system/)** -- Email automation, templates, variables, editor guides
 - **[features/](./features/)** -- Smart lists, payment deadlines, landing page
 - **[design/](./design/)** -- Glass modal design system, styling specs
 
 ### Reference
+
 - **[releases/](./releases/)** -- Version release notes (v1.5 through v1.9)
 - **[v3-migration/](./v3-migration/)** -- Historical V3 migration docs (completed)
 - **[demo-data/](./demo-data/)** -- Demo seed data for QA

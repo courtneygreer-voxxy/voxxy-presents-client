@@ -21,37 +21,24 @@ export interface EnvironmentConfig {
 const ENVIRONMENT_CONFIGS: Record<string, EnvironmentConfig> = {
   development: {
     required: [],
-    optional: [
-      'VITE_API_BASE_URL',
-      'VITE_ENVIRONMENT',
-      'VITE_APP_VERSION'
-    ],
-    validators: {}
+    optional: ['VITE_API_BASE_URL', 'VITE_ENVIRONMENT', 'VITE_APP_VERSION'],
+    validators: {},
   },
   staging: {
     required: [],
-    optional: [
-      'VITE_API_BASE_URL',
-      'VITE_ENVIRONMENT',
-      'VITE_APP_VERSION'
-    ],
+    optional: ['VITE_API_BASE_URL', 'VITE_ENVIRONMENT', 'VITE_APP_VERSION'],
     validators: {
       VITE_ENVIRONMENT: (value) => {
         if (value !== 'staging') {
           return 'Environment should be set to "staging" for staging deployment'
         }
         return null
-      }
-    }
+      },
+    },
   },
   production: {
-    required: [
-      'VITE_API_BASE_URL'
-    ],
-    optional: [
-      'VITE_ENVIRONMENT',
-      'VITE_APP_VERSION'
-    ],
+    required: ['VITE_API_BASE_URL'],
+    optional: ['VITE_ENVIRONMENT', 'VITE_APP_VERSION'],
     validators: {
       VITE_ENVIRONMENT: (value) => {
         if (value !== 'production') {
@@ -64,9 +51,9 @@ const ENVIRONMENT_CONFIGS: Record<string, EnvironmentConfig> = {
           return 'Production API URL must use HTTPS'
         }
         return null
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export class EnvironmentValidator {
@@ -87,7 +74,7 @@ export class EnvironmentValidator {
         isValid: false,
         errors,
         warnings,
-        environment: this.env
+        environment: this.env,
       }
     }
 
@@ -135,7 +122,7 @@ export class EnvironmentValidator {
       isValid: errors.length === 0,
       errors,
       warnings,
-      environment: this.env
+      environment: this.env,
     }
   }
 
@@ -202,12 +189,12 @@ export class EnvironmentValidator {
 
     if (result.errors.length > 0) {
       console.log('\n🚨 Errors:')
-      result.errors.forEach(error => console.log(`   ❌ ${error}`))
+      result.errors.forEach((error) => console.log(`   ❌ ${error}`))
     }
 
     if (result.warnings.length > 0) {
       console.log('\n⚠️  Warnings:')
-      result.warnings.forEach(warning => console.log(`   ⚠️  ${warning}`))
+      result.warnings.forEach((warning) => console.log(`   ⚠️  ${warning}`))
     }
 
     console.log('')

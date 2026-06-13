@@ -57,40 +57,40 @@ The wizard maintains a single `WizardState` object that flows through all steps:
 
 ```typescript
 interface WizardState {
-  currentStep: 1 | 2 | 3 | 4;
+  currentStep: 1 | 2 | 3 | 4
 
   eventDetails: {
-    title: string;
-    description: string;
-    event_date: string;
-    event_end_date?: string;
-    start_time?: string;
-    end_time?: string;
-    venue?: string;
-    location: string;
-    age_restriction?: string;
-    ticket_link?: string;
-    application_deadline: string;  // REQUIRED
-    payment_deadline?: string;
-  };
+    title: string
+    description: string
+    event_date: string
+    event_end_date?: string
+    start_time?: string
+    end_time?: string
+    venue?: string
+    location: string
+    age_restriction?: string
+    ticket_link?: string
+    application_deadline: string // REQUIRED
+    payment_deadline?: string
+  }
 
   applicationDetails: {
-    applications: ApplicationRow[];
-  };
+    applications: ApplicationRow[]
+  }
 
   inviteList: {
-    selectedListIds: number[];
-    invitedContactIds: number[];
-    excludedContactIds: number[];
-  };
+    selectedListIds: number[]
+    invitedContactIds: number[]
+    excludedContactIds: number[]
+  }
 
   automaticMessages: {
-    messages: unknown[];
-    email_campaign_template_id?: number;
-    use_category_templates?: boolean;
-    use_universal_category_template?: boolean;  // DEFAULT: true
-    universal_category_template_id?: number;
-  };
+    messages: unknown[]
+    email_campaign_template_id?: number
+    use_category_templates?: boolean
+    use_universal_category_template?: boolean // DEFAULT: true
+    universal_category_template_id?: number
+  }
 }
 ```
 
@@ -103,15 +103,18 @@ interface WizardState {
 **File:** `steps/Step1EventDetails.tsx`
 
 ### Purpose
+
 Collect basic event information and important deadlines.
 
 ### Required Fields
+
 - **Event Name** (min 3 characters)
 - **Event Date** (must be in future)
 - **Location** (city/venue)
 - **Application Deadline** (must be on or before event date)
 
 ### Optional Fields
+
 - Event End Date (for multi-day events)
 - Event Start/End Times
 - Venue (Google Places integration)
@@ -140,6 +143,7 @@ if (!location.trim()) → "Location is required"
 ```
 
 ### UI Components
+
 - Text inputs with validation feedback
 - Date pickers with constraints
 - Google Places autocomplete for venue
@@ -152,11 +156,13 @@ if (!location.trim()) → "Location is required"
 **File:** `steps/Step2ApplicationDetails.tsx`
 
 ### Purpose
+
 Select vendor categories and configure booth pricing. Features **smart pre-fill** from previous events.
 
 ### Smart Pre-fill System
 
 **How It Works:**
+
 1. Producer selects category (e.g., "Food Vendor")
 2. System checks category's `last_used_event_name` and default values
 3. If defaults exist, application is pre-filled with:
@@ -169,22 +175,26 @@ Select vendor categories and configure booth pricing. Features **smart pre-fill*
 5. Producer can clear pre-filled data with one click
 
 **Data Source:**
+
 - NO API call needed - uses cached category data
 - Categories fetched once on step load
 - Defaults stored in organization's categories table
 
 ### Required Fields
+
 - At least 1 category selected
 - **Booth Price** > $0 for each category
 - **Application Deadline** (set in this step, shared across categories)
 
 ### Optional Fields Per Category
+
 - Description
 - Install Date & Times
 - Payment Link
 - Application Tags (free-text)
 
 ### Category Management
+
 - **Create New Category**: Inline category creation without leaving wizard
 - **Pre-filled Indicator**: Shows which event data came from
 - **Clear Defaults**: One-click to start fresh
@@ -210,6 +220,7 @@ if (app.booth_price <= 0)
 ```
 
 ### UI Components
+
 - Category selection grid with checkboxes
 - Color-coded category badges
 - Inline category creation form
@@ -225,17 +236,20 @@ if (app.booth_price <= 0)
 **File:** `steps/Step3InviteList.tsx`
 
 ### Purpose
+
 Select which vendor contacts receive invitations. Features **immediate import** with live preview.
 
 ### Selection Options
 
 **1. Invite All Contacts**
+
 - Checkbox at top of list
 - Fetches all contacts from organization
 - Shows total count: `(245)`
 - Mutually exclusive with list selection
 
 **2. Select Contact Lists**
+
 - Multi-select checkboxes for saved lists
 - Shows count per list: `(42)`
 - Can select multiple lists simultaneously
@@ -244,9 +258,11 @@ Select which vendor contacts receive invitations. Features **immediate import** 
 ### Immediate Import Behavior
 
 **Previous Flow (Removed):**
+
 - ❌ Select lists → Open modal → Preview → Confirm → Import
 
 **New Flow:**
+
 - ✅ Select lists → Contacts imported immediately
 - ✅ Table view appears instantly
 - ✅ No modal, no extra confirmation step
@@ -254,12 +270,14 @@ Select which vendor contacts receive invitations. Features **immediate import** 
 ### Contact Table Features
 
 **Displayed Fields:**
+
 - Name (contact_name)
 - Business Name (business_name)
 - Email (email)
 - Unsubscribe Status (is_unsubscribed, scope)
 
 **Functionality:**
+
 - Search by name, email, or business
 - Pagination (50 contacts/page)
 - Bulk selection with checkboxes
@@ -269,12 +287,14 @@ Select which vendor contacts receive invitations. Features **immediate import** 
 ### Unsubscribe Status Handling
 
 **Visual Indicators:**
+
 - 🟢 **Active** (green badge) - Will receive emails
 - 🔴 **Global** (red badge) - Unsubscribed at global level, won't receive emails
 - 🟡 **Org** (yellow badge) - Unsubscribed at organization level, won't receive emails
 
 **Warning Banner:**
 When unsubscribed contacts present:
+
 ```
 ⚠️ Warning: 5 contacts are unsubscribed and won't receive invitations
 Unsubscribed contacts are highlighted below. They opted out at the global
@@ -284,6 +304,7 @@ or organization level.
 ### Multi-Select Behavior
 
 Users can select multiple lists:
+
 ```typescript
 // Example: Select 3 lists
 ✅ Food Vendors (42)
@@ -293,11 +314,13 @@ Users can select multiple lists:
 ```
 
 ### Validation Rules
+
 - No validation required (step 3 is optional)
 - Can create event without inviting anyone
 - Can always add invitations later
 
 ### UI Components
+
 - Checkbox list for "Invite All" and contact lists
 - Live-updating contact table
 - Search bar with instant filter
@@ -312,14 +335,17 @@ Users can select multiple lists:
 **File:** `steps/Step4AutoMessages.tsx`
 
 ### Purpose
+
 Configure automated email sequences for event-wide emails and vendor category emails.
 
 ### Two Email Types
 
 #### 1. Event-Wide Sequence
+
 **Purpose:** Emails sent to ALL vendors regardless of category
 
 **Email Types:**
+
 - Event invitations
 - Event updates/changes
 - Event cancellation
@@ -328,9 +354,11 @@ Configure automated email sequences for event-wide emails and vendor category em
 **Selection:** Single template dropdown
 
 #### 2. Vendor Category Emails
+
 **Purpose:** Emails specific to application process
 
 **Email Types:**
+
 - Application confirmation
 - Approval/rejection notifications
 - Payment reminders
@@ -347,17 +375,20 @@ Configure automated email sequences for event-wide emails and vendor category em
 **Description:** Same content for all vendors
 
 **How It Works:**
+
 - Producer selects one template
 - ALL vendor categories use the same emails
 - Simpler management
 - Consistent messaging
 
 **When to Use:**
+
 - Categories have similar requirements
 - Content doesn't need to vary by type
 - Simpler event management preferred
 
 **UI Display:**
+
 ```
 🔘 Universal Sequence [DEFAULT]
    (5 emails)
@@ -373,17 +404,20 @@ Configure automated email sequences for event-wide emails and vendor category em
 **Description:** Customize content per vendor type
 
 **How It Works:**
+
 - Each category uses its assigned template
 - Producer sees template per category
 - More complex but allows customization
 
 **When to Use:**
+
 - Food vendors need different payment instructions
 - Artists need portfolio submission reminders
 - Sponsors need visibility package details
 - Different booth setup times per category
 
 **UI Display:**
+
 ```
 ⚪ Category-Specific Sequences
    (15 total emails)
@@ -396,6 +430,7 @@ Configure automated email sequences for event-wide emails and vendor category em
 ### Template Preview
 
 **Features:**
+
 - Email count per template
 - Send date calculations based on event dates
 - Category color coding
@@ -408,28 +443,31 @@ System shows accurate email counts per category:
 ```typescript
 // Universal mode
 universalTemplate.email_count = 5
-Display: "(5 emails)"
+Display: '(5 emails)'
 
 // Category-specific mode
 foodTemplate.email_count = 5
 artistTemplate.email_count = 7
 sponsorTemplate.email_count = 4
-Display: "(16 total emails)"
+Display: '(16 total emails)'
 ```
 
 ### Default Behavior
 
 **On Wizard Load:**
+
 - Universal Sequence is pre-selected (radio button checked)
 - If organization has a universal template, it's auto-selected
 - Otherwise, shows system default template
 
 ### Validation Rules
+
 - No validation required (emails are optional)
 - Can create event without email sequences
 - Can configure sequences after event creation
 
 ### UI Components
+
 - Radio button selection (Universal vs Category-Specific)
 - Template dropdown selector
 - Email count badges
@@ -448,22 +486,25 @@ Display: "(16 total emails)"
 **Step Clicking:** Can only click completed steps or current step
 
 ### Validation Timing
+
 - **Real-time:** As user types (with debounce)
 - **On Blur:** When leaving a field
 - **On Submit:** Before moving to next step
 
 ### Error Display
+
 ```typescript
 // Field-level errors
-errors[fieldName] = "Error message"
+errors[fieldName] = 'Error message'
 // Displayed below input with red text
 
 // Step-level errors
-errors.submit = "Overall error message"
+errors.submit = 'Overall error message'
 // Displayed at top of step in red banner
 ```
 
 ### Validation Order
+
 1. Step 1 validation (event details)
 2. Step 2 validation (categories & pricing)
 3. Step 3 validation (none - optional)
@@ -517,9 +558,10 @@ POST /api/v1/presents/organizations/:org_slug/events
 ### Category Defaults Flow
 
 **Step 2: Category Selection**
+
 ```typescript
 // 1. User clicks "Food Vendor" category
-toggleCategory(categoryId);
+toggleCategory(categoryId)
 
 // 2. System checks if category has defaults
 if (category.default_booth_price > 0) {
@@ -531,8 +573,8 @@ if (category.default_booth_price > 0) {
     description: category.default_description,
     install_start_time: category.default_install_start_time,
     // ... other defaults
-    prefilled_from_event: category.last_used_event_name
-  };
+    prefilled_from_event: category.last_used_event_name,
+  }
 }
 
 // 4. Display pre-fill indicator
@@ -544,24 +586,23 @@ if (app.prefilled_from_event) {
 ### Contact Import Flow
 
 **Step 3: Contact Selection**
+
 ```typescript
 // 1. User checks "Food Vendors" list
-handleToggleList(listId);
+handleToggleList(listId)
 
 // 2. System fetches contacts from list
-const response = await contactListsApi.getContacts(listId);
+const response = await contactListsApi.getContacts(listId)
 
 // 3. De-duplicate by contact ID
-const uniqueContacts = Array.from(
-  new Map(contacts.map(c => [c.id, c])).values()
-);
+const uniqueContacts = Array.from(new Map(contacts.map((c) => [c.id, c])).values())
 
 // 4. Update wizard state immediately
 updateWizardState({
   inviteList: {
-    invitedContactIds: uniqueContacts.map(c => c.id)
-  }
-});
+    invitedContactIds: uniqueContacts.map((c) => c.id),
+  },
+})
 
 // 5. Table view updates automatically
 ```
@@ -604,20 +645,21 @@ if (applications.length === 0) {
 ```typescript
 // API error handling
 try {
-  await onSubmit(wizardState);
+  await onSubmit(wizardState)
 } catch (error) {
-  const errorMessage = error?.response?.data?.errors?.[0]
-    || error?.message
-    || 'Failed to create event. Please try again.';
+  const errorMessage =
+    error?.response?.data?.errors?.[0] ||
+    error?.message ||
+    'Failed to create event. Please try again.'
 
   setErrors({
     submit: errorMessage.includes('taken')
       ? 'An event with this name already exists.'
-      : errorMessage
-  });
+      : errorMessage,
+  })
 
   // Go back to step 1 to fix
-  setCurrentStep(1);
+  setCurrentStep(1)
 }
 ```
 
@@ -640,6 +682,7 @@ if (error) {
 ### Manual Testing Checklist
 
 **Step 1: Event Details**
+
 - [ ] Create event with all required fields
 - [ ] Try submitting without event name → See error
 - [ ] Try past date → See error
@@ -647,6 +690,7 @@ if (error) {
 - [ ] Verify location autocomplete works
 
 **Step 2: Application Categories**
+
 - [ ] Select category with defaults → See pre-fill indicator
 - [ ] Clear pre-filled data → Fields reset
 - [ ] Create new category inline → Auto-selects new category
@@ -654,6 +698,7 @@ if (error) {
 - [ ] Add duplicate category name → See error
 
 **Step 3: Invite Contacts**
+
 - [ ] Select "Invite All" → See all contacts
 - [ ] Select multiple lists → See de-duplicated contacts
 - [ ] See unsubscribe warnings → Check counts
@@ -662,12 +707,14 @@ if (error) {
 - [ ] Change selection → Reset works
 
 **Step 4: Email Sequences**
+
 - [ ] Universal Sequence pre-selected → Verify default
 - [ ] Switch to Category-Specific → See per-category templates
 - [ ] Verify email counts match template library
 - [ ] Preview button → Opens template preview
 
 **Navigation**
+
 - [ ] Back button → Returns to previous step
 - [ ] Step clicking → Can jump to completed steps
 - [ ] Cancel button → Closes wizard
@@ -751,6 +798,7 @@ describe('CreateEventWizard', () => {
 ## Change Log
 
 **April 3, 2026** - Initial documentation
+
 - Documented complete 4-step wizard flow
 - Explained smart category pre-fill system
 - Documented immediate contact import (no modal)

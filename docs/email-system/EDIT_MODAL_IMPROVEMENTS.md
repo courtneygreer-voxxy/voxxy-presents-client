@@ -27,12 +27,12 @@
 
 ### Before vs After
 
-| Aspect | Before ❌ | After ✅ |
-|--------|----------|---------|
-| **Variables** | Type `{{event_title}}` manually | Click "Event Name" button → inserts `[eventName]` |
-| **Email Body** | See raw HTML tags | See clean plain text |
-| **Send Time** | Manual time selection, timezone confusion | Fixed 8:00 AM local time, automatic UTC conversion |
-| **User Experience** | Technical, error-prone | User-friendly, professional |
+| Aspect              | Before ❌                                 | After ✅                                           |
+| ------------------- | ----------------------------------------- | -------------------------------------------------- |
+| **Variables**       | Type `{{event_title}}` manually           | Click "Event Name" button → inserts `[eventName]`  |
+| **Email Body**      | See raw HTML tags                         | See clean plain text                               |
+| **Send Time**       | Manual time selection, timezone confusion | Fixed 8:00 AM local time, automatic UTC conversion |
+| **User Experience** | Technical, error-prone                    | User-friendly, professional                        |
 
 ### Impact
 
@@ -63,6 +63,7 @@ A **user-friendly email editing experience** with three major improvements:
 **After:** Click "Event Name" button → inserts `[eventName]` at cursor
 
 **Categories with Color Coding:**
+
 - 🟣 **Event Info** (purple): Event Name, Date, Location, etc.
 - 🟣 **Vendor Info** (pink): Vendor Name, Business Name, Category
 - 🔵 **Your Organization** (blue): Organization Name, Email
@@ -70,14 +71,15 @@ A **user-friendly email editing experience** with three major improvements:
 
 ### 2. **User-Friendly Variable Names**
 
-| What User Sees | What Backend Stores |
-|---------------|---------------------|
-| `[eventName]` | `{{event_title}}` |
+| What User Sees   | What Backend Stores |
+| ---------------- | ------------------- |
+| `[eventName]`    | `{{event_title}}`   |
 | `[businessName]` | `{{business_name}}` |
-| `[boothPrice]` | `{{booth_price}}` |
-| `[vendorName]` | `{{vendor_name}}` |
+| `[boothPrice]`   | `{{booth_price}}`   |
+| `[vendorName]`   | `{{vendor_name}}`   |
 
 **Benefits:**
+
 - CamelCase is easier to read
 - No underscores or curly braces to remember
 - Clear, descriptive names
@@ -88,6 +90,7 @@ A **user-friendly email editing experience** with three major improvements:
 Click a variable button → it inserts at your current cursor position (not at the end!)
 
 **Example:**
+
 ```
 User types: "Hi , see you at the event!"
          cursor here ↑
@@ -110,6 +113,7 @@ Result: "Hi [vendorName], see you at the event!"
 ### 5. **Contextual Variable Panel**
 
 Variables only show when you're actively editing a field:
+
 - Click in **Subject** field → Shows compact variable list
 - Click in **Body** field → Shows full categorized variable panel
 - Click outside → Panel hides (clean UI)
@@ -126,6 +130,7 @@ Variables only show when you're actively editing a field:
 - Preview shows local time: "Jan 17, 2026 8:00 AM PST"
 
 **Example:**
+
 - California user: Sends at 8:00 AM PST (4:00 PM UTC)
 - New York user: Sends at 8:00 AM EST (1:00 PM UTC)
 - Both see "8:00 AM" in their interface
@@ -167,11 +172,13 @@ Variables only show when you're actively editing a field:
 ### Conversion Details
 
 **Loading (Backend → Frontend):**
+
 1. **Strip HTML**: `<p>Hi {{vendor_name}},</p>` → `Hi {{vendor_name}},`
 2. **Convert Variables**: `Hi {{vendor_name}},` → `Hi [vendorName],`
 3. **Result**: User sees plain text with friendly variables
 
 **Saving (Frontend → Backend):**
+
 1. **Convert Variables**: `Hi [vendorName],` → `Hi {{vendor_name}},`
 2. **Add HTML**: `Hi {{vendor_name}},` → `<p>Hi {{vendor_name}},</p>`
 3. **Result**: Backend receives HTML with technical variables
@@ -183,6 +190,7 @@ Variables only show when you're actively editing a field:
 ## 📁 Files Created/Modified
 
 ### NEW Files:
+
 ```
 /src/utils/emailVariables.ts (320 lines)
 /src/utils/emailVariables.test.ts (test examples)
@@ -190,6 +198,7 @@ Variables only show when you're actively editing a field:
 ```
 
 **emailVariables.ts Contains:**
+
 - 15 email variables with frontend/backend mapping
 - **`htmlToPlainText()`** - strips HTML tags, converts to plain text
 - **`plainTextToHtml()`** - wraps paragraphs, adds HTML structure
@@ -200,6 +209,7 @@ Variables only show when you're actively editing a field:
 - `validateVariables()` - check for unrecognized vars
 
 **timezone.ts Contains:**
+
 - **`getUserTimezone()`** - detects IANA timezone identifier
 - **`getTimezoneAbbreviation()`** - gets short timezone string (PST, EST, etc.)
 - **`getEightAmLocalAsUTC()`** - converts 8:00 AM local to UTC HH:MM format
@@ -210,10 +220,13 @@ Variables only show when you're actively editing a field:
 - `isEightAmLocal()` - validates if UTC time represents 8:00 AM local
 
 ### UPDATED Files:
+
 ```
 /src/components/producer/Email/EditScheduledEmailModal.tsx (515 lines)
 ```
+
 **Changes:**
+
 - Added variable button UI
 - Plain text editor (removed HTML label/hint)
 - Conversion on load/save
@@ -226,6 +239,7 @@ Variables only show when you're actively editing a field:
 - **Updated scheduled time preview to show local time**
 
 ### DOCUMENTATION:
+
 ```
 /SCHEDULED_EMAILS_SYSTEM.md (updated)
 /EDIT_MODAL_IMPROVEMENTS.md (this file)
@@ -257,6 +271,7 @@ Variables only show when you're actively editing a field:
 ```
 
 Each button has:
+
 - **Hover tooltip:** Shows description + example
 - **Color coding:** Different colors per category
 - **Click action:** Inserts variable at cursor
@@ -266,6 +281,7 @@ Each button has:
 ## 🧪 Testing Checklist
 
 ### Basic Functionality
+
 - [ ] Open an existing scheduled email in edit modal
 - [ ] Verify backend variables (`{{}}`) are converted to frontend format (`[]`)
 - [ ] Click on subject field → variable buttons appear
@@ -276,6 +292,7 @@ Each button has:
 - [ ] Backend receives correct `{{}}` format
 
 ### Edge Cases
+
 - [ ] Empty fields → variables insert correctly
 - [ ] Cursor at start of text → variable inserts at start
 - [ ] Cursor at end of text → variable inserts at end
@@ -284,6 +301,7 @@ Each button has:
 - [ ] Sent email (read-only) → variable buttons don't show
 
 ### UI/UX
+
 - [ ] Variable panel only shows when field is focused
 - [ ] Panel hides when clicking outside
 - [ ] Colors are distinct and accessible
@@ -292,12 +310,14 @@ Each button has:
 - [ ] Responsive on smaller screens
 
 ### Backend Integration
+
 - [ ] Preview email shows resolved variables
 - [ ] Send email uses backend `{{}}` format correctly
 - [ ] Variables resolve to actual values (test with real event)
 - [ ] Save/load cycle preserves content exactly
 
 ### Timezone Tests
+
 - [ ] Modal displays "Send Time: 8:00 AM [YOUR_TZ]" correctly
 - [ ] Timezone abbreviation matches system timezone (PST, EST, etc.)
 - [ ] No manual time input field is visible
@@ -315,6 +335,7 @@ Each button has:
 ## 🚀 How to Test
 
 1. **Start your dev server:**
+
    ```bash
    cd /Users/beaulazear/Desktop/voxxy-presents-client
    npm run dev
@@ -407,6 +428,7 @@ See you at [eventName]!
 ## 📊 Variables Available (15 total)
 
 ### Event Info (6 variables)
+
 - Event Name
 - Event Date
 - Event Time
@@ -415,6 +437,7 @@ See you at [eventName]!
 - Booth Price
 
 ### Vendor Info (5 variables)
+
 - Vendor Name
 - First Name
 - Business Name
@@ -422,10 +445,12 @@ See you at [eventName]!
 - Booth Number
 
 ### Your Organization (2 variables)
+
 - Organization Name
 - Organization Email
 
 ### Links (2 variables)
+
 - Event URL
 - Unsubscribe Link
 
@@ -445,6 +470,7 @@ See you at [eventName]!
 ### Example Message
 
 **You type:**
+
 ```
 Hi [vendorName],
 
@@ -460,6 +486,7 @@ See you there!
 ```
 
 **Vendor receives:**
+
 ```
 Hi John Doe,
 
@@ -479,6 +506,7 @@ See you there!
 ## 🔮 Future Enhancements
 
 ### Potential Additions:
+
 1. **Variable Preview Tooltip** - Show example value on hover
 2. **Search Variables** - Search box to filter variable buttons
 3. **Recently Used** - Show most-used variables at top
@@ -499,6 +527,7 @@ See you there!
 **Root Cause:** Ref conflict between React Hook Form's `register()` ref and our custom refs for cursor positioning
 
 **Solution:** Properly merged both refs using ref callback:
+
 ```typescript
 ref={(e) => {
   register('subject_template').ref(e);  // RHF's ref
@@ -515,14 +544,17 @@ ref={(e) => {
 **Request:** Users shouldn't see HTML tags - only plain text
 
 **Implementation:** Added two-layer conversion:
+
 1. **HTML Layer**: `<p>`, `<br>`, `<div>` ↔ Plain text with `\n`
 2. **Variable Layer**: `{{event_title}}` ↔ `[eventName]`
 
 **Functions Added:**
+
 - `htmlToPlainText()` - Strips all HTML, converts to readable text
 - `plainTextToHtml()` - Wraps paragraphs, adds proper structure
 
 **Example:**
+
 ```
 Backend: "<p>Hi {{vendor_name}},</p><p>See you!</p>"
     ↓
@@ -542,6 +574,7 @@ Backend Gets: "<p>Hi {{vendor_name}},</p><p>See you at {{event_title}}!</p>"
 **Request:** Remove manual time selection and fix all emails to send at 8:00 AM in user's local timezone
 
 **Implementation:**
+
 1. **Created** `/src/utils/timezone.ts` with timezone utilities:
    - `getUserTimezone()` - Detects IANA timezone (e.g., "America/Los_Angeles")
    - `getTimezoneAbbreviation()` - Gets short timezone string (PST, EST, etc.)
@@ -557,6 +590,7 @@ Backend Gets: "<p>Hi {{vendor_name}},</p><p>See you at {{event_title}}!</p>"
    - Updated scheduled time preview to show local time with timezone
 
 **How It Works:**
+
 ```typescript
 // User in California (PST = UTC-8)
 getEightAmLocalAsUTC() → "16:00"  // 8 AM PST = 4 PM UTC
@@ -568,6 +602,7 @@ getEightAmLocalAsUTC() → "13:00"  // 8 AM EST = 1 PM UTC
 ```
 
 **Example:**
+
 ```
 California User:
   Display: "Send Time: 8:00 AM PST"
@@ -579,6 +614,7 @@ New York User:
 ```
 
 **Benefits:**
+
 - No timezone confusion for users
 - All emails send at 8:00 AM in user's local time
 - Consistent user experience across timezones
@@ -601,15 +637,17 @@ New York User:
 // Update editor content when prop changes (e.g., when email data loads)
 useEffect(() => {
   if (editor && content !== editor.getHTML()) {
-    editor.commands.setContent(content);
+    editor.commands.setContent(content)
   }
-}, [editor, content]);
+}, [editor, content])
 ```
 
 **Files Changed:**
+
 - `src/components/producer/Email/RichTextEditor.tsx` (lines 88-92)
 
 **How It Works:**
+
 1. Component mounts → Editor initializes with empty content (email data hasn't loaded yet)
 2. Email data loads from backend → `content` prop updates with actual email body
 3. `useEffect` detects prop change → Updates editor content using `editor.commands.setContent()`
@@ -639,9 +677,11 @@ useEffect(() => {
 ```
 
 **Files Changed:**
+
 - `src/components/producer/Email/RichTextEditor.tsx` (line 113)
 
 **How It Works:**
+
 - `onMouseDown` fires before `onClick`
 - `preventDefault()` prevents the button from taking focus
 - Editor maintains focus and text selection
@@ -652,6 +692,7 @@ useEffect(() => {
 ---
 
 If you find any NEW issues during testing, document here:
+
 - Issue description
 - Steps to reproduce
 - Expected vs actual behavior
@@ -663,6 +704,7 @@ If you find any NEW issues during testing, document here:
 ### Technical Decisions
 
 **1. Why Frontend-Only Conversion?**
+
 - ✅ Zero backend changes required
 - ✅ Faster iteration and testing
 - ✅ Backend stays stable and unchanged
@@ -670,6 +712,7 @@ If you find any NEW issues during testing, document here:
 - ✅ Separates presentation layer from data layer
 
 **2. Why Square Brackets `[eventName]` Instead of `{{event_title}}`?**
+
 - ✅ More readable (camelCase vs snake_case)
 - ✅ No curly braces (less technical looking)
 - ✅ Easier to type and remember
@@ -677,6 +720,7 @@ If you find any NEW issues during testing, document here:
 - ✅ Clear distinction from backend format
 
 **3. Why 8:00 AM Fixed Time?**
+
 - ✅ Optimal time for email engagement
 - ✅ Eliminates timezone confusion
 - ✅ Consistent user experience
@@ -684,6 +728,7 @@ If you find any NEW issues during testing, document here:
 - ✅ Automatic daylight saving time handling
 
 **4. Why HTML to Plain Text Conversion?**
+
 - ✅ Users don't need to know HTML
 - ✅ Cleaner editing experience
 - ✅ Reduces errors from malformed HTML
@@ -693,6 +738,7 @@ If you find any NEW issues during testing, document here:
 ### Architecture Choices
 
 **Separation of Concerns:**
+
 ```
 User Interface (EditScheduledEmailModal.tsx)
     ↓
@@ -704,6 +750,7 @@ Backend (Rails API)
 ```
 
 **Two-Layer Conversion System:**
+
 ```
 Layer 1: HTML Conversion
   <p>Hello</p>  ↔  Hello
@@ -716,6 +763,7 @@ Combined:
 ```
 
 **Timezone Conversion Flow:**
+
 ```
 User Action → getEightAmLocalAsUTC() → UTC Time String → Backend
 Backend → formatDateWithTimezone() → Local Time Display → User
@@ -734,6 +782,7 @@ Backend → formatDateWithTimezone() → Local Time Display → User
 ## 📞 Support
 
 **Questions?** Refer to:
+
 - `SCHEDULED_EMAILS_SYSTEM.md` - Complete system documentation
 - `CLAUDE_CONTEXT.md` - Overall project context
 - `/src/utils/emailVariables.ts` - Variable mapping and HTML conversion code
@@ -741,6 +790,7 @@ Backend → formatDateWithTimezone() → Local Time Display → User
 - `/src/components/producer/Email/EditScheduledEmailModal.tsx` - Main edit modal component
 
 **Key Features Implemented:**
+
 - ✅ Clickable variable buttons with color coding
 - ✅ Plain text editing with automatic HTML conversion
 - ✅ Timezone-aware 8:00 AM send time

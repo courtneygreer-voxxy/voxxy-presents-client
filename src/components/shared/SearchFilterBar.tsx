@@ -1,32 +1,32 @@
-import { useState, useRef, useEffect } from 'react';
-import { Search, X, Check, ChevronDown } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react'
+import { Search, X, Check, ChevronDown } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 // --- Types ---
 
 export interface FilterFieldConfig {
-  key: string;
-  label: string;
-  icon?: LucideIcon;
-  options: string[];
-  multi?: boolean; // defaults to true
+  key: string
+  label: string
+  icon?: LucideIcon
+  options: string[]
+  multi?: boolean // defaults to true
 }
 
 export interface ActiveFilter {
-  fieldKey: string;
-  values: string[];
+  fieldKey: string
+  values: string[]
 }
 
 interface SearchFilterBarProps {
-  searchPlaceholder?: string;
-  searchValue: string;
-  onSearchChange: (value: string) => void;
-  onSearchSubmit?: () => void;
-  filterFields: FilterFieldConfig[];
-  activeFilters: ActiveFilter[];
-  onFiltersChange: (filters: ActiveFilter[]) => void;
+  searchPlaceholder?: string
+  searchValue: string
+  onSearchChange: (value: string) => void
+  onSearchSubmit?: () => void
+  filterFields: FilterFieldConfig[]
+  activeFilters: ActiveFilter[]
+  onFiltersChange: (filters: ActiveFilter[]) => void
   /** Extra filter elements (e.g. date picker) rendered inline with filter dropdowns */
-  extraFilters?: React.ReactNode;
+  extraFilters?: React.ReactNode
 }
 
 // --- Filter Dropdown ---
@@ -36,38 +36,36 @@ function FilterDropdown({
   selectedValues,
   onChange,
 }: {
-  field: FilterFieldConfig;
-  selectedValues: string[];
-  onChange: (values: string[]) => void;
+  field: FilterFieldConfig
+  selectedValues: string[]
+  onChange: (values: string[]) => void
 }) {
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const ref = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-        setSearch('');
+        setOpen(false)
+        setSearch('')
       }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
-  const filtered = field.options.filter(opt =>
-    opt.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = field.options.filter((opt) => opt.toLowerCase().includes(search.toLowerCase()))
 
   const handleToggle = (value: string) => {
     if (selectedValues.includes(value)) {
-      onChange(selectedValues.filter(v => v !== value));
+      onChange(selectedValues.filter((v) => v !== value))
     } else {
-      onChange([...selectedValues, value]);
+      onChange([...selectedValues, value])
     }
-  };
+  }
 
-  const Icon = field.icon;
+  const Icon = field.icon
 
   return (
     <div className="relative" ref={ref}>
@@ -86,7 +84,9 @@ function FilterDropdown({
             {selectedValues.length}
           </span>
         )}
-        <ChevronDown className={`w-3 h-3 text-foreground/65 dark:text-foreground/40 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown
+          className={`w-3 h-3 text-foreground/65 dark:text-foreground/40 transition-transform ${open ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {open && (
@@ -105,9 +105,11 @@ function FilterDropdown({
           )}
           <div className="max-h-48 overflow-y-auto p-1">
             {filtered.length === 0 ? (
-              <p className="px-3 py-2 text-xs text-foreground/75 dark:text-muted-foreground">No options found</p>
+              <p className="px-3 py-2 text-xs text-foreground/75 dark:text-muted-foreground">
+                No options found
+              </p>
             ) : (
-              filtered.map(option => (
+              filtered.map((option) => (
                 <button
                   key={option}
                   onClick={() => handleToggle(option)}
@@ -142,7 +144,7 @@ function FilterDropdown({
         </div>
       )}
     </div>
-  );
+  )
 }
 
 // --- Main Component ---
@@ -157,25 +159,25 @@ export function SearchFilterBar({
   onFiltersChange,
   extraFilters,
 }: SearchFilterBarProps) {
-  const activeFilterCount = activeFilters.filter(f => f.values.length > 0).length;
+  const activeFilterCount = activeFilters.filter((f) => f.values.length > 0).length
 
   const handleUpdateFilterValues = (fieldKey: string, values: string[]) => {
-    const existing = activeFilters.find(f => f.fieldKey === fieldKey);
+    const existing = activeFilters.find((f) => f.fieldKey === fieldKey)
     if (existing) {
       if (values.length === 0) {
         // Remove filter when cleared
-        onFiltersChange(activeFilters.filter(f => f.fieldKey !== fieldKey));
+        onFiltersChange(activeFilters.filter((f) => f.fieldKey !== fieldKey))
       } else {
-        onFiltersChange(activeFilters.map(f => f.fieldKey === fieldKey ? { ...f, values } : f));
+        onFiltersChange(activeFilters.map((f) => (f.fieldKey === fieldKey ? { ...f, values } : f)))
       }
     } else if (values.length > 0) {
-      onFiltersChange([...activeFilters, { fieldKey, values }]);
+      onFiltersChange([...activeFilters, { fieldKey, values }])
     }
-  };
+  }
 
   const handleClearAll = () => {
-    onFiltersChange([]);
-  };
+    onFiltersChange([])
+  }
 
   return (
     <div className="space-y-2">
@@ -195,11 +197,11 @@ export function SearchFilterBar({
       {/* Filter dropdowns - always visible underneath */}
       {(filterFields.length > 0 || extraFilters) && (
         <div className="flex items-center gap-2 flex-wrap">
-          {filterFields.map(field => (
+          {filterFields.map((field) => (
             <FilterDropdown
               key={field.key}
               field={field}
-              selectedValues={activeFilters.find(f => f.fieldKey === field.key)?.values || []}
+              selectedValues={activeFilters.find((f) => f.fieldKey === field.key)?.values || []}
               onChange={(values) => handleUpdateFilterValues(field.key, values)}
             />
           ))}
@@ -216,5 +218,5 @@ export function SearchFilterBar({
         </div>
       )}
     </div>
-  );
+  )
 }

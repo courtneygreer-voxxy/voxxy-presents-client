@@ -1,78 +1,78 @@
-import { useState, useEffect } from 'react';
-import { DollarSign, RefreshCw, AlertCircle, Check, X, Search, Filter } from 'lucide-react';
-import { paymentTransactionsApi } from '@/services/paymentApi';
-import type { PaymentTransaction } from '@/types/payment';
+import { useState, useEffect } from 'react'
+import { DollarSign, RefreshCw, AlertCircle, Check, X, Search, Filter } from 'lucide-react'
+import { paymentTransactionsApi } from '@/services/paymentApi'
+import type { PaymentTransaction } from '@/types/payment'
 
 interface PaymentTransactionsListProps {
-  eventSlug: string;
-  onTransactionUpdate?: () => void;
+  eventSlug: string
+  onTransactionUpdate?: () => void
 }
 
 export default function PaymentTransactionsList({
   eventSlug,
   onTransactionUpdate,
 }: PaymentTransactionsListProps) {
-  const [transactions, setTransactions] = useState<PaymentTransaction[]>([]);
-  const [filteredTransactions, setFilteredTransactions] = useState<PaymentTransaction[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [transactions, setTransactions] = useState<PaymentTransaction[]>([])
+  const [filteredTransactions, setFilteredTransactions] = useState<PaymentTransaction[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Filters
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [matchFilter, setMatchFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [matchFilter, setMatchFilter] = useState<string>('all')
 
   useEffect(() => {
-    fetchTransactions();
-  }, [eventSlug]);
+    fetchTransactions()
+  }, [eventSlug])
 
   useEffect(() => {
-    applyFilters();
-  }, [transactions, searchQuery, statusFilter, matchFilter]);
+    applyFilters()
+  }, [transactions, searchQuery, statusFilter, matchFilter])
 
   const fetchTransactions = async () => {
     try {
-      setIsLoading(true);
-      setError(null);
-      const data = await paymentTransactionsApi.getByEvent(eventSlug);
-      setTransactions(data);
+      setIsLoading(true)
+      setError(null)
+      const data = await paymentTransactionsApi.getByEvent(eventSlug)
+      setTransactions(data)
     } catch (err: any) {
-      console.error('Failed to fetch transactions:', err);
-      setError('Failed to load payment transactions');
+      console.error('Failed to fetch transactions:', err)
+      setError('Failed to load payment transactions')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const applyFilters = () => {
-    let filtered = [...transactions];
+    let filtered = [...transactions]
 
     // Search filter
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+      const query = searchQuery.toLowerCase()
       filtered = filtered.filter(
         (t) =>
           t.payer_email.toLowerCase().includes(query) ||
           t.payer_first_name?.toLowerCase().includes(query) ||
           t.payer_last_name?.toLowerCase().includes(query) ||
-          t.provider_transaction_id.toLowerCase().includes(query)
-      );
+          t.provider_transaction_id.toLowerCase().includes(query),
+      )
     }
 
     // Status filter
     if (statusFilter !== 'all') {
-      filtered = filtered.filter((t) => t.payment_status === statusFilter);
+      filtered = filtered.filter((t) => t.payment_status === statusFilter)
     }
 
     // Match filter
     if (matchFilter === 'matched') {
-      filtered = filtered.filter((t) => t.vendor_contact_id !== null);
+      filtered = filtered.filter((t) => t.vendor_contact_id !== null)
     } else if (matchFilter === 'unmatched') {
-      filtered = filtered.filter((t) => t.vendor_contact_id === null);
+      filtered = filtered.filter((t) => t.vendor_contact_id === null)
     }
 
-    setFilteredTransactions(filtered);
-  };
+    setFilteredTransactions(filtered)
+  }
 
   const getStatusBadge = (status: string) => {
     const badges = {
@@ -80,24 +80,24 @@ export default function PaymentTransactionsList({
       pending: 'bg-yellow-100 text-yellow-800',
       refunded: 'bg-blue-100 text-blue-800',
       cancelled: 'bg-red-100 text-red-800',
-    };
-    return badges[status as keyof typeof badges] || 'bg-muted text-gray-800';
-  };
+    }
+    return badges[status as keyof typeof badges] || 'bg-muted text-gray-800'
+  }
 
   const formatAmount = (amount: string, currency: string) => {
-    const num = parseFloat(amount);
+    const num = parseFloat(amount)
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency || 'USD',
-    }).format(num);
-  };
+    }).format(num)
+  }
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
         <RefreshCw className="w-6 h-6 text-primary animate-spin" />
       </div>
-    );
+    )
   }
 
   return (
@@ -229,7 +229,7 @@ export default function PaymentTransactionsList({
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(
-                          transaction.payment_status
+                          transaction.payment_status,
                         )}`}
                       >
                         {transaction.payment_status}
@@ -313,12 +313,12 @@ export default function PaymentTransactionsList({
                   .filter((t) => t.payment_status === 'paid')
                   .reduce((sum, t) => sum + parseFloat(t.amount), 0)
                   .toString(),
-                'USD'
+                'USD',
               )}
             </p>
           </div>
         </div>
       )}
     </div>
-  );
+  )
 }

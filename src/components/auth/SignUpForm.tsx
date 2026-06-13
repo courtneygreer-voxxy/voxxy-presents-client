@@ -38,7 +38,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
     email: '',
     password: '',
     confirmPassword: '',
-    acceptTerms: false
+    acceptTerms: false,
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [showPassword, setShowPassword] = useState(false)
@@ -81,13 +81,13 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
 
   // Handle input changes with validation
   const handleInputChange = (field: keyof FormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    
+    setFormData((prev) => ({ ...prev, [field]: value }))
+
     // Clear previous errors for this field
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }))
+      setErrors((prev) => ({ ...prev, [field]: undefined }))
     }
-    
+
     // Clear general auth error when user starts typing
     if (error) {
       clearError()
@@ -97,8 +97,8 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
   // Validate entire form
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
-    
-    Object.keys(formData).forEach(key => {
+
+    Object.keys(formData).forEach((key) => {
       const field = key as keyof FormData
       const fieldError = validateField(field, formData[field])
       if (fieldError) {
@@ -113,23 +113,23 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
-    
+
     setIsSubmitting(true)
-    setErrors(prev => ({ ...prev, submit: undefined }))
-    
+    setErrors((prev) => ({ ...prev, submit: undefined }))
+
     try {
       await signUp({
         email: formData.email.trim(),
         password: formData.password,
-        displayName: formData.displayName.trim()
+        displayName: formData.displayName.trim(),
       })
-      
+
       onSuccess?.()
     } catch (err) {
       // Error is handled by the AuthContext
-      setErrors(prev => ({ ...prev, submit: 'Failed to create account. Please try again.' }))
+      setErrors((prev) => ({ ...prev, submit: 'Failed to create account. Please try again.' }))
     } finally {
       setIsSubmitting(false)
     }
@@ -150,7 +150,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-        
+
         {/* Display form submission errors */}
         {errors.submit && (
           <Alert variant="destructive">
@@ -173,15 +173,13 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                 onChange={(e) => handleInputChange('displayName', e.target.value)}
                 onBlur={() => {
                   const error = validateField('displayName', formData.displayName)
-                  if (error) setErrors(prev => ({ ...prev, displayName: error as string }))
+                  if (error) setErrors((prev) => ({ ...prev, displayName: error as string }))
                 }}
                 aria-invalid={!!errors.displayName}
                 disabled={isSubmitting || loading}
               />
             </div>
-            {errors.displayName && (
-              <p className="text-sm text-destructive">{errors.displayName}</p>
-            )}
+            {errors.displayName && <p className="text-sm text-destructive">{errors.displayName}</p>}
           </div>
 
           {/* Email Field */}
@@ -198,16 +196,14 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 onBlur={() => {
                   const error = validateField('email', formData.email)
-                  if (error) setErrors(prev => ({ ...prev, email: error as string }))
+                  if (error) setErrors((prev) => ({ ...prev, email: error as string }))
                 }}
                 aria-invalid={!!errors.email}
                 disabled={isSubmitting || loading}
                 autoComplete="email"
               />
             </div>
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email}</p>
-            )}
+            {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
           </div>
 
           {/* Password Field */}
@@ -224,7 +220,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                 onChange={(e) => handleInputChange('password', e.target.value)}
                 onBlur={() => {
                   const error = validateField('password', formData.password)
-                  if (error) setErrors(prev => ({ ...prev, password: error as string[] }))
+                  if (error) setErrors((prev) => ({ ...prev, password: error as string[] }))
                 }}
                 aria-invalid={!!errors.password}
                 disabled={isSubmitting || loading}
@@ -242,7 +238,9 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
             {errors.password && (
               <div className="space-y-1">
                 {errors.password.map((error, index) => (
-                  <p key={index} className="text-sm text-destructive">{error}</p>
+                  <p key={index} className="text-sm text-destructive">
+                    {error}
+                  </p>
                 ))}
               </div>
             )}
@@ -262,7 +260,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                 onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                 onBlur={() => {
                   const error = validateField('confirmPassword', formData.confirmPassword)
-                  if (error) setErrors(prev => ({ ...prev, confirmPassword: error as string }))
+                  if (error) setErrors((prev) => ({ ...prev, confirmPassword: error as string }))
                 }}
                 aria-invalid={!!errors.confirmPassword}
                 disabled={isSubmitting || loading}
@@ -304,9 +302,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                 </a>
               </Label>
             </div>
-            {errors.acceptTerms && (
-              <p className="text-sm text-destructive">{errors.acceptTerms}</p>
-            )}
+            {errors.acceptTerms && <p className="text-sm text-destructive">{errors.acceptTerms}</p>}
           </div>
 
           {/* Submit Button */}

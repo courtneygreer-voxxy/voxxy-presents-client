@@ -10,10 +10,10 @@
  * - Variable insertion support
  */
 
-import { useEffect, useState, useMemo } from 'react';
-import { useEditor, EditorContent, Editor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
+import { useEffect, useState, useMemo } from 'react'
+import { useEditor, EditorContent, Editor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Link from '@tiptap/extension-link'
 import {
   Bold,
   Italic,
@@ -27,18 +27,18 @@ import {
   Undo,
   Redo,
   LinkIcon as UnlinkIcon,
-} from 'lucide-react';
-import { EMAIL_VARIABLES } from '@/utils/emailVariables';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+} from 'lucide-react'
+import { EMAIL_VARIABLES } from '@/utils/emailVariables'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 interface RichTextEditorProps {
-  content: string;
-  onChange: (html: string) => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
-  onEditorReady?: (editor: Editor) => void;
-  placeholder?: string;
-  isBlastEmail?: boolean; // Whether this is a blast/announcement email (recipients haven't applied yet)
+  content: string
+  onChange: (html: string) => void
+  onFocus?: () => void
+  onBlur?: () => void
+  onEditorReady?: (editor: Editor) => void
+  placeholder?: string
+  isBlastEmail?: boolean // Whether this is a blast/announcement email (recipients haven't applied yet)
 }
 
 // Default display text for system link variables
@@ -51,7 +51,7 @@ const SYSTEM_LINK_DEFAULTS: Record<string, string> = {
   '[bulletinLink]': 'View Bulletin',
   '[eventOptOutLink]': 'Decline Invitation',
   '[unsubscribeLink]': 'Unsubscribe',
-};
+}
 
 export function RichTextEditor({
   content,
@@ -62,11 +62,11 @@ export function RichTextEditor({
   placeholder = 'Write your email message here...',
   isBlastEmail = false,
 }: RichTextEditorProps) {
-  const [linkPopoverOpen, setLinkPopoverOpen] = useState(false);
-  const [linkMode, setLinkMode] = useState<'system' | 'custom'>('system');
-  const [selectedSystemLink, setSelectedSystemLink] = useState('');
-  const [customUrl, setCustomUrl] = useState('');
-  const [displayText, setDisplayText] = useState('');
+  const [linkPopoverOpen, setLinkPopoverOpen] = useState(false)
+  const [linkMode, setLinkMode] = useState<'system' | 'custom'>('system')
+  const [selectedSystemLink, setSelectedSystemLink] = useState('')
+  const [customUrl, setCustomUrl] = useState('')
+  const [displayText, setDisplayText] = useState('')
 
   const editor = useEditor({
     extensions: [
@@ -78,7 +78,8 @@ export function RichTextEditor({
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-violet-700 underline hover:text-violet-800 dark:text-primary dark:hover:text-primary',
+          class:
+            'text-violet-700 underline hover:text-violet-800 dark:text-primary dark:hover:text-primary',
           rel: 'noopener noreferrer',
           target: '_blank',
         },
@@ -93,39 +94,38 @@ export function RichTextEditor({
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      onChange(editor.getHTML())
     },
     onFocus,
     onBlur,
-  });
+  })
 
   useEffect(() => {
     if (editor && onEditorReady) {
-      onEditorReady(editor);
+      onEditorReady(editor)
     }
-  }, [editor, onEditorReady]);
+  }, [editor, onEditorReady])
 
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content);
+      editor.commands.setContent(content)
     }
-  }, [editor, content]);
+  }, [editor, content])
 
   // Build system link options from EMAIL_VARIABLES
   const systemLinkOptions = useMemo(() => {
-    return EMAIL_VARIABLES
-      .filter(v =>
+    return EMAIL_VARIABLES.filter(
+      (v) =>
         v.category === 'links' && // Show all link variables
-        (!isBlastEmail || v.worksInInvitations) // Filter out post-application variables for blast emails
-      )
-      .map(v => ({
-        variable: v.frontendVar,
-        label: v.label,
-        defaultText: SYSTEM_LINK_DEFAULTS[v.frontendVar] || 'Click Here',
-      }));
-  }, [isBlastEmail]);
+        (!isBlastEmail || v.worksInInvitations), // Filter out post-application variables for blast emails
+    ).map((v) => ({
+      variable: v.frontendVar,
+      label: v.label,
+      defaultText: SYSTEM_LINK_DEFAULTS[v.frontendVar] || 'Click Here',
+    }))
+  }, [isBlastEmail])
 
-  if (!editor) return null;
+  if (!editor) return null
 
   const ToolbarButton = ({
     onClick,
@@ -134,11 +134,11 @@ export function RichTextEditor({
     children,
     title,
   }: {
-    onClick: () => void;
-    active?: boolean;
-    disabled?: boolean;
-    children: React.ReactNode;
-    title: string;
+    onClick: () => void
+    active?: boolean
+    disabled?: boolean
+    children: React.ReactNode
+    title: string
   }) => (
     <button
       type="button"
@@ -148,95 +148,103 @@ export function RichTextEditor({
       title={title}
       className={`
         p-2 rounded transition-colors
-        ${active
-          ? 'bg-primary/30 text-violet-950 dark:text-primary border border-primary/40'
-          : 'hover:bg-background/10 text-foreground/70 hover:text-foreground border border-transparent'
+        ${
+          active
+            ? 'bg-primary/30 text-violet-950 dark:text-primary border border-primary/40'
+            : 'hover:bg-background/10 text-foreground/70 hover:text-foreground border border-transparent'
         }
         ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
       `}
     >
       {children}
     </button>
-  );
+  )
 
   const removeLink = () => {
-    editor.chain().focus().unsetLink().run();
-  };
+    editor.chain().focus().unsetLink().run()
+  }
 
   const resetPopoverState = () => {
-    setLinkMode('system');
-    setSelectedSystemLink('');
-    setCustomUrl('');
-    setDisplayText('');
-  };
+    setLinkMode('system')
+    setSelectedSystemLink('')
+    setCustomUrl('')
+    setDisplayText('')
+  }
 
   const handlePopoverOpen = (open: boolean) => {
     if (open) {
       // Pre-fill display text with selected text from editor
-      const { from, to } = editor.state.selection;
-      const selectedText = editor.state.doc.textBetween(from, to, ' ');
+      const { from, to } = editor.state.selection
+      const selectedText = editor.state.doc.textBetween(from, to, ' ')
       if (selectedText) {
-        setDisplayText(selectedText);
+        setDisplayText(selectedText)
       }
 
       // If cursor is on an existing link, pre-fill for editing
       if (editor.isActive('link')) {
-        const href = editor.getAttributes('link').href || '';
+        const href = editor.getAttributes('link').href || ''
         if (href.startsWith('[') && href.endsWith(']')) {
-          setLinkMode('system');
-          setSelectedSystemLink(href);
+          setLinkMode('system')
+          setSelectedSystemLink(href)
           if (!selectedText) {
-            setDisplayText(SYSTEM_LINK_DEFAULTS[href] || 'Click Here');
+            setDisplayText(SYSTEM_LINK_DEFAULTS[href] || 'Click Here')
           }
         } else {
-          setLinkMode('custom');
-          setCustomUrl(href);
+          setLinkMode('custom')
+          setCustomUrl(href)
         }
       }
     } else {
-      resetPopoverState();
+      resetPopoverState()
     }
-    setLinkPopoverOpen(open);
-  };
+    setLinkPopoverOpen(open)
+  }
 
   const handleSystemLinkChange = (variable: string) => {
-    setSelectedSystemLink(variable);
+    setSelectedSystemLink(variable)
     // Auto-fill display text with default (only if user hasn't typed custom text)
     if (!displayText || displayText === SYSTEM_LINK_DEFAULTS[selectedSystemLink]) {
-      setDisplayText(SYSTEM_LINK_DEFAULTS[variable] || 'Click Here');
+      setDisplayText(SYSTEM_LINK_DEFAULTS[variable] || 'Click Here')
     }
-  };
+  }
 
   const handleInsertLink = () => {
-    const href = linkMode === 'system' ? selectedSystemLink : customUrl;
-    const text = displayText || (linkMode === 'system' ? SYSTEM_LINK_DEFAULTS[selectedSystemLink] : customUrl) || 'Link';
+    const href = linkMode === 'system' ? selectedSystemLink : customUrl
+    const text =
+      displayText ||
+      (linkMode === 'system' ? SYSTEM_LINK_DEFAULTS[selectedSystemLink] : customUrl) ||
+      'Link'
 
-    if (!href) return;
+    if (!href) return
 
     // If there's selected text in the editor, replace it with the link
-    const { from, to } = editor.state.selection;
-    const hasSelection = from !== to;
+    const { from, to } = editor.state.selection
+    const hasSelection = from !== to
 
     if (hasSelection) {
       editor
         .chain()
         .focus()
         .deleteSelection()
-        .insertContent(`<a href="${href}" style="color: #0066cc; text-decoration: underline;">${text}</a>`)
-        .run();
+        .insertContent(
+          `<a href="${href}" style="color: #0066cc; text-decoration: underline;">${text}</a>`,
+        )
+        .run()
     } else {
       editor
         .chain()
         .focus()
-        .insertContent(`<a href="${href}" style="color: #0066cc; text-decoration: underline;">${text}</a>`)
-        .run();
+        .insertContent(
+          `<a href="${href}" style="color: #0066cc; text-decoration: underline;">${text}</a>`,
+        )
+        .run()
     }
 
-    setLinkPopoverOpen(false);
-    resetPopoverState();
-  };
+    setLinkPopoverOpen(false)
+    resetPopoverState()
+  }
 
-  const canInsert = linkMode === 'system' ? !!selectedSystemLink : !!customUrl;
+  const canInsert = linkMode === 'system' ? !!selectedSystemLink : !!customUrl
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-card/80 dark:bg-background/10">
@@ -321,9 +329,10 @@ export function RichTextEditor({
               title="Insert Link"
               className={`
                 px-2.5 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5
-                ${editor.isActive('link')
-                  ? 'bg-primary/30 text-violet-950 dark:text-primary border border-primary/40'
-                  : 'bg-violet-200/90 text-foreground hover:bg-violet-300/90 border border-violet-300/80 dark:bg-primary/80 dark:hover:bg-primary dark:text-primary-foreground dark:border-transparent'
+                ${
+                  editor.isActive('link')
+                    ? 'bg-primary/30 text-violet-950 dark:text-primary border border-primary/40'
+                    : 'bg-violet-200/90 text-foreground hover:bg-violet-300/90 border border-violet-300/80 dark:bg-primary/80 dark:hover:bg-primary dark:text-primary-foreground dark:border-transparent'
                 }
               `}
             >
@@ -340,7 +349,9 @@ export function RichTextEditor({
             <div className="p-4 space-y-4">
               <div>
                 <p className="text-sm font-semibold text-foreground">Insert Link</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">Add a clickable link to your email</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Add a clickable link to your email
+                </p>
               </div>
 
               {/* Display Text */}
@@ -398,8 +409,12 @@ export function RichTextEditor({
                       }`}
                     >
                       <div>
-                        <span className="text-sm font-medium text-foreground block">{option.label}</span>
-                        <span className="text-[10px] text-muted-foreground">{option.defaultText}</span>
+                        <span className="text-sm font-medium text-foreground block">
+                          {option.label}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {option.defaultText}
+                        </span>
                       </div>
                       {selectedSystemLink === option.variable && (
                         <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
@@ -429,7 +444,10 @@ export function RichTextEditor({
               <div className="flex gap-2 pt-1">
                 <button
                   type="button"
-                  onClick={() => { setLinkPopoverOpen(false); resetPopoverState(); }}
+                  onClick={() => {
+                    setLinkPopoverOpen(false)
+                    resetPopoverState()
+                  }}
                   className="flex-1 rounded-md bg-muted/60 px-3 py-2 text-xs font-medium text-foreground/60 transition-all hover:bg-muted hover:text-foreground dark:bg-background/5 dark:hover:bg-background/10"
                 >
                   Cancel
@@ -452,10 +470,7 @@ export function RichTextEditor({
         </Popover>
 
         {editor.isActive('link') && (
-          <ToolbarButton
-            onClick={removeLink}
-            title="Remove Link"
-          >
+          <ToolbarButton onClick={removeLink} title="Remove Link">
             <UnlinkIcon className="w-4 h-4" />
           </ToolbarButton>
         )}
@@ -482,5 +497,5 @@ export function RichTextEditor({
       {/* Editor Content */}
       <EditorContent editor={editor} />
     </div>
-  );
+  )
 }

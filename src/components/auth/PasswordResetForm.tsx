@@ -24,7 +24,7 @@ export function PasswordResetForm({ onSuccess, onBackToLogin }: PasswordResetFor
   // Handle email input change
   const handleEmailChange = (value: string) => {
     setEmail(value)
-    
+
     // Clear errors when user starts typing
     if (emailError) setEmailError(undefined)
     if (error) clearError()
@@ -36,27 +36,27 @@ export function PasswordResetForm({ onSuccess, onBackToLogin }: PasswordResetFor
       setEmailError('Email is required')
       return false
     }
-    
+
     if (!validateEmail(email)) {
       setEmailError('Please enter a valid email address')
       return false
     }
-    
+
     return true
   }
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
-    
+
     setIsSubmitting(true)
-    
+
     try {
       await resetPassword(email.trim())
       setIsSuccess(true)
-      
+
       // Auto redirect after showing success message
       setTimeout(() => {
         onSuccess?.()
@@ -76,20 +76,21 @@ export function PasswordResetForm({ onSuccess, onBackToLogin }: PasswordResetFor
           <div className="flex justify-center mb-4">
             <CheckCircle className="h-12 w-12 text-green-700 dark:text-green-400" />
           </div>
-          <CardTitle className="text-2xl font-bold text-center text-foreground">Check Your Email</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center text-foreground">
+            Check Your Email
+          </CardTitle>
           <CardDescription className="text-center">
-            We've sent password reset instructions to <strong className="text-foreground">{email}</strong>
+            We've sent password reset instructions to{' '}
+            <strong className="text-foreground">{email}</strong>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-sm text-muted-foreground text-center space-y-2">
             <p>
-              Click the link in the email to reset your password.
-              If you don't see the email, check your spam folder.
+              Click the link in the email to reset your password. If you don't see the email, check
+              your spam folder.
             </p>
-            <p>
-              The link will expire in 1 hour for security.
-            </p>
+            <p>The link will expire in 1 hour for security.</p>
           </div>
 
           <Button
@@ -108,7 +109,9 @@ export function PasswordResetForm({ onSuccess, onBackToLogin }: PasswordResetFor
   return (
     <Card className="voxxy-auth-card mx-auto w-full max-w-md">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center text-foreground">Reset Password</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center text-foreground">
+          Reset Password
+        </CardTitle>
         <CardDescription className="text-center">
           Enter your email address and we'll send you a link to reset your password
         </CardDescription>
@@ -124,7 +127,9 @@ export function PasswordResetForm({ onSuccess, onBackToLogin }: PasswordResetFor
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Field */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground">Email Address</Label>
+            <Label htmlFor="email" className="text-foreground">
+              Email Address
+            </Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -145,9 +150,7 @@ export function PasswordResetForm({ onSuccess, onBackToLogin }: PasswordResetFor
                 autoFocus
               />
             </div>
-            {emailError && (
-              <p className="text-sm text-red-400">{emailError}</p>
-            )}
+            {emailError && <p className="text-sm text-red-400">{emailError}</p>}
           </div>
 
           {/* Submit Button */}

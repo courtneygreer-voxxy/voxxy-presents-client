@@ -11,6 +11,7 @@
 ## 📋 **Project Overview**
 
 ### **Current System Challenges:**
+
 1. **Inconsistent Category Data:** String arrays (`["Artist", "Food Vendor"]`) lack consistency
 2. **No Reusability:** Users re-type same categories for every event
 3. **Email Targeting Limitations:** Cannot create category-specific email templates
@@ -19,6 +20,7 @@
 6. **No Category Management:** No central place to view/edit categories
 
 ### **Business Impact:**
+
 - **User Frustration:** Re-entering same categories repeatedly
 - **Time Waste:** 5-10 minutes per event for category setup
 - **Poor Email Targeting:** Generic emails to all vendors (lower engagement)
@@ -30,7 +32,9 @@
 ## 🎯 **Solution Strategy**
 
 ### **Core Concept:**
+
 Create a **unified Categories table** that flows through:
+
 1. **Event Creation** → Select categories (replaces typing application names)
 2. **Vendor Applications** → Link to category + event-specific config
 3. **Email Sequences** → Auto-split by category with custom templates
@@ -38,6 +42,7 @@ Create a **unified Categories table** that flows through:
 5. **Template Library** → Create category-specific email templates
 
 ### **User Flow (Event Creation):**
+
 ```
 Step 1: Event Details ✓
 Step 2: Choose Categories
@@ -52,6 +57,7 @@ Step 4: Email Template
 ```
 
 ### **Email Sequence Behavior:**
+
 **Event Announcements** → One set (all categories)
 **Application/Payment/Event Emails** → Split per category
 
@@ -63,6 +69,7 @@ Plus: 5 event announcements (all categories) = 50 total scheduled emails
 ## 🗄️ **Database Architecture**
 
 ### **New Table: categories**
+
 ```sql
 CREATE TABLE categories (
   id SERIAL PRIMARY KEY,
@@ -85,6 +92,7 @@ CREATE INDEX idx_categories_name ON categories(name);
 ```
 
 ### **Update: vendor_applications**
+
 ```sql
 ALTER TABLE vendor_applications
   ADD COLUMN category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL;
@@ -96,6 +104,7 @@ CREATE INDEX idx_vendor_applications_category ON vendor_applications(category_id
 ```
 
 ### **Update: email_template_items**
+
 ```sql
 ALTER TABLE email_template_items
   ADD COLUMN category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE;
@@ -107,6 +116,7 @@ CREATE INDEX idx_email_template_items_category ON email_template_items(category_
 ```
 
 ### **Update: scheduled_emails**
+
 ```sql
 ALTER TABLE scheduled_emails
   ADD COLUMN category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL;
@@ -118,6 +128,7 @@ CREATE INDEX idx_scheduled_emails_category ON scheduled_emails(category_id);
 ```
 
 ### **Update: vendor_contacts (Future)**
+
 ```sql
 -- Phase 2 enhancement (not in MVP)
 CREATE TABLE contact_categories (
@@ -137,6 +148,7 @@ CREATE TABLE contact_categories (
 ## 🔌 **API Endpoints**
 
 ### **Categories API**
+
 ```typescript
 // Base: /api/v1/presents/organizations/:org_id/categories
 
@@ -173,9 +185,11 @@ interface Category {
 ## 🔧 **Implementation Phases**
 
 ### **Phase 1: Database & Backend Foundation (Days 1-3)** ✅ COMPLETE
+
 **Goal:** Set up categories table, models, and API
 
 **Tasks:**
+
 - [x] Create categories migration
 - [x] Add category_id to vendor_applications, email_template_items, scheduled_emails
 - [x] Create Category model with validations
@@ -185,6 +199,7 @@ interface Category {
 - [ ] Seed test categories for development (deferred)
 
 **Deliverables:**
+
 - ✅ Working categories API
 - ✅ Database schema updated
 - ✅ Routes verified
@@ -192,9 +207,11 @@ interface Category {
 ---
 
 ### **Phase 2: Event Creation Wizard (Days 4-6)**
+
 **Goal:** Replace application name input with category selector
 
 **Tasks:**
+
 - [ ] Create CategorySelector component
 - [ ] Create CategoryBadge component
 - [ ] Create CategoryApplicationForm component
@@ -206,6 +223,7 @@ interface Category {
 - [ ] Handle edge cases (0 categories, 10+ categories)
 
 **Deliverables:**
+
 - Working category selection in wizard
 - Event creation generates category-split emails
 - UI shows template preview per category
@@ -213,9 +231,11 @@ interface Category {
 ---
 
 ### **Phase 3: Email Generation Logic (Days 7-8)**
+
 **Goal:** Backend generates category-split email sequences
 
 **Tasks:**
+
 - [ ] Update ScheduledEmailGenerator service
 - [ ] Implement event announcement detection (category_id = null)
 - [ ] Implement category-specific email generation
@@ -227,6 +247,7 @@ interface Category {
 - [ ] Test with category-specific templates
 
 **Deliverables:**
+
 - Emails correctly split by category
 - Event announcements not duplicated
 - Category templates applied when available
@@ -235,9 +256,11 @@ interface Category {
 ---
 
 ### **Phase 4: Template Manager Updates (Days 9-11)**
+
 **Goal:** Enable category-specific template creation
 
 **Tasks:**
+
 - [ ] Update EmailTemplateItemEditor with category selector
 - [ ] Add category badge to template item cards
 - [ ] Create hierarchical template item display
@@ -249,6 +272,7 @@ interface Category {
 - [ ] Test template application during event creation
 
 **Deliverables:**
+
 - Can create category-specific email templates
 - Template library shows category support
 - Category templates correctly applied to events
@@ -256,9 +280,11 @@ interface Category {
 ---
 
 ### **Phase 5: Email Automation Tab Redesign (Days 12-13)**
+
 **Goal:** Update email list filters and display
 
 **Tasks:**
+
 - [ ] Remove "Email Type" (system/scheduled) filter
 - [ ] Rename "Category" filter to "Email Type"
 - [ ] Add new "Category" filter (vendor categories)
@@ -270,6 +296,7 @@ interface Category {
 - [ ] Test with events having multiple categories
 
 **Deliverables:**
+
 - New filter structure working
 - Category badges visible on emails
 - Filter by vendor category works
@@ -278,9 +305,11 @@ interface Category {
 ---
 
 ### **Phase 6: Network Tab Integration (Days 14-15)**
+
 **Goal:** Use categories in contact management
 
 **Tasks:**
+
 - [ ] Update AddContactModal with CategorySelector
 - [ ] Update EditContactModal with CategorySelector
 - [ ] Update NetworkPage category filter
@@ -292,6 +321,7 @@ interface Category {
 - [ ] Test CSV import with category matching
 
 **Deliverables:**
+
 - Contact category selection uses Category table
 - CSV import creates/matches categories
 - Contact filtering by category works
@@ -300,9 +330,11 @@ interface Category {
 ---
 
 ### **Phase 7: Settings & Management (Days 16-17)**
+
 **Goal:** Category management interface
 
 **Tasks:**
+
 - [ ] Create CategoryManager component
 - [ ] Add Categories section to Settings page
 - [ ] Implement category edit/delete
@@ -315,6 +347,7 @@ interface Category {
 - [ ] Test category editing propagation
 
 **Deliverables:**
+
 - Full category management UI
 - Can edit/delete categories
 - Usage stats visible
@@ -323,9 +356,11 @@ interface Category {
 ---
 
 ### **Phase 8: TypeScript & Integration (Days 18-19)**
+
 **Goal:** Type definitions and API client
 
 **Tasks:**
+
 - [ ] Create src/types/category.ts
 - [ ] Update VendorApplication interface
 - [ ] Update EmailTemplateItem interface
@@ -338,6 +373,7 @@ interface Category {
 - [ ] Integration testing across all features
 
 **Deliverables:**
+
 - All TypeScript interfaces updated
 - API client methods complete
 - Build passes with 0 errors
@@ -346,9 +382,11 @@ interface Category {
 ---
 
 ### **Phase 9: Testing & Polish (Day 20)**
+
 **Goal:** Comprehensive testing and bug fixes
 
 **Tasks:**
+
 - [ ] End-to-end test: Event creation → Email generation
 - [ ] Test category-specific templates
 - [ ] Test with 0, 1, 5, 10 categories
@@ -361,6 +399,7 @@ interface Category {
 - [ ] Documentation updates
 
 **Deliverables:**
+
 - All features tested and working
 - Performance acceptable
 - UI polished
@@ -371,23 +410,27 @@ interface Category {
 ## 📈 **Success Metrics**
 
 ### **User Adoption:**
+
 - 90% of events use category selector (vs typing names)
 - Average 3 categories selected per event
 - 60% of producers create at least one category-specific template
 - Category reuse rate > 80% across events
 
 ### **Technical Performance:**
+
 - Category API response < 100ms
 - Email generation < 5 seconds for 5 categories
 - Template library load < 500ms
 - Database queries optimized (N+1 prevention)
 
 ### **Data Quality:**
+
 - Category name typos reduced by 95%
 - Duplicate categories eliminated
 - Consistent reporting and analytics
 
 ### **User Experience:**
+
 - Event setup time reduced by 30%
 - Email targeting accuracy improved to 99%
 - "Wrong audience" support tickets reduced by 80%
@@ -398,11 +441,13 @@ interface Category {
 ## 🚨 **Risk Assessment**
 
 ### **Risk 1: Email Multiplication**
+
 **Issue:** 5 categories × 20 emails = 100 scheduled emails per event
 **Severity:** Medium
 **Likelihood:** High
 
 **Mitigation:**
+
 - Event announcements not duplicated (reduces count)
 - Archive sent emails automatically
 - Pagination in email list (50 per page)
@@ -410,11 +455,13 @@ interface Category {
 - Database indexes on category_id columns
 
 ### **Risk 2: Category Deletion**
+
 **Issue:** User deletes category that's in use
 **Severity:** High
 **Likelihood:** Medium
 
 **Mitigation:**
+
 - Block deletion if category has associations
 - Show usage count before delete confirmation
 - Offer "merge into another category" option
@@ -422,11 +469,13 @@ interface Category {
 - Admin override with warning
 
 ### **Risk 3: Template Complexity**
+
 **Issue:** Users confused by category-specific templates
 **Severity:** Medium
 **Likelihood:** Medium
 
 **Mitigation:**
+
 - Clear UI labels and help text
 - "General template" as default (simple mode)
 - Progressive disclosure (advanced users find category option)
@@ -440,27 +489,33 @@ interface Category {
 ### **Key Decisions Made:**
 
 **1. Categories table organization-scoped (not system-wide)**
+
 - **Why:** Different orgs need different categories (Art Show vs Tech Conference)
 - **Trade-off:** Can't share categories across orgs, but ensures flexibility
 
 **2. Keep VendorApplication.name field alongside category_id**
+
 - **Why:** Backwards compatibility, display flexibility, legacy support
 - **Trade-off:** Minor data duplication, but safer migration path
 
 **3. Event announcements NOT duplicated per category**
+
 - **Why:** Reduces email count, these emails truly apply to all
 - **Implementation:** category_id = NULL for event announcements
 
 **4. Category-specific templates as overrides (not separate templates)**
+
 - **Why:** Easier to manage, clear inheritance model
 - **Alternative Considered:** Separate templates per category (rejected: too complex)
 
 **5. Allow category creation inline everywhere**
+
 - **Why:** User convenience, reduces friction
 - **Trade-off:** Potential for duplicates if not careful
 - **Mitigation:** Uniqueness constraint, search-before-create
 
 **6. Gradual contact migration (no immediate breaking changes)**
+
 - **Why:** Safe rollout, backwards compatibility
 - **Timeline:** Phase 2 (Month 2) for full migration
 
@@ -473,6 +528,7 @@ interface Category {
 ### **Session Log:**
 
 #### **March 13, 2026 - Project Planning & Kickoff**
+
 - **Time Spent:** 3 hours
 - **Work Done:**
   - Researched existing category implementation
@@ -493,6 +549,7 @@ interface Category {
 - **Notes:** Comprehensive planning complete, ready to implement
 
 #### **March 13, 2026 - Phase 1 Implementation Complete**
+
 - **Time Spent:** 2 hours
 - **Work Done:**
   - ✅ Created 4 database migrations (categories table + 3 foreign keys)

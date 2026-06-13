@@ -20,12 +20,14 @@
 ## 📊 Scope Analysis
 
 ### What Changes (Language & Abstraction)
+
 - ✅ "Venue" → "Vendor" terminology throughout UI
 - ✅ "Venue Owner" → "Vendor" user role
 - ✅ Venue-specific fields → Vendor-type-specific fields
 - ✅ Single venue type → Multi-vendor type support
 
 ### What Stays the Same (Can be reused)
+
 - ✅ User authentication system
 - ✅ Approval/onboarding flow
 - ✅ Public profile pages
@@ -38,6 +40,7 @@
 ## 🗄️ Database Schema Changes
 
 ### Current: User Table
+
 ```typescript
 role: 'admin' | 'organizer' | 'venue_owner' | 'club_owner' | 'user'
 
@@ -53,6 +56,7 @@ venueOwnerProfile?: {
 ```
 
 ### Proposed: User Table (Phase 1)
+
 ```typescript
 // CHANGE: Simplify role
 role: 'admin' | 'organizer' | 'vendor' | 'user'
@@ -70,6 +74,7 @@ vendorProfile?: {
 ```
 
 ### Current: Venue Collection
+
 ```typescript
 interface Venue {
   id: string
@@ -93,6 +98,7 @@ interface Venue {
 ```
 
 ### Proposed: Vendor Collection (Phase 1 - Backward Compatible)
+
 ```typescript
 interface Vendor {
   id: string
@@ -190,23 +196,28 @@ interface MarketVendorSpecificDetails {
 ### Files That Need Changes (Rename/Refactor)
 
 #### 1. Types & Interfaces (~5 files)
+
 - ✅ `src/types/venue.ts` → `src/types/vendor.ts`
   - Generalize Venue interface
   - Add vendor-type-specific sub-interfaces
   - Backward compatible aliases
 
 #### 2. Services (~3 files)
+
 - ✅ `src/services/venueService.ts` → `src/services/vendorService.ts`
   - Generalize CRUD operations
   - Add vendor-type filtering
 
 #### 3. Components (~20 files)
+
 **Reusable (minor changes)**:
+
 - `src/components/venue/VenueCard.tsx` → `VendorCard.tsx` (generic card)
 - `src/components/venue/VenueGallery.tsx` → `VendorGallery.tsx` (photos work for all)
 - `src/components/venue/VenueContactModal.tsx` → `VendorContactModal.tsx`
 
 **Needs Vendor-Type Logic**:
+
 - `src/components/venue/VenueDetailsForm.tsx` → `VendorDetailsForm.tsx`
   - Conditional fields based on vendorType
   - Show capacity only for venues
@@ -218,15 +229,19 @@ interface MarketVendorSpecificDetails {
   - Dynamic form rendering based on vendorType
 
 **Can Delete (venue-specific)**:
+
 - `src/components/venue/VenueFilters.tsx` → Need new multi-type filtering
 
 #### 4. Pages (~8 files)
+
 **Simple Rename**:
+
 - `src/pages/VenueOwnerLoginPage.tsx` → `VendorLoginPage.tsx`
 - `src/pages/VenueOwnerDashboardNew.tsx` → `VendorDashboardNew.tsx`
 - `src/pages/VenueProfilePage.tsx` → `VendorProfilePage.tsx`
 
 **Needs Refactoring**:
+
 - `src/pages/VenueSearchPortal.tsx` → `VendorMarketplace.tsx`
   - Add vendor-type tabs (Venues | Catering | Entertainment | Market)
   - Update filters per vendor type
@@ -237,6 +252,7 @@ interface MarketVendorSpecificDetails {
   - Step 3: Type-specific details
 
 #### 5. Admin Components (~2 files)
+
 - `src/components/admin/VenuesManagement.tsx` → `VendorsManagement.tsx`
   - Add vendor-type filter
   - Show type-specific columns in table
@@ -246,6 +262,7 @@ interface MarketVendorSpecificDetails {
 ## 👥 User Journey Changes
 
 ### Current Journey (Venue Owner)
+
 1. Sign up as "Venue Owner"
 2. Login → VenueOwnerDashboard
 3. Create venue (venue-specific form)
@@ -254,6 +271,7 @@ interface MarketVendorSpecificDetails {
 6. View on VenueSearchPortal (public)
 
 ### New Journey (Any Vendor)
+
 1. Sign up as "Vendor" (select type: venue/catering/entertainment/market)
 2. Login → VendorDashboard
 3. Create vendor profile (dynamic form based on type)
@@ -268,9 +286,11 @@ interface MarketVendorSpecificDetails {
 ## 🚀 Phased Implementation Plan
 
 ### Phase 1: Foundation & Refactoring (Week 1-2)
+
 **Goal**: Generalize existing venue system without breaking anything
 
 **Tasks**:
+
 1. ✅ Database migration script (Firestore)
    - Add `vendorType: 'venue'` to all existing venues
    - Migrate `venueOwnerProfile` → `vendorProfile` in users
@@ -294,9 +314,11 @@ interface MarketVendorSpecificDetails {
 ---
 
 ### Phase 2: UI Generalization (Week 3-4)
+
 **Goal**: Make UI work for all vendor types
 
 **Tasks**:
+
 1. ✅ Component refactoring
    - Rename venue components → vendor components
    - Add `vendorType` prop to all components
@@ -321,9 +343,11 @@ interface MarketVendorSpecificDetails {
 ---
 
 ### Phase 3: Catering, Entertainment, Market Vendor Support (Week 5-6)
+
 **Goal**: Enable real vendors of other types to sign up
 
 **Tasks**:
+
 1. ✅ Catering-specific features
    - Menu item management
    - Dietary options filters
@@ -349,10 +373,13 @@ interface MarketVendorSpecificDetails {
 ---
 
 ### Phase 4: Future - Event-Vendor Matching (Week 7-8+)
+
 **Goal**: Connect club owners with vendors through events
 
 **Tasks**:
+
 1. ✅ Event-Vendor relationship table
+
    ```typescript
    interface EventVendor {
      id: string
@@ -394,8 +421,10 @@ interface MarketVendorSpecificDetails {
 ## 🎨 UI/UX Changes
 
 ### Vendor Marketplace (Public)
+
 **Before**: Single page with venue listings
 **After**: Tabbed interface
+
 ```
 [ Venues ] [ Catering ] [ Entertainment ] [ Market Vendors ]
 
@@ -407,8 +436,10 @@ Filters adapt per tab:
 ```
 
 ### Vendor Dashboard (After Login)
+
 **Before**: Venue owner sees their venues
 **After**: Vendor sees type-specific CRM
+
 ```
 [ My Profile ] [ Events ] [ Messages ] [ Settings ]
 
@@ -420,14 +451,17 @@ Events Tab (FUTURE):
 ```
 
 ### Vendor Profile (Public Page)
+
 **Before**: Venue details, hours, amenities, events
 **After**: Vendor showcase, NO events on public page
 
 **Purpose Shift**:
+
 - OLD: "Check out this venue and the events they're hosting"
 - NEW: "Check out this vendor's offerings so you can hire them"
 
 **Vendor Profile Sections**:
+
 - About (description)
 - Gallery (photos)
 - Offerings (menu/services)
@@ -439,15 +473,19 @@ Events Tab (FUTURE):
 ## ⚠️ Migration Risks & Mitigation
 
 ### Risk 1: Breaking existing venues
+
 **Mitigation**: Backward-compatible type aliases, gradual migration
 
 ### Risk 2: Data loss during schema change
+
 **Mitigation**: Migration script with rollback, backup Firestore data first
 
 ### Risk 3: User confusion (venue owners see "vendor" everywhere)
+
 **Mitigation**: Announcement email, in-app banner explaining rebrand
 
 ### Risk 4: Search/filters break
+
 **Mitigation**: Extensive testing with all vendor types, fallback to showing all
 
 ---
@@ -455,22 +493,26 @@ Events Tab (FUTURE):
 ## 📝 Recommended Approach
 
 ### Option A: Full Migration (Recommended)
+
 **Timeline**: 6-8 weeks
 **Pros**: Clean, scalable, future-proof
 **Cons**: More upfront work
 
 **Plan**:
+
 - Week 1-2: Database + types (Phase 1)
 - Week 3-4: UI generalization (Phase 2)
 - Week 5-6: New vendor types (Phase 3)
 - Week 7-8: Event-vendor matching (Phase 4)
 
 ### Option B: Incremental (Faster but messier)
+
 **Timeline**: 3-4 weeks
 **Pros**: Faster to market
 **Cons**: Technical debt, harder to maintain
 
 **Plan**:
+
 - Week 1: Rename "venue" → "vendor" in UI only
 - Week 2: Add catering as second vendor type
 - Week 3: Add entertainment
@@ -489,6 +531,7 @@ Events Tab (FUTURE):
 4. **User experience** - Polished multi-vendor experience vs. hacked-together
 
 **Quick Win**: I can implement **Phase 1 (Foundation) in 1-2 days**
+
 - Generalize types
 - Rename components
 - No visible changes yet, but foundation is ready

@@ -1,45 +1,48 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { X } from 'lucide-react';
-import { registrationsApi, ApiError } from '@/services/api';
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { X } from 'lucide-react'
+import { registrationsApi, ApiError } from '@/services/api'
 
 export interface EditVendorDetailsModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
   /** Local applicant row id (e.g. reg-123) for state updates */
-  applicantId: string;
-  registrationId: number;
+  applicantId: string
+  registrationId: number
   /** Maps to Rails registration `name` (contact name) */
-  initialContactName: string;
-  initialPhone: string;
-  initialLocation?: string;
-  initialProducerNotes?: string;
-  initialTags?: string[];
-  initialInstagramHandle?: string;
-  initialTiktokHandle?: string;
-  initialWebsite?: string;
+  initialContactName: string
+  initialPhone: string
+  initialLocation?: string
+  initialProducerNotes?: string
+  initialTags?: string[]
+  initialInstagramHandle?: string
+  initialTiktokHandle?: string
+  initialWebsite?: string
   /** Shown read-only — not in Rails `update_params` */
-  emailReadOnly: string;
-  onSaved: (applicantId: string, patch: {
-    contact_name: string;
-    phone: string;
-    location?: string;
-    producer_notes?: string;
-    tags?: string[];
-    instagram_handle?: string;
-    tiktok_handle?: string;
-    website?: string;
-  }) => void;
+  emailReadOnly: string
+  onSaved: (
+    applicantId: string,
+    patch: {
+      contact_name: string
+      phone: string
+      location?: string
+      producer_notes?: string
+      tags?: string[]
+      instagram_handle?: string
+      tiktok_handle?: string
+      website?: string
+    },
+  ) => void
 }
 
 export function EditVendorDetailsModal({
@@ -58,56 +61,66 @@ export function EditVendorDetailsModal({
   emailReadOnly,
   onSaved,
 }: EditVendorDetailsModalProps) {
-  const [name, setName] = useState(initialContactName);
-  const [phone, setPhone] = useState(initialPhone);
-  const [location, setLocation] = useState(initialLocation || '');
-  const [producerNotes, setProducerNotes] = useState(initialProducerNotes || '');
-  const [tags, setTags] = useState<string[]>(initialTags || []);
-  const [tagInput, setTagInput] = useState('');
-  const [instagramHandle, setInstagramHandle] = useState(initialInstagramHandle || '');
-  const [tiktokHandle, setTiktokHandle] = useState(initialTiktokHandle || '');
-  const [website, setWebsite] = useState(initialWebsite || '');
-  const [saving, setSaving] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
+  const [name, setName] = useState(initialContactName)
+  const [phone, setPhone] = useState(initialPhone)
+  const [location, setLocation] = useState(initialLocation || '')
+  const [producerNotes, setProducerNotes] = useState(initialProducerNotes || '')
+  const [tags, setTags] = useState<string[]>(initialTags || [])
+  const [tagInput, setTagInput] = useState('')
+  const [instagramHandle, setInstagramHandle] = useState(initialInstagramHandle || '')
+  const [tiktokHandle, setTiktokHandle] = useState(initialTiktokHandle || '')
+  const [website, setWebsite] = useState(initialWebsite || '')
+  const [saving, setSaving] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
 
   useEffect(() => {
     if (open) {
-      setName(initialContactName);
-      setPhone(initialPhone || '');
-      setLocation(initialLocation || '');
-      setProducerNotes(initialProducerNotes || '');
-      setTags(initialTags || []);
-      setTagInput('');
-      setInstagramHandle(initialInstagramHandle || '');
-      setTiktokHandle(initialTiktokHandle || '');
-      setWebsite(initialWebsite || '');
-      setFormError(null);
+      setName(initialContactName)
+      setPhone(initialPhone || '')
+      setLocation(initialLocation || '')
+      setProducerNotes(initialProducerNotes || '')
+      setTags(initialTags || [])
+      setTagInput('')
+      setInstagramHandle(initialInstagramHandle || '')
+      setTiktokHandle(initialTiktokHandle || '')
+      setWebsite(initialWebsite || '')
+      setFormError(null)
     }
-  }, [open, initialContactName, initialPhone, initialLocation, initialProducerNotes, initialTags, initialInstagramHandle, initialTiktokHandle, initialWebsite]);
+  }, [
+    open,
+    initialContactName,
+    initialPhone,
+    initialLocation,
+    initialProducerNotes,
+    initialTags,
+    initialInstagramHandle,
+    initialTiktokHandle,
+    initialWebsite,
+  ])
 
   const handleAddTag = () => {
-    const trimmedTag = tagInput.trim();
+    const trimmedTag = tagInput.trim()
     if (trimmedTag && !tags.includes(trimmedTag)) {
-      setTags([...tags, trimmedTag]);
-      setTagInput('');
+      setTags([...tags, trimmedTag])
+      setTagInput('')
     }
-  };
+  }
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
-  };
+    setTags(tags.filter((tag) => tag !== tagToRemove))
+  }
 
   const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddTag();
+      e.preventDefault()
+      handleAddTag()
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError(null);
-    setSaving(true);
+    e.preventDefault()
+    setFormError(null)
+    setSaving(true)
     try {
       // Send all fields to API, including empty values (to allow clearing)
       await registrationsApi.update(registrationId, {
@@ -119,7 +132,7 @@ export function EditVendorDetailsModal({
         instagram_handle: instagramHandle.trim(),
         tiktok_handle: tiktokHandle.trim(),
         website: website.trim(),
-      });
+      })
       onSaved(applicantId, {
         contact_name: name.trim(),
         phone: phone.trim(),
@@ -129,20 +142,20 @@ export function EditVendorDetailsModal({
         instagram_handle: instagramHandle.trim(),
         tiktok_handle: tiktokHandle.trim(),
         website: website.trim(),
-      });
-      onOpenChange(false);
+      })
+      onOpenChange(false)
     } catch (err) {
       if (err instanceof ApiError && err.errors?.length) {
-        setFormError(err.errors.join(' '));
+        setFormError(err.errors.join(' '))
       } else if (err instanceof Error) {
-        setFormError(err.message);
+        setFormError(err.message)
       } else {
-        setFormError('Could not save changes.');
+        setFormError('Could not save changes.')
       }
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -151,7 +164,8 @@ export function EditVendorDetailsModal({
           <DialogHeader>
             <DialogTitle className="text-foreground">Edit vendor details</DialogTitle>
             <p className="text-xs text-foreground/60 pt-1">
-              Update contact info, location, tags, and producer notes. Status, category, and payment use their existing controls.
+              Update contact info, location, tags, and producer notes. Status, category, and payment
+              use their existing controls.
             </p>
           </DialogHeader>
           <div className="space-y-3 py-2">
@@ -303,9 +317,7 @@ export function EditVendorDetailsModal({
                 className="bg-background/5 border-border text-xs min-h-[80px]"
                 placeholder="Internal notes about this vendor..."
               />
-              <p className="text-[10px] text-foreground/50">
-                Notes are only visible to you
-              </p>
+              <p className="text-[10px] text-foreground/50">Notes are only visible to you</p>
             </div>
             {formError && (
               <p className="text-xs text-red-400 rounded-lg border border-red-500/30 bg-red-500/10 px-2 py-1.5">
@@ -330,5 +342,5 @@ export function EditVendorDetailsModal({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

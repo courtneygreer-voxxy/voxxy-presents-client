@@ -1,24 +1,19 @@
-import { useState, useEffect } from 'react';
-import {
-  X,
-  Save,
-  Loader2,
-  Mail,
-  AlertCircle,
-  Calendar,
-  Filter,
-  Clock,
-  Tag
-} from 'lucide-react';
-import type { EmailTemplateItem, FilterCriteria, RegistrationStatus, PaymentStatus } from '@/types/email';
-import { RichTextEditor } from './RichTextEditor';
+import { useState, useEffect } from 'react'
+import { X, Save, Loader2, Mail, AlertCircle, Calendar, Filter, Clock, Tag } from 'lucide-react'
+import type {
+  EmailTemplateItem,
+  FilterCriteria,
+  RegistrationStatus,
+  PaymentStatus,
+} from '@/types/email'
+import { RichTextEditor } from './RichTextEditor'
 
 interface EmailTemplateItemEditorProps {
-  item: EmailTemplateItem | null;
-  templateId: number;
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (item: EmailTemplateItem) => void;
+  item: EmailTemplateItem | null
+  templateId: number
+  isOpen: boolean
+  onClose: () => void
+  onSave: (item: EmailTemplateItem) => void
 }
 
 const CATEGORY_OPTIONS = [
@@ -30,7 +25,7 @@ const CATEGORY_OPTIONS = [
   { value: 'vendor_payment', label: 'Vendor Payment' },
   { value: 'artist_countdown', label: 'Artist Countdown' },
   { value: 'vendor_countdown', label: 'Vendor Countdown' },
-];
+]
 
 const TRIGGER_TYPE_OPTIONS = [
   { value: 'on_invitation_send', label: 'On Invitation Send' },
@@ -42,7 +37,7 @@ const TRIGGER_TYPE_OPTIONS = [
   { value: 'days_before_deadline', label: 'Days Before Deadline' },
   { value: 'days_before_payment_deadline', label: 'Days Before Payment Deadline' },
   { value: 'days_before_event', label: 'Days Before Event' },
-];
+]
 
 export default function EmailTemplateItemEditor({
   item,
@@ -60,14 +55,14 @@ export default function EmailTemplateItemEditor({
     trigger_value: 0,
     trigger_time: '09:00:00',
     enabled_by_default: true,
-  });
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  })
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Filter criteria state
-  const [filterStatus, setFilterStatus] = useState<string[]>([]);
-  const [filterPaymentStatus, setFilterPaymentStatus] = useState<string[]>([]);
-  const [filterVendorCategory, setFilterVendorCategory] = useState('');
+  const [filterStatus, setFilterStatus] = useState<string[]>([])
+  const [filterPaymentStatus, setFilterPaymentStatus] = useState<string[]>([])
+  const [filterVendorCategory, setFilterVendorCategory] = useState('')
 
   useEffect(() => {
     if (item) {
@@ -80,40 +75,41 @@ export default function EmailTemplateItemEditor({
         trigger_value: item.trigger_value || 0,
         trigger_time: item.trigger_time || '09:00:00',
         enabled_by_default: item.enabled_by_default !== false,
-      });
+      })
 
       // Parse filter criteria
       if (item.filter_criteria) {
-        setFilterStatus(item.filter_criteria.status || []);
-        setFilterPaymentStatus(item.filter_criteria.payment_status || []);
-        const vendorCat = item.filter_criteria.vendor_category;
-        setFilterVendorCategory(Array.isArray(vendorCat) ? vendorCat[0] || '' : vendorCat || '');
+        setFilterStatus(item.filter_criteria.status || [])
+        setFilterPaymentStatus(item.filter_criteria.payment_status || [])
+        const vendorCat = item.filter_criteria.vendor_category
+        setFilterVendorCategory(Array.isArray(vendorCat) ? vendorCat[0] || '' : vendorCat || '')
       }
     }
-  }, [item]);
+  }, [item])
 
   const handleSave = async () => {
-    if (!item) return;
+    if (!item) return
 
     if (!formData.name.trim()) {
-      setError('Email name is required');
-      return;
+      setError('Email name is required')
+      return
     }
 
     if (!formData.subject_template.trim()) {
-      setError('Subject template is required');
-      return;
+      setError('Subject template is required')
+      return
     }
 
-    setIsSaving(true);
-    setError(null);
+    setIsSaving(true)
+    setError(null)
 
     try {
       // Build filter criteria
-      const filter_criteria: FilterCriteria = {};
-      if (filterStatus.length > 0) filter_criteria.status = filterStatus as RegistrationStatus[];
-      if (filterPaymentStatus.length > 0) filter_criteria.payment_status = filterPaymentStatus as PaymentStatus[];
-      if (filterVendorCategory) filter_criteria.vendor_category = [filterVendorCategory];
+      const filter_criteria: FilterCriteria = {}
+      if (filterStatus.length > 0) filter_criteria.status = filterStatus as RegistrationStatus[]
+      if (filterPaymentStatus.length > 0)
+        filter_criteria.payment_status = filterPaymentStatus as PaymentStatus[]
+      if (filterVendorCategory) filter_criteria.vendor_category = [filterVendorCategory]
 
       const updatedItem = {
         ...item,
@@ -126,19 +122,19 @@ export default function EmailTemplateItemEditor({
         trigger_time: formData.trigger_time,
         enabled_by_default: formData.enabled_by_default,
         filter_criteria,
-      };
+      }
 
-      onSave(updatedItem as EmailTemplateItem);
+      onSave(updatedItem as EmailTemplateItem)
     } catch (err: any) {
-      setError(err.message || 'Failed to save email');
+      setError(err.message || 'Failed to save email')
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
-  const requiresTriggerValue = formData.trigger_type.includes('days_before');
+  const requiresTriggerValue = formData.trigger_type.includes('days_before')
 
-  if (!isOpen || !item) return null;
+  if (!isOpen || !item) return null
 
   return (
     <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -183,7 +179,10 @@ export default function EmailTemplateItemEditor({
 
             {/* Name */}
             <div>
-              <label htmlFor="email-name" className="block text-sm font-medium text-foreground mb-2">
+              <label
+                htmlFor="email-name"
+                className="block text-sm font-medium text-foreground mb-2"
+              >
                 Email Name *
               </label>
               <input
@@ -253,7 +252,8 @@ export default function EmailTemplateItemEditor({
                 placeholder="Write your email content here..."
               />
               <p className="mt-2 text-xs text-foreground/40">
-                Available variables: [firstName], [eventName], [eventDate], [applicationLink], [paymentLink], [unsubscribeLink]
+                Available variables: [firstName], [eventName], [eventDate], [applicationLink],
+                [paymentLink], [unsubscribeLink]
               </p>
             </div>
           </div>
@@ -267,7 +267,10 @@ export default function EmailTemplateItemEditor({
 
             {/* Trigger Type */}
             <div>
-              <label htmlFor="trigger-type" className="block text-sm font-medium text-foreground mb-2">
+              <label
+                htmlFor="trigger-type"
+                className="block text-sm font-medium text-foreground mb-2"
+              >
                 Trigger Type
               </label>
               <select
@@ -287,7 +290,10 @@ export default function EmailTemplateItemEditor({
             {/* Trigger Value (for days_before triggers) */}
             {requiresTriggerValue && (
               <div>
-                <label htmlFor="trigger-value" className="block text-sm font-medium text-foreground mb-2">
+                <label
+                  htmlFor="trigger-value"
+                  className="block text-sm font-medium text-foreground mb-2"
+                >
                   Days Before
                 </label>
                 <input
@@ -296,7 +302,9 @@ export default function EmailTemplateItemEditor({
                   min="0"
                   max="365"
                   value={formData.trigger_value}
-                  onChange={(e) => setFormData({ ...formData, trigger_value: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, trigger_value: parseInt(e.target.value) || 0 })
+                  }
                   className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
@@ -304,7 +312,10 @@ export default function EmailTemplateItemEditor({
 
             {/* Trigger Time */}
             <div>
-              <label htmlFor="trigger-time" className="block text-sm font-medium text-foreground mb-2">
+              <label
+                htmlFor="trigger-time"
+                className="block text-sm font-medium text-foreground mb-2"
+              >
                 <Clock className="w-4 h-4 inline mr-1" />
                 Send Time
               </label>
@@ -325,7 +336,8 @@ export default function EmailTemplateItemEditor({
               Recipient Filters
             </h3>
             <p className="text-xs text-foreground/60">
-              Only send this email to recipients matching these criteria (leave empty for all recipients)
+              Only send this email to recipients matching these criteria (leave empty for all
+              recipients)
             </p>
 
             {/* Status Filter */}
@@ -335,15 +347,18 @@ export default function EmailTemplateItemEditor({
               </label>
               <div className="flex flex-wrap gap-2">
                 {['pending', 'approved', 'waitlist', 'declined', 'confirmed'].map((status) => (
-                  <label key={status} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background/5 border border-border cursor-pointer hover:bg-background/10 transition-all">
+                  <label
+                    key={status}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background/5 border border-border cursor-pointer hover:bg-background/10 transition-all"
+                  >
                     <input
                       type="checkbox"
                       checked={filterStatus.includes(status)}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          setFilterStatus([...filterStatus, status]);
+                          setFilterStatus([...filterStatus, status])
                         } else {
-                          setFilterStatus(filterStatus.filter((s) => s !== status));
+                          setFilterStatus(filterStatus.filter((s) => s !== status))
                         }
                       }}
                       className="w-4 h-4 rounded border-border bg-background/5 text-primary focus:ring-primary/50"
@@ -361,15 +376,18 @@ export default function EmailTemplateItemEditor({
               </label>
               <div className="flex flex-wrap gap-2">
                 {['pending', 'paid', 'overdue'].map((status) => (
-                  <label key={status} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background/5 border border-border cursor-pointer hover:bg-background/10 transition-all">
+                  <label
+                    key={status}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background/5 border border-border cursor-pointer hover:bg-background/10 transition-all"
+                  >
                     <input
                       type="checkbox"
                       checked={filterPaymentStatus.includes(status)}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          setFilterPaymentStatus([...filterPaymentStatus, status]);
+                          setFilterPaymentStatus([...filterPaymentStatus, status])
                         } else {
-                          setFilterPaymentStatus(filterPaymentStatus.filter((s) => s !== status));
+                          setFilterPaymentStatus(filterPaymentStatus.filter((s) => s !== status))
                         }
                       }}
                       className="w-4 h-4 rounded border-border bg-background/5 text-primary focus:ring-primary/50"
@@ -382,7 +400,10 @@ export default function EmailTemplateItemEditor({
 
             {/* Vendor Category Filter */}
             <div>
-              <label htmlFor="vendor-category" className="block text-sm font-medium text-foreground mb-2">
+              <label
+                htmlFor="vendor-category"
+                className="block text-sm font-medium text-foreground mb-2"
+              >
                 Vendor Category
               </label>
               <select
@@ -442,5 +463,5 @@ export default function EmailTemplateItemEditor({
         </div>
       </div>
     </div>
-  );
+  )
 }

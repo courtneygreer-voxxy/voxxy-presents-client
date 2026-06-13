@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { Loader2, AlertCircle, Tag } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import type { Category } from '@/types/category';
-import type { EmailCampaignTemplate } from '@/types/email';
-import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles';
+import { useState } from 'react'
+import { Loader2, AlertCircle, Tag } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import type { Category } from '@/types/category'
+import type { EmailCampaignTemplate } from '@/types/email'
+import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles'
 
 interface CreateCategoryTemplateDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  category: Category;
-  genericTemplates: EmailCampaignTemplate[];  // Available templates to clone from
-  onCreateTemplate: (categoryId: number, sourceTemplateId: number) => Promise<void>;
+  isOpen: boolean
+  onClose: () => void
+  category: Category
+  genericTemplates: EmailCampaignTemplate[] // Available templates to clone from
+  onCreateTemplate: (categoryId: number, sourceTemplateId: number) => Promise<void>
 }
 
 export function CreateCategoryTemplateDialog({
@@ -21,42 +21,42 @@ export function CreateCategoryTemplateDialog({
   genericTemplates,
   onCreateTemplate,
 }: CreateCategoryTemplateDialogProps) {
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async () => {
     if (!selectedTemplateId) {
-      setError('Please select a template to clone');
-      return;
+      setError('Please select a template to clone')
+      return
     }
 
-    setIsSubmitting(true);
-    setError(null);
+    setIsSubmitting(true)
+    setError(null)
 
     try {
-      await onCreateTemplate(category.id, selectedTemplateId);
-      onClose();
+      await onCreateTemplate(category.id, selectedTemplateId)
+      onClose()
     } catch (err: any) {
-      setError(err.message || 'Failed to create category template');
+      setError(err.message || 'Failed to create category template')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    setSelectedTemplateId(null);
-    setError(null);
-    onClose();
-  };
+    setSelectedTemplateId(null)
+    setError(null)
+    onClose()
+  }
 
   // Only show generic templates
-  const availableTemplates = genericTemplates.filter(t => t.template_type === 'generic');
-  const defaultTemplate = availableTemplates.find(t => t.is_default);
+  const availableTemplates = genericTemplates.filter((t) => t.template_type === 'generic')
+  const defaultTemplate = availableTemplates.find((t) => t.is_default)
 
   // Auto-select default template if available
   if (!selectedTemplateId && defaultTemplate) {
-    setSelectedTemplateId(defaultTemplate.id);
+    setSelectedTemplateId(defaultTemplate.id)
   }
 
   // Event-wide triggers that will be excluded from category templates
@@ -65,23 +65,23 @@ export function CreateCategoryTemplateDialog({
     'on_event_cancel',
     'on_bulletin_post',
     'on_category_change',
-    'on_invitation_send'
-  ];
+    'on_invitation_send',
+  ]
 
   // Count category-specific emails (excluding event-wide emails)
   const getCategorySpecificEmailCount = (template: EmailCampaignTemplate) => {
-    if (!template.email_template_items) return 0;
+    if (!template.email_template_items) return 0
 
-    return template.email_template_items.filter(item => {
+    return template.email_template_items.filter((item) => {
       // Exclude event announcements
-      if (item.category === 'event_announcements') return false;
+      if (item.category === 'event_announcements') return false
 
       // Exclude event-wide trigger types
-      if (EVENT_WIDE_TRIGGERS.includes(item.trigger_type)) return false;
+      if (EVENT_WIDE_TRIGGERS.includes(item.trigger_type)) return false
 
-      return true;
-    }).length;
-  };
+      return true
+    }).length
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -127,7 +127,7 @@ export function CreateCategoryTemplateDialog({
                   <p className="text-foreground/40 text-xs mt-1">Create a generic template first</p>
                 </div>
               ) : (
-                availableTemplates.map(template => (
+                availableTemplates.map((template) => (
                   <button
                     key={template.id}
                     type="button"
@@ -139,18 +139,22 @@ export function CreateCategoryTemplateDialog({
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 ${
-                        selectedTemplateId === template.id
-                          ? 'border-primary bg-primary'
-                          : 'border-border'
-                      }`}>
+                      <div
+                        className={`w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 ${
+                          selectedTemplateId === template.id
+                            ? 'border-primary bg-primary'
+                            : 'border-border'
+                        }`}
+                      >
                         {selectedTemplateId === template.id && (
                           <div className="w-full h-full rounded-full bg-background scale-50" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-foreground">{template.name}</span>
+                          <span className="text-sm font-medium text-foreground">
+                            {template.name}
+                          </span>
                           {template.is_default && (
                             <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide bg-yellow-500/20 text-yellow-950 dark:text-yellow-300 border border-yellow-500/30">
                               Default
@@ -162,9 +166,15 @@ export function CreateCategoryTemplateDialog({
                         )}
                         <p className="text-xs text-foreground/40 mt-1">
                           {getCategorySpecificEmailCount(template)} category-specific emails
-                          {template.email_count && template.email_count > getCategorySpecificEmailCount(template) && (
-                            <span className="text-foreground/30"> ({template.email_count - getCategorySpecificEmailCount(template)} event-wide emails excluded)</span>
-                          )}
+                          {template.email_count &&
+                            template.email_count > getCategorySpecificEmailCount(template) && (
+                              <span className="text-foreground/30">
+                                {' '}
+                                ({template.email_count -
+                                  getCategorySpecificEmailCount(template)}{' '}
+                                event-wide emails excluded)
+                              </span>
+                            )}
                         </p>
                       </div>
                     </div>
@@ -188,7 +198,9 @@ export function CreateCategoryTemplateDialog({
               ".
             </p>
             <p className="text-xs text-blue-300/80">
-              <strong>Note:</strong> Event-wide emails (announcements, invitations, bulletins) will be excluded from this category template, as they are sent to all vendors regardless of category.
+              <strong>Note:</strong> Event-wide emails (announcements, invitations, bulletins) will
+              be excluded from this category template, as they are sent to all vendors regardless of
+              category.
             </p>
           </div>
 
@@ -222,5 +234,5 @@ export function CreateCategoryTemplateDialog({
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

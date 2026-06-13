@@ -10,7 +10,9 @@ Total Documentation: 1,400+ lines across 5 files
 ## Documentation Files
 
 ### 1. VENDOR_CATEGORY_QUICK_REFERENCE.md
+
 **Best for: Quick lookups and status checks**
+
 - VendorCategory type definition
 - Category-specific fields summary table
 - Email variables status (WORKS vs MISSING)
@@ -22,7 +24,9 @@ Total Documentation: 1,400+ lines across 5 files
 ---
 
 ### 2. VENDOR_CATEGORY_ANALYSIS.md
+
 **Best for: Complete understanding and planning**
+
 - Full VendorCategory type definition with all details
 - Complete ApplicationRow interface
 - All category-specific fields explained (8 fields)
@@ -37,7 +41,9 @@ Total Documentation: 1,400+ lines across 5 files
 ---
 
 ### 3. VENDOR_CATEGORY_CODE_LOCATIONS.md
+
 **Best for: Finding and implementing code changes**
+
 - Complete file structure overview
 - Type definitions with line numbers
 - Email variables with line numbers
@@ -53,7 +59,9 @@ Total Documentation: 1,400+ lines across 5 files
 ---
 
 ### 4. VENDOR_CATEGORY_SUMMARY.md
+
 **Best for: Reviewing findings and planning work**
+
 - Executive summary of the entire analysis
 - Key findings section
 - Storage model diagrams
@@ -69,6 +77,7 @@ Total Documentation: 1,400+ lines across 5 files
 ---
 
 ### 5. VENDOR_CATEGORY_INDEX.md
+
 **This file** - Navigation guide for the entire documentation set
 
 ---
@@ -78,14 +87,17 @@ Total Documentation: 1,400+ lines across 5 files
 ### I need to...
 
 **...understand what VendorCategory is**
+
 - Read: VENDOR_CATEGORY_SUMMARY.md (Key Findings section)
 - Then: VENDOR_CATEGORY_ANALYSIS.md (sections 1-2)
 
 **...find where something is defined**
+
 - Read: VENDOR_CATEGORY_CODE_LOCATIONS.md (Type Definitions section)
 - Then: Use absolute paths provided
 
 **...add a new email variable**
+
 1. VENDOR_CATEGORY_QUICK_REFERENCE.md (How to Add New Email Variable section)
 2. VENDOR_CATEGORY_CODE_LOCATIONS.md (EMAIL VARIABLES DEFINITIONS section)
 3. Find `/src/utils/emailVariables.ts` (line 36-308)
@@ -93,20 +105,24 @@ Total Documentation: 1,400+ lines across 5 files
 5. Update backend EmailVariableResolver
 
 **...understand the email preview system**
+
 - Read: VENDOR_CATEGORY_SUMMARY.md (Email Preview Flow section)
 - Then: VENDOR_CATEGORY_ANALYSIS.md (section 4)
 - Then: VENDOR_CATEGORY_CODE_LOCATIONS.md (Component Implementations section)
 
 **...implement category-specific email variables**
+
 1. VENDOR_CATEGORY_SUMMARY.md (Recommendations section)
 2. VENDOR_CATEGORY_ANALYSIS.md (section 8 - Recommendations)
 3. VENDOR_CATEGORY_CODE_LOCATIONS.md (Component Implementations section)
 4. VENDOR_CATEGORY_SUMMARY.md (Implementation Checklist)
 
 **...see all category-specific fields and their status**
+
 - VENDOR_CATEGORY_QUICK_REFERENCE.md (Category-Specific Fields Summary table)
 
 **...understand the data flow**
+
 - VENDOR_CATEGORY_CODE_LOCATIONS.md (Data Flow Diagram section)
 
 ---
@@ -114,35 +130,39 @@ Total Documentation: 1,400+ lines across 5 files
 ## Key Information at a Glance
 
 ### VendorCategory Type Location
+
 - File: `/src/types/eventPortal.ts`
 - Lines: 39-52
 - Also see: `EventPortalData` at lines 4-11
 
 ### Email Variables Location
+
 - File: `/src/utils/emailVariables.ts`
 - Lines: 36-308
 - 26 total variables, 8 category-specific, 3 missing
 
 ### Category-Specific Fields
 
-| Field | Type | Variable | Status |
-|-------|------|----------|--------|
-| booth_price | $USD | [boothPrice] | WORKS |
-| install_date | Date | [installDate] | WORKS |
-| install_start_time | HH:MM | [installStartTime] | WORKS |
-| install_end_time | HH:MM | [installEndTime] | WORKS |
-| install_time (range) | Computed | [installTime] | WORKS |
-| payment_link | URL | [paymentLink] | WORKS |
-| application_tags | string[] | MISSING | HIGH PRIORITY |
-| description | string | MISSING | HIGH PRIORITY |
+| Field                | Type     | Variable           | Status        |
+| -------------------- | -------- | ------------------ | ------------- |
+| booth_price          | $USD     | [boothPrice]       | WORKS         |
+| install_date         | Date     | [installDate]      | WORKS         |
+| install_start_time   | HH:MM    | [installStartTime] | WORKS         |
+| install_end_time     | HH:MM    | [installEndTime]   | WORKS         |
+| install_time (range) | Computed | [installTime]      | WORKS         |
+| payment_link         | URL      | [paymentLink]      | WORKS         |
+| application_tags     | string[] | MISSING            | HIGH PRIORITY |
+| description          | string   | MISSING            | HIGH PRIORITY |
 
 ### Key Components
+
 - Email Preview: `/src/components/shared/EventEmailPreviewModal.tsx`
 - Application Form: `/src/components/producer/CreateApplicationForm.tsx`
 - Event Wizard Step 2: `/src/components/producer/CreateEventWizard/steps/Step2ApplicationDetails.tsx`
 - Vendor Portal: `/src/pages/VendorEventPortalPage.tsx`
 
 ### API Endpoints
+
 - Create Application: POST `/v1/presents/events/{eventSlug}/vendor_applications`
 - Update Application: PATCH `/v1/presents/vendor_applications/{id}`
 - Email Preview: POST `/v1/presents/events/{eventSlug}/scheduled_emails/{id}/preview`
@@ -152,6 +172,7 @@ Total Documentation: 1,400+ lines across 5 files
 ## Most Important Findings
 
 ### 1. Events Store Categories as Arrays
+
 ```
 event.vendor_categories: [
   { name: "Artist Booth", booth_price: 150, install_date: "2026-06-14", ... },
@@ -160,12 +181,14 @@ event.vendor_categories: [
 ```
 
 ### 2. Registrations Track Which Category Applied
+
 ```
 registration.vendor_category: "Artist Booth"  // Application name
 // Inherits booth_price, install dates, etc. from that category
 ```
 
 ### 3. Email Preview Supports Categories
+
 ```
 Email Preview Modal:
   1. Detects [category*] variables
@@ -175,9 +198,11 @@ Email Preview Modal:
 ```
 
 ### 4. 8 Category-Specific Variables Already Work
+
 `[installDate]`, `[installTime*]`, `[vendorCategory]`, `[paymentLink]`, `[boothPrice]`
 
 ### 5. 3 High-Priority Missing Variables
+
 `[categoryDescription]`, `[applicationTags]`, `[tagsList]`
 
 ---
@@ -185,18 +210,21 @@ Email Preview Modal:
 ## Implementation Roadmap
 
 ### Phase 1: Frontend (Add Missing Variables)
+
 - [ ] Add [categoryDescription] to EMAIL_VARIABLES
-- [ ] Add [applicationTags] to EMAIL_VARIABLES  
+- [ ] Add [applicationTags] to EMAIL_VARIABLES
 - [ ] Add [tagsList] to EMAIL_VARIABLES
 - Estimated: 2-3 hours
 
 ### Phase 2: Backend (Variable Resolution)
+
 - [ ] Update EmailVariableResolver for new variables
 - [ ] Fix [categoryPrice] to use registration's category price
 - [ ] Add unit tests
 - Estimated: 4-6 hours
 
 ### Phase 3: Testing & QA
+
 - [ ] Test single-category events
 - [ ] Test multi-category events
 - [ ] Test category dropdown behavior
@@ -238,14 +266,14 @@ Email Preview Modal:
 
 ## File Summary
 
-| File | Lines | Purpose | Best For |
-|------|-------|---------|----------|
-| VENDOR_CATEGORY_QUICK_REFERENCE.md | 104 | Quick lookup | Status checks, reminders |
-| VENDOR_CATEGORY_ANALYSIS.md | 620 | Deep analysis | Planning, understanding |
-| VENDOR_CATEGORY_CODE_LOCATIONS.md | 384 | Code reference | Implementation, finding files |
-| VENDOR_CATEGORY_SUMMARY.md | 256 | Executive summary | Planning, reporting |
-| VENDOR_CATEGORY_INDEX.md | 336 | This file | Navigation |
-| **TOTAL** | **1,700** | Complete docs | Any need |
+| File                               | Lines     | Purpose           | Best For                      |
+| ---------------------------------- | --------- | ----------------- | ----------------------------- |
+| VENDOR_CATEGORY_QUICK_REFERENCE.md | 104       | Quick lookup      | Status checks, reminders      |
+| VENDOR_CATEGORY_ANALYSIS.md        | 620       | Deep analysis     | Planning, understanding       |
+| VENDOR_CATEGORY_CODE_LOCATIONS.md  | 384       | Code reference    | Implementation, finding files |
+| VENDOR_CATEGORY_SUMMARY.md         | 256       | Executive summary | Planning, reporting           |
+| VENDOR_CATEGORY_INDEX.md           | 336       | This file         | Navigation                    |
+| **TOTAL**                          | **1,700** | Complete docs     | Any need                      |
 
 ---
 
@@ -270,6 +298,7 @@ Email Preview Modal:
 ## Status
 
 Complete analysis with:
+
 - Type definitions: 100%
 - Field mappings: 100%
 - Email variables: 100%
@@ -278,6 +307,7 @@ Complete analysis with:
 - Implementation checklist: 100%
 
 Ready for:
+
 - Planning
 - Implementation
 - Backend integration

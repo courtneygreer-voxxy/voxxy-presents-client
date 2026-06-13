@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import {
   Calendar,
   Clock,
@@ -10,29 +10,29 @@ import {
   Trash2,
   Eye,
   MoreVertical,
-  AlertTriangle
-} from 'lucide-react';
-import { format } from 'date-fns';
-import type { ScheduledEmail, DeliveryStatus } from '@/types/email';
-import DeliveryStatusBadge from './DeliveryStatusBadge';
-import { backendToFrontend } from '@/utils/emailVariables';
-import { logger } from '@/utils/logger';
+  AlertTriangle,
+} from 'lucide-react'
+import { format } from 'date-fns'
+import type { ScheduledEmail, DeliveryStatus } from '@/types/email'
+import DeliveryStatusBadge from './DeliveryStatusBadge'
+import { backendToFrontend } from '@/utils/emailVariables'
+import { logger } from '@/utils/logger'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu'
 
 interface ScheduledEmailCardProps {
-  email: ScheduledEmail;
-  onEdit?: (email: ScheduledEmail) => void;
-  onPreview?: (email: ScheduledEmail) => void;
-  onPause?: (emailId: number) => Promise<void>;
-  onResume?: (emailId: number) => Promise<void>;
-  onSendNow?: (emailId: number) => Promise<void>;
-  onDelete?: (emailId: number) => Promise<void>;
+  email: ScheduledEmail
+  onEdit?: (email: ScheduledEmail) => void
+  onPreview?: (email: ScheduledEmail) => void
+  onPause?: (emailId: number) => Promise<void>
+  onResume?: (emailId: number) => Promise<void>
+  onSendNow?: (emailId: number) => Promise<void>
+  onDelete?: (emailId: number) => Promise<void>
 }
 
 export default function ScheduledEmailCard({
@@ -42,36 +42,36 @@ export default function ScheduledEmailCard({
   onPause,
   onResume,
   onSendNow,
-  onDelete
+  onDelete,
 }: ScheduledEmailCardProps) {
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const handleAction = async (action: () => Promise<void>) => {
-    setIsProcessing(true);
+    setIsProcessing(true)
     try {
-      await action();
+      await action()
     } catch (error) {
-      logger.error('Email card action failed', { emailId: email.id, error });
+      logger.error('Email card action failed', { emailId: email.id, error })
     } finally {
-      setIsProcessing(false);
+      setIsProcessing(false)
     }
-  };
+  }
 
-  const scheduledDate = email.scheduled_for ? new Date(email.scheduled_for) : null;
-  const isPast = scheduledDate && scheduledDate < new Date();
-  const isSent = email.status === 'sent';
-  const isPaused = email.status === 'paused';
-  const isScheduled = email.status === 'scheduled';
-  const isFailed = email.status === 'failed';
+  const scheduledDate = email.scheduled_for ? new Date(email.scheduled_for) : null
+  const isPast = scheduledDate && scheduledDate < new Date()
+  const isSent = email.status === 'sent'
+  const isPaused = email.status === 'paused'
+  const isScheduled = email.status === 'scheduled'
+  const isFailed = email.status === 'failed'
 
   // Determine if card should be clickable (all scheduled emails are now editable)
-  const isClickable = onEdit && !isSent;
+  const isClickable = onEdit && !isSent
 
   const handleCardClick = () => {
     if (isClickable && onEdit) {
-      onEdit(email);
+      onEdit(email)
     }
-  };
+  }
 
   // Determine status badge
   const statusBadge = isSent ? (
@@ -82,15 +82,15 @@ export default function ScheduledEmailCard({
         isPaused
           ? 'bg-yellow-500/10 text-yellow-400'
           : isFailed
-          ? 'bg-red-500/10 text-red-400'
-          : isScheduled
-          ? 'bg-blue-500/10 text-blue-400'
-          : 'bg-muted/10 text-muted-foreground'
+            ? 'bg-red-500/10 text-red-400'
+            : isScheduled
+              ? 'bg-blue-500/10 text-blue-400'
+              : 'bg-muted/10 text-muted-foreground'
       }`}
     >
       {email.status.charAt(0).toUpperCase() + email.status.slice(1)}
     </span>
-  );
+  )
 
   return (
     <div
@@ -104,7 +104,9 @@ export default function ScheduledEmailCard({
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className={`text-foreground font-medium truncate ${isClickable ? 'group-hover:text-primary transition-colors' : ''}`}>
+            <h3
+              className={`text-foreground font-medium truncate ${isClickable ? 'group-hover:text-primary transition-colors' : ''}`}
+            >
               {email.name}
             </h3>
             {statusBadge}
@@ -117,9 +119,7 @@ export default function ScheduledEmailCard({
           {email.overdue && email.overdue_message && (
             <div className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg bg-red-500/10 border border-red-500/30">
               <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
-              <span className="text-sm font-semibold text-red-400">
-                {email.overdue_message}
-              </span>
+              <span className="text-sm font-semibold text-red-400">{email.overdue_message}</span>
             </div>
           )}
 
@@ -148,7 +148,7 @@ export default function ScheduledEmailCard({
               <div className="flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5" />
                 <span>
-                  {email.email_deliveries.filter(d => d.status === 'delivered').length} delivered
+                  {email.email_deliveries.filter((d) => d.status === 'delivered').length} delivered
                 </span>
               </div>
             )}
@@ -157,69 +157,69 @@ export default function ScheduledEmailCard({
 
         {/* Actions Dropdown */}
         <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="p-2 rounded-lg text-foreground/60 hover:text-foreground hover:bg-background/5 transition-all"
+          <DropdownMenuTrigger asChild>
+            <button
+              className="p-2 rounded-lg text-foreground/60 hover:text-foreground hover:bg-background/5 transition-all"
+              disabled={isProcessing}
+              onClick={(e) => e.stopPropagation()} // Prevent card click when clicking dropdown
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            {onPreview && (
+              <DropdownMenuItem onClick={() => onPreview(email)}>
+                <Eye className="w-4 h-4 mr-2" />
+                Preview
+              </DropdownMenuItem>
+            )}
+            {onEdit && !isSent && (
+              <DropdownMenuItem onClick={() => onEdit(email)}>
+                <Edit2 className="w-4 h-4 mr-2" />
+                Edit
+              </DropdownMenuItem>
+            )}
+            {isScheduled && !isPast && onSendNow && (
+              <DropdownMenuItem
+                onClick={() => handleAction(() => onSendNow(email.id))}
                 disabled={isProcessing}
-                onClick={(e) => e.stopPropagation()} // Prevent card click when clicking dropdown
               >
-                <MoreVertical className="w-4 h-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {onPreview && (
-                <DropdownMenuItem onClick={() => onPreview(email)}>
-                  <Eye className="w-4 h-4 mr-2" />
-                  Preview
-                </DropdownMenuItem>
-              )}
-              {onEdit && !isSent && (
-                <DropdownMenuItem onClick={() => onEdit(email)}>
-                  <Edit2 className="w-4 h-4 mr-2" />
-                  Edit
-                </DropdownMenuItem>
-              )}
-              {isScheduled && !isPast && onSendNow && (
+                <Play className="w-4 h-4 mr-2" />
+                Send Now
+              </DropdownMenuItem>
+            )}
+            {isScheduled && onPause && (
+              <DropdownMenuItem
+                onClick={() => handleAction(() => onPause(email.id))}
+                disabled={isProcessing}
+              >
+                <Pause className="w-4 h-4 mr-2" />
+                Pause
+              </DropdownMenuItem>
+            )}
+            {isPaused && onResume && (
+              <DropdownMenuItem
+                onClick={() => handleAction(() => onResume(email.id))}
+                disabled={isProcessing}
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Resume
+              </DropdownMenuItem>
+            )}
+            {!isSent && onDelete && (
+              <>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onClick={() => handleAction(() => onSendNow(email.id))}
+                  onClick={() => handleAction(() => onDelete(email.id))}
                   disabled={isProcessing}
+                  className="text-red-400 focus:text-red-400"
                 >
-                  <Play className="w-4 h-4 mr-2" />
-                  Send Now
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
                 </DropdownMenuItem>
-              )}
-              {isScheduled && onPause && (
-                <DropdownMenuItem
-                  onClick={() => handleAction(() => onPause(email.id))}
-                  disabled={isProcessing}
-                >
-                  <Pause className="w-4 h-4 mr-2" />
-                  Pause
-                </DropdownMenuItem>
-              )}
-              {isPaused && onResume && (
-                <DropdownMenuItem
-                  onClick={() => handleAction(() => onResume(email.id))}
-                  disabled={isProcessing}
-                >
-                  <Play className="w-4 h-4 mr-2" />
-                  Resume
-                </DropdownMenuItem>
-              )}
-              {!isSent && onDelete && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => handleAction(() => onDelete(email.id))}
-                    disabled={isProcessing}
-                    className="text-red-400 focus:text-red-400"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
+              </>
+            )}
+          </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
@@ -230,5 +230,5 @@ export default function ScheduledEmailCard({
         </div>
       )}
     </div>
-  );
+  )
 }

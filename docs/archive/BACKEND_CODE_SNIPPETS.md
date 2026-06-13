@@ -3,6 +3,7 @@
 ## Database Schema
 
 ### VendorContact (20251217120000_create_vendor_contacts.rb)
+
 ```ruby
 create_table :vendor_contacts do |t|
   t.references :organization, null: false, foreign_key: true
@@ -16,12 +17,13 @@ create_table :vendor_contacts do |t|
   t.string :email
   t.string :phone
   # ... other fields
-  
+
   t.timestamps
 end
 ```
 
 ### Registration (20251104140632_create_registrations.rb + 20251115162751_add_vendor_fields_to_registrations.rb)
+
 ```ruby
 # Initial table
 create_table :registrations do |t|
@@ -149,7 +151,7 @@ def as_json
     organization_id: @vendor_contact.organization_id,
     vendor_id: @vendor_contact.vendor_id,
     registration_id: @vendor_contact.registration_id,
-    
+
     # Flat structure for compatibility with frontend VendorContact interface
     contact_name: @vendor_contact.name,              # <- Maps name to contact_name
     email: @vendor_contact.email,
@@ -231,7 +233,7 @@ end
 ```typescript
 export const EMAIL_VARIABLES: EmailVariable[] = [
   // ... event variables ...
-  
+
   // Vendor Variables
   {
     label: 'Greeting Name',
@@ -240,7 +242,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: 'Smart greeting (business name or first name)',
     example: "John's Tacos (or John)",
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'First Name',
@@ -249,7 +251,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's first name",
     example: 'John',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Last Name',
@@ -258,7 +260,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's last name",
     example: 'Doe',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Full Name',
@@ -267,7 +269,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's full name",
     example: 'John Doe',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Business Name',
@@ -276,7 +278,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's business name",
     example: "John's Tacos",
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Contact Name',
@@ -285,25 +287,24 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's contact person name",
     example: 'Jane Smith',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   // ... more variables ...
-];
+]
 ```
 
 ---
 
 ## Summary Table
 
-| Aspect | Value |
-|--------|-------|
-| VendorContact name field | `name` (string, required) |
-| VendorContact business field | `business_name` (string, optional) |
-| Registration name field | `name` (string, optional) |
-| Registration business field | `business_name` (string, optional) |
-| First/Last name separation | Runtime parsing via `split(" ", 2)` |
-| Greeting preference | business_name > first_name > "there" |
-| Email variable format | `[bracket]` (not `{{mustache}}`) |
-| Invitation email variables | All work (tested with worksInInvitations flag) |
-| Registration email variables | All work (full registration data available) |
-
+| Aspect                       | Value                                          |
+| ---------------------------- | ---------------------------------------------- |
+| VendorContact name field     | `name` (string, required)                      |
+| VendorContact business field | `business_name` (string, optional)             |
+| Registration name field      | `name` (string, optional)                      |
+| Registration business field  | `business_name` (string, optional)             |
+| First/Last name separation   | Runtime parsing via `split(" ", 2)`            |
+| Greeting preference          | business_name > first_name > "there"           |
+| Email variable format        | `[bracket]` (not `{{mustache}}`)               |
+| Invitation email variables   | All work (tested with worksInInvitations flag) |
+| Registration email variables | All work (full registration data available)    |

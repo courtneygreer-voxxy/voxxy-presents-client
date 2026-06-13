@@ -5,18 +5,18 @@
 ```typescript
 // File: src/types/eventPortal.ts
 export interface VendorCategory {
-  id: number;
-  name: string;                    // e.g., "Artist Booth"
-  description: string;             // e.g., "For visual artists"
-  categories: string[];            // e.g., ["artist", "visual_artist"]
-  booth_price: number | null;      // e.g., $150
-  payment_link: string | null;     // Stripe payment URL
+  id: number
+  name: string // e.g., "Artist Booth"
+  description: string // e.g., "For visual artists"
+  categories: string[] // e.g., ["artist", "visual_artist"]
+  booth_price: number | null // e.g., $150
+  payment_link: string | null // Stripe payment URL
   install: {
-    install_date: string | null;          // ISO date: "2026-06-14"
-    install_start_time: string | null;    // HH:MM: "08:00"
-    install_end_time: string | null;      // HH:MM: "10:00"
-  };
-  application_tags: string[];      // e.g., ["outdoor", "equipment_provided"]
+    install_date: string | null // ISO date: "2026-06-14"
+    install_start_time: string | null // HH:MM: "08:00"
+    install_end_time: string | null // HH:MM: "10:00"
+  }
+  application_tags: string[] // e.g., ["outdoor", "equipment_provided"]
 }
 ```
 
@@ -28,20 +28,21 @@ export interface VendorCategory {
 
 ## Category-Specific Fields Summary
 
-| Field | Type | Email Variable | Status |
-|-------|------|----------------|--------|
-| booth_price | number | [boothPrice], [categoryPrice] | WORKS |
-| install_date | ISO string | [installDate] | WORKS |
-| install_start_time | HH:MM | [installStartTime] | WORKS |
-| install_end_time | HH:MM | [installEndTime] | WORKS |
-| install_time (range) | computed | [installTime] | WORKS |
-| payment_link | URL | [paymentLink] | WORKS |
-| application_tags | string[] | MISSING | Need to add |
-| description | string | MISSING | Need to add |
+| Field                | Type       | Email Variable                | Status      |
+| -------------------- | ---------- | ----------------------------- | ----------- |
+| booth_price          | number     | [boothPrice], [categoryPrice] | WORKS       |
+| install_date         | ISO string | [installDate]                 | WORKS       |
+| install_start_time   | HH:MM      | [installStartTime]            | WORKS       |
+| install_end_time     | HH:MM      | [installEndTime]              | WORKS       |
+| install_time (range) | computed   | [installTime]                 | WORKS       |
+| payment_link         | URL        | [paymentLink]                 | WORKS       |
+| application_tags     | string[]   | MISSING                       | Need to add |
+| description          | string     | MISSING                       | Need to add |
 
 ## Email Variables Existing
 
 All working and category-specific:
+
 - `[installDate]` - Setup date from category
 - `[installStartTime]` - Setup start time
 - `[installEndTime]` - Setup end time
@@ -67,9 +68,8 @@ All working and category-specific:
 
 ```typescript
 // 1. Detect if email has category-specific variables
-const hasCategorySpecificContent = 
-  email?.body_template?.includes('[category') ||
-  email?.subject_template?.includes('[category');
+const hasCategorySpecificContent =
+  email?.body_template?.includes('[category') || email?.subject_template?.includes('[category')
 
 // 2. Show dropdown to select category
 // 3. Pass to backend:
@@ -101,4 +101,3 @@ scheduledEmailsApi.preview(eventSlug, id, { category: selectedCategory })
 3. Registration Model
    - Stores: `vendor_category` (application name)
    - Backend uses this to lookup category data
-

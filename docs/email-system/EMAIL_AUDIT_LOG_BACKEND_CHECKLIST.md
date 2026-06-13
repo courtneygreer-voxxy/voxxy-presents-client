@@ -10,12 +10,14 @@
 ## Phase Status
 
 ### ✅ Phases 1-3 Complete (Deployed to Staging)
+
 - ✅ 17 email types support
 - ✅ Registration data in email deliveries (recipient_name, vendor_category)
 - ✅ Invitation delivery stats
 - ✅ Event-based emails via unified EmailSenderService
 
 ### ⏳ Phase 4 Pending
+
 - ⏳ Fix delivery count discrepancy (Issue #4)
 - ⏳ `recalculate_delivery_counts!` method
 - ⏳ SendGrid webhook handler updates
@@ -28,6 +30,7 @@
 The frontend Email Audit Log is **complete and deployed**. Phases 1-3 of the backend implementation are **complete and in staging**. Phase 4 will address data consistency and performance optimizations.
 
 **Related Docs:**
+
 - [EMAIL_AUDIT_LOG_TECHNICAL_SPEC.md](./EMAIL_AUDIT_LOG_TECHNICAL_SPEC.md) - Full technical specification
 - [EMAIL_AUDIT_LOG_QUICK_REFERENCE.md](./EMAIL_AUDIT_LOG_QUICK_REFERENCE.md) - Quick reference guide
 
@@ -89,6 +92,7 @@ end
 ```
 
 **Testing:**
+
 ```ruby
 test "delivery_counts matches email_deliveries status counts" do
   email = scheduled_emails(:confirmation_email)
@@ -100,6 +104,7 @@ end
 ```
 
 **Files to Modify:**
+
 - `app/models/scheduled_email.rb`
 - `app/controllers/sendgrid_webhooks_controller.rb` (or similar)
 
@@ -118,6 +123,7 @@ end
 **Endpoint:** `GET /api/v1/presents/events/:event_slug/scheduled_emails/:id/email_deliveries`
 
 **Current Response:**
+
 ```json
 [
   {
@@ -129,6 +135,7 @@ end
 ```
 
 **Required Response:**
+
 ```json
 [
   {
@@ -148,6 +155,7 @@ end
 ```
 
 **Implementation:**
+
 ```ruby
 class EmailDeliveriesController < ApplicationController
   def index
@@ -183,6 +191,7 @@ end
 **Endpoint:** `GET /api/v1/presents/events/:event_slug/invitations`
 
 **Current Response:**
+
 ```json
 {
   "invitations": [...],
@@ -194,6 +203,7 @@ end
 ```
 
 **Required Response:**
+
 ```json
 {
   "invitations": [
@@ -225,6 +235,7 @@ end
 ```
 
 **Implementation:**
+
 ```ruby
 class EventInvitationsController < ApplicationController
   def index
@@ -266,6 +277,7 @@ end
 **Problem:** Frontend makes separate API call for each sent email
 
 **Current Flow:**
+
 ```
 1. GET /events/:slug/scheduled_emails (1 request)
 2. For each sent email:
@@ -273,6 +285,7 @@ end
 ```
 
 **Proposed Endpoint:**
+
 ```
 GET /api/v1/presents/events/:event_slug/email_deliveries
 Query params:
@@ -281,6 +294,7 @@ Query params:
 ```
 
 **Response:**
+
 ```json
 {
   "deliveries": [
@@ -296,6 +310,7 @@ Query params:
 ```
 
 **Implementation:**
+
 ```ruby
 class EmailDeliveriesController < ApplicationController
   def bulk_index
@@ -321,6 +336,7 @@ end
 **Problem:** Frontend polls every 30 seconds, causing repeated API calls
 
 **Option 1: Add `include_delivery_counts` Param**
+
 ```ruby
 # GET /events/:slug/scheduled_emails?include_delivery_counts=true
 def index
@@ -339,6 +355,7 @@ end
 ```
 
 **Option 2: Add Caching**
+
 ```ruby
 class ScheduledEmail < ApplicationRecord
   def delivery_counts_with_cache
@@ -418,18 +435,21 @@ end
 ## Implementation Order
 
 ### Phase 1: Critical Fixes (Week 1)
+
 1. ✅ Implement `recalculate_delivery_counts!` method
 2. ✅ Update SendGrid webhook handler to call it
 3. ✅ Add database tests for count consistency
 4. ✅ Deploy and verify in staging
 
 ### Phase 2: API Enhancements (Week 2)
+
 1. ✅ Include registration data in email deliveries endpoint
 2. ✅ Add delivery stats to invitations endpoint
 3. ✅ Test in staging with frontend
 4. ✅ Deploy to production
 
 ### Phase 3: Optimizations (Optional - Week 3)
+
 1. ⏸️ Implement bulk deliveries endpoint
 2. ⏸️ Add caching for auto-refresh
 3. ⏸️ Performance testing
@@ -439,12 +459,14 @@ end
 ## Rollout Plan
 
 ### Staging Deployment
+
 1. Deploy backend changes to staging
 2. Test with frontend staging environment
 3. Verify data consistency
 4. Run integration tests
 
 ### Production Deployment
+
 1. Announce maintenance window (if needed)
 2. Deploy backend changes
 3. Monitor error logs for 24 hours
@@ -452,7 +474,9 @@ end
 5. Check delivery count consistency
 
 ### Rollback Plan
+
 If issues occur:
+
 1. Revert migration (if needed)
 2. Restore previous webhook handler
 3. Clear cache
@@ -473,10 +497,12 @@ If issues occur:
 ## Questions or Issues?
 
 **Contact:**
+
 - Frontend Team: Courtney + Claude Code
 - Related Docs: [EMAIL_AUDIT_LOG_TECHNICAL_SPEC.md](./EMAIL_AUDIT_LOG_TECHNICAL_SPEC.md)
 
 **Slack Channels:**
+
 - `#voxxy-backend-dev`
 - `#voxxy-frontend-dev`
 
@@ -484,13 +510,13 @@ If issues occur:
 
 ## Status Tracking
 
-| Task | Priority | Status | Assignee | ETA |
-|------|----------|--------|----------|-----|
-| Fix delivery count discrepancy | 🔴 HIGH | ⏳ Phase 4 | Backend Team | TBD |
-| Include registration data | 🟡 MEDIUM | ✅ Complete (Phases 1-3) | Backend Team | Deployed |
-| Add invitation delivery stats | 🟡 MEDIUM | ✅ Complete (Phases 1-3) | Backend Team | Deployed |
-| Bulk deliveries endpoint | 🟢 LOW | ⏸️ Deferred to Phase 4 | - | - |
-| Auto-refresh optimization | 🟢 LOW | ⏸️ Deferred to Phase 4 | - | - |
+| Task                           | Priority  | Status                   | Assignee     | ETA      |
+| ------------------------------ | --------- | ------------------------ | ------------ | -------- |
+| Fix delivery count discrepancy | 🔴 HIGH   | ⏳ Phase 4               | Backend Team | TBD      |
+| Include registration data      | 🟡 MEDIUM | ✅ Complete (Phases 1-3) | Backend Team | Deployed |
+| Add invitation delivery stats  | 🟡 MEDIUM | ✅ Complete (Phases 1-3) | Backend Team | Deployed |
+| Bulk deliveries endpoint       | 🟢 LOW    | ⏸️ Deferred to Phase 4   | -            | -        |
+| Auto-refresh optimization      | 🟢 LOW    | ⏸️ Deferred to Phase 4   | -            | -        |
 
 ---
 

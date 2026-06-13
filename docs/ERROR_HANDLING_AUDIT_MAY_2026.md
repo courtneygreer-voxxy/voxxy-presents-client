@@ -10,6 +10,7 @@
 ## Executive Summary
 
 This audit examined error handling across **283 TypeScript/TSX files** in the Voxxy Presents frontend, focusing on major API request patterns for:
+
 - Scheduled Emails
 - Email Templates
 - Events
@@ -21,12 +22,14 @@ This audit examined error handling across **283 TypeScript/TSX files** in the Vo
 **Error Handling Score: 7.1/10**
 
 **Strengths:**
+
 - ✅ 95% of API calls wrapped in try/catch blocks
 - ✅ Loading states implemented consistently
 - ✅ Structured error handling with ApiError class
 - ✅ Toast notifications used in 106 locations across 22 files
 
 **Critical Issues:**
+
 - ❌ 12 locations with silent failures (no user feedback)
 - ❌ 8 locations using blocking `alert()` instead of toast
 - ❌ 3 critical user flows with missing error handling
@@ -37,6 +40,7 @@ This audit examined error handling across **283 TypeScript/TSX files** in the Vo
 ## 1. Scheduled Emails API (scheduledEmailsApi)
 
 ### Summary
+
 **Overall Score: 7.5/10**
 
 The scheduled email system has good error handling overall, but lacks consistency in user feedback mechanisms.
@@ -44,6 +48,7 @@ The scheduled email system has good error handling overall, but lacks consistenc
 ### Critical Issues
 
 #### 🔴 CRITICAL: EmailEditorPage delete handler (Line 820-824)
+
 ```typescript
 // CURRENT - NO ERROR HANDLING
 <button onClick={async () => {
@@ -57,6 +62,7 @@ The scheduled email system has good error handling overall, but lacks consistenc
 **Impact:** If deletion fails, user is navigated back anyway, thinking email is deleted when it's not.
 
 **Fix Required:**
+
 ```typescript
 <button onClick={async () => {
   if (confirm('Delete this email? This cannot be undone.')) {
@@ -74,6 +80,7 @@ The scheduled email system has good error handling overall, but lacks consistenc
 ```
 
 #### ⚠️ MODERATE: Inconsistent loading states
+
 - `pause()` - No loading state (Line 173-181)
 - `resume()` - No loading state (Line 183-191)
 - `sendNow()` - No loading state (Line 193-205)
@@ -85,26 +92,27 @@ The scheduled email system has good error handling overall, but lacks consistenc
 
 ### Method-by-Method Analysis
 
-| Method | File | Try/Catch | Loading | User Feedback | Issues |
-|--------|------|-----------|---------|---------------|--------|
-| getByEvent | EmailAutomationTab.tsx:156 | ✅ | ✅ | ✅ Error banner | None |
-| getByEvent | EmailAuditLogOverlay.tsx:137 | ✅ | ✅ | ✅ Error banner | None |
-| generate | EmailAutomationTab.tsx:261 | ✅ | ✅ | ⚠️ Local state | Missing toast |
-| update | EmailAutomationTab.tsx:272 | ❌ | ⚠️ | ⚠️ | Relies on caller |
-| update | EmailEditorPage.tsx:593 | ✅ | ✅ | ✅ Toast | Good |
-| pause | EmailAutomationTab.tsx:175 | ✅ | ❌ | ⚠️ Local state | Missing loading + toast |
-| resume | EmailAutomationTab.tsx:185 | ✅ | ❌ | ⚠️ Local state | Missing loading + toast |
-| sendNow | EmailAutomationTab.tsx:199 | ✅ | ❌ | ⚠️ Local state | Missing loading + toast |
-| sendTest | EmailEditorPage.tsx:430 | ✅ | ✅ | ✅ Toast | **EXCELLENT** |
-| sendTest | EmailSequenceEditorOverlay.tsx:241 | ✅ | ✅ | ⚠️ Local state | Missing toast |
-| delete | EmailAutomationTab.tsx:233 | ✅ | ❌ | ⚠️ Local state | Missing loading + toast |
-| delete | EmailEditorPage.tsx:822 | ❌ | ❌ | ❌ | **CRITICAL** |
+| Method     | File                               | Try/Catch | Loading | User Feedback   | Issues                  |
+| ---------- | ---------------------------------- | --------- | ------- | --------------- | ----------------------- |
+| getByEvent | EmailAutomationTab.tsx:156         | ✅        | ✅      | ✅ Error banner | None                    |
+| getByEvent | EmailAuditLogOverlay.tsx:137       | ✅        | ✅      | ✅ Error banner | None                    |
+| generate   | EmailAutomationTab.tsx:261         | ✅        | ✅      | ⚠️ Local state  | Missing toast           |
+| update     | EmailAutomationTab.tsx:272         | ❌        | ⚠️      | ⚠️              | Relies on caller        |
+| update     | EmailEditorPage.tsx:593            | ✅        | ✅      | ✅ Toast        | Good                    |
+| pause      | EmailAutomationTab.tsx:175         | ✅        | ❌      | ⚠️ Local state  | Missing loading + toast |
+| resume     | EmailAutomationTab.tsx:185         | ✅        | ❌      | ⚠️ Local state  | Missing loading + toast |
+| sendNow    | EmailAutomationTab.tsx:199         | ✅        | ❌      | ⚠️ Local state  | Missing loading + toast |
+| sendTest   | EmailEditorPage.tsx:430            | ✅        | ✅      | ✅ Toast        | **EXCELLENT**           |
+| sendTest   | EmailSequenceEditorOverlay.tsx:241 | ✅        | ✅      | ⚠️ Local state  | Missing toast           |
+| delete     | EmailAutomationTab.tsx:233         | ✅        | ❌      | ⚠️ Local state  | Missing loading + toast |
+| delete     | EmailEditorPage.tsx:822            | ❌        | ❌      | ❌              | **CRITICAL**            |
 
 ---
 
 ## 2. Email Templates API (emailCampaignTemplatesApi, emailTemplateItemsApi)
 
 ### Summary
+
 **Overall Score: 8.2/10**
 
 Email template handling is generally excellent with comprehensive error handling.
@@ -112,43 +120,46 @@ Email template handling is generally excellent with comprehensive error handling
 ### Critical Issues
 
 #### ⚠️ MODERATE: Step4AutoMessages.tsx - Silent failures
+
 **Location:** `src/components/producer/CreateEventWizard/steps/Step4AutoMessages.tsx`
 
 ```typescript
 // Lines 257, 273, 294 - Console.error only, no user feedback
 try {
-  const templates = await emailCampaignTemplatesApi.getAll();
+  const templates = await emailCampaignTemplatesApi.getAll()
 } catch (error) {
-  console.error('Failed to load templates', error);  // ❌ No user feedback
+  console.error('Failed to load templates', error) // ❌ No user feedback
 }
 ```
 
 **Impact:** Users won't know why template dropdown is empty.
 
 **Fix Required:**
+
 ```typescript
 try {
-  const templates = await emailCampaignTemplatesApi.getAll();
+  const templates = await emailCampaignTemplatesApi.getAll()
 } catch (error: any) {
-  console.error('Failed to load templates', error);
-  setError('Unable to load email templates. Please refresh the page.');
+  console.error('Failed to load templates', error)
+  setError('Unable to load email templates. Please refresh the page.')
   // OR
   toast.error('Failed to load templates', {
-    description: 'Please refresh the page or try again later.'
-  });
+    description: 'Please refresh the page or try again later.',
+  })
 }
 ```
 
 #### ⚠️ MODERATE: ImportTemplateModal.tsx - Silent failure
+
 **Location:** `src/components/producer/CreateEventWizard/ImportTemplateModal.tsx` (Line 31)
 
 ```typescript
 try {
-  const data = await emailCampaignTemplatesApi.getAll();
-  setTemplates(data.templates);
+  const data = await emailCampaignTemplatesApi.getAll()
+  setTemplates(data.templates)
 } catch (error) {
-  console.error('Failed to load templates:', error);
-  setTemplates([]);  // ❌ Silent failure - sets empty array
+  console.error('Failed to load templates:', error)
+  setTemplates([]) // ❌ Silent failure - sets empty array
 }
 ```
 
@@ -157,6 +168,7 @@ try {
 ### Best Practices Found
 
 #### ✅ EXCELLENT: TemplateLibraryPage.tsx clone validation
+
 ```typescript
 // Client-side validation before API call
 const nameExists = templates.some(
@@ -187,6 +199,7 @@ try {
 ## 3. Events API (eventsApi)
 
 ### Summary
+
 **Overall Score: 6.8/10**
 
 Event API error handling has several critical gaps, especially in Dashboard.tsx.
@@ -194,89 +207,94 @@ Event API error handling has several critical gaps, especially in Dashboard.tsx.
 ### Critical Issues
 
 #### 🔴 CRITICAL: eventsApi.delete - No error handling
+
 **Location:** `src/pages/Dashboard.tsx` (Line 629)
 
 ```typescript
 // CURRENT - Throws error with no user feedback
 const handleDeleteEvent = async (eventSlug: string) => {
   try {
-    await eventsApi.delete(eventSlug);
-    await fetchEvents(); // Refresh list
+    await eventsApi.delete(eventSlug)
+    await fetchEvents() // Refresh list
   } catch (error) {
-    console.error('Failed to delete event:', error);
-    throw error;  // ❌ No loading state, no toast, no user feedback
+    console.error('Failed to delete event:', error)
+    throw error // ❌ No loading state, no toast, no user feedback
   }
-};
+}
 ```
 
 **Impact:** User doesn't know if deletion failed.
 
 **Fix Required:**
+
 ```typescript
-const [isDeletingEvent, setIsDeletingEvent] = useState(false);
+const [isDeletingEvent, setIsDeletingEvent] = useState(false)
 
 const handleDeleteEvent = async (eventSlug: string) => {
-  setIsDeletingEvent(true);
+  setIsDeletingEvent(true)
   try {
-    await eventsApi.delete(eventSlug);
-    toast.success('Event deleted successfully');
-    await fetchEvents();
+    await eventsApi.delete(eventSlug)
+    toast.success('Event deleted successfully')
+    await fetchEvents()
   } catch (error: any) {
-    console.error('Failed to delete event:', error);
+    console.error('Failed to delete event:', error)
     toast.error('Failed to delete event', {
-      description: error.message || 'Please try again'
-    });
+      description: error.message || 'Please try again',
+    })
   } finally {
-    setIsDeletingEvent(false);
+    setIsDeletingEvent(false)
   }
-};
+}
 ```
 
 #### 🔴 CRITICAL: eventsApi.create - No user feedback
+
 **Location:** `src/pages/Dashboard.tsx` (Line 465)
 
 ```typescript
 try {
-  const newEvent = await eventsApi.create(eventData);
+  const newEvent = await eventsApi.create(eventData)
   // ... more logic
 } catch (error) {
-  console.error('Failed to create event:', error);
-  setLoadingCommandCenter(false);
-  setEventsView('create');
-  throw error;  // ❌ Error re-thrown but no toast shown
+  console.error('Failed to create event:', error)
+  setLoadingCommandCenter(false)
+  setEventsView('create')
+  throw error // ❌ Error re-thrown but no toast shown
 }
 ```
 
 **Impact:** User relies on wizard component for error feedback.
 
 #### ⚠️ MODERATE: eventsApi.update - Multiple instances missing feedback
+
 - Dashboard.tsx:599 - No loading state, no toast
 - EventDetailsTab.tsx:140 - Has error state but no toast
 
 ### Method-by-Method Analysis
 
-| Method | File | Try/Catch | Loading | User Feedback | Issues |
-|--------|------|-----------|---------|---------------|--------|
-| create | Dashboard.tsx:465 | ✅ | ✅ | ❌ | No toast |
-| update | EventSettings.tsx:254 | ✅ | ✅ | ✅ Toast | Good |
-| update | HomeDashboard.tsx:267 | ✅ | ⚠️ | ✅ Error state | Missing toast |
-| update | EventDetailsTab.tsx:140 | ✅ | ✅ | ✅ Error state | Missing toast |
-| update | Dashboard.tsx:599 | ✅ | ❌ | ❌ | **CRITICAL** |
-| delete | Dashboard.tsx:629 | ✅ | ❌ | ❌ | **CRITICAL** |
-| getById | VendorApplicationForm.tsx:161 | ✅ | ✅ | ✅ Error UI | Good |
-| getById | PublicEventDetailPage.tsx:104 | ✅ | ✅ | ✅ Error UI | Good |
-| getById | Dashboard.tsx:651 | ✅ | ❌ | ❌ | Silent fallback |
-| getByOrganization | Dashboard.tsx:336 | ✅ | ✅ | ✅ Retry button | **EXCELLENT** |
-| goLive | GoLiveCard.tsx:62 | ✅ | ✅ | ✅ Toast + animation | **EXCELLENT** |
-| sendCancellationEmails | EventSettings.tsx:372 | ✅ | ✅ | ✅ Toast | **EXCELLENT** |
-| checkCancellationImpact | EventSettings.tsx:341 | ✅ | ❌ | ✅ Toast | Missing loading |
-| generateEmails | Dashboard.tsx:547 | ✅ | ✅ | ❌ | Silent by design |
+| Method                  | File                          | Try/Catch | Loading | User Feedback        | Issues           |
+| ----------------------- | ----------------------------- | --------- | ------- | -------------------- | ---------------- |
+| create                  | Dashboard.tsx:465             | ✅        | ✅      | ❌                   | No toast         |
+| update                  | EventSettings.tsx:254         | ✅        | ✅      | ✅ Toast             | Good             |
+| update                  | HomeDashboard.tsx:267         | ✅        | ⚠️      | ✅ Error state       | Missing toast    |
+| update                  | EventDetailsTab.tsx:140       | ✅        | ✅      | ✅ Error state       | Missing toast    |
+| update                  | Dashboard.tsx:599             | ✅        | ❌      | ❌                   | **CRITICAL**     |
+| delete                  | Dashboard.tsx:629             | ✅        | ❌      | ❌                   | **CRITICAL**     |
+| getById                 | VendorApplicationForm.tsx:161 | ✅        | ✅      | ✅ Error UI          | Good             |
+| getById                 | PublicEventDetailPage.tsx:104 | ✅        | ✅      | ✅ Error UI          | Good             |
+| getById                 | Dashboard.tsx:651             | ✅        | ❌      | ❌                   | Silent fallback  |
+| getByOrganization       | Dashboard.tsx:336             | ✅        | ✅      | ✅ Retry button      | **EXCELLENT**    |
+| goLive                  | GoLiveCard.tsx:62             | ✅        | ✅      | ✅ Toast + animation | **EXCELLENT**    |
+| sendCancellationEmails  | EventSettings.tsx:372         | ✅        | ✅      | ✅ Toast             | **EXCELLENT**    |
+| checkCancellationImpact | EventSettings.tsx:341         | ✅        | ❌      | ✅ Toast             | Missing loading  |
+| generateEmails          | Dashboard.tsx:547             | ✅        | ✅      | ❌                   | Silent by design |
 
 ---
 
 ## 4. Auth & Organizations API (authApi, organizationsApi)
 
 ### Summary
+
 **Overall Score: 7.3/10**
 
 Authentication flows have solid error handling but suffer from inconsistent user feedback mechanisms.
@@ -284,49 +302,53 @@ Authentication flows have solid error handling but suffer from inconsistent user
 ### Critical Issues
 
 #### 🔴 CRITICAL: Silent auth failures on mount
+
 **Location:** `src/contexts/AuthContext.tsx` (Lines 147-154)
 
 ```typescript
 // CURRENT - Silent failure when session expires
 useEffect(() => {
   const initAuth = async () => {
-    const token = getAuthToken();
+    const token = getAuthToken()
     if (!token) {
-      setLoading(false);
-      return;
+      setLoading(false)
+      return
     }
     try {
-      await fetchAndSetCurrentUser();
+      await fetchAndSetCurrentUser()
     } catch (error) {
-      console.warn('Failed to fetch user profile on mount:', error);
-      clearAuthToken();  // ❌ User doesn't know session expired
-      clearUserCache();
+      console.warn('Failed to fetch user profile on mount:', error)
+      clearAuthToken() // ❌ User doesn't know session expired
+      clearUserCache()
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
-  initAuth();
-}, []);
+  }
+  initAuth()
+}, [])
 ```
 
 **Impact:** User is silently logged out with no explanation.
 
 **Fix Required:**
+
 ```typescript
 try {
-  await fetchAndSetCurrentUser();
+  await fetchAndSetCurrentUser()
 } catch (error) {
-  console.warn('Failed to fetch user profile on mount:', error);
+  console.warn('Failed to fetch user profile on mount:', error)
   toast.info('Your session has expired', {
-    description: 'Please log in again to continue.'
-  });
-  clearAuthToken();
-  clearUserCache();
+    description: 'Please log in again to continue.',
+  })
+  clearAuthToken()
+  clearUserCache()
 }
 ```
 
 #### 🔴 CRITICAL: alert() usage instead of toast
+
 **Locations:**
+
 - `SettingsPage.tsx` - Lines 170, 175 (updateUser)
 - `SettingsPage.tsx` - Line 175 (deleteAccount)
 - `BetaPendingPage.tsx` - Line 175 (deleteAccount)
@@ -344,6 +366,7 @@ try {
 **Impact:** Disrupts user flow, looks unprofessional.
 
 **Fix Required:**
+
 ```typescript
 try {
   await authApi.updateUser(...);
@@ -356,23 +379,25 @@ try {
 ```
 
 #### 🔴 CRITICAL: No confirmation modal for destructive actions
+
 **Location:** `BetaPendingPage.tsx` (Lines 161-178)
 
 ```typescript
 // CURRENT - Inline confirm() for account deletion
 const handleDeleteAccount = async () => {
-  if (window.confirm('Are you sure...')) {  // ❌ Should use proper modal
-    setIsDeleting(true);
+  if (window.confirm('Are you sure...')) {
+    // ❌ Should use proper modal
+    setIsDeleting(true)
     try {
-      await authApi.deleteAccount();
-      alert('Account deleted');  // ❌ Should use toast
-      await signOut();
+      await authApi.deleteAccount()
+      alert('Account deleted') // ❌ Should use toast
+      await signOut()
     } catch (error) {
-      console.error('Delete failed:', error);
-      alert('Failed to delete account');  // ❌ Should use toast
+      console.error('Delete failed:', error)
+      alert('Failed to delete account') // ❌ Should use toast
     }
   }
-};
+}
 ```
 
 **Impact:** Accidental data loss risk, poor UX.
@@ -380,6 +405,7 @@ const handleDeleteAccount = async () => {
 **Fix Required:** Implement proper confirmation modal (like ConfirmationModal component).
 
 #### ⚠️ MODERATE: Double error handling
+
 **Locations:** Multiple methods in AuthContext.tsx
 
 ```typescript
@@ -400,12 +426,13 @@ try {
 **Recommendation:** Either set state OR throw, not both.
 
 #### ⚠️ MODERATE: Inconsistent state after partial update failure
+
 **Location:** `SettingsPage.tsx` (Lines 155-180)
 
 ```typescript
 // User and org updated separately
-await authApi.updateUser(userProfile.id, userData);  // Succeeds
-await organizationsApi.update(organization.id, orgData);  // ❌ Fails
+await authApi.updateUser(userProfile.id, userData) // Succeeds
+await organizationsApi.update(organization.id, orgData) // ❌ Fails
 
 // User data updated but org data is stale - inconsistent state!
 ```
@@ -416,34 +443,35 @@ await organizationsApi.update(organization.id, orgData);  // ❌ Fails
 
 ### Auth Methods Analysis
 
-| Method | File | Try/Catch | Loading | User Feedback | Score |
-|--------|------|-----------|---------|---------------|-------|
-| getCurrentUser (mount) | AuthContext.tsx:129 | ✅ | ✅ | ❌ Silent | 6/10 |
-| signup | AuthContext.tsx:201 | ✅ | ✅ | ✅ Error state | 7/10 |
-| login | AuthContext.tsx:241 | ✅ | ✅ | ✅ Error state | 7/10 |
-| logout | AuthContext.tsx:282 | ✅ | ✅ | ✅ Error state | 7/10 |
-| updateUser | SettingsPage.tsx:155 | ✅ | ✅ | ⚠️ alert() | 5/10 |
-| requestPasswordReset | ForgotPasswordPage.tsx:38 | ✅ | ✅ | ✅ Error UI | 9/10 |
-| requestPasswordReset | SettingsPage.tsx:214 | ✅ | ✅ | ✅ Toast | 10/10 |
-| resetPasswordWithToken | ResetPasswordPage.tsx:64 | ✅ | ✅ | ✅ Error UI | 10/10 |
-| verifyEmailCode | BetaPendingPage.tsx:103 | ✅ | ✅ | ✅ Success state | 9/10 |
-| resendVerificationEmail | BetaPendingPage.tsx:133 | ✅ | ✅ | ✅ Success state | 9/10 |
-| deleteAccount | BetaPendingPage.tsx:169 | ✅ | ✅ | ⚠️ alert() | 4/10 |
+| Method                  | File                      | Try/Catch | Loading | User Feedback    | Score |
+| ----------------------- | ------------------------- | --------- | ------- | ---------------- | ----- |
+| getCurrentUser (mount)  | AuthContext.tsx:129       | ✅        | ✅      | ❌ Silent        | 6/10  |
+| signup                  | AuthContext.tsx:201       | ✅        | ✅      | ✅ Error state   | 7/10  |
+| login                   | AuthContext.tsx:241       | ✅        | ✅      | ✅ Error state   | 7/10  |
+| logout                  | AuthContext.tsx:282       | ✅        | ✅      | ✅ Error state   | 7/10  |
+| updateUser              | SettingsPage.tsx:155      | ✅        | ✅      | ⚠️ alert()       | 5/10  |
+| requestPasswordReset    | ForgotPasswordPage.tsx:38 | ✅        | ✅      | ✅ Error UI      | 9/10  |
+| requestPasswordReset    | SettingsPage.tsx:214      | ✅        | ✅      | ✅ Toast         | 10/10 |
+| resetPasswordWithToken  | ResetPasswordPage.tsx:64  | ✅        | ✅      | ✅ Error UI      | 10/10 |
+| verifyEmailCode         | BetaPendingPage.tsx:103   | ✅        | ✅      | ✅ Success state | 9/10  |
+| resendVerificationEmail | BetaPendingPage.tsx:133   | ✅        | ✅      | ✅ Success state | 9/10  |
+| deleteAccount           | BetaPendingPage.tsx:169   | ✅        | ✅      | ⚠️ alert()       | 4/10  |
 
 ### Organizations API Analysis
 
-| Method | File | Try/Catch | Loading | User Feedback | Score |
-|--------|------|-----------|---------|---------------|-------|
-| getMine | BetaPendingPage.tsx:49 | ✅ | ✅ | ❌ Silent | 5/10 |
-| getMine | Dashboard.tsx:215 | ✅ | ✅ | ✅ Error state | 8/10 |
-| create | Dashboard.tsx:237 | ✅ | ✅ | ✅ Error handling | 8/10 |
-| update | SettingsPage.tsx:158 | ✅ | ✅ | ⚠️ alert() | 5/10 |
+| Method  | File                   | Try/Catch | Loading | User Feedback     | Score |
+| ------- | ---------------------- | --------- | ------- | ----------------- | ----- |
+| getMine | BetaPendingPage.tsx:49 | ✅        | ✅      | ❌ Silent         | 5/10  |
+| getMine | Dashboard.tsx:215      | ✅        | ✅      | ✅ Error state    | 8/10  |
+| create  | Dashboard.tsx:237      | ✅        | ✅      | ✅ Error handling | 8/10  |
+| update  | SettingsPage.tsx:158   | ✅        | ✅      | ⚠️ alert()        | 5/10  |
 
 ---
 
 ## 5. Vendor Applications API (vendorApplicationsApi, registrationsApi)
 
 ### Summary
+
 **Overall Score: 6.5/10**
 
 Vendor application flows have mixed error handling quality, with one exemplary implementation and several critical gaps.
@@ -451,37 +479,39 @@ Vendor application flows have mixed error handling quality, with one exemplary i
 ### Critical Issues
 
 #### 🔴 CRITICAL: VendorEventPortalPage - Silent failure
+
 **Location:** `src/pages/VendorEventPortalPage.tsx` (Line 226)
 
 ```typescript
 // CURRENT - Swallows all errors
-vendorApplicationsApi.getByEvent(eventSlug)
-  .catch(() => [])  // ❌ Returns empty array, user sees no indication of error
+vendorApplicationsApi.getByEvent(eventSlug).catch(() => []) // ❌ Returns empty array, user sees no indication of error
 ```
 
 **Impact:** User sees empty vendor portal with no explanation why.
 
 **Fix Required:**
+
 ```typescript
 try {
-  const applications = await vendorApplicationsApi.getByEvent(eventSlug);
-  setApplications(applications);
+  const applications = await vendorApplicationsApi.getByEvent(eventSlug)
+  setApplications(applications)
 } catch (error: any) {
-  logger.error('Failed to load applications', { eventSlug, error });
-  setError('Unable to load vendor applications. Please try again.');
-  setApplications([]);
+  logger.error('Failed to load applications', { eventSlug, error })
+  setError('Unable to load vendor applications. Please try again.')
+  setApplications([])
 }
 ```
 
 #### 🔴 CRITICAL: Dashboard event creation - No error handling
+
 **Location:** `src/pages/Dashboard.tsx` (Line 476)
 
 ```typescript
 // CURRENT - No error handling during event creation
 const vendorApplication = await vendorApplicationsApi.create({
   event_id: newEvent.id,
-  ...applicationData
-});  // ❌ If this fails, event is created but has no application
+  ...applicationData,
+}) // ❌ If this fails, event is created but has no application
 
 // Event creation continues even if application creation fails
 ```
@@ -491,20 +521,23 @@ const vendorApplication = await vendorApplicationsApi.create({
 **Fix Required:** Wrap in try/catch, consider rolling back event on failure.
 
 #### 🔴 CRITICAL: EmailAutomationTab - Silent failure loading categories
+
 **Location:** `src/components/producer/Email/EmailAutomationTab.tsx` (Line 106)
 
 ```typescript
 try {
-  const apps = await vendorApplicationsApi.getByEvent(eventSlug);
+  const apps = await vendorApplicationsApi.getByEvent(eventSlug)
 } catch (error) {
-  console.error('Failed to load categories:', error);  // ❌ No user feedback
+  console.error('Failed to load categories:', error) // ❌ No user feedback
 }
 ```
 
 **Impact:** Category dropdown empty with no explanation.
 
 #### ⚠️ MODERATE: Multiple alert() usages
+
 **Locations:**
+
 - EventSettings.tsx:264 - Update application
 - ViewApplicationSubmissions.tsx:99 - Update status
 - CreateApplicationForm.tsx:106, 108 - Create/update
@@ -512,6 +545,7 @@ try {
 ### Best Practice Found
 
 #### ✅ EXCELLENT: VendorApplicationForm.tsx - Comprehensive error handling
+
 **Location:** `src/pages/VendorApplicationForm.tsx` (Line 344)
 
 ```typescript
@@ -526,53 +560,53 @@ try {
 
 const submitWithRetry = async (data: FormData, attempt = 1): Promise<void> => {
   try {
-    const result = await registrationsApi.submitVendorApplication(eventSlug, data);
+    const result = await registrationsApi.submitVendorApplication(eventSlug, data)
     // Success handling
   } catch (error: any) {
-    const isRetryable = error.status >= 500 || error.status === 0;
+    const isRetryable = error.status >= 500 || error.status === 0
 
     if (isRetryable && attempt < 3) {
-      setRetryAttempt(attempt);
-      await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-      return submitWithRetry(data, attempt + 1);
+      setRetryAttempt(attempt)
+      await new Promise((resolve) => setTimeout(resolve, 1000 * attempt))
+      return submitWithRetry(data, attempt + 1)
     }
 
     if (attempt >= 3) {
-      setShowBugReport(true);
+      setShowBugReport(true)
     }
 
     // Detailed error feedback
     toast.error(`Submission failed (Attempt ${attempt}/3)`, {
-      description: getErrorMessage(error)
-    });
+      description: getErrorMessage(error),
+    })
   }
-};
+}
 ```
 
 **This pattern should be replicated for other critical user flows.**
 
 ### Vendor Applications Analysis
 
-| Method | File | Try/Catch | Loading | User Feedback | Issues |
-|--------|------|-----------|---------|---------------|--------|
-| getByEvent | VendorEventPortalPage.tsx:226 | ❌ Catch | ✅ | ❌ | **CRITICAL** - Silent failure |
-| getByEvent | EmailAutomationTab.tsx:106 | ✅ | ✅ | ❌ | **CRITICAL** - No user feedback |
-| getByEvent | InvitesTab.tsx:122 | ✅ | ✅ | ❌ | **CRITICAL** - Silent catch |
-| getByEvent | EventSettings.tsx:185 | ✅ | ✅ | ❌ | No user feedback |
-| getByEvent | EventSettings.tsx:264 | ✅ | ✅ | ⚠️ alert() | Should use toast |
-| getByEvent | EventSettings.tsx:443 | ✅ | ✅ | ✅ | Good |
-| getByEvent | ApplicationsTab.tsx:60 | ✅ | ✅ | ✅ | Good |
-| getByEvent | ApplicantsTab.tsx:159 | ✅ | ✅ | ✅ | Good |
-| create | Dashboard.tsx:476 | ❌ | ✅ | ❌ | **CRITICAL** |
-| update | EventSettings.tsx:264 | ✅ | ✅ | ⚠️ alert() | Should use toast |
+| Method     | File                          | Try/Catch | Loading | User Feedback | Issues                          |
+| ---------- | ----------------------------- | --------- | ------- | ------------- | ------------------------------- |
+| getByEvent | VendorEventPortalPage.tsx:226 | ❌ Catch  | ✅      | ❌            | **CRITICAL** - Silent failure   |
+| getByEvent | EmailAutomationTab.tsx:106    | ✅        | ✅      | ❌            | **CRITICAL** - No user feedback |
+| getByEvent | InvitesTab.tsx:122            | ✅        | ✅      | ❌            | **CRITICAL** - Silent catch     |
+| getByEvent | EventSettings.tsx:185         | ✅        | ✅      | ❌            | No user feedback                |
+| getByEvent | EventSettings.tsx:264         | ✅        | ✅      | ⚠️ alert()    | Should use toast                |
+| getByEvent | EventSettings.tsx:443         | ✅        | ✅      | ✅            | Good                            |
+| getByEvent | ApplicationsTab.tsx:60        | ✅        | ✅      | ✅            | Good                            |
+| getByEvent | ApplicantsTab.tsx:159         | ✅        | ✅      | ✅            | Good                            |
+| create     | Dashboard.tsx:476             | ❌        | ✅      | ❌            | **CRITICAL**                    |
+| update     | EventSettings.tsx:264         | ✅        | ✅      | ⚠️ alert()    | Should use toast                |
 
 ### Registrations API Analysis
 
-| Method | File | Try/Catch | Loading | User Feedback | Quality |
-|--------|------|-----------|---------|---------------|---------|
-| submitVendorApplication | VendorApplicationForm.tsx:344 | ✅ | ✅ | ✅ | **EXCELLENT** |
-| trackByTicketCode | ApplicationTrackingPage.tsx:80 | ✅ | ✅ | ✅ | Good |
-| updateStatus | ViewApplicationSubmissions.tsx:99 | ✅ | ✅ | ⚠️ alert() | Should use toast |
+| Method                  | File                              | Try/Catch | Loading | User Feedback | Quality          |
+| ----------------------- | --------------------------------- | --------- | ------- | ------------- | ---------------- |
+| submitVendorApplication | VendorApplicationForm.tsx:344     | ✅        | ✅      | ✅            | **EXCELLENT**    |
+| trackByTicketCode       | ApplicationTrackingPage.tsx:80    | ✅        | ✅      | ✅            | Good             |
+| updateStatus            | ViewApplicationSubmissions.tsx:99 | ✅        | ✅      | ⚠️ alert()    | Should use toast |
 
 ---
 
@@ -585,55 +619,57 @@ The base `fetchApi` function provides good error handling infrastructure:
 ```typescript
 async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   try {
-    const response = await fetch(url, { headers, ...options });
+    const response = await fetch(url, { headers, ...options })
 
     if (!response.ok) {
-      let errorData: any = {};
+      let errorData: any = {}
       try {
-        errorData = await response.json();
+        errorData = await response.json()
       } catch {
-        errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
+        errorData = { message: `HTTP ${response.status}: ${response.statusText}` }
       }
 
       // ✅ Prioritizes validation errors from errors array
-      let errorMessage: string;
+      let errorMessage: string
       if (errorData.errors && Array.isArray(errorData.errors)) {
-        errorMessage = errorData.errors[0];
+        errorMessage = errorData.errors[0]
       } else {
-        errorMessage = errorData.message || errorData.error || `API request failed: ${response.status}`;
+        errorMessage =
+          errorData.message || errorData.error || `API request failed: ${response.status}`
       }
 
-      throw new ApiError(errorMessage, response.status, errorData.errors);
+      throw new ApiError(errorMessage, response.status, errorData.errors)
     }
 
     // ✅ Handles 204 No Content
     if (response.status === 204) {
-      return null as T;
+      return null as T
     }
 
-    return await response.json();
-
+    return await response.json()
   } catch (error) {
     if (error instanceof ApiError) {
-      throw error;
+      throw error
     }
 
     // ✅ Network error handling
     throw new ApiError(
       `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      0
-    );
+      0,
+    )
   }
 }
 ```
 
 **Strengths:**
+
 - Structured error handling with ApiError class
 - Validation error prioritization
 - Network error detection
 - HTTP 204 handling
 
 **Gaps:**
+
 - No retry logic at base level
 - No timeout handling
 - No request cancellation
@@ -727,22 +763,21 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 ### Immediate Actions (This Week)
 
 1. **Create standardized error handling hook**
+
    ```typescript
    // src/hooks/useApiError.ts
    export function useApiError() {
      const handleError = (error: any, context?: string) => {
-       logger.error(context || 'API Error', { error });
+       logger.error(context || 'API Error', { error })
 
-       const message = error instanceof ApiError
-         ? error.message
-         : 'An unexpected error occurred';
+       const message = error instanceof ApiError ? error.message : 'An unexpected error occurred'
 
        toast.error(context || 'Operation Failed', {
          description: message,
-       });
-     };
+       })
+     }
 
-     return { handleError };
+     return { handleError }
    }
    ```
 
@@ -774,6 +809,7 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 ### Long-term Actions (Next Quarter)
 
 7. **Implement error boundaries**
+
    ```typescript
    // src/components/ErrorBoundary.tsx
    export class ErrorBoundary extends React.Component {
@@ -788,25 +824,26 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
    - Apply to critical user flows
 
 9. **Implement offline detection and handling**
+
    ```typescript
    // src/hooks/useOnlineStatus.ts
    export function useOnlineStatus() {
-     const [isOnline, setIsOnline] = useState(navigator.onLine);
+     const [isOnline, setIsOnline] = useState(navigator.onLine)
 
      useEffect(() => {
-       const handleOnline = () => setIsOnline(true);
-       const handleOffline = () => setIsOnline(false);
+       const handleOnline = () => setIsOnline(true)
+       const handleOffline = () => setIsOnline(false)
 
-       window.addEventListener('online', handleOnline);
-       window.addEventListener('offline', handleOffline);
+       window.addEventListener('online', handleOnline)
+       window.addEventListener('offline', handleOffline)
 
        return () => {
-         window.removeEventListener('online', handleOnline);
-         window.removeEventListener('offline', handleOffline);
-       };
-     }, []);
+         window.removeEventListener('online', handleOnline)
+         window.removeEventListener('offline', handleOffline)
+       }
+     }, [])
 
-     return isOnline;
+     return isOnline
    }
    ```
 
@@ -827,7 +864,9 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 ### Exemplary Error Handling Examples
 
 #### 1. VendorApplicationForm.tsx - submitVendorApplication
+
 **Why it's excellent:**
+
 - Retry logic with exponential backoff
 - Network error detection
 - User feedback on retry attempts
@@ -836,7 +875,9 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 - Specific error messages
 
 #### 2. ResetPasswordPage.tsx - resetPasswordWithToken
+
 **Why it's excellent:**
+
 - Pre-validation (password strength, match)
 - Loading state
 - Success/error states
@@ -845,7 +886,9 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 - Clear error messages
 
 #### 3. GoLiveCard.tsx - goLive
+
 **Why it's excellent:**
+
 - Loading state
 - Success animation
 - Error modal
@@ -853,7 +896,9 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 - Clear user feedback
 
 #### 4. TemplateLibraryPage.tsx - clone
+
 **Why it's excellent:**
+
 - Client-side validation before API call
 - Toast notifications
 - Modal stays open on error for correction
@@ -878,45 +923,47 @@ For every API call, ensure:
 
 ### Error Handling Coverage
 
-| Category | Total Methods | With try/catch | With Loading | With User Feedback | Score |
-|----------|---------------|----------------|--------------|-------------------|-------|
-| scheduledEmailsApi | 14 | 12 (86%) | 11 (79%) | 10 (71%) | 7.5/10 |
-| emailTemplatesApi | 18 | 17 (94%) | 16 (89%) | 15 (83%) | 8.2/10 |
-| eventsApi | 13 | 13 (100%) | 10 (77%) | 8 (62%) | 6.8/10 |
-| authApi | 10 | 10 (100%) | 8 (80%) | 7 (70%) | 7.3/10 |
-| organizationsApi | 4 | 4 (100%) | 4 (100%) | 2 (50%) | 7.0/10 |
-| vendorApplicationsApi | 11 | 8 (73%) | 8 (73%) | 5 (45%) | 6.5/10 |
-| registrationsApi | 5 | 5 (100%) | 4 (80%) | 4 (80%) | 8.0/10 |
-| **TOTAL** | **75** | **69 (92%)** | **61 (81%)** | **51 (68%)** | **7.1/10** |
+| Category              | Total Methods | With try/catch | With Loading | With User Feedback | Score      |
+| --------------------- | ------------- | -------------- | ------------ | ------------------ | ---------- |
+| scheduledEmailsApi    | 14            | 12 (86%)       | 11 (79%)     | 10 (71%)           | 7.5/10     |
+| emailTemplatesApi     | 18            | 17 (94%)       | 16 (89%)     | 15 (83%)           | 8.2/10     |
+| eventsApi             | 13            | 13 (100%)      | 10 (77%)     | 8 (62%)            | 6.8/10     |
+| authApi               | 10            | 10 (100%)      | 8 (80%)      | 7 (70%)            | 7.3/10     |
+| organizationsApi      | 4             | 4 (100%)       | 4 (100%)     | 2 (50%)            | 7.0/10     |
+| vendorApplicationsApi | 11            | 8 (73%)        | 8 (73%)      | 5 (45%)            | 6.5/10     |
+| registrationsApi      | 5             | 5 (100%)       | 4 (80%)      | 4 (80%)            | 8.0/10     |
+| **TOTAL**             | **75**        | **69 (92%)**   | **61 (81%)** | **51 (68%)**       | **7.1/10** |
 
 ### User Feedback Mechanisms
 
-| Mechanism | Count | Percentage | Assessment |
-|-----------|-------|------------|------------|
-| Toast notifications | 106 | 38% | Good, but inconsistent |
-| Error state (inline) | 89 | 32% | Good for data fetching |
-| alert() calls | 14 | 5% | ❌ Should be replaced |
-| Silent failures | 12 | 4% | ❌ Critical issue |
-| Console.error only | 58 | 21% | ⚠️ Should add user feedback |
+| Mechanism            | Count | Percentage | Assessment                  |
+| -------------------- | ----- | ---------- | --------------------------- |
+| Toast notifications  | 106   | 38%        | Good, but inconsistent      |
+| Error state (inline) | 89    | 32%        | Good for data fetching      |
+| alert() calls        | 14    | 5%         | ❌ Should be replaced       |
+| Silent failures      | 12    | 4%         | ❌ Critical issue           |
+| Console.error only   | 58    | 21%        | ⚠️ Should add user feedback |
 
 ### Loading State Patterns
 
-| Pattern | Count | Assessment |
-|---------|-------|------------|
-| useState(false) | 134 | ✅ Standard pattern |
-| Form isSubmitting | 22 | ✅ Good for forms |
-| No loading state | 28 | ❌ Should add |
+| Pattern           | Count | Assessment          |
+| ----------------- | ----- | ------------------- |
+| useState(false)   | 134   | ✅ Standard pattern |
+| Form isSubmitting | 22    | ✅ Good for forms   |
+| No loading state  | 28    | ❌ Should add       |
 
 ---
 
 ## Conclusion
 
 The Voxxy Presents frontend has a **solid foundation for error handling (7.1/10)** with:
+
 - 92% of API calls wrapped in try/catch
 - 81% with loading states
 - 68% with user feedback
 
 However, there are **critical gaps** that need immediate attention:
+
 - 12 silent failures with no user feedback
 - 8 locations using blocking alert() instead of toast
 - 3 critical user flows with missing error handling

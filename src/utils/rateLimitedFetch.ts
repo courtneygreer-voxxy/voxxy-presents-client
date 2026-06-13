@@ -3,12 +3,12 @@
  * Provides client-side rate limiting for API calls
  */
 
-import { apiRateLimiter, formSubmissionRateLimiter } from './rateLimiter';
+import { apiRateLimiter, formSubmissionRateLimiter } from './rateLimiter'
 
 interface RateLimitedFetchOptions extends RequestInit {
-  skipRateLimit?: boolean;
-  rateLimitKey?: string;
-  isFormSubmission?: boolean;
+  skipRateLimit?: boolean
+  rateLimitKey?: string
+  isFormSubmission?: boolean
 }
 
 /**
@@ -16,31 +16,33 @@ interface RateLimitedFetchOptions extends RequestInit {
  */
 export async function rateLimitedFetch(
   url: string | URL,
-  options: RateLimitedFetchOptions = {}
+  options: RateLimitedFetchOptions = {},
 ): Promise<Response> {
-  const { skipRateLimit, rateLimitKey, isFormSubmission, ...fetchOptions } = options;
+  const { skipRateLimit, rateLimitKey, isFormSubmission, ...fetchOptions } = options
 
   if (!skipRateLimit) {
-    const limiter = isFormSubmission ? formSubmissionRateLimiter : apiRateLimiter;
-    const key = rateLimitKey || `fetch:${url.toString()}`;
+    const limiter = isFormSubmission ? formSubmissionRateLimiter : apiRateLimiter
+    const key = rateLimitKey || `fetch:${url.toString()}`
 
     if (!limiter.isAllowed(key)) {
-      const timeUntilReset = limiter.getTimeUntilReset(key);
-      throw new Error(`Rate limit exceeded. Please wait ${timeUntilReset} seconds before trying again.`);
+      const timeUntilReset = limiter.getTimeUntilReset(key)
+      throw new Error(
+        `Rate limit exceeded. Please wait ${timeUntilReset} seconds before trying again.`,
+      )
     }
   }
 
   try {
-    const response = await fetch(url, fetchOptions);
-    return response;
+    const response = await fetch(url, fetchOptions)
+    return response
   } catch (error) {
     // If network error, don't count against rate limit
     if (error instanceof TypeError) {
-      const limiter = isFormSubmission ? formSubmissionRateLimiter : apiRateLimiter;
-      const key = rateLimitKey || `fetch:${url.toString()}`;
-      limiter.reset(key); // Reset on network error
+      const limiter = isFormSubmission ? formSubmissionRateLimiter : apiRateLimiter
+      const key = rateLimitKey || `fetch:${url.toString()}`
+      limiter.reset(key) // Reset on network error
     }
-    throw error;
+    throw error
   }
 }
 
@@ -49,21 +51,21 @@ export async function rateLimitedFetch(
  */
 export async function rateLimitedFetchJson<T = any>(
   url: string | URL,
-  options: RateLimitedFetchOptions = {}
+  options: RateLimitedFetchOptions = {},
 ): Promise<T> {
   const response = await rateLimitedFetch(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...options.headers
-    }
-  });
+      ...options.headers,
+    },
+  })
 
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`)
   }
 
-  return response.json();
+  return response.json()
 }
 
 /**
@@ -72,12 +74,12 @@ export async function rateLimitedFetchJson<T = any>(
 export async function rateLimitedPost<T = any>(
   url: string | URL,
   data: any,
-  options: RateLimitedFetchOptions = {}
+  options: RateLimitedFetchOptions = {},
 ): Promise<T> {
   return rateLimitedFetchJson<T>(url, {
     ...options,
     method: 'POST',
     body: JSON.stringify(data),
-    isFormSubmission: true
-  });
+    isFormSubmission: true,
+  })
 }

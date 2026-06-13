@@ -1,14 +1,7 @@
 import React, { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import {
-  Share2,
-  Copy,
-  Check,
-  Facebook,
-  Twitter,
-  Mail
-} from "lucide-react"
+import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Share2, Copy, Check, Facebook, Twitter, Mail } from 'lucide-react'
 
 interface ShareButtonProps {
   url: string
@@ -19,13 +12,13 @@ interface ShareButtonProps {
   className?: string
 }
 
-export function ShareButton({ 
-  url, 
-  title, 
+export function ShareButton({
+  url,
+  title,
   description = '',
   variant = 'outline',
   size = 'sm',
-  className = ''
+  className = '',
 }: ShareButtonProps) {
   const [copied, setCopied] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -52,7 +45,7 @@ export function ShareButton({
   const shareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
     twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`,
-    email: `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${description}\n\n${url}`)}`
+    email: `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${description}\n\n${url}`)}`,
   }
 
   const handleShare = (platform: keyof typeof shareLinks) => {
@@ -69,7 +62,7 @@ export function ShareButton({
         await navigator.share({
           title,
           text: description,
-          url
+          url,
         })
         setIsOpen(false)
       } catch (error) {
@@ -89,7 +82,7 @@ export function ShareButton({
       <PopoverContent className="voxxy-auth-card w-64 p-3 text-foreground" align="end">
         <div className="space-y-2">
           <h4 className="font-medium text-sm text-foreground">Share this page</h4>
-          
+
           {/* Copy Link */}
           <Button
             variant="ghost"

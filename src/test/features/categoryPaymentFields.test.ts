@@ -4,23 +4,23 @@ import path from 'path'
 
 const networkSource = readFileSync(
   path.resolve(__dirname, '../../components/producer/Network/NetworkPage.tsx'),
-  'utf-8'
+  'utf-8',
 )
 
-const categoryTypeSource = readFileSync(
-  path.resolve(__dirname, '../../types/category.ts'),
-  'utf-8'
-)
+const categoryTypeSource = readFileSync(path.resolve(__dirname, '../../types/category.ts'), 'utf-8')
 
 const step2Source = readFileSync(
-  path.resolve(__dirname, '../../components/producer/CreateEventWizard/steps/Step2ApplicationDetails.tsx'),
-  'utf-8'
+  path.resolve(
+    __dirname,
+    '../../components/producer/CreateEventWizard/steps/Step2ApplicationDetails.tsx',
+  ),
+  'utf-8',
 )
 
 describe('Category type — legacy flat payment fields preserved for backwards compatibility', () => {
   const fields = ['early_bird_price', 'early_bird_deadline', 'payment_deadline', 'deposit']
 
-  fields.forEach(field => {
+  fields.forEach((field) => {
     it(`Category interface includes ${field}`, () => {
       expect(categoryTypeSource).toContain(field)
     })

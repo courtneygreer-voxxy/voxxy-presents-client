@@ -1,24 +1,44 @@
-import { useState, useEffect, useMemo } from 'react';
-import { RefreshCw, AlertCircle, CheckCircle, Loader2, Sparkles, FileSearch, Mail, Plus } from 'lucide-react';
-import { scheduledEmailsApi, eventsApi, categoriesApi, vendorApplicationsApi } from '@/services/api';
-import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus, AuditFilters, EmailCategory, CreateScheduledEmailRequest } from '@/types/email';
-import type { Category } from '@/types/category';
-import EmailTable from './EmailTable';
-import { EmailEditorPage } from './EmailEditorPage';
-import { EmailAuditLogOverlay } from './EmailAuditLogOverlay';
-import EmailSequenceEditorOverlay from './EmailSequenceEditorOverlay';
-import { DebugPanel } from '../DebugPanel';
-import { SearchFilterBar, type ActiveFilter, type FilterFieldConfig } from '@/components/shared/SearchFilterBar';
-import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
-import { logger } from '@/utils/logger';
+import { useState, useEffect, useMemo } from 'react'
+import {
+  RefreshCw,
+  AlertCircle,
+  CheckCircle,
+  Loader2,
+  Sparkles,
+  FileSearch,
+  Mail,
+  Plus,
+} from 'lucide-react'
+import { scheduledEmailsApi, eventsApi, categoriesApi, vendorApplicationsApi } from '@/services/api'
+import type {
+  ScheduledEmail,
+  UpdateEmailRequest,
+  ScheduledEmailStatus,
+  AuditFilters,
+  EmailCategory,
+  CreateScheduledEmailRequest,
+} from '@/types/email'
+import type { Category } from '@/types/category'
+import EmailTable from './EmailTable'
+import { EmailEditorPage } from './EmailEditorPage'
+import { EmailAuditLogOverlay } from './EmailAuditLogOverlay'
+import EmailSequenceEditorOverlay from './EmailSequenceEditorOverlay'
+import { DebugPanel } from '../DebugPanel'
+import {
+  SearchFilterBar,
+  type ActiveFilter,
+  type FilterFieldConfig,
+} from '@/components/shared/SearchFilterBar'
+import { getEmailTypeInfo } from '@/utils/emailTypeHelper'
+import { logger } from '@/utils/logger'
 
 interface EmailAutomationTabProps {
-  eventSlug: string;
-  event?: any;
-  isAdmin?: boolean;
+  eventSlug: string
+  event?: any
+  isAdmin?: boolean
 }
 
-type FilterType = 'all' | ScheduledEmailStatus;
+type FilterType = 'all' | ScheduledEmailStatus
 
 const FILTER_OPTIONS: { value: FilterType; label: string }[] = [
   { value: 'all', label: 'All Emails' },
@@ -27,271 +47,290 @@ const FILTER_OPTIONS: { value: FilterType; label: string }[] = [
   { value: 'sent', label: 'Sent' },
   { value: 'failed', label: 'Failed' },
   { value: 'cancelled', label: 'Cancelled' },
-];
+]
 
 type ViewState =
   | { view: 'table' }
   | { view: 'audit-log'; filters: AuditFilters | null }
   | { view: 'sequence-editor' }
   | { view: 'email-editor'; email: ScheduledEmail; returnTo: 'table' | 'sequence-editor' }
-  | { view: 'email-editor'; email: null; returnTo: 'table' | 'sequence-editor'; sequenceContext?: { categoryId: number | null } };
+  | {
+      view: 'email-editor'
+      email: null
+      returnTo: 'table' | 'sequence-editor'
+      sequenceContext?: { categoryId: number | null }
+    }
 
 export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailAutomationTabProps) {
-  const [emails, setEmails] = useState<ScheduledEmail[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [emails, setEmails] = useState<ScheduledEmail[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   // Event must be published before "Send Now" is allowed
-  const isEventLive = event?.published === true || event?.status?.status === 'published';
+  const isEventLive = event?.published === true || event?.status?.status === 'published'
   // Check if event is cancelled - emails become read-only
-  const isEventCancelled = event?.status?.status === 'cancelled';
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [eventData, setEventData] = useState<any | null>(null);
+  const isEventCancelled = event?.status?.status === 'cancelled'
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [eventData, setEventData] = useState<any | null>(null)
 
   // Navigation state
-  const [viewState, setViewState] = useState<ViewState>({ view: 'table' });
+  const [viewState, setViewState] = useState<ViewState>({ view: 'table' })
 
   // Auto-refresh state
-  const [autoRefresh, setAutoRefresh] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
+  const [autoRefresh, setAutoRefresh] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null)
 
   // Search and filter state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+  const [searchQuery, setSearchQuery] = useState('')
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([])
 
   // Category data (fetched from API)
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>([])
 
   // Sort state
-  type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'email_type' | 'category' | 'recipient_count' | 'undelivered_count' | 'status';
-  type SortDirection = 'asc' | 'desc';
-  const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  type SortColumn =
+    | 'name'
+    | 'subject'
+    | 'scheduled_for'
+    | 'email_type'
+    | 'category'
+    | 'recipient_count'
+    | 'undelivered_count'
+    | 'status'
+  type SortDirection = 'asc' | 'desc'
+  const [sortColumn, setSortColumn] = useState<SortColumn | null>(null)
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
 
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
-      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))
     } else {
-      setSortColumn(column);
-      setSortDirection('asc');
+      setSortColumn(column)
+      setSortDirection('asc')
     }
-  };
-
+  }
 
   // Load scheduled emails
   useEffect(() => {
-    loadEmails();
-  }, [eventSlug]);
+    loadEmails()
+  }, [eventSlug])
 
   // Load categories (only those used by this event's vendor applications)
   useEffect(() => {
     const loadCategories = async () => {
       // Try multiple ways to get organization ID
-      const orgId = eventData?.organization?.id ||
-                    eventData?.organization_id ||
-                    event?.organization?.id ||
-                    event?.organization_id;
+      const orgId =
+        eventData?.organization?.id ||
+        eventData?.organization_id ||
+        event?.organization?.id ||
+        event?.organization_id
 
       if (!orgId) {
-        return;
+        return
       }
 
       try {
         // Load all categories for the organization
-        const categoriesResponse = await categoriesApi.getAll(orgId, true);
-        const allCategories = categoriesResponse.categories || [];
+        const categoriesResponse = await categoriesApi.getAll(orgId, true)
+        const allCategories = categoriesResponse.categories || []
 
         // Load vendor applications for this event to see which categories are actually used
-        const vendorApplications = await vendorApplicationsApi.getByEvent(eventSlug);
+        const vendorApplications = await vendorApplicationsApi.getByEvent(eventSlug)
 
         // Extract unique category_ids from vendor applications
         // Safety check: ensure vendorApplications is an array
-        const apps = Array.isArray(vendorApplications) ? vendorApplications : [];
+        const apps = Array.isArray(vendorApplications) ? vendorApplications : []
         const usedCategoryIds = new Set(
-          apps
-            .map((app: any) => app.category_id)
-            .filter((id: number | null) => id !== null)
-        );
+          apps.map((app: any) => app.category_id).filter((id: number | null) => id !== null),
+        )
 
         // Filter categories to only show those used by this event
-        const eventCategories = allCategories.filter((cat: Category) => usedCategoryIds.has(cat.id));
+        const eventCategories = allCategories.filter((cat: Category) => usedCategoryIds.has(cat.id))
 
-        setCategories(eventCategories);
+        setCategories(eventCategories)
       } catch (error) {
-        logger.error('Failed to load categories', { organizationId: orgId, error });
+        logger.error('Failed to load categories', { organizationId: orgId, error })
       }
-    };
+    }
 
     // Only load categories if we have event data
     if (eventData || event) {
-      loadCategories();
+      loadCategories()
     }
-  }, [eventSlug, eventData, event]);
+  }, [eventSlug, eventData, event])
 
   // Auto-refresh delivery stats every 30 seconds (only on table view)
   useEffect(() => {
-    if (!autoRefresh || viewState.view !== 'table') return;
+    if (!autoRefresh || viewState.view !== 'table') return
 
     const interval = setInterval(() => {
-      loadEmails(true); // Silent refresh
-    }, 30000); // 30 seconds
+      loadEmails(true) // Silent refresh
+    }, 30000) // 30 seconds
 
-    return () => clearInterval(interval);
-  }, [autoRefresh, viewState.view, eventSlug]);
+    return () => clearInterval(interval)
+  }, [autoRefresh, viewState.view, eventSlug])
 
   const loadEmails = async (silent = false) => {
     if (!silent) {
-      setIsLoading(true);
+      setIsLoading(true)
     } else {
-      setIsRefreshing(true);
+      setIsRefreshing(true)
     }
-    setError(null);
+    setError(null)
     try {
       // Fetch event data (for preview calculations)
-      const eventDataResponse = await eventsApi.getById(eventSlug);
-      setEventData(eventDataResponse);
+      const eventDataResponse = await eventsApi.getById(eventSlug)
+      setEventData(eventDataResponse)
 
       // Fetch scheduled emails
-      const scheduledEmailsData = await scheduledEmailsApi.getByEvent(eventSlug);
+      const scheduledEmailsData = await scheduledEmailsApi.getByEvent(eventSlug)
 
       // Safety check: ensure scheduledEmailsData is an array
-      const emailsArray = Array.isArray(scheduledEmailsData) ? scheduledEmailsData : [];
-      setEmails(emailsArray);
-      setLastRefreshTime(new Date());
+      const emailsArray = Array.isArray(scheduledEmailsData) ? scheduledEmailsData : []
+      setEmails(emailsArray)
+      setLastRefreshTime(new Date())
     } catch (err: any) {
-      logger.error('Failed to load emails', { eventSlug, error: err });
+      logger.error('Failed to load emails', { eventSlug, error: err })
       if (!silent) {
-        setError(err.message || 'Failed to load scheduled emails');
+        setError(err.message || 'Failed to load scheduled emails')
       }
     } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
+      setIsLoading(false)
+      setIsRefreshing(false)
     }
-  };
+  }
 
   const handlePause = async (emailId: number) => {
     try {
-      await scheduledEmailsApi.pause(eventSlug, emailId);
-      await loadEmails(); // Reload to get updated data
-      showSuccess('Email paused successfully');
+      await scheduledEmailsApi.pause(eventSlug, emailId)
+      await loadEmails() // Reload to get updated data
+      showSuccess('Email paused successfully')
     } catch (err: any) {
-      setError(err.message || 'Failed to pause email');
+      setError(err.message || 'Failed to pause email')
     }
-  };
+  }
 
   const handleResume = async (emailId: number) => {
     try {
-      await scheduledEmailsApi.resume(eventSlug, emailId);
-      await loadEmails();
-      showSuccess('Email resumed successfully');
+      await scheduledEmailsApi.resume(eventSlug, emailId)
+      await loadEmails()
+      showSuccess('Email resumed successfully')
     } catch (err: any) {
-      setError(err.message || 'Failed to resume email');
+      setError(err.message || 'Failed to resume email')
     }
-  };
+  }
 
   const handleSendNow = async (emailId: number) => {
     if (!confirm('Are you sure you want to send this email now? This cannot be undone.')) {
-      return;
+      return
     }
 
     try {
-      const result = await scheduledEmailsApi.sendNow(eventSlug, emailId);
-      await loadEmails();
-      showSuccess(`Email sent to ${result.sent_count} recipients`);
+      const result = await scheduledEmailsApi.sendNow(eventSlug, emailId)
+      await loadEmails()
+      showSuccess(`Email sent to ${result.sent_count} recipients`)
     } catch (err: any) {
-      setError(err.message || 'Failed to send email');
+      setError(err.message || 'Failed to send email')
     }
-  };
+  }
 
   const handleRetryFailed = async (emailId: number) => {
-    if (!confirm('Retry all failed deliveries? Only soft bounces (temporary failures like "mailbox full") will be retried. Hard bounces (invalid emails) will be skipped.')) {
-      return;
+    if (
+      !confirm(
+        'Retry all failed deliveries? Only soft bounces (temporary failures like "mailbox full") will be retried. Hard bounces (invalid emails) will be skipped.',
+      )
+    ) {
+      return
     }
 
     try {
-      const result = await scheduledEmailsApi.retryFailed(eventSlug, emailId);
-      await loadEmails(); // Reload to get updated counts
+      const result = await scheduledEmailsApi.retryFailed(eventSlug, emailId)
+      await loadEmails() // Reload to get updated counts
 
       // Build success message
-      let message = `Retried ${result.retried_count} failed ${result.retried_count === 1 ? 'delivery' : 'deliveries'}`;
+      let message = `Retried ${result.retried_count} failed ${result.retried_count === 1 ? 'delivery' : 'deliveries'}`
       if (result.skipped_count > 0) {
-        message += ` (${result.skipped_count} hard ${result.skipped_count === 1 ? 'bounce' : 'bounces'} skipped)`;
+        message += ` (${result.skipped_count} hard ${result.skipped_count === 1 ? 'bounce' : 'bounces'} skipped)`
       }
-      showSuccess(message);
+      showSuccess(message)
     } catch (err: any) {
-      setError(err.message || 'Failed to retry failed deliveries');
+      setError(err.message || 'Failed to retry failed deliveries')
     }
-  };
+  }
 
   const handleDelete = async (emailId: number) => {
     if (!confirm('Are you sure you want to delete this scheduled email? This cannot be undone.')) {
-      return;
+      return
     }
 
     try {
-      await scheduledEmailsApi.delete(eventSlug, emailId);
-      await loadEmails();
-      showSuccess('Email deleted successfully');
+      await scheduledEmailsApi.delete(eventSlug, emailId)
+      await loadEmails()
+      showSuccess('Email deleted successfully')
     } catch (err: any) {
-      setError(err.message || 'Failed to delete email');
+      setError(err.message || 'Failed to delete email')
     }
-  };
+  }
 
   const handleCreateEmail = async (data: CreateScheduledEmailRequest) => {
     try {
-      const newEmail = await scheduledEmailsApi.create(eventSlug, data);
-      await loadEmails();
-      showSuccess('Email created successfully!');
-      return newEmail;
+      const newEmail = await scheduledEmailsApi.create(eventSlug, data)
+      await loadEmails()
+      showSuccess('Email created successfully!')
+      return newEmail
     } catch (err: any) {
-      setError(err.message || 'Failed to create email');
-      throw err;
+      setError(err.message || 'Failed to create email')
+      throw err
     }
-  };
+  }
 
   const handleGenerateEmails = async () => {
-    if (!confirm('Generate scheduled emails from the system template? This will create automated emails for your event.')) {
-      return;
+    if (
+      !confirm(
+        'Generate scheduled emails from the system template? This will create automated emails for your event.',
+      )
+    ) {
+      return
     }
 
-    setIsLoading(true);
-    setError(null);
+    setIsLoading(true)
+    setError(null)
     try {
-      const result = await scheduledEmailsApi.generate(eventSlug);
-      await loadEmails();
-      showSuccess(`Generated ${result.generated_count} scheduled emails for your event!`);
+      const result = await scheduledEmailsApi.generate(eventSlug)
+      await loadEmails()
+      showSuccess(`Generated ${result.generated_count} scheduled emails for your event!`)
     } catch (err: any) {
-      setError(err.message || 'Failed to generate emails');
+      setError(err.message || 'Failed to generate emails')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleSaveEdit = async (emailId: number, data: UpdateEmailRequest) => {
-    const updated = await scheduledEmailsApi.update(eventSlug, emailId, data);
+    const updated = await scheduledEmailsApi.update(eventSlug, emailId, data)
 
     // Force a fresh reload of emails to ensure UI updates
-    setIsLoading(true);
-    await loadEmails();
-    setIsLoading(false);
+    setIsLoading(true)
+    await loadEmails()
+    setIsLoading(false)
 
-    showSuccess('Email updated successfully');
-  };
+    showSuccess('Email updated successfully')
+  }
 
   const showSuccess = (message: string) => {
-    setSuccessMessage(message);
-    setTimeout(() => setSuccessMessage(null), 5000);
-  };
+    setSuccessMessage(message)
+    setTimeout(() => setSuccessMessage(null), 5000)
+  }
 
   // Filter field configs for SearchFilterBar
-  const statusOptions = FILTER_OPTIONS.filter(o => o.value !== 'all').map(o => o.label);
+  const statusOptions = FILTER_OPTIONS.filter((o) => o.value !== 'all').map((o) => o.label)
 
   const categoryOptions = [
     'All Invitations',
     'All Vendors',
-    ...categories.map(c => c.icon ? `${c.icon} ${c.name}` : c.name),
-  ];
+    ...categories.map((c) => (c.icon ? `${c.icon} ${c.name}` : c.name)),
+  ]
 
   const emailTypeOptions = [
     'Event Announcement',
@@ -299,142 +338,169 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     'Payment',
     'Event Countdown',
     'Other',
-  ];
+  ]
 
   const filterFieldConfigs: FilterFieldConfig[] = [
     { key: 'status', label: 'Status', options: statusOptions, multi: true },
     { key: 'email_type', label: 'Email Type', options: emailTypeOptions, multi: true },
     { key: 'category', label: 'Audience', options: categoryOptions, multi: true },
-  ];
+  ]
 
   // Derive filter values from activeFilters (now supporting multi-select)
-  const statusFiltersFromBar = activeFilters.find(f => f.fieldKey === 'status')?.values || [];
-  const emailTypeFiltersFromBar = activeFilters.find(f => f.fieldKey === 'email_type')?.values || [];
-  const categoryFiltersFromBar = activeFilters.find(f => f.fieldKey === 'category')?.values || [];
+  const statusFiltersFromBar = activeFilters.find((f) => f.fieldKey === 'status')?.values || []
+  const emailTypeFiltersFromBar =
+    activeFilters.find((f) => f.fieldKey === 'email_type')?.values || []
+  const categoryFiltersFromBar = activeFilters.find((f) => f.fieldKey === 'category')?.values || []
 
   // Map status labels back to FilterType values (array)
-  const derivedStatusFilters: FilterType[] = statusFiltersFromBar.length > 0
-    ? statusFiltersFromBar.map(label => FILTER_OPTIONS.find(o => o.label === label)?.value ?? 'all').filter(v => v !== 'all')
-    : [];
+  const derivedStatusFilters: FilterType[] =
+    statusFiltersFromBar.length > 0
+      ? statusFiltersFromBar
+          .map((label) => FILTER_OPTIONS.find((o) => o.label === label)?.value ?? 'all')
+          .filter((v) => v !== 'all')
+      : []
 
   // Email type filter values (array of direct label matches)
-  const derivedEmailTypeFilters: string[] = emailTypeFiltersFromBar;
+  const derivedEmailTypeFilters: string[] = emailTypeFiltersFromBar
 
   // Map category labels to category IDs and special values (array)
-  const derivedCategoryFilters: (number | 'all_invitations' | 'all_vendors')[] = categoryFiltersFromBar.map(label => {
-    if (label === 'All Invitations') return 'all_invitations';
-    if (label === 'All Vendors') return 'all_vendors';
-    const matchedCategory = categories.find(c =>
-      (c.icon ? `${c.icon} ${c.name}` : c.name) === label
-    );
-    return matchedCategory ? matchedCategory.id : null;
-  }).filter((v): v is number | 'all_invitations' | 'all_vendors' => v !== null);
+  const derivedCategoryFilters: (number | 'all_invitations' | 'all_vendors')[] =
+    categoryFiltersFromBar
+      .map((label) => {
+        if (label === 'All Invitations') return 'all_invitations'
+        if (label === 'All Vendors') return 'all_vendors'
+        const matchedCategory = categories.find(
+          (c) => (c.icon ? `${c.icon} ${c.name}` : c.name) === label,
+        )
+        return matchedCategory ? matchedCategory.id : null
+      })
+      .filter((v): v is number | 'all_invitations' | 'all_vendors' => v !== null)
 
   // Filter and search emails
   const filteredEmails = useMemo(() => {
-    let result = emails;
+    let result = emails
 
     // Filter by status (OR logic - email matches ANY selected status)
     if (derivedStatusFilters.length > 0) {
-      result = result.filter(email => derivedStatusFilters.includes(email.status as FilterType));
+      result = result.filter((email) => derivedStatusFilters.includes(email.status as FilterType))
     }
 
     // Filter by email type (OR logic - email matches ANY selected type)
     if (derivedEmailTypeFilters.length > 0) {
-      result = result.filter(email => {
-        const emailTypeInfo = getEmailTypeInfo(email.trigger_type);
-        return derivedEmailTypeFilters.includes(emailTypeInfo.label);
-      });
+      result = result.filter((email) => {
+        const emailTypeInfo = getEmailTypeInfo(email.trigger_type)
+        return derivedEmailTypeFilters.includes(emailTypeInfo.label)
+      })
     }
 
     // Filter by vendor category (OR logic - email matches ANY selected category)
     if (derivedCategoryFilters.length > 0) {
-      result = result.filter(email => {
+      result = result.filter((email) => {
         // Helper function to infer email type using same logic as EmailRow.tsx
         const inferCategory = (): EmailCategory => {
-          const name = email.name.toLowerCase();
-          const trigger = email.trigger_type;
+          const name = email.name.toLowerCase()
+          const trigger = email.trigger_type
 
           // Check triggers first (more reliable than name patterns)
-          if (trigger.includes('payment')) return 'payment_reminders';
-          if (trigger === 'on_invitation_send' || trigger === 'on_application_submit' || trigger === 'on_approval' || trigger === 'on_rejection' || trigger === 'on_waitlist') return 'application_updates';
-          if (trigger === 'days_before_event' || trigger === 'on_event_date' || trigger === 'days_after_event') return 'event_countdown';
+          if (trigger.includes('payment')) return 'payment_reminders'
+          if (
+            trigger === 'on_invitation_send' ||
+            trigger === 'on_application_submit' ||
+            trigger === 'on_approval' ||
+            trigger === 'on_rejection' ||
+            trigger === 'on_waitlist'
+          )
+            return 'application_updates'
+          if (
+            trigger === 'days_before_event' ||
+            trigger === 'on_event_date' ||
+            trigger === 'days_after_event'
+          )
+            return 'event_countdown'
 
           // Then check name patterns
-          if (name.includes('payment')) return 'payment_reminders';
-          if (name.includes('application') || name.includes('approval') || name.includes('rejected') || name.includes('waitlist')) return 'application_updates';
-          if (name.includes('days before') || name.includes('day of')) return 'event_countdown';
-          if (name.includes('announcement') || name.includes('immediate')) return 'event_announcements';
+          if (name.includes('payment')) return 'payment_reminders'
+          if (
+            name.includes('application') ||
+            name.includes('approval') ||
+            name.includes('rejected') ||
+            name.includes('waitlist')
+          )
+            return 'application_updates'
+          if (name.includes('days before') || name.includes('day of')) return 'event_countdown'
+          if (name.includes('announcement') || name.includes('immediate'))
+            return 'event_announcements'
 
-          return 'event_announcements';
-        };
+          return 'event_announcements'
+        }
 
-        const emailCategory = email.email_template_item?.category || inferCategory();
+        const emailCategory = email.email_template_item?.category || inferCategory()
 
         // Check if email matches ANY of the selected category filters
-        return derivedCategoryFilters.some(categoryFilter => {
+        return derivedCategoryFilters.some((categoryFilter) => {
           // Filter by "All Invitations" - show only application emails without specific category
           if (categoryFilter === 'all_invitations') {
-            return !email.category_id && emailCategory === 'application_updates';
+            return !email.category_id && emailCategory === 'application_updates'
           }
 
           // Filter by "All Vendors" - show only announcement emails without specific category
           if (categoryFilter === 'all_vendors') {
-            return !email.category_id && emailCategory !== 'application_updates';
+            return !email.category_id && emailCategory !== 'application_updates'
           }
 
           // Filter by specific vendor category
           if (typeof categoryFilter === 'number') {
             // Include emails that have a matching category_id
             if (email.category_id && email.category_id === categoryFilter) {
-              return true;
+              return true
             }
             // For emails without a category_id (All Invitations / All Vendors)
             if (!email.category_id) {
               // Exclude "All Invitations" (application_updates) when filtering by specific category
               // because once someone has a vendor category, they're approved and won't receive application emails
               if (emailCategory === 'application_updates') {
-                return false;
+                return false
               }
 
               // Include "All Vendors" emails (announcements, event updates, etc.)
-              return true;
+              return true
             }
           }
 
-          return false;
-        });
-      });
+          return false
+        })
+      })
     }
 
     // Search by name or subject
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(email =>
-        email.name.toLowerCase().includes(query) ||
-        email.subject_template.toLowerCase().includes(query)
-      );
+      const query = searchQuery.toLowerCase()
+      result = result.filter(
+        (email) =>
+          email.name.toLowerCase().includes(query) ||
+          email.subject_template.toLowerCase().includes(query),
+      )
     }
 
     // If a column sort is active, use that
     if (sortColumn) {
       return [...result].sort((a, b) => {
-        let valA: string | number = '';
-        let valB: string | number = '';
+        let valA: string | number = ''
+        let valB: string | number = ''
 
         switch (sortColumn) {
           case 'name':
-            valA = a.name.toLowerCase();
-            valB = b.name.toLowerCase();
-            break;
+            valA = a.name.toLowerCase()
+            valB = b.name.toLowerCase()
+            break
           case 'subject':
-            valA = a.subject_template.toLowerCase();
-            valB = b.subject_template.toLowerCase();
-            break;
+            valA = a.subject_template.toLowerCase()
+            valB = b.subject_template.toLowerCase()
+            break
           case 'scheduled_for':
-            valA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
-            valB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
-            break;
+            valA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0
+            valB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0
+            break
           case 'email_type': {
             // Map trigger types to email type categories
             // Must match backend groupings in EmailTemplateItem::EVENT_WIDE_TRIGGERS and CATEGORY_SPECIFIC_TRIGGERS
@@ -465,33 +531,41 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
               days_before_event: 'event_countdown',
               on_event_date: 'event_countdown',
               days_after_event: 'event_countdown',
-            };
-            valA = (a.email_template_item?.email_type ?? toCat[a.trigger_type] ?? 'event_announcements').toLowerCase();
-            valB = (b.email_template_item?.email_type ?? toCat[b.trigger_type] ?? 'event_announcements').toLowerCase();
-            break;
+            }
+            valA = (
+              a.email_template_item?.email_type ??
+              toCat[a.trigger_type] ??
+              'event_announcements'
+            ).toLowerCase()
+            valB = (
+              b.email_template_item?.email_type ??
+              toCat[b.trigger_type] ??
+              'event_announcements'
+            ).toLowerCase()
+            break
           }
           case 'category':
-            valA = (a.category?.name ?? 'All').toLowerCase();
-            valB = (b.category?.name ?? 'All').toLowerCase();
-            break;
+            valA = (a.category?.name ?? 'All').toLowerCase()
+            valB = (b.category?.name ?? 'All').toLowerCase()
+            break
           case 'recipient_count':
-            valA = a.recipient_count ?? 0;
-            valB = b.recipient_count ?? 0;
-            break;
+            valA = a.recipient_count ?? 0
+            valB = b.recipient_count ?? 0
+            break
           case 'undelivered_count':
-            valA = a.undelivered_count ?? 0;
-            valB = b.undelivered_count ?? 0;
-            break;
+            valA = a.undelivered_count ?? 0
+            valB = b.undelivered_count ?? 0
+            break
           case 'status':
-            valA = a.status.toLowerCase();
-            valB = b.status.toLowerCase();
-            break;
+            valA = a.status.toLowerCase()
+            valB = b.status.toLowerCase()
+            break
         }
 
-        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-      });
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1
+        return 0
+      })
     }
 
     // Default: sort by trigger-type group, then by scheduled_for within each group
@@ -512,28 +586,36 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       on_event_cancel: 10,
       on_category_change: 10,
       on_bulletin_post: 10,
-    };
+    }
 
     return [...result].sort((a, b) => {
-      const groupA = TRIGGER_GROUP_ORDER[a.trigger_type] ?? 99;
-      const groupB = TRIGGER_GROUP_ORDER[b.trigger_type] ?? 99;
+      const groupA = TRIGGER_GROUP_ORDER[a.trigger_type] ?? 99
+      const groupB = TRIGGER_GROUP_ORDER[b.trigger_type] ?? 99
 
-      if (groupA !== groupB) return groupA - groupB;
+      if (groupA !== groupB) return groupA - groupB
 
-      const dateA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
-      const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
-      return dateA - dateB;
-    });
-  }, [emails, searchQuery, derivedStatusFilters, derivedEmailTypeFilters, derivedCategoryFilters, sortColumn, sortDirection]);
+      const dateA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0
+      const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0
+      return dateA - dateB
+    })
+  }, [
+    emails,
+    searchQuery,
+    derivedStatusFilters,
+    derivedEmailTypeFilters,
+    derivedCategoryFilters,
+    sortColumn,
+    sortDirection,
+  ])
 
   // Calculate statistics
   const stats = {
     total: emails.length,
-    scheduled: emails.filter(e => e.status === 'scheduled').length,
-    paused: emails.filter(e => e.status === 'paused').length,
-    sent: emails.filter(e => e.status === 'sent').length,
-    failed: emails.filter(e => e.status === 'failed').length,
-  };
+    scheduled: emails.filter((e) => e.status === 'scheduled').length,
+    paused: emails.filter((e) => e.status === 'paused').length,
+    sent: emails.filter((e) => e.status === 'sent').length,
+    failed: emails.filter((e) => e.status === 'failed').length,
+  }
 
   // Show full-screen audit log overlay
   if (viewState.view === 'audit-log' && eventData) {
@@ -543,7 +625,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         initialFilters={viewState.filters}
         onClose={() => setViewState({ view: 'table' })}
       />
-    );
+    )
   }
 
   // Show full-screen sequence editor overlay
@@ -554,25 +636,38 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         eventSlug={eventSlug}
         eventData={eventData}
         onBack={() => setViewState({ view: 'table' })}
-        onEditEmail={(email) => setViewState({ view: 'email-editor', email, returnTo: 'sequence-editor' })}
+        onEditEmail={(email) =>
+          setViewState({ view: 'email-editor', email, returnTo: 'sequence-editor' })
+        }
         onPause={handlePause}
         onResume={handleResume}
         onSendNow={isEventLive ? handleSendNow : undefined}
         onDelete={handleDelete}
-        onCreateEmail={(categoryId) => setViewState({ view: 'email-editor', email: null, returnTo: 'sequence-editor', sequenceContext: { categoryId } })}
+        onCreateEmail={(categoryId) =>
+          setViewState({
+            view: 'email-editor',
+            email: null,
+            returnTo: 'sequence-editor',
+            sequenceContext: { categoryId },
+          })
+        }
       />
-    );
+    )
   }
 
   // Show full-screen email editor (create or edit mode)
   if (viewState.view === 'email-editor') {
-    const isCreateMode = viewState.email === null;
+    const isCreateMode = viewState.email === null
     return (
       <EmailEditorPage
         email={viewState.email}
         eventData={eventData}
         eventSlug={eventSlug}
-        onBack={() => setViewState({ view: viewState.returnTo === 'sequence-editor' ? 'sequence-editor' : 'table' })}
+        onBack={() =>
+          setViewState({
+            view: viewState.returnTo === 'sequence-editor' ? 'sequence-editor' : 'table',
+          })
+        }
         onSave={handleSaveEdit}
         onCreate={isCreateMode ? handleCreateEmail : undefined}
         onDelete={handleDelete}
@@ -581,7 +676,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         isAdmin={isAdmin}
         sequenceContext={isCreateMode ? viewState.sequenceContext : undefined}
       />
-    );
+    )
   }
 
   if (isLoading) {
@@ -592,7 +687,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
           <p className="text-foreground/60">Loading email automation...</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -601,12 +696,8 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       <div className="mb-8">
         <div className="flex items-start justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              Email Automation
-            </h2>
-            <p className="text-foreground/60">
-              Manage automated emails for your event
-            </p>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Email Automation</h2>
+            <p className="text-foreground/60">Manage automated emails for your event</p>
           </div>
           <div className="flex items-center gap-3">
             {emails.length > 0 && (
@@ -642,7 +733,10 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
-            <label className="flex items-center gap-1.5 cursor-pointer" title="Auto-refresh every 30s">
+            <label
+              className="flex items-center gap-1.5 cursor-pointer"
+              title="Auto-refresh every 30s"
+            >
               <div className="relative">
                 <input
                   type="checkbox"
@@ -672,10 +766,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
           <p className="text-red-400 flex-1">{error}</p>
-          <button
-            onClick={() => setError(null)}
-            className="text-red-400 hover:text-red-300"
-          >
+          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-300">
             ×
           </button>
         </div>
@@ -687,11 +778,10 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-200/80 dark:bg-gradient-to-r dark:from-primary/30 dark:to-blue-500/30 border border-border mb-4">
             <Sparkles className="w-8 h-8 text-primary" />
           </div>
-          <h3 className="text-xl font-semibold text-foreground mb-2">
-            No Scheduled Emails Yet
-          </h3>
+          <h3 className="text-xl font-semibold text-foreground mb-2">No Scheduled Emails Yet</h3>
           <p className="text-foreground/60 mb-6 max-w-md mx-auto">
-            Generate automated emails from the system template to keep your vendors informed throughout the event lifecycle.
+            Generate automated emails from the system template to keep your vendors informed
+            throughout the event lifecycle.
           </p>
           <button
             onClick={handleGenerateEmails}
@@ -730,7 +820,10 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             </p>
             {(searchQuery || activeFilters.length > 0) && (
               <button
-                onClick={() => { setSearchQuery(''); setActiveFilters([]); }}
+                onClick={() => {
+                  setSearchQuery('')
+                  setActiveFilters([])
+                }}
                 className="text-sm text-primary hover:text-primary/70 transition-colors"
               >
                 Clear search
@@ -744,7 +837,8 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-white/70">
-                  This event has been cancelled. All emails are in read-only mode and cannot be edited, paused, or sent.
+                  This event has been cancelled. All emails are in read-only mode and cannot be
+                  edited, paused, or sent.
                 </p>
               </div>
             </div>
@@ -754,7 +848,11 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
           <EmailTable
             emails={filteredEmails}
             eventSlug={eventSlug}
-            onEdit={isEventCancelled ? undefined : (email) => setViewState({ view: 'email-editor', email, returnTo: 'table' })}
+            onEdit={
+              isEventCancelled
+                ? undefined
+                : (email) => setViewState({ view: 'email-editor', email, returnTo: 'table' })
+            }
             onPause={isEventCancelled ? undefined : handlePause}
             onResume={isEventCancelled ? undefined : handleResume}
             onSendNow={isEventLive && !isEventCancelled ? handleSendNow : undefined}
@@ -782,5 +880,5 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         isAdmin={isAdmin}
       />
     </div>
-  );
+  )
 }

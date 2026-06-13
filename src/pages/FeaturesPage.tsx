@@ -1,18 +1,10 @@
 import { useEffect } from 'react'
-import {
-  Shield,
-  ArrowRight,
-  CheckCircle,
-  Mail,
-  Users,
-  Search,
-  Zap
-} from "lucide-react"
-import { usePageTracking } from "@/hooks/usePageTracking"
-import { useSectionTracking } from "@/hooks/useSectionTracking"
-import { TrackedLink } from "@/components/analytics/TrackedLink"
-import Navigation from "@/components/Navigation"
-import Footer from "@/components/Footer"
+import { Shield, ArrowRight, CheckCircle, Mail, Users, Search, Zap } from 'lucide-react'
+import { usePageTracking } from '@/hooks/usePageTracking'
+import { useSectionTracking } from '@/hooks/useSectionTracking'
+import { TrackedLink } from '@/components/analytics/TrackedLink'
+import Navigation from '@/components/Navigation'
+import Footer from '@/components/Footer'
 import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function FeaturesPage() {
@@ -44,11 +36,15 @@ export default function FeaturesPage() {
         <div className="container mx-auto max-w-[1200px] relative z-10">
           <div className="text-center max-w-[800px] mx-auto">
             <h1 className="mb-5 text-[52px] font-display font-bold leading-[1.1] tracking-tight text-white md:text-[56px]">
-              Everything you need to <em className="not-italic bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] bg-clip-text text-transparent">run better shows</em>
+              Everything you need to{' '}
+              <em className="not-italic bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] bg-clip-text text-transparent">
+                run better events
+              </em>
             </h1>
 
             <p className="mx-auto mb-0 max-w-[600px] text-[18px] leading-relaxed text-white/65">
-              Artist coordination, automated communications, and relationship management — all in one platform designed for how you actually work.
+              Vendor coordination, automated communications, and relationship management — all in
+              one platform designed for how you actually work.
             </p>
           </div>
 
@@ -65,8 +61,12 @@ export default function FeaturesPage() {
       <section ref={featuresRef} className="bg-[#faf9fc] py-[100px] px-6 md:px-12">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">Core Features</div>
-            <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-slate-950">Built for your workflow</h2>
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">
+              Core Features
+            </div>
+            <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-slate-950">
+              Built for your workflow
+            </h2>
             <p className="text-[18px] text-gray-600 max-w-[600px]">
               Every feature designed to save you time and help you run more events with less stress.
             </p>
@@ -78,18 +78,26 @@ export default function FeaturesPage() {
               <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
                 <Mail className="h-6 w-6 text-violet-700" />
               </div>
-              <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-slate-950">Automated artist communication</h3>
+              <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-slate-950">
+                Automated vendor communication
+              </h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
-                Stop writing the same emails over and over. Application confirmations, approval notices, payment reminders, waitlist updates, and event-day details — all sent automatically from one branded email thread. Artists always know where they stand.
+                Stop writing the same emails over and over. Application confirmations, approval
+                notices, payment reminders, waitlist updates, and event-day details — all sent
+                automatically from one branded email thread. Vendors always know where they stand.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
-                  <span className="text-[15px] text-gray-700">Automated email sequences for every event stage</span>
+                  <span className="text-[15px] text-gray-700">
+                    Automated email sequences for every event stage
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
-                  <span className="text-[15px] text-gray-700">Branded emails that feel personal</span>
+                  <span className="text-[15px] text-gray-700">
+                    Branded emails that feel personal
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
@@ -111,22 +119,32 @@ export default function FeaturesPage() {
               <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
                 <Users className="h-6 w-6 text-violet-700" />
               </div>
-              <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-slate-950">Artist relationships that compound</h3>
+              <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-slate-950">
+                Vendor relationships that compound
+              </h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
-                Stop rebuilding your roster from scratch every season. Track performance, notes, tags, and ratings across all your shows. CSV import for existing lists. Your best artists are always one search away.
+                Stop rebuilding your vendor list from scratch every season. Track performance,
+                notes, tags, and ratings across all your events. CSV import for existing lists. Your
+                best vendors are always one search away.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
-                  <span className="text-[15px] text-gray-700">Unified artist profiles across all shows</span>
+                  <span className="text-[15px] text-gray-700">
+                    Unified vendor profiles across all events
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
-                  <span className="text-[15px] text-gray-700">Performance tracking and ratings</span>
+                  <span className="text-[15px] text-gray-700">
+                    Performance tracking and ratings
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
-                  <span className="text-[15px] text-gray-700">CSV import for existing artist lists</span>
+                  <span className="text-[15px] text-gray-700">
+                    CSV import for existing vendor lists
+                  </span>
                 </div>
               </div>
             </div>
@@ -146,18 +164,26 @@ export default function FeaturesPage() {
               <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
                 <Search className="h-6 w-6 text-violet-700" />
               </div>
-              <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-slate-950">Fast application review</h3>
+              <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-slate-950">
+                Fast application review
+              </h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
-                Stop scrolling through 200 Instagram profiles one by one. Side-by-side portfolio comparison with integrated social profiles. One-click approve, waitlist, or reject. Bulk actions for faster decisions.
+                Stop scrolling through 200 Instagram profiles one by one. Side-by-side portfolio
+                comparison with integrated social profiles. One-click approve, waitlist, or reject.
+                Bulk actions for faster decisions.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
-                  <span className="text-[15px] text-gray-700">Side-by-side application comparison</span>
+                  <span className="text-[15px] text-gray-700">
+                    Side-by-side application comparison
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
-                  <span className="text-[15px] text-gray-700">Integrated social profiles and portfolios</span>
+                  <span className="text-[15px] text-gray-700">
+                    Integrated social profiles and portfolios
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
@@ -179,14 +205,20 @@ export default function FeaturesPage() {
               <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
                 <Zap className="h-6 w-6 text-violet-700" />
               </div>
-              <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-slate-950">Email automation without technical setup</h3>
+              <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-slate-950">
+                Email automation without technical setup
+              </h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
-                No Mailgun, no SendGrid, no developer needed. Application confirmations, approvals, rejections, waitlist notifications, payment reminders, and day-of logistics — all automated and customizable.
+                No Mailgun, no SendGrid, no developer needed. Application confirmations, approvals,
+                rejections, waitlist notifications, payment reminders, and day-of logistics — all
+                automated and customizable.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
-                  <span className="text-[15px] text-gray-700">Automated email triggers for every action</span>
+                  <span className="text-[15px] text-gray-700">
+                    Automated email triggers for every action
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
@@ -221,15 +253,20 @@ export default function FeaturesPage() {
             </div>
 
             <div className="mb-10 text-center">
-              <h2 className="mb-4 text-[36px] font-display font-bold text-white">Trust & Safety Commitment</h2>
+              <h2 className="mb-4 text-[36px] font-display font-bold text-white">
+                Trust & Safety Commitment
+              </h2>
               <p className="text-[18px] text-white/60">
-                We found that our users — especially those focused on art and community — really care about their data. They want privacy and a commitment that their data won't be sold to third parties.
+                We found that our users — especially those focused on art and community — really
+                care about their data. They want privacy and a commitment that their data won't be
+                sold to third parties.
               </p>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-white/6 p-10 backdrop-blur-sm">
               <p className="mb-6 text-[16px] leading-relaxed text-white/70">
-                <strong className="text-white">Trust is a huge part of community</strong>, and we want our users to feel safe. That's why we:
+                <strong className="text-white">Trust is a huge part of community</strong>, and we
+                want our users to feel safe. That's why we:
               </p>
 
               <div className="space-y-4">
@@ -237,7 +274,10 @@ export default function FeaturesPage() {
                   <CheckCircle className="h-6 w-6 text-voxxy-pink flex-shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-white">Never sell your data</strong>
-                    <span className="text-white/60"> to third parties without explicit consent</span>
+                    <span className="text-white/60">
+                      {' '}
+                      to third parties without explicit consent
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -258,7 +298,10 @@ export default function FeaturesPage() {
                   <CheckCircle className="h-6 w-6 text-voxxy-pink flex-shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-white">Transparent about data usage</strong>
-                    <span className="text-white/60"> — you always know what we do with your information</span>
+                    <span className="text-white/60">
+                      {' '}
+                      — you always know what we do with your information
+                    </span>
                   </div>
                 </div>
               </div>
@@ -287,7 +330,7 @@ export default function FeaturesPage() {
               link_text: 'Request Access',
               destination_page: 'Contact',
               current_page: 'Features',
-              link_position: 'cta_section'
+              link_position: 'cta_section',
             }}
           >
             Request Access <ArrowRight className="ml-2 h-5 w-5" />

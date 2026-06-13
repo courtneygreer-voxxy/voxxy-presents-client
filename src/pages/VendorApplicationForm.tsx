@@ -170,7 +170,8 @@ export default function VendorApplicationForm() {
 
     autoSaveTimerRef.current = setTimeout(() => {
       // Only save if form has been touched (not all defaults)
-      const hasData = formData.first_name || formData.last_name || formData.email || formData.phone
+      const hasData =
+        formData.first_name || formData.last_name || formData.email || formData.business_name
       if (hasData) {
         saveFormData(formId, formData)
         console.log('[AutoSave] Form data saved')
@@ -222,6 +223,7 @@ export default function VendorApplicationForm() {
         email: data.email || prev.email,
         first_name: data.first_name || prev.first_name,
         last_name: data.last_name || prev.last_name,
+        business_name: data.business_name || prev.business_name,
       }))
 
       console.log('Form pre-filled with invitation data')
@@ -240,7 +242,7 @@ export default function VendorApplicationForm() {
 
     if (saved) {
       // Restore all fields except internal metadata
-      const { ...savedFormData } = saved
+      const { _timestamp, _formId, ...savedFormData } = saved
       setFormData((prev) => ({
         ...prev,
         ...savedFormData,
@@ -621,17 +623,20 @@ export default function VendorApplicationForm() {
                     required
                   />
                 </div>
+
                 <div>
                   <label className="block text-xs font-medium text-foreground mb-1.5">
-                    Last Name <span className="text-red-600 dark:text-red-400">*</span>
+                    Business/Brand Name{' '}
+                    <span className="text-muted-foreground text-[10px] ml-1 font-normal">
+                      (optional)
+                    </span>
                   </label>
                   <input
                     type="text"
-                    value={formData.last_name}
-                    onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                    placeholder="Your last name"
+                    value={formData.business_name}
+                    onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
+                    placeholder="Your business or brand name"
                     className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
-                    required
                   />
                 </div>
 

@@ -5,6 +5,7 @@
 The Voxxy Presents application provides a **public-facing guest application system** that allows non-logged-in users to apply for vendor spots at events and track their application status. The system is designed for **vendor applications** (businesses applying to participate in events), not traditional guest/attendee RSVP functionality.
 
 Currently, there is **NO traditional guest registration system** for general event attendees. The application is primarily focused on:
+
 1. Vendor application management (public form)
 2. Application tracking (public lookup)
 3. Producer/venue owner management of applications
@@ -39,12 +40,14 @@ Browse Event → View Event Details → Apply as Vendor → Confirmation → Tra
 **Authentication:** Not required
 
 #### What Guests Can Do:
+
 - View public event details (name, description, date, time, location)
 - See event capacity (total registered/remaining attendees)
 - View ticket pricing and external ticket URL
 - See if the event has vendor opportunities
 
 #### Key Information Displayed:
+
 - Event title, description, and poster image
 - Date and time (formatted for user's locale)
 - Location
@@ -53,6 +56,7 @@ Browse Event → View Event Details → Apply as Vendor → Confirmation → Tra
 - Organization/Producer name
 
 #### API Endpoint Used:
+
 ```
 GET /api/v1/presents/events/:slug
 Authentication: Not required
@@ -63,10 +67,12 @@ Authentication: Not required
 ### Stage 2: Applying as Vendor
 
 **Public Routes:**
+
 - `/events/:slug/apply` - Vendor application form
 - `/apply/:code` - Short link redirect to application
 
-**Components:** 
+**Components:**
+
 - `VendorApplicationForm`
 - `ShortLinkRedirectPage`
 
@@ -79,6 +85,7 @@ The main vendor application flow for guests:
 **Page:** `/events/:slug/apply`
 
 **Form Fields:**
+
 1. **Email Address** (required)
 2. **Phone Number** (optional)
 3. **Business Name** (required)
@@ -86,6 +93,7 @@ The main vendor application flow for guests:
 5. **Newsletter Subscription** (checkbox, default enabled)
 
 #### API Endpoint Used (Public, No Auth):
+
 ```
 POST /api/v1/presents/events/:slug/registrations
 Authentication: Not required
@@ -124,6 +132,7 @@ Response:
 **Authentication:** Not required
 
 #### What Guests See:
+
 - Success message and confirmation icon
 - **Application ID (Ticket Code)** - displayed prominently for tracking
 - Instructions on what happens next
@@ -140,12 +149,14 @@ Response:
 **Authentication:** Not required
 
 #### What Guests Can Do:
+
 - Look up their application by ticket code
 - View current application status
 - See detailed application information
 - View event details
 
 #### Application Status Options:
+
 1. **Pending** (blue) - Under review
 2. **Approved** (green) - Approved with next steps
 3. **Rejected** (red) - Not selected
@@ -153,6 +164,7 @@ Response:
 5. **Confirmed** (purple) - Spot confirmed
 
 #### API Endpoint Used (Public, No Auth):
+
 ```
 GET /api/v1/presents/registrations/track/:ticket_code
 Authentication: Not required
@@ -167,15 +179,18 @@ Authentication: Not required
 **Authentication:** Not required
 
 #### Purpose:
+
 Allows producers to share shortened, branded links for vendor applications.
 
 #### How It Works:
+
 1. Guest clicks a short link like `voxxypresents.com/apply/ABC123`
 2. Page fetches event data using the code
 3. Automatically redirects to `/events/:slug/apply` for the actual application
 4. Guest proceeds with normal vendor application flow
 
 #### API Endpoint Used (Public, No Auth):
+
 ```
 GET /api/v1/presents/vendor_applications/lookup/:code
 Authentication: Not required
@@ -187,14 +202,14 @@ Authentication: Not required
 
 ### Guest-Accessible Routes (No Authentication Required)
 
-| Route | Purpose | Component | Auth |
-|-------|---------|-----------|------|
-| `/events/:slug` | View event details and discover vendor opportunities | `PublicEventDetailPage` | ❌ No |
-| `/events/:slug/apply` | Submit vendor application | `VendorApplicationForm` | ❌ No |
-| `/applications/success` | Confirm successful application submission | `ApplicationConfirmationPage` | ❌ No |
-| `/applications/track/:ticketCode` | Track application status | `ApplicationTrackingPage` | ❌ No |
-| `/apply/:code` | Redirect from short link to vendor application | `ShortLinkRedirectPage` | ❌ No |
-| `/` | Homepage with event discovery | `HomePage` | ❌ No |
+| Route                             | Purpose                                              | Component                     | Auth  |
+| --------------------------------- | ---------------------------------------------------- | ----------------------------- | ----- |
+| `/events/:slug`                   | View event details and discover vendor opportunities | `PublicEventDetailPage`       | ❌ No |
+| `/events/:slug/apply`             | Submit vendor application                            | `VendorApplicationForm`       | ❌ No |
+| `/applications/success`           | Confirm successful application submission            | `ApplicationConfirmationPage` | ❌ No |
+| `/applications/track/:ticketCode` | Track application status                             | `ApplicationTrackingPage`     | ❌ No |
+| `/apply/:code`                    | Redirect from short link to vendor application       | `ShortLinkRedirectPage`       | ❌ No |
+| `/`                               | Homepage with event discovery                        | `HomePage`                    | ❌ No |
 
 ---
 
@@ -203,6 +218,7 @@ Authentication: Not required
 ### Public (No Auth Required) Endpoints
 
 #### 1. Get Event Details
+
 ```
 GET /api/v1/presents/events/:slug
 Purpose: View public event information
@@ -210,6 +226,7 @@ Authentication: Not required
 ```
 
 #### 2. Submit Vendor Application
+
 ```
 POST /api/v1/presents/events/:slug/registrations
 Purpose: Guest submits vendor application
@@ -218,6 +235,7 @@ Required fields: email, business_name, vendor_category, vendor_application_id
 ```
 
 #### 3. Track Application Status
+
 ```
 GET /api/v1/presents/registrations/track/:ticket_code
 Purpose: Look up application status by ticket code
@@ -225,6 +243,7 @@ Authentication: Not required
 ```
 
 #### 4. Lookup Event by Shareable Code
+
 ```
 GET /api/v1/presents/vendor_applications/lookup/:code
 Purpose: Resolve short link to event
@@ -240,12 +259,12 @@ Authentication: Not required
 ```typescript
 interface Registration {
   id: number
-  ticket_code: string        // Unique tracking code
+  ticket_code: string // Unique tracking code
   email: string
   business_name: string
   vendor_category: string
   status: 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed'
-  created_at: string         // ISO 8601 timestamp
+  created_at: string // ISO 8601 timestamp
   event: {
     id: number
     title: string
@@ -264,11 +283,11 @@ interface Event {
   title: string
   slug: string
   description?: string
-  dates: { start?: string, end?: string }
+  dates: { start?: string; end?: string }
   location?: string
   poster_url?: string
-  ticket_url?: string        // External ticket link
-  pricing: { ticket_price?: number, currency: string }
+  ticket_url?: string // External ticket link
+  pricing: { ticket_price?: number; currency: string }
   capacity: {
     total?: number
     registered?: number
@@ -281,7 +300,8 @@ interface Event {
     city?: string
     state?: string
   }
-  vendor_application?: {      // Only if event accepts vendors
+  vendor_application?: {
+    // Only if event accepts vendors
     id: number
     name: string
     description?: string
@@ -341,6 +361,7 @@ GUEST USER JOURNEY
 ### For Guests/Vendors
 
 ✅ **Can do:**
+
 - Browse events without account
 - View event details (date, time, location, capacity)
 - Apply for vendor opportunities
@@ -349,6 +370,7 @@ GUEST USER JOURNEY
 - Get email notifications (if subscribed)
 
 ❌ **Cannot do:**
+
 - Create account without contacting support (beta access)
 - Purchase tickets through platform (external link provided)
 - RSVP as general attendee (vendor-only application)
@@ -380,6 +402,7 @@ GUEST USER JOURNEY
 ## Files & Components Reference
 
 ### Pages
+
 - `/src/pages/PublicEventDetailPage.tsx` - Event detail view
 - `/src/pages/VendorApplicationForm.tsx` - Application form
 - `/src/pages/ApplicationConfirmationPage.tsx` - Confirmation after submit
@@ -387,9 +410,11 @@ GUEST USER JOURNEY
 - `/src/pages/ShortLinkRedirectPage.tsx` - Short link redirect
 
 ### API Service
+
 - `/src/services/api.ts` - Contains registrationsApi and vendorApplicationsApi
 
 ### Key API Methods
+
 ```typescript
 registrationsApi.submitVendorApplication(eventSlug, data)
 registrationsApi.trackByTicketCode(ticketCode)
@@ -404,6 +429,7 @@ eventsApi.getById(slug)
 The Voxxy Presents application implements a **complete vendor application workflow** for guests without authentication. The system is well-designed for its specific use case: allowing producers to accept vendor applications for events.
 
 However, it **does not support traditional guest/attendee registration or RSVP**. Guests can only:
+
 1. View event details
 2. Apply as vendors
 3. Track their vendor application

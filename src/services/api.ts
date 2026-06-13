@@ -3344,6 +3344,7 @@ export const eventInvitationsApi = {
       email: string
       first_name: string
       last_name: string
+      business_name: string
     }>(`/v1/presents/invitations/prefill/${token}`)
   },
 }

@@ -12,9 +12,7 @@ export function resolveEventLocation(event: Record<string, unknown>): string {
   return ''
 }
 
-export function buildEventLocationMap(
-  events: Record<string, unknown>[]
-): Map<number, string> {
+export function buildEventLocationMap(events: Record<string, unknown>[]): Map<number, string> {
   const map = new Map<number, string>()
   for (const ev of events) {
     const id = Number(ev.id)

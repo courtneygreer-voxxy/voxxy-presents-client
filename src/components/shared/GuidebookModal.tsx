@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { X, ChevronLeft, ChevronRight, Users, Tag, Mail, Calendar, BookOpen } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { useState } from 'react'
+import { X, ChevronLeft, ChevronRight, Users, Tag, Mail, Calendar, BookOpen } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 // --- Page content ---
 
 interface GuidePage {
-  section: string;
-  title: string;
-  content: React.ReactNode;
+  section: string
+  title: string
+  content: React.ReactNode
 }
 
 const GUIDE_PAGES: GuidePage[] = [
@@ -18,9 +18,8 @@ const GUIDE_PAGES: GuidePage[] = [
     content: (
       <div className="space-y-3">
         <p>
-          Voxxy helps you manage vendor markets and fairs from one
-          dashboard. This guide walks you through the key features so you can
-          get up and running quickly.
+          Voxxy helps you manage vendor markets and fairs from one dashboard. This guide walks you
+          through the key features so you can get up and running quickly.
         </p>
         <div className="grid grid-cols-2 gap-2">
           {[
@@ -29,7 +28,10 @@ const GUIDE_PAGES: GuidePage[] = [
             { icon: Mail, label: 'Emails', desc: 'Automated communications' },
             { icon: Calendar, label: 'Events', desc: 'Create & manage markets' },
           ].map(({ icon: Icon, label, desc }) => (
-            <div key={label} className="flex items-start gap-2 p-2.5 rounded-lg bg-background/5 border border-border">
+            <div
+              key={label}
+              className="flex items-start gap-2 p-2.5 rounded-lg bg-background/5 border border-border"
+            >
               <Icon className="w-4 h-4 text-primary dark:text-primary mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-xs font-semibold text-foreground">{label}</p>
@@ -52,32 +54,57 @@ const GUIDE_PAGES: GuidePage[] = [
     content: (
       <div className="space-y-3">
         <p>
-          The <strong>Network</strong> tab is your vendor database. Start by
-          importing your existing contacts.
+          The <strong>Network</strong> tab is your vendor database. Start by importing your existing
+          contacts.
         </p>
         <ol className="space-y-2 text-foreground/80">
           <li className="flex gap-2">
-            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">1</Badge>
-            <span>Go to the <strong>Network</strong> tab in the sidebar.</span>
+            <Badge
+              variant="tintPurple"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold"
+            >
+              1
+            </Badge>
+            <span>
+              Go to the <strong>Network</strong> tab in the sidebar.
+            </span>
           </li>
           <li className="flex gap-2">
-            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">2</Badge>
-            <span>Click <strong>Import CSV</strong> to upload a spreadsheet of vendors.</span>
+            <Badge
+              variant="tintPurple"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold"
+            >
+              2
+            </Badge>
+            <span>
+              Click <strong>Import CSV</strong> to upload a spreadsheet of vendors.
+            </span>
           </li>
           <li className="flex gap-2">
-            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">3</Badge>
+            <Badge
+              variant="tintPurple"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold"
+            >
+              3
+            </Badge>
             <span>Map your columns (name, email, phone, category) and confirm.</span>
           </li>
           <li className="flex gap-2">
-            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">4</Badge>
-            <span>You can also click <strong>Add Contact</strong> to add vendors one at a time.</span>
+            <Badge
+              variant="tintPurple"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold"
+            >
+              4
+            </Badge>
+            <span>
+              You can also click <strong>Add Contact</strong> to add vendors one at a time.
+            </span>
           </li>
         </ol>
         <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
           <p className="text-[11px] text-blue-900 dark:text-blue-300">
-            <strong>Tip:</strong> If you're migrating from a Google Sheet, export
-            it as CSV first — the importer handles most common column names
-            automatically.
+            <strong>Tip:</strong> If you're migrating from a Google Sheet, export it as CSV first —
+            the importer handles most common column names automatically.
           </p>
         </div>
       </div>
@@ -90,9 +117,7 @@ const GUIDE_PAGES: GuidePage[] = [
     title: 'Editing & Managing Contacts',
     content: (
       <div className="space-y-3">
-        <p>
-          Click any contact row to view their details. From there you can:
-        </p>
+        <p>Click any contact row to view their details. From there you can:</p>
         <ul className="space-y-1.5">
           {[
             'Update name, email, phone, or business name',
@@ -107,9 +132,8 @@ const GUIDE_PAGES: GuidePage[] = [
           ))}
         </ul>
         <p>
-          Use the <strong>search bar</strong> at the top to quickly find a
-          contact by name, email, or business. Filters let you narrow by
-          category, tags, or status.
+          Use the <strong>search bar</strong> at the top to quickly find a contact by name, email,
+          or business. Filters let you narrow by category, tags, or status.
         </p>
       </div>
     ),
@@ -121,24 +145,24 @@ const GUIDE_PAGES: GuidePage[] = [
     title: 'Creating Lists',
     content: (
       <div className="space-y-3">
-        <p>
-          Lists let you group contacts for targeted outreach. There are two
-          types:
-        </p>
+        <p>Lists let you group contacts for targeted outreach. There are two types:</p>
         <div className="space-y-2">
           <div className="p-2.5 rounded-lg bg-background/5 border border-border">
-            <p className="text-xs font-semibold text-violet-900 dark:text-primary mb-1">Smart Lists</p>
+            <p className="text-xs font-semibold text-violet-900 dark:text-primary mb-1">
+              Smart Lists
+            </p>
             <p className="text-[11px] text-foreground/60">
-              Auto-update based on rules you set (e.g. "all contacts tagged
-              'returning vendor'"). Members update automatically as contacts
-              change.
+              Auto-update based on rules you set (e.g. "all contacts tagged 'returning vendor'").
+              Members update automatically as contacts change.
             </p>
           </div>
           <div className="p-2.5 rounded-lg bg-background/5 border border-border">
-            <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-1">Manual Lists</p>
+            <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-1">
+              Manual Lists
+            </p>
             <p className="text-[11px] text-foreground/60">
-              Hand-pick specific contacts. Great for VIP vendors, priority
-              invites, or custom groups that don't follow a pattern.
+              Hand-pick specific contacts. Great for VIP vendors, priority invites, or custom groups
+              that don't follow a pattern.
             </p>
           </div>
         </div>
@@ -157,8 +181,8 @@ const GUIDE_PAGES: GuidePage[] = [
     content: (
       <div className="space-y-3">
         <p>
-          Categories define the types of vendors at your events — like "Food
-          Vendor", "Artisan", "Jewelry", or "Live Music".
+          Categories define the types of vendors at your events — like "Food Vendor", "Artisan",
+          "Jewelry", or "Live Music".
         </p>
         <p>They are used in three key places:</p>
         <div className="space-y-2">
@@ -167,9 +191,8 @@ const GUIDE_PAGES: GuidePage[] = [
             <div>
               <p className="text-xs font-semibold text-foreground">Event Creation</p>
               <p className="text-[11px] text-foreground/60">
-                When setting up an event, you choose which categories are
-                accepting applications. Each category gets its own booth price
-                and application link.
+                When setting up an event, you choose which categories are accepting applications.
+                Each category gets its own booth price and application link.
               </p>
             </div>
           </div>
@@ -178,8 +201,8 @@ const GUIDE_PAGES: GuidePage[] = [
             <div>
               <p className="text-xs font-semibold text-foreground">Contact Assignments</p>
               <p className="text-[11px] text-foreground/60">
-                Assign a category to any contact in your network. This helps
-                you filter and find vendors by type.
+                Assign a category to any contact in your network. This helps you filter and find
+                vendors by type.
               </p>
             </div>
           </div>
@@ -188,8 +211,8 @@ const GUIDE_PAGES: GuidePage[] = [
             <div>
               <p className="text-xs font-semibold text-foreground">Targeted Emails</p>
               <p className="text-[11px] text-foreground/60">
-                Send category-specific emails — for example, "Food Vendor
-                Setup Instructions" that only food vendors receive.
+                Send category-specific emails — for example, "Food Vendor Setup Instructions" that
+                only food vendors receive.
               </p>
             </div>
           </div>
@@ -206,27 +229,45 @@ const GUIDE_PAGES: GuidePage[] = [
       <div className="space-y-3">
         <ol className="space-y-2 text-foreground/80">
           <li className="flex gap-2">
-            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">1</Badge>
-            <span>Go to <strong>Network → Categories</strong> tab.</span>
+            <Badge
+              variant="tintPurple"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold"
+            >
+              1
+            </Badge>
+            <span>
+              Go to <strong>Network → Categories</strong> tab.
+            </span>
           </li>
           <li className="flex gap-2">
-            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">2</Badge>
-            <span>Click <strong>Add Category</strong> and enter a name (e.g. "Food Vendor").</span>
+            <Badge
+              variant="tintPurple"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold"
+            >
+              2
+            </Badge>
+            <span>
+              Click <strong>Add Category</strong> and enter a name (e.g. "Food Vendor").
+            </span>
           </li>
           <li className="flex gap-2">
-            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">3</Badge>
+            <Badge
+              variant="tintPurple"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold"
+            >
+              3
+            </Badge>
             <span>Optionally pick a color and icon to make it easy to spot.</span>
           </li>
         </ol>
         <p>
-          Once created, categories appear automatically in the event creation
-          wizard, in the contact editor, and in email targeting options.
+          Once created, categories appear automatically in the event creation wizard, in the contact
+          editor, and in email targeting options.
         </p>
         <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
           <p className="text-[11px] text-blue-900 dark:text-blue-300">
-            <strong>Tip:</strong> Keep category names short and consistent. They
-            appear on public application forms, so "Food & Beverage" reads better
-            than "food_vendors_category_1".
+            <strong>Tip:</strong> Keep category names short and consistent. They appear on public
+            application forms, so "Food & Beverage" reads better than "food_vendors_category_1".
           </p>
         </div>
       </div>
@@ -240,22 +281,42 @@ const GUIDE_PAGES: GuidePage[] = [
     content: (
       <div className="space-y-3">
         <p>
-          Each event comes with a full <strong>email sequence</strong> — a set
-          of automated emails that send at the right time throughout your
-          event lifecycle.
+          Each event comes with a full <strong>email sequence</strong> — a set of automated emails
+          that send at the right time throughout your event lifecycle.
         </p>
-        <p className="text-foreground/70">
-          Emails are organized into five groups:
-        </p>
+        <p className="text-foreground/70">Emails are organized into five groups:</p>
         <div className="space-y-1.5">
           {[
-            { label: 'Event Announcements', desc: 'Invitations and application opens', color: 'text-violet-900 dark:text-primary' },
-            { label: 'Application Updates', desc: 'Approvals, rejections, waitlist notices', color: 'text-rose-900 dark:text-pink-300' },
-            { label: 'Payment Reminders', desc: 'Booth fees, deadlines, and overdue alerts', color: 'text-blue-900 dark:text-blue-300' },
-            { label: 'Event Countdown', desc: 'Setup instructions and final reminders', color: 'text-emerald-900 dark:text-green-300' },
-            { label: 'Post-Event', desc: 'Thank you notes and follow-ups', color: 'text-amber-950 dark:text-yellow-300' },
+            {
+              label: 'Event Announcements',
+              desc: 'Invitations and application opens',
+              color: 'text-violet-900 dark:text-primary',
+            },
+            {
+              label: 'Application Updates',
+              desc: 'Approvals, rejections, waitlist notices',
+              color: 'text-rose-900 dark:text-pink-300',
+            },
+            {
+              label: 'Payment Reminders',
+              desc: 'Booth fees, deadlines, and overdue alerts',
+              color: 'text-blue-900 dark:text-blue-300',
+            },
+            {
+              label: 'Event Countdown',
+              desc: 'Setup instructions and final reminders',
+              color: 'text-emerald-900 dark:text-green-300',
+            },
+            {
+              label: 'Post-Event',
+              desc: 'Thank you notes and follow-ups',
+              color: 'text-amber-950 dark:text-yellow-300',
+            },
           ].map(({ label, desc, color }) => (
-            <div key={label} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-background/5">
+            <div
+              key={label}
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-background/5"
+            >
               <span className={`text-xs font-semibold ${color}`}>{label}</span>
               <span className="text-[11px] text-foreground/40">— {desc}</span>
             </div>
@@ -271,28 +332,33 @@ const GUIDE_PAGES: GuidePage[] = [
     title: 'Email Types & Triggers',
     content: (
       <div className="space-y-3">
-        <p>Every email has a <strong>trigger</strong> that determines when it sends:</p>
+        <p>
+          Every email has a <strong>trigger</strong> that determines when it sends:
+        </p>
         <div className="space-y-2">
           <div className="p-2.5 rounded-lg bg-background/5 border border-border">
-            <p className="text-xs font-semibold text-emerald-900 dark:text-green-300 mb-1">Event-Based (Instant)</p>
+            <p className="text-xs font-semibold text-emerald-900 dark:text-green-300 mb-1">
+              Event-Based (Instant)
+            </p>
             <p className="text-[11px] text-foreground/60">
-              Send immediately when something happens — a vendor applies, gets
-              approved, makes a payment, or you post a bulletin.
+              Send immediately when something happens — a vendor applies, gets approved, makes a
+              payment, or you post a bulletin.
             </p>
           </div>
           <div className="p-2.5 rounded-lg bg-background/5 border border-border">
-            <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-1">Time-Based (Scheduled)</p>
+            <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-1">
+              Time-Based (Scheduled)
+            </p>
             <p className="text-[11px] text-foreground/60">
-              Send on a specific date — like 7 days before the event, on the
-              payment deadline, or 3 days after the event. All scheduled
-              emails send at 8:00 AM Eastern.
+              Send on a specific date — like 7 days before the event, on the payment deadline, or 3
+              days after the event. All scheduled emails send at 8:00 AM Eastern.
             </p>
           </div>
         </div>
         <p className="text-foreground/80">
           You can <strong>pause</strong> any email to temporarily stop it,
-          <strong> resume</strong> it later, or <strong>send it now</strong>{' '}
-          manually (once your event is live).
+          <strong> resume</strong> it later, or <strong>send it now</strong> manually (once your
+          event is live).
         </p>
       </div>
     ),
@@ -307,27 +373,28 @@ const GUIDE_PAGES: GuidePage[] = [
         <p>Emails can target all vendors or just specific categories:</p>
         <div className="space-y-2">
           <div className="p-2.5 rounded-lg bg-primary/10 border border-primary/20">
-            <p className="text-xs font-semibold text-violet-900 dark:text-primary mb-1">Universal Emails</p>
+            <p className="text-xs font-semibold text-violet-900 dark:text-primary mb-1">
+              Universal Emails
+            </p>
             <p className="text-[11px] text-foreground/60">
-              Sent to <em>every</em> vendor regardless of category. Use these
-              for event-wide announcements, general reminders, and post-event
-              follow-ups.
+              Sent to <em>every</em> vendor regardless of category. Use these for event-wide
+              announcements, general reminders, and post-event follow-ups.
             </p>
           </div>
           <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
-            <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-1">Category-Specific Emails</p>
+            <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-1">
+              Category-Specific Emails
+            </p>
             <p className="text-[11px] text-foreground/60">
-              Sent only to vendors in a particular category. Perfect for
-              tailored setup instructions, category-specific pricing, or
-              booth assignment details.
+              Sent only to vendors in a particular category. Perfect for tailored setup
+              instructions, category-specific pricing, or booth assignment details.
             </p>
           </div>
         </div>
         <div className="p-2.5 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
           <p className="text-[11px] text-amber-950 dark:text-yellow-300">
-            <strong>Note:</strong> Invitation and announcement emails are always
-            universal — category targeting becomes available for emails sent
-            after a vendor applies.
+            <strong>Note:</strong> Invitation and announcement emails are always universal —
+            category targeting becomes available for emails sent after a vendor applies.
           </p>
         </div>
       </div>
@@ -341,12 +408,11 @@ const GUIDE_PAGES: GuidePage[] = [
     content: (
       <div className="space-y-3">
         <p>
-          Make emails personal by inserting <strong>tags</strong> that auto-fill
-          with each vendor's info when sent.
+          Make emails personal by inserting <strong>tags</strong> that auto-fill with each vendor's
+          info when sent.
         </p>
         <p className="text-foreground/70">
-          In the email editor, click any tag in the sidebar to insert it.
-          Tags use bracket format:
+          In the email editor, click any tag in the sidebar to insert it. Tags use bracket format:
         </p>
         <div className="grid grid-cols-2 gap-1.5">
           {[
@@ -366,8 +432,8 @@ const GUIDE_PAGES: GuidePage[] = [
           ))}
         </div>
         <p className="text-[11px] text-foreground/50">
-          The editor shows a live preview so you can see exactly how the email
-          will look before sending.
+          The editor shows a live preview so you can see exactly how the email will look before
+          sending.
         </p>
       </div>
     ),
@@ -380,25 +446,53 @@ const GUIDE_PAGES: GuidePage[] = [
     content: (
       <div className="space-y-3">
         <p>
-          Events are the core of Voxxy. Each event represents a
-          vendor market or fair you're organizing.
+          Events are the core of Voxxy. Each event represents a vendor market or fair you're
+          organizing.
         </p>
         <ol className="space-y-2 text-foreground/80">
           <li className="flex gap-2">
-            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">1</Badge>
-            <span>Click <strong>Create New Event</strong> from the Events page.</span>
+            <Badge
+              variant="tintPurple"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold"
+            >
+              1
+            </Badge>
+            <span>
+              Click <strong>Create New Event</strong> from the Events page.
+            </span>
           </li>
           <li className="flex gap-2">
-            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">2</Badge>
+            <Badge
+              variant="tintPurple"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold"
+            >
+              2
+            </Badge>
             <span>Fill in event details: name, date, venue, location, and description.</span>
           </li>
           <li className="flex gap-2">
-            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">3</Badge>
-            <span>Set up application categories — choose which vendor types you'll accept and set booth prices.</span>
+            <Badge
+              variant="tintPurple"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold"
+            >
+              3
+            </Badge>
+            <span>
+              Set up application categories — choose which vendor types you'll accept and set booth
+              prices.
+            </span>
           </li>
           <li className="flex gap-2">
-            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">4</Badge>
-            <span>Your event starts as a <strong>Draft</strong>. Go live when you're ready to start accepting applications.</span>
+            <Badge
+              variant="tintPurple"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold"
+            >
+              4
+            </Badge>
+            <span>
+              Your event starts as a <strong>Draft</strong>. Go live when you're ready to start
+              accepting applications.
+            </span>
           </li>
         </ol>
       </div>
@@ -412,8 +506,8 @@ const GUIDE_PAGES: GuidePage[] = [
     content: (
       <div className="space-y-3">
         <p>
-          Once created, click <strong>Command Center</strong> to manage every
-          aspect of your event from one place.
+          Once created, click <strong>Command Center</strong> to manage every aspect of your event
+          from one place.
         </p>
         <div className="space-y-2">
           {[
@@ -451,17 +545,17 @@ const GUIDE_PAGES: GuidePage[] = [
     content: (
       <div className="space-y-3">
         <p>
-          Every event generates a full <strong>email sequence</strong> automatically.
-          Open the <strong>Sequence Editor</strong> from the Mail tab to see all
-          emails organized by category.
+          Every event generates a full <strong>email sequence</strong> automatically. Open the{' '}
+          <strong>Sequence Editor</strong> from the Mail tab to see all emails organized by
+          category.
         </p>
         <p className="text-foreground/70">From the sequence editor you can:</p>
         <ul className="space-y-1.5">
           {[
             'Preview and edit any email in the sequence',
-            'Pause emails you don\'t need right now',
+            "Pause emails you don't need right now",
             'Create new custom emails for specific situations',
-            'Delete emails that don\'t apply to your event',
+            "Delete emails that don't apply to your event",
             'Send test emails to yourself before going live',
           ].map((item, i) => (
             <li key={i} className="flex gap-2 items-start">
@@ -472,9 +566,8 @@ const GUIDE_PAGES: GuidePage[] = [
         </ul>
         <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
           <p className="text-[11px] text-blue-900 dark:text-blue-300">
-            <strong>Tip:</strong> Check the <strong>Audit Log</strong> after
-            sending to track deliveries, bounces, and opens. You can retry
-            failed sends with one click.
+            <strong>Tip:</strong> Check the <strong>Audit Log</strong> after sending to track
+            deliveries, bounces, and opens. You can retry failed sends with one click.
           </p>
         </div>
       </div>
@@ -491,13 +584,10 @@ const GUIDE_PAGES: GuidePage[] = [
           Need to send a quick update to all your vendors? Use <strong>Bulletins</strong>.
         </p>
         <p className="text-foreground/70">
-          Bulletins are one-off announcements you post from the Command Center.
-          When you post a bulletin, vendors with "bulletin" email notifications
-          enabled receive it automatically.
+          Bulletins are one-off announcements you post from the Command Center. When you post a
+          bulletin, vendors with "bulletin" email notifications enabled receive it automatically.
         </p>
-        <p className="text-foreground/70">
-          Common uses:
-        </p>
+        <p className="text-foreground/70">Common uses:</p>
         <ul className="space-y-1.5">
           {[
             'Weather updates or schedule changes',
@@ -514,11 +604,11 @@ const GUIDE_PAGES: GuidePage[] = [
       </div>
     ),
   },
-];
+]
 
 // --- Section navigation ---
 
-const SECTIONS = ['Welcome', 'Network', 'Categories', 'Emails', 'Events'] as const;
+const SECTIONS = ['Welcome', 'Network', 'Categories', 'Emails', 'Events'] as const
 
 const SECTION_ICONS: Record<string, React.ElementType> = {
   Welcome: BookOpen,
@@ -526,31 +616,31 @@ const SECTION_ICONS: Record<string, React.ElementType> = {
   Categories: Tag,
   Emails: Mail,
   Events: Calendar,
-};
+}
 
 // --- Component ---
 
 interface GuidebookModalProps {
-  open: boolean;
-  onClose: () => void;
+  open: boolean
+  onClose: () => void
 }
 
 export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
-  const [pageIndex, setPageIndex] = useState(0);
+  const [pageIndex, setPageIndex] = useState(0)
 
-  if (!open) return null;
+  if (!open) return null
 
-  const page = GUIDE_PAGES[pageIndex];
-  const isFirst = pageIndex === 0;
-  const isLast = pageIndex === GUIDE_PAGES.length - 1;
+  const page = GUIDE_PAGES[pageIndex]
+  const isFirst = pageIndex === 0
+  const isLast = pageIndex === GUIDE_PAGES.length - 1
 
   // Build section → first page index map
-  const sectionStartIndex: Record<string, number> = {};
+  const sectionStartIndex: Record<string, number> = {}
   GUIDE_PAGES.forEach((p, i) => {
     if (!(p.section in sectionStartIndex)) {
-      sectionStartIndex[p.section] = i;
+      sectionStartIndex[p.section] = i
     }
-  });
+  })
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
@@ -569,8 +659,8 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
           </div>
           <nav className="flex-1 space-y-0.5 px-2">
             {SECTIONS.map((section) => {
-              const Icon = SECTION_ICONS[section];
-              const isActiveSection = page.section === section;
+              const Icon = SECTION_ICONS[section]
+              const isActiveSection = page.section === section
               return (
                 <button
                   key={section}
@@ -584,7 +674,7 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
                   <Icon className="w-3.5 h-3.5" />
                   {section}
                 </button>
-              );
+              )
             })}
           </nav>
           <div className="px-4 pt-3 border-t border-border">
@@ -641,7 +731,9 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
                   key={i}
                   onClick={() => setPageIndex(i)}
                   className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                    i === pageIndex ? 'bg-primary dark:bg-primary' : 'bg-background/15 hover:bg-background/30'
+                    i === pageIndex
+                      ? 'bg-primary dark:bg-primary'
+                      : 'bg-background/15 hover:bg-background/30'
                   }`}
                 />
               ))}
@@ -650,9 +742,9 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
             <button
               onClick={() => {
                 if (isLast) {
-                  onClose();
+                  onClose()
                 } else {
-                  setPageIndex(pageIndex + 1);
+                  setPageIndex(pageIndex + 1)
                 }
               }}
               className="flex items-center gap-1 px-4 py-1.5 text-xs font-medium voxxy-btn-solid rounded-lg transition-colors"
@@ -664,5 +756,5 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

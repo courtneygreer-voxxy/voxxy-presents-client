@@ -6,7 +6,7 @@ import { readdirSync } from 'fs'
 const legalDir = path.resolve(__dirname, '../../pages/legal')
 const layoutSource = readFileSync(
   path.resolve(__dirname, '../../components/legal/LegalLayout.tsx'),
-  'utf-8'
+  'utf-8',
 )
 
 describe('LegalLayout — always forces light mode', () => {
@@ -43,9 +43,9 @@ describe('LegalLayout — always forces light mode', () => {
 })
 
 describe('Legal pages — no hard-coded gray text classes', () => {
-  const legalFiles = readdirSync(legalDir).filter(f => f.endsWith('.tsx'))
+  const legalFiles = readdirSync(legalDir).filter((f) => f.endsWith('.tsx'))
 
-  legalFiles.forEach(file => {
+  legalFiles.forEach((file) => {
     it(`${file} has no text-gray-* classes`, () => {
       const src = readFileSync(path.join(legalDir, file), 'utf-8')
       expect(src).not.toMatch(/text-gray-\d+/)

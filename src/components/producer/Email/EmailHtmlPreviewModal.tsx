@@ -5,26 +5,26 @@
  * and displays it in a secure sandboxed iframe with subject line.
  */
 
-import { useEffect, useState, useRef } from 'react';
-import { Eye, Loader2, Mail, AlertCircle } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react'
+import { Eye, Loader2, Mail, AlertCircle } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { getApiUrl } from '@/config/environments';
-import { getAuthToken } from '@/services/api';
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { getApiUrl } from '@/config/environments'
+import { getAuthToken } from '@/services/api'
 
 interface EmailHtmlPreviewModalProps {
-  open: boolean;
-  onClose: () => void;
-  previewUrl: string; // API endpoint URL to fetch HTML
-  subject?: string; // Optional: pass resolved subject directly
-  title?: string; // Modal title
-  apiMethod?: 'GET' | 'POST'; // HTTP method (GET for templates, POST for scheduled emails)
+  open: boolean
+  onClose: () => void
+  previewUrl: string // API endpoint URL to fetch HTML
+  subject?: string // Optional: pass resolved subject directly
+  title?: string // Modal title
+  apiMethod?: 'GET' | 'POST' // HTTP method (GET for templates, POST for scheduled emails)
 }
 
 export function EmailHtmlPreviewModal({
@@ -35,102 +35,104 @@ export function EmailHtmlPreviewModal({
   title = 'Email Preview',
   apiMethod = 'GET',
 }: EmailHtmlPreviewModalProps) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [htmlContent, setHtmlContent] = useState<string>('');
-  const [resolvedSubject, setResolvedSubject] = useState<string>(subject || '');
-  const [isMockData, setIsMockData] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [htmlContent, setHtmlContent] = useState<string>('')
+  const [resolvedSubject, setResolvedSubject] = useState<string>(subject || '')
+  const [isMockData, setIsMockData] = useState(false)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
 
   // Fetch HTML preview from backend
   const fetchPreview = async () => {
     if (!previewUrl) {
-      console.error('No preview URL provided');
-      return;
+      console.error('No preview URL provided')
+      return
     }
 
     // Construct full API URL
-    const apiBaseUrl = getApiUrl();
-    const fullUrl = `${apiBaseUrl}${previewUrl}`;
+    const apiBaseUrl = getApiUrl()
+    const fullUrl = `${apiBaseUrl}${previewUrl}`
 
-    console.log('Fetching preview from:', fullUrl);
-    console.log('Method:', apiMethod);
+    console.log('Fetching preview from:', fullUrl)
+    console.log('Method:', apiMethod)
 
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
 
     try {
       // Get auth token for Rails authentication
-      const token = getAuthToken();
-      const headers: Record<string, string> = {};
+      const token = getAuthToken()
+      const headers: Record<string, string> = {}
 
       if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-        console.log('Added auth token to request');
+        headers['Authorization'] = `Bearer ${token}`
+        console.log('Added auth token to request')
       } else {
-        console.warn('No auth token found - request may fail');
+        console.warn('No auth token found - request may fail')
       }
 
       // Fetch HTML from backend (.html extension tells Rails to return HTML format)
-      console.log('Fetching HTML...');
+      console.log('Fetching HTML...')
       const htmlResponse = await fetch(fullUrl, {
         method: apiMethod,
         credentials: 'include',
         headers,
-      });
+      })
 
-      console.log('HTML Response status:', htmlResponse.status);
-      console.log('HTML Response headers:', Object.fromEntries(htmlResponse.headers.entries()));
+      console.log('HTML Response status:', htmlResponse.status)
+      console.log('HTML Response headers:', Object.fromEntries(htmlResponse.headers.entries()))
 
       if (!htmlResponse.ok) {
-        const errorText = await htmlResponse.text();
-        console.error('HTML Response error:', errorText);
-        throw new Error(`Failed to load preview (${htmlResponse.status}): ${htmlResponse.statusText}`);
+        const errorText = await htmlResponse.text()
+        console.error('HTML Response error:', errorText)
+        throw new Error(
+          `Failed to load preview (${htmlResponse.status}): ${htmlResponse.statusText}`,
+        )
       }
 
-      const html = await htmlResponse.text();
-      console.log('Received HTML length:', html.length);
-      console.log('HTML preview (first 500 chars):', html.substring(0, 500));
+      const html = await htmlResponse.text()
+      console.log('Received HTML length:', html.length)
+      console.log('HTML preview (first 500 chars):', html.substring(0, 500))
 
-      setHtmlContent(html);
+      setHtmlContent(html)
 
       // If subject not provided, fetch JSON to get resolved subject
       if (!subject) {
-        console.log('Fetching subject from JSON...');
+        console.log('Fetching subject from JSON...')
         // Replace .html with .json in the URL
-        const jsonUrl = fullUrl.replace('.html', '.json');
+        const jsonUrl = fullUrl.replace('.html', '.json')
         const jsonResponse = await fetch(jsonUrl, {
           method: apiMethod,
           credentials: 'include',
           headers,
-        });
+        })
 
         if (jsonResponse.ok) {
-          const data = await jsonResponse.json();
-          console.log('JSON response:', data);
+          const data = await jsonResponse.json()
+          console.log('JSON response:', data)
           // Handle both response formats (template vs scheduled email)
-          setResolvedSubject(data.email_item?.subject || data.subject || '');
-          setIsMockData(data.sample_data_used || data.is_mock_data || false);
+          setResolvedSubject(data.email_item?.subject || data.subject || '')
+          setIsMockData(data.sample_data_used || data.is_mock_data || false)
         }
       } else {
-        console.log('Using provided subject:', subject);
+        console.log('Using provided subject:', subject)
       }
 
-      setLoading(false);
-      console.log('Preview fetch complete');
+      setLoading(false)
+      console.log('Preview fetch complete')
     } catch (err: any) {
-      console.error('Preview fetch error:', err);
-      setError(err.message || 'Failed to load email preview');
-      setLoading(false);
+      console.error('Preview fetch error:', err)
+      setError(err.message || 'Failed to load email preview')
+      setLoading(false)
     }
-  };
+  }
 
   // Fetch preview when modal opens or URL changes
   useEffect(() => {
     if (open && previewUrl) {
-      fetchPreview();
+      fetchPreview()
     }
-  }, [open, previewUrl]);
+  }, [open, previewUrl])
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -144,7 +146,8 @@ export function EmailHtmlPreviewModal({
           <DialogDescription className="text-foreground/60 text-sm flex items-start gap-2">
             <Eye className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <span>
-              This preview shows how your email will appear in recipients' inboxes with all variables resolved.
+              This preview shows how your email will appear in recipients' inboxes with all
+              variables resolved.
               {isMockData && (
                 <span className="block mt-1 text-amber-700 dark:text-yellow-400/80 text-xs">
                   � Using sample data (no registrations found for this event)
@@ -220,7 +223,8 @@ export function EmailHtmlPreviewModal({
         <div className="px-6 py-2 border-t border-border bg-muted/20 flex-shrink-0">
           <div className="flex items-center justify-between">
             <p className="text-xs text-foreground/50">
-              Preview rendered using {isMockData ? 'sample data' : 'actual event data'}. Variables are resolved to show actual values.
+              Preview rendered using {isMockData ? 'sample data' : 'actual event data'}. Variables
+              are resolved to show actual values.
             </p>
             <Button
               onClick={onClose}
@@ -234,5 +238,5 @@ export function EmailHtmlPreviewModal({
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

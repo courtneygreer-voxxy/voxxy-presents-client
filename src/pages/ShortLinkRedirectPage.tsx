@@ -1,51 +1,51 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { vendorApplicationsApi } from '@/services/api';
+import { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { vendorApplicationsApi } from '@/services/api'
 
 export default function ShortLinkRedirectPage() {
-  const { code } = useParams<{ code: string }>();
-  const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
+  const { code } = useParams<{ code: string }>()
+  const navigate = useNavigate()
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const lookupAndRedirect = async () => {
       if (!code) {
-        setError('No application code provided');
-        return;
+        setError('No application code provided')
+        return
       }
 
       try {
         // Lookup the event by shareable code
-        const eventData = await vendorApplicationsApi.lookupByCode(code);
+        const eventData = await vendorApplicationsApi.lookupByCode(code)
 
         // Extract the application ID from the vendor_applications array
         if (!eventData.vendor_applications || eventData.vendor_applications.length === 0) {
-          setError('No active applications found for this event');
-          return;
+          setError('No active applications found for this event')
+          return
         }
 
         // Find the specific application that matches the shareable_code
         const matchingApp = eventData.vendor_applications.find(
-          (app: any) => app.shareable_code === code
-        );
+          (app: any) => app.shareable_code === code,
+        )
 
         if (!matchingApp) {
-          setError('Application not found for this code');
-          return;
+          setError('Application not found for this code')
+          return
         }
 
-        const applicationId = matchingApp.id;
+        const applicationId = matchingApp.id
 
         // Redirect to the vendor application form for this event
-        navigate(`/events/${eventData.slug}/apply/${applicationId}`, { replace: true });
+        navigate(`/events/${eventData.slug}/apply/${applicationId}`, { replace: true })
       } catch (err: any) {
-        console.error('Failed to lookup application:', err);
-        setError(err.message || 'Application not found');
+        console.error('Failed to lookup application:', err)
+        setError(err.message || 'Application not found')
       }
-    };
+    }
 
-    lookupAndRedirect();
-  }, [code, navigate]);
+    lookupAndRedirect()
+  }, [code, navigate])
 
   if (error) {
     return (
@@ -76,7 +76,7 @@ export default function ShortLinkRedirectPage() {
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -86,5 +86,5 @@ export default function ShortLinkRedirectPage() {
         <p className="text-foreground/60">Loading application...</p>
       </div>
     </div>
-  );
+  )
 }
