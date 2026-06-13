@@ -12,6 +12,7 @@ import { Toaster } from 'sonner'
 import HomePage from './pages/HomePage'
 
 // Lazy load: Public Pages (load on-demand)
+const ArtistLandingPage = lazy(() => import('./pages/ArtistLandingPage'))
 const FeaturesPage = lazy(() => import('./pages/FeaturesPage'))
 const PricingPage = lazy(() => import('./pages/PricingPage'))
 const HelpPage = lazy(() => import('./pages/HelpPage'))

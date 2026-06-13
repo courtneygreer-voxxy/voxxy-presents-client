@@ -89,7 +89,6 @@ export default function VendorApplicationForm() {
     last_name: '',
     email: '',
     phone: '',
-    business_name: '',
     vendor_category: '',
     instagram_handle: '',
     tiktok_handle: '',
@@ -335,7 +334,6 @@ export default function VendorApplicationForm() {
             name: formData.first_name.concat(' ', formData.last_name).trim(),
             email: formData.email,
             phone: formData.phone,
-            business_name: formData.business_name,
             vendor_category: formData.vendor_category,
             vendor_application_id: Number(applicationId),
             subscribed: formData.subscribed,
@@ -612,33 +610,18 @@ export default function VendorApplicationForm() {
             <div>
               <h3 className="text-base font-semibold text-foreground mb-3">Your Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-foreground mb-1.5">
-                      First Name <span className="text-red-600 dark:text-red-400">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.first_name}
-                      onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                      placeholder="Your first name"
-                      className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-foreground mb-1.5">
-                      Last Name <span className="text-red-600 dark:text-red-400">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.last_name}
-                      onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                      placeholder="Your last name"
-                      className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
-                      required
-                    />
-                  </div>
+                <div>
+                  <label className="block text-xs font-medium text-foreground mb-1.5">
+                    First Name <span className="text-red-600 dark:text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.first_name}
+                    onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                    placeholder="Your first name"
+                    className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
+                    required
+                  />
                 </div>
 
                 <div>

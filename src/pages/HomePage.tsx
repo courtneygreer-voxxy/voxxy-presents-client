@@ -109,11 +109,13 @@ export default function HomePage() {
   const { sectionRef: problemsRef } = useSectionTracking({
     pageName: 'Home',
     sectionName: 'Problems',
+    threshold: 0.4,
   })
 
   const { sectionRef: featuresRef } = useSectionTracking({
     pageName: 'Home',
     sectionName: 'Features',
+    threshold: 0.4,
   })
 
   // Contact form state
@@ -223,16 +225,17 @@ export default function HomePage() {
                 <TrackedButton
                   className="h-auto inline-flex items-center rounded-xl voxxy-btn-brand px-6 py-3 text-[15px] font-semibold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
                   trackingData={{
-                    button_text: 'Request Access',
+                    button_text: 'Get Started',
                     button_location: 'hero',
                     page_name: 'Home',
                     is_primary_cta: true,
                   }}
+                  onClick={() => analytics.track('hero_cta_clicked', { button_text: 'Get Started', page: 'landing' })}
                   asChild
                 >
-                  <a href="#contact">
-                    Request Access <ArrowRight className="ml-2 h-5 w-5" />
-                  </a>
+                  <Link to="/signup">
+                    Get Started <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
                 </TrackedButton>
                 <TrackedButton
                   className="h-auto voxxy-btn-public-secondary inline-flex items-center rounded-xl px-6 py-3 text-[15px] font-semibold transition-all hover:-translate-y-0.5"
@@ -242,6 +245,7 @@ export default function HomePage() {
                     page_name: 'Home',
                     is_primary_cta: false,
                   }}
+                  onClick={() => analytics.track('hero_cta_clicked', { button_text: 'See How It Works', page: 'landing' })}
                   asChild
                 >
                   <Link to="/features">See How It Works</Link>

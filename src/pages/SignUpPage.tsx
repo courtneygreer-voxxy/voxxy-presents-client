@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, Sparkles } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { UnifiedSignUpForm } from '@/components/auth/UnifiedSignUpForm'
 import { usePageTracking } from '@/hooks/usePageTracking'
 import { useForceTheme } from '@/hooks/useForceTheme'
@@ -82,8 +82,9 @@ export default function SignUpPage() {
           <div className="max-w-md w-full space-y-8">
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8">
-              <Sparkles className="h-16 w-16 mx-auto text-primary mb-4" />
-              <h1 className="text-3xl font-bold text-foreground">Join Voxxy</h1>
+              <span className="font-nav-logo text-[2.5rem] font-black italic tracking-[0.08em] text-white uppercase leading-none block mb-3">
+                VOXXY
+              </span>
             </div>
 
             <Card className="w-full bg-background/5 backdrop-blur-xl border border-primary/30 shadow-[0_0_50px_rgba(144,84,227,0.3)]">

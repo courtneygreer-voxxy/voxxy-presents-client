@@ -23,7 +23,7 @@ export default function PrivacyPolicyPage() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-foreground">Privacy Policy</h1>
-          <p className="text-muted-foreground italic">Last Updated: February 12, 2026</p>
+          <p className="text-muted-foreground italic">Last Updated: June 10, 2026</p>
         </div>
 
         {/* Annotation Box */}
@@ -532,6 +532,9 @@ export default function PrivacyPolicyPage() {
               communications on behalf of and at the direction of the Customer. The Customer is
               responsible for the content and frequency of these communications and for compliance
               with applicable email marketing laws, including CAN-SPAM.
+            </p>
+            <p>
+              <strong>12.4 SMS / Text Messaging.</strong> Voxxy operates the <strong>Voxxy Artist Network</strong> SMS program. You can opt in to this program by texting the keyword ARTIST to (209) 713-5755, or by scanning the QR code provided on our artist opt-in pages. By opting in, you consent to receive recurring automated marketing and informational text messages from Voxxy at the mobile number you provide. Message frequency varies. Message and data rates may apply. Consent to receive SMS messages is not a condition of purchasing any goods or services. To opt out at any time, reply <strong>STOP</strong> to any message. To request help, reply <strong>HELP</strong> or contact us at team@heyvoxxy.com. Carriers are not liable for delayed or undelivered messages. Phone numbers collected for SMS communications are not sold or shared with third parties for their own marketing purposes.
             </p>
           </div>
         </section>

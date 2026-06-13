@@ -40,7 +40,7 @@ export default function PricingPage() {
           </h1>
 
           <p className="mx-auto mb-0 max-w-3xl text-xl leading-relaxed text-white/65">
-            Choose the plan that fits your event schedule
+            Choose the plan that fits your show schedule.
           </p>
 
           {/* Divider */}
@@ -68,19 +68,15 @@ export default function PricingPage() {
                   <ul className="space-y-3 min-h-[180px]">
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Up to 10 events per year</span>
+                      <span>Up to 10 shows per year</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>10k vendor contacts</span>
+                      <span>10k artist contacts</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>$ Marketplace Add ons</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>2% transaction fee</span>
                     </li>
                   </ul>
                 </div>
@@ -110,19 +106,15 @@ export default function PricingPage() {
                   <ul className="space-y-3 min-h-[180px]">
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Up to 50 events per year</span>
+                      <span>Up to 50 shows per year</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>50k vendor contacts</span>
+                      <span>50k artist contacts</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>$ Marketplace Add ons</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>2% transaction fee</span>
                     </li>
                   </ul>
                 </div>
@@ -147,19 +139,15 @@ export default function PricingPage() {
                   <ul className="space-y-3 min-h-[180px]">
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Unlimited events</span>
+                      <span>Unlimited shows</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Unlimited vendor contacts</span>
+                      <span>Unlimited artist contacts</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>$ Marketplace Add ons</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>2% transaction fee</span>
                     </li>
                   </ul>
                 </div>
@@ -180,7 +168,7 @@ export default function PricingPage() {
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <h2 className="mb-6 text-4xl font-bold text-white md:text-5xl">Ready to Get Started?</h2>
           <p className="mx-auto mb-10 max-w-2xl text-xl leading-relaxed text-white/70">
-            Join event producers who are scaling their recurring events with Voxxy
+            Join the producers scaling their art markets and shows with Voxxy.
           </p>
           <Link
             to="/#contact"

@@ -1,4 +1,7 @@
 import { Link } from 'react-router-dom'
+import { analytics } from '@/lib/analytics'
+
+const trackFooterLink = (label: string) => analytics.track('footer_link_clicked', { link_label: label, page: 'landing' })
 
 export default function Footer() {
   return (
@@ -41,6 +44,7 @@ export default function Footer() {
                     Voxxy Mobile
                   </a>
                 </li>
+                {/* Voxxy Mobile link hidden until re-enabled */}
               </ul>
             </div>
 
@@ -118,7 +122,7 @@ export default function Footer() {
 
         {/* Copyright Section */}
         <div className="mt-10 border-t border-white/10 pt-6 text-center">
-          <p className="text-sm text-white/60">&copy; 2025 Voxxy, Inc. All rights reserved.</p>
+          <p className="text-sm text-white/60">&copy; 2026 Voxxy AI, Inc. All rights reserved.</p>
         </div>
       </div>
     </footer>
