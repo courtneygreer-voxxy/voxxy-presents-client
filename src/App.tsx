@@ -12,6 +12,7 @@ import { Toaster } from 'sonner'
 import HomePage from './pages/HomePage'
 
 // Lazy load: Public Pages (load on-demand)
+const ArtistLandingPage = lazy(() => import('./pages/ArtistLandingPage'))
 const FeaturesPage = lazy(() => import('./pages/FeaturesPage'))
 const PricingPage = lazy(() => import('./pages/PricingPage'))
 const HelpPage = lazy(() => import('./pages/HelpPage'))
@@ -241,6 +242,7 @@ export default function App() {
               PUBLIC ROUTES
               ========================================== */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/artists" element={<ArtistLandingPage />} />
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/help" element={<HelpPage />} />

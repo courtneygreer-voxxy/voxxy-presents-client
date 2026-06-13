@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Eye, EyeOff, Loader2, Mail, User, Lock, Users, Building2 } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Mail, User, Lock, Users, Palette } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail, validatePassword } from '@/utils/validation'
+import { analytics } from '@/lib/analytics'
 
 interface UnifiedSignUpFormProps {
   onSuccess?: (email: string) => void
@@ -169,7 +171,7 @@ export function UnifiedSignUpForm({
             {isProducer ? (
               <Users className="h-5 w-5 text-primary" />
             ) : (
-              <Building2 className="h-5 w-5 text-primary" />
+              <Palette className="h-5 w-5 text-primary" />
             )}
             <h3 className="text-lg font-semibold text-foreground">
               {isProducer ? 'Create Producer Account' : 'Create Vendor Account'}
@@ -345,7 +347,16 @@ export function UnifiedSignUpForm({
 
   return (
     <div className="w-full">
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as UserType)} className="w-full">
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => {
+          setActiveTab(value as UserType)
+          if (value === 'vendor') {
+            analytics.track('artist_tab_clicked', { page: 'signup' })
+          }
+        }}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-2 mb-6 bg-background/10 backdrop-blur-sm">
           <TabsTrigger
             value="venue_owner"
@@ -358,8 +369,8 @@ export function UnifiedSignUpForm({
             value="vendor"
             className="data-[state=active]:bg-violet-200 data-[state=active]:text-foreground dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-muted-foreground"
           >
-            <Building2 className="h-4 w-4 mr-2" />
-            Vendor
+            <Palette className="h-4 w-4 mr-2" />
+            Artist
           </TabsTrigger>
         </TabsList>
 
@@ -368,7 +379,19 @@ export function UnifiedSignUpForm({
         </TabsContent>
 
         <TabsContent value="vendor" className="mt-0">
-          {getTabContent('vendor')}
+          <div className="flex flex-col items-center text-center space-y-5 py-8 px-4">
+            <Palette className="h-12 w-12 text-primary opacity-80" />
+            <h3 className="text-xl font-semibold text-foreground">Artist accounts coming soon</h3>
+            <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">
+              We're building something for independent artists. In the meantime, join the Voxxy Artist Network via SMS and be first to know when it launches.
+            </p>
+            <Link
+              to="/artists"
+              className="inline-flex items-center rounded-xl voxxy-btn-brand px-5 py-2.5 text-[14px] font-semibold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:brightness-105"
+            >
+              Join the Artist Network
+            </Link>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

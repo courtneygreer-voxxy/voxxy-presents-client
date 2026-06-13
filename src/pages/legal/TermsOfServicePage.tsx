@@ -23,7 +23,7 @@ export default function TermsOfServicePage() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-foreground">Terms Of Service</h1>
-          <p className="text-muted-foreground italic">Last Updated: February 12, 2026</p>
+          <p className="text-muted-foreground italic">Last Updated: June 10, 2026</p>
         </div>
 
         {/* Annotation Box */}
@@ -184,6 +184,10 @@ export default function TermsOfServicePage() {
             </p>
             <p>
               <strong>5.4 Accurate Information.</strong> You represent that all information you provide to us, including without limitation Account registration information and End User contact data, is accurate, current, and complete.
+            </p>
+            <p>
+              <strong>5.5 SMS Opt-In and Consent.</strong> If you opt in to receive SMS communications from Voxxy (including by texting a keyword to a Voxxy shortcode or longcode, or by scanning a Voxxy QR code that initiates an SMS), you consent to receive recurring automated marketing and informational text messages from Voxxy at the mobile number you provide. You acknowledge that: (a) consent is not a condition of any purchase; (b) message and data rates may apply; (c) message frequency varies; (d) you may opt out at any time by replying STOP to any message; and (e) you may reply HELP for assistance. Opting out will not affect your use of the Services. For full details, see the SMS / Text Messaging section of our{' '}
+              <a href="/legal/privacy" className="underline transition-colors hover:text-foreground">Privacy Policy</a>.
             </p>
           </div>
         </section>
