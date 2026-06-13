@@ -38,7 +38,7 @@ export interface PaymentEngineConfig {
   collect_app_code: boolean // Whether to prompt artists to include app code in payment
 }
 
-export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'CAD' | 'AUD'
+export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'CAD' | 'AUD' | 'MXN';
 
 // ─── Payment Constants ───────────────────────────────────────────────────────
 
@@ -48,52 +48,18 @@ export const SUPPORTED_CURRENCIES: { code: CurrencyCode; label: string; symbol: 
   { code: 'GBP', label: 'British Pound', symbol: '£' },
   { code: 'CAD', label: 'Canadian Dollar', symbol: 'CA$' },
   { code: 'AUD', label: 'Australian Dollar', symbol: 'A$' },
-]
+  { code: 'MXN', label: 'Mexican Peso', symbol: 'MX$' },
+];
 
-export const PAYMENT_PRICE_TYPES: {
-  value: PaymentPriceType
-  label: string
-  description: string
-  isPercentage: boolean
-}[] = [
-  {
-    value: 'booth_price',
-    label: 'Booth Fee',
-    description: 'Standard fixed-price booth rental',
-    isPercentage: false,
-  },
-  {
-    value: 'early_bird_price',
-    label: 'Early Bird Rate',
-    description: 'Discounted rate for early registrants',
-    isPercentage: false,
-  },
-  {
-    value: 'jury_fee',
-    label: 'Jury / Application Fee',
-    description: 'Non-refundable fee to review application',
-    isPercentage: false,
-  },
-  {
-    value: 'percentage_of_sales',
-    label: 'Commission on Sales',
-    description: 'Percentage of artist sales paid to producer',
-    isPercentage: true,
-  },
-  {
-    value: 'price_per_piece',
-    label: 'Per Piece Fee',
-    description: 'Fee charged per artwork or item displayed',
-    isPercentage: false,
-  },
-]
+export const PAYMENT_PRICE_TYPES: { value: PaymentPriceType; label: string; description: string; isPercentage: boolean }[] = [
+  { value: 'booth_price', label: 'Booth Fee', description: 'Standard fixed-price booth rental', isPercentage: false },
+  { value: 'early_bird_price', label: 'Early Bird Rate', description: 'Discounted rate for early registrants', isPercentage: false },
+  { value: 'jury_fee', label: 'Jury / Application Fee', description: 'Non-refundable fee to review application', isPercentage: false },
+  { value: 'percentage_of_sales', label: 'Commission on Sales', description: 'Percentage of artist sales paid to producer', isPercentage: true },
+  { value: 'price_per_piece', label: 'Per Piece Fee', description: 'Fee charged per artwork or item displayed', isPercentage: false },
+];
 
-export const PAYMENT_ENGINES: {
-  value: PaymentEngine
-  label: string
-  icon: string
-  collectsEmail: boolean
-}[] = [
+export const PAYMENT_ENGINES: { value: PaymentEngine; label: string; icon: string; collectsEmail: boolean }[] = [
   { value: 'eventbrite', label: 'Eventbrite', icon: 'ticket', collectsEmail: true },
   { value: 'stripe', label: 'Stripe', icon: 'credit-card', collectsEmail: false },
   { value: 'paypal', label: 'PayPal', icon: 'dollar-sign', collectsEmail: true },
