@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react'
+import { useSearchParams, useLocation } from 'react-router-dom'
 import {
   MapPin,
   ExternalLink,
@@ -13,211 +13,213 @@ import {
   Tags,
   ArrowUpRight,
   XCircle,
-} from 'lucide-react';
+} from 'lucide-react'
 import {
   verifyPortalAccess,
   fetchPortalData,
   fetchPortalDataByToken,
   clearPortalSession,
   hasActiveSession,
-} from '@/services/eventPortalService';
-import { useAuth } from '@/contexts/AuthContext';
-import { useForceTheme } from '@/hooks/useForceTheme';
-import { eventsApi, vendorApplicationsApi, bulletinsApi, registrationsApi } from '@/services/api';
-import type { EventPortalData } from '@/types/eventPortal';
-import type { Bulletin } from '@/types/bulletin';
-import { VendorPortalHero } from '@/components/vendor-portal/VendorPortalHero';
-import { VendorPortalLocationMap } from '@/components/vendor-portal/VendorPortalLocationMap';
-import { VendorPortalPageCanvas } from '@/components/vendor-portal/VendorPortalPageCanvas';
-import { VendorPortalSection } from '@/components/vendor-portal/VendorPortalSection';
-import { formatDistanceToNow } from 'date-fns';
+} from '@/services/eventPortalService'
+import { useAuth } from '@/contexts/AuthContext'
+import { useForceTheme } from '@/hooks/useForceTheme'
+import { eventsApi, vendorApplicationsApi, bulletinsApi, registrationsApi } from '@/services/api'
+import type { EventPortalData } from '@/types/eventPortal'
+import type { Bulletin } from '@/types/bulletin'
+import { VendorPortalHero } from '@/components/vendor-portal/VendorPortalHero'
+import { VendorPortalLocationMap } from '@/components/vendor-portal/VendorPortalLocationMap'
+import { VendorPortalPageCanvas } from '@/components/vendor-portal/VendorPortalPageCanvas'
+import { VendorPortalSection } from '@/components/vendor-portal/VendorPortalSection'
+import { formatDistanceToNow } from 'date-fns'
 
 export default function VendorEventPortalPage() {
-  useForceTheme('dark');
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
-  const { isAuthenticated: isLoggedIn, isProducer, isAdmin } = useAuth();
+  useForceTheme('dark')
+  const location = useLocation()
+  const [searchParams] = useSearchParams()
+  const { isAuthenticated: isLoggedIn, isProducer, isAdmin } = useAuth()
 
   // Extract identifier from path: /portal/[identifier] or /portal/[org-slug]-[org_id]/[event-slug]-[event_id]
-  const portalIdentifier = location.pathname.replace('/portal/', '');
+  const portalIdentifier = location.pathname.replace('/portal/', '')
 
   // Detect if portalIdentifier is a token (long base64) or slug (short kebab-case or namespaced)
   // Tokens are 43 chars (urlsafe_base64(32)), slugs can have slashes for namespaced format
-  const isToken = portalIdentifier && portalIdentifier.length > 40 && !/[^A-Za-z0-9_-]/.test(portalIdentifier);
-  const eventSlug = !isToken ? portalIdentifier : undefined;
-  const accessToken = isToken ? portalIdentifier : undefined;
+  const isToken =
+    portalIdentifier && portalIdentifier.length > 40 && !/[^A-Za-z0-9_-]/.test(portalIdentifier)
+  const eventSlug = !isToken ? portalIdentifier : undefined
+  const accessToken = isToken ? portalIdentifier : undefined
 
   // Authentication state
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [email, setEmail] = useState('');
-  const [verifying, setVerifying] = useState(false);
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [isProducerPreview, setIsProducerPreview] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [email, setEmail] = useState('')
+  const [verifying, setVerifying] = useState(false)
+  const [authError, setAuthError] = useState<string | null>(null)
+  const [isProducerPreview, setIsProducerPreview] = useState(false)
 
   // Portal data state
-  const [portalData, setPortalData] = useState<EventPortalData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [dataError, setDataError] = useState<string | null>(null);
+  const [portalData, setPortalData] = useState<EventPortalData | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [dataError, setDataError] = useState<string | null>(null)
   /** Local-only banner preview (object URL); never persisted */
-  const [bannerPreviewUrl, setBannerPreviewUrl] = useState<string | null>(null);
+  const [bannerPreviewUrl, setBannerPreviewUrl] = useState<string | null>(null)
 
   // Opt-out state
-  const [showOptOutModal, setShowOptOutModal] = useState(false);
-  const [optingOut, setOptingOut] = useState(false);
+  const [showOptOutModal, setShowOptOutModal] = useState(false)
+  const [optingOut, setOptingOut] = useState(false)
 
   useEffect(() => {
     return () => {
-      if (bannerPreviewUrl) URL.revokeObjectURL(bannerPreviewUrl);
-    };
-  }, [bannerPreviewUrl]);
+      if (bannerPreviewUrl) URL.revokeObjectURL(bannerPreviewUrl)
+    }
+  }, [bannerPreviewUrl])
 
   useEffect(() => {
-    setBannerPreviewUrl(prev => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
-  }, [portalData?.event?.id]);
+    setBannerPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev)
+      return null
+    })
+  }, [portalData?.event?.id])
 
   const handlePickBannerFile = (file: File) => {
-    setBannerPreviewUrl(prev => {
-      if (prev) URL.revokeObjectURL(prev);
-      return URL.createObjectURL(file);
-    });
-  };
+    setBannerPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev)
+      return URL.createObjectURL(file)
+    })
+  }
 
   const handleClearBannerPreview = () => {
-    setBannerPreviewUrl(prev => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
-  };
+    setBannerPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev)
+      return null
+    })
+  }
 
   const handleOptOut = async () => {
-    if (!portalData?.registration?.id) return;
+    if (!portalData?.registration?.id) return
 
-    setOptingOut(true);
+    setOptingOut(true)
     try {
-      const result = await registrationsApi.optOut(portalData.registration.id);
-      setPortalData(prev => prev ? { ...prev, registration: result.registration } : null);
-      setShowOptOutModal(false);
-      alert(result.message || 'You have successfully opted out.');
+      const result = await registrationsApi.optOut(portalData.registration.id)
+      setPortalData((prev) => (prev ? { ...prev, registration: result.registration } : null))
+      setShowOptOutModal(false)
+      alert(result.message || 'You have successfully opted out.')
     } catch (error: any) {
-      alert(error.message || 'Failed to opt out. Please contact the organizer.');
+      alert(error.message || 'Failed to opt out. Please contact the organizer.')
     } finally {
-      setOptingOut(false);
+      setOptingOut(false)
     }
-  };
+  }
 
   // Pre-fill email from URL params on mount
   useEffect(() => {
-    const emailParam = searchParams.get('email');
-    const skipAuth = searchParams.get('skip'); // TEMP: for design review
+    const emailParam = searchParams.get('email')
+    const skipAuth = searchParams.get('skip') // TEMP: for design review
 
-    if (emailParam) setEmail(emailParam);
+    if (emailParam) setEmail(emailParam)
 
     // TEMP: Skip auth for design review
     if (skipAuth === 'true') {
-      setIsAuthenticated(true);
-      loadMockPortalData();
-      return;
+      setIsAuthenticated(true)
+      loadMockPortalData()
+      return
     }
 
     // Producer/admin bypass: skip email gate, fetch via authenticated APIs
     if (isLoggedIn && (isProducer || isAdmin)) {
-      loadPortalDataAsProducer();
-      return;
+      loadPortalDataAsProducer()
+      return
     }
 
     // Check if user already has an active session
     if (eventSlug && hasActiveSession(eventSlug)) {
-      setIsAuthenticated(true);
-      loadPortalData();
+      setIsAuthenticated(true)
+      loadPortalData()
     }
-  }, [portalIdentifier, eventSlug, searchParams, isLoggedIn, isProducer, isAdmin]);
+  }, [portalIdentifier, eventSlug, searchParams, isLoggedIn, isProducer, isAdmin])
 
   const handleAccessPortal = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!portalIdentifier || !email) {
-      setAuthError('Please provide your email address');
-      return;
+      setAuthError('Please provide your email address')
+      return
     }
 
     try {
-      setVerifying(true);
-      setAuthError(null);
+      setVerifying(true)
+      setAuthError(null)
 
       // Build request with either access_token or event_slug
       const request = isToken
         ? { access_token: accessToken, email: email.toLowerCase().trim() }
-        : { event_slug: eventSlug, email: email.toLowerCase().trim() };
+        : { event_slug: eventSlug, email: email.toLowerCase().trim() }
 
-      const response = await verifyPortalAccess(request);
+      const response = await verifyPortalAccess(request)
 
       if (response.access_granted) {
-        setIsAuthenticated(true);
-        loadPortalData();
+        setIsAuthenticated(true)
+        loadPortalData()
       } else {
-        setAuthError(response.error || 'Access denied');
+        setAuthError(response.error || 'Access denied')
       }
     } catch (error: any) {
-      console.error('Portal access error:', error);
-      setAuthError(error.message || 'Failed to verify access');
+      console.error('Portal access error:', error)
+      setAuthError(error.message || 'Failed to verify access')
     } finally {
-      setVerifying(false);
+      setVerifying(false)
     }
-  };
+  }
 
   const loadPortalData = async () => {
-    if (!portalIdentifier) return;
+    if (!portalIdentifier) return
 
     try {
-      setLoading(true);
-      setDataError(null);
+      setLoading(true)
+      setDataError(null)
 
       // Use token-based fetch if we have a token, otherwise use slug-based fetch
-      const data = isToken && accessToken
-        ? await fetchPortalDataByToken(accessToken)
-        : await fetchPortalData(eventSlug!);
-      setPortalData(data);
+      const data =
+        isToken && accessToken
+          ? await fetchPortalDataByToken(accessToken)
+          : await fetchPortalData(eventSlug!)
+      setPortalData(data)
     } catch (error: any) {
-      console.error('Portal data error:', error);
-      setDataError(error.message || 'Failed to load portal data');
+      console.error('Portal data error:', error)
+      setDataError(error.message || 'Failed to load portal data')
 
       // If session expired, reset to login form
       if (error.status === 401) {
-        setIsAuthenticated(false);
-        clearPortalSession();
+        setIsAuthenticated(false)
+        clearPortalSession()
       }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // Producer bypass: load portal data using authenticated producer APIs
   const loadPortalDataAsProducer = async () => {
     try {
-      setLoading(true);
-      setIsAuthenticated(true);
-      setIsProducerPreview(true);
+      setLoading(true)
+      setIsAuthenticated(true)
+      setIsProducerPreview(true)
 
-      let slug = eventSlug;
+      let slug = eventSlug
 
       // For token-based URLs, resolve the token to an event slug
       if (isToken && accessToken) {
-        const events = await eventsApi.getAll();
+        const events = await eventsApi.getAll()
         const matchingEvent = (events as any[]).find(
-          (e: any) => e.event_portal?.access_token === accessToken
-        );
+          (e: any) => e.event_portal?.access_token === accessToken,
+        )
         if (matchingEvent) {
-          slug = matchingEvent.namespaced_slug || matchingEvent.slug;
+          slug = matchingEvent.namespaced_slug || matchingEvent.slug
         } else {
-          throw new Error('Could not find event for this portal link');
+          throw new Error('Could not find event for this portal link')
         }
       }
 
       if (!slug) {
-        throw new Error('Could not determine event');
+        throw new Error('Could not determine event')
       }
 
       // Fetch event data, vendor applications, and bulletins in parallel
@@ -225,7 +227,7 @@ export default function VendorEventPortalPage() {
         eventsApi.getById(slug),
         vendorApplicationsApi.getByEvent(slug).catch(() => []),
         bulletinsApi.getByEvent(slug).catch(() => ({ bulletins: [] })),
-      ]);
+      ])
 
       // Map to EventPortalData shape
       const data: EventPortalData = {
@@ -268,16 +270,16 @@ export default function VendorEventPortalPage() {
           application_tags: app.application_tags || [],
         })),
         producer_updates: (bulletinsResponse as any)?.bulletins || [],
-      };
+      }
 
-      setPortalData(data);
+      setPortalData(data)
     } catch (error: any) {
-      console.error('Producer portal preview error:', error);
-      setDataError(error.message || 'Failed to load portal preview');
+      console.error('Producer portal preview error:', error)
+      setDataError(error.message || 'Failed to load portal preview')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // TEMP: Mock data for design review
   const loadMockPortalData = () => {
@@ -289,7 +291,8 @@ export default function VendorEventPortalPage() {
         id: 1,
         title: 'Summer Art Market 2026',
         slug: 'summer-art-market',
-        description: 'Join us for our annual summer art market featuring local artists, food vendors, and live music. This is a family-friendly event showcasing the best of our creative community.',
+        description:
+          'Join us for our annual summer art market featuring local artists, food vendors, and live music. This is a family-friendly event showcasing the best of our creative community.',
         poster_url:
           'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1920&q=80',
         dates: {
@@ -314,7 +317,8 @@ export default function VendorEventPortalPage() {
         {
           id: 1,
           name: 'Food Vendor - Full Kitchen',
-          description: 'Full kitchen setup with cooking equipment. Perfect for food trucks or vendors needing extensive cooking space.',
+          description:
+            'Full kitchen setup with cooking equipment. Perfect for food trucks or vendors needing extensive cooking space.',
           categories: ['Food', 'Beverage', 'Restaurant'],
           booth_price: 350,
           payment_link: 'https://stripe.com/pay/food-vendor',
@@ -328,7 +332,8 @@ export default function VendorEventPortalPage() {
         {
           id: 2,
           name: 'Artisan Booth - 10x10',
-          description: 'Standard 10x10 booth space for artists and craftspeople. Includes table and tent.',
+          description:
+            'Standard 10x10 booth space for artists and craftspeople. Includes table and tent.',
           categories: ['Art', 'Crafts', 'Handmade'],
           booth_price: 150,
           payment_link: 'https://stripe.com/pay/artisan-booth',
@@ -355,27 +360,27 @@ export default function VendorEventPortalPage() {
         },
       ],
       producer_updates: [],
-    });
-  };
+    })
+  }
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'TBA';
+    if (!dateString) return 'TBA'
     return new Date(dateString).toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    });
-  };
+    })
+  }
 
   const formatTime = (timeString: string | null) => {
-    if (!timeString) return '';
+    if (!timeString) return ''
     return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
-    });
-  };
+    })
+  }
 
   // Authentication Form
   if (!isAuthenticated) {
@@ -392,9 +397,12 @@ export default function VendorEventPortalPage() {
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
                 Applicants
               </p>
-              <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground">Your event portal</h1>
+              <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground">
+                Your event portal
+              </h1>
               <p className="text-muted-foreground">
-                Sign in with the email you used when you applied—then view your event info, fees, and updates.
+                Sign in with the email you used when you applied—then view your event info, fees,
+                and updates.
               </p>
             </div>
 
@@ -452,7 +460,7 @@ export default function VendorEventPortalPage() {
           </div>
         </div>
       </VendorPortalPageCanvas>
-    );
+    )
   }
 
   // Loading state
@@ -464,7 +472,7 @@ export default function VendorEventPortalPage() {
           <p className="text-muted-foreground">Loading your portal…</p>
         </div>
       </VendorPortalPageCanvas>
-    );
+    )
   }
 
   // Error state
@@ -477,8 +485,8 @@ export default function VendorEventPortalPage() {
           <p className="mb-6 text-muted-foreground">{dataError}</p>
           <button
             onClick={() => {
-              clearPortalSession();
-              setIsAuthenticated(false);
+              clearPortalSession()
+              setIsAuthenticated(false)
             }}
             className="voxxy-btn-solid rounded-full px-6 py-2.5 text-sm font-semibold transition"
           >
@@ -486,10 +494,10 @@ export default function VendorEventPortalPage() {
           </button>
         </div>
       </VendorPortalPageCanvas>
-    );
+    )
   }
 
-  const { event, vendor_categories } = portalData;
+  const { event, vendor_categories } = portalData
 
   // Show cancellation message if event is cancelled
   if (event.status === 'cancelled') {
@@ -514,35 +522,60 @@ export default function VendorEventPortalPage() {
 
           <div className="rounded-3xl border border-red-500/30 bg-background/5 p-8 text-center shadow-sm ring-1 ring-white/10 text-foreground">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/20">
-              <svg className="h-8 w-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              <svg
+                className="h-8 w-8 text-red-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
               </svg>
             </div>
-            <h1 className="mb-2 text-2xl font-semibold tracking-tight text-foreground">Event cancelled</h1>
+            <h1 className="mb-2 text-2xl font-semibold tracking-tight text-foreground">
+              Event cancelled
+            </h1>
             <p className="mb-4 text-lg text-muted-foreground">{event.title}</p>
             <p className="mb-6 text-muted-foreground">
-              This event has been cancelled by the event organizer. If you submitted payment, you will be contacted regarding refund details.
+              This event has been cancelled by the event organizer. If you submitted payment, you
+              will be contacted regarding refund details.
             </p>
 
             {event.organization && (
               <div className="mx-auto mb-6 max-w-md rounded-2xl border border-white/10 bg-white/5 p-6 text-left">
-                <p className="mb-3 text-sm text-muted-foreground">For questions about this cancellation, please contact:</p>
-                <p className="mb-2 text-lg font-semibold text-foreground">{event.organization.name}</p>
+                <p className="mb-3 text-sm text-muted-foreground">
+                  For questions about this cancellation, please contact:
+                </p>
+                <p className="mb-2 text-lg font-semibold text-foreground">
+                  {event.organization.name}
+                </p>
                 {event.organization.email ? (
                   <a
                     href={`mailto:${event.organization.email}`}
                     className="inline-flex items-center gap-2 text-sm font-medium text-primary underline-offset-4 hover:underline"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
                     </svg>
                     {event.organization.email}
                   </a>
                 ) : (
-                  <p className="text-sm italic text-muted-foreground">Contact information not available</p>
+                  <p className="text-sm italic text-muted-foreground">
+                    Contact information not available
+                  </p>
                 )}
                 <p className="mt-4 text-xs text-muted-foreground">
-                  This event was managed through Voxxy, but all event decisions including cancellations are made by the event organizer.
+                  This event was managed through Voxxy, but all event decisions including
+                  cancellations are made by the event organizer.
                 </p>
               </div>
             )}
@@ -550,8 +583,8 @@ export default function VendorEventPortalPage() {
             {!isProducerPreview && (
               <button
                 onClick={() => {
-                  clearPortalSession();
-                  setIsAuthenticated(false);
+                  clearPortalSession()
+                  setIsAuthenticated(false)
                 }}
                 className="rounded-full bg-white/10 border border-white/20 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/20"
               >
@@ -561,7 +594,7 @@ export default function VendorEventPortalPage() {
           </div>
         </div>
       </VendorPortalPageCanvas>
-    );
+    )
   }
 
   // Portal Dashboard
@@ -573,8 +606,8 @@ export default function VendorEventPortalPage() {
         formatTime={formatTime}
         isProducerPreview={isProducerPreview}
         onSignOut={() => {
-          clearPortalSession();
-          setIsAuthenticated(false);
+          clearPortalSession()
+          setIsAuthenticated(false)
         }}
       />
 
@@ -593,10 +626,12 @@ export default function VendorEventPortalPage() {
                   </h3>
                   <div className="space-y-2 text-sm text-orange-800 dark:text-orange-200/90">
                     <p className="leading-relaxed">
-                      Your registration status has been changed to "opted out". This means you will <strong>no longer receive any emails</strong> about this event.
+                      Your registration status has been changed to "opted out". This means you will{' '}
+                      <strong>no longer receive any emails</strong> about this event.
                     </p>
                     <p className="leading-relaxed">
-                      If this is not correct or you'd like to rejoin the event, please contact the event organizer directly:
+                      If this is not correct or you'd like to rejoin the event, please contact the
+                      event organizer directly:
                     </p>
                     {portalData.event.organization?.email && (
                       <div className="mt-3 rounded-lg bg-orange-100/60 px-4 py-2.5 dark:bg-orange-900/30">
@@ -623,126 +658,130 @@ export default function VendorEventPortalPage() {
           <>
             <VendorPortalSection
               title="Event details"
-          description="Schedule context, venue, deadlines, and links your organizer has shared."
-          icon={LayoutList}
-        >
-          {event.description ? (
-            <p className="mb-6 text-sm leading-relaxed text-muted-foreground md:text-base">{event.description}</p>
-          ) : null}
-          <div className="divide-y divide-border rounded-2xl border border-border bg-background/5">
-            {event.location ? (
-              <div className="flex gap-3 px-4 py-3.5 md:px-5 md:py-4">
-                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
-                <div className="min-w-0 flex-1">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Location</p>
-                  <p className="font-medium text-foreground">{event.venue}</p>
-                  <p className="text-sm text-muted-foreground">{event.location}</p>
-                  <VendorPortalLocationMap venue={event.venue} location={event.location} />
-                </div>
-              </div>
-            ) : null}
-            {event.age_restriction ? (
-              <div className="flex gap-3 px-4 py-3.5 md:px-5 md:py-4">
-                <Users className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Audience
-                  </p>
-                  <p className="text-foreground">{event.age_restriction}</p>
-                </div>
-              </div>
-            ) : null}
-            {event.payment_deadline ? (
-              <div className="flex gap-3 px-4 py-3.5 md:px-5 md:py-4">
-                <DollarSign className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Payment due
-                  </p>
-                  <p className="text-foreground">{formatDate(event.payment_deadline)}</p>
-                </div>
-              </div>
-            ) : null}
-            {event.ticket_url ? (
-              <div className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between md:px-5 md:py-4">
-                <div className="flex gap-3">
-                  <ExternalLink className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      Tickets
-                    </p>
-                    <p className="text-sm text-muted-foreground">Public ticket link</p>
+              description="Schedule context, venue, deadlines, and links your organizer has shared."
+              icon={LayoutList}
+            >
+              {event.description ? (
+                <p className="mb-6 text-sm leading-relaxed text-muted-foreground md:text-base">
+                  {event.description}
+                </p>
+              ) : null}
+              <div className="divide-y divide-border rounded-2xl border border-border bg-background/5">
+                {event.location ? (
+                  <div className="flex gap-3 px-4 py-3.5 md:px-5 md:py-4">
+                    <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Location
+                      </p>
+                      <p className="font-medium text-foreground">{event.venue}</p>
+                      <p className="text-sm text-muted-foreground">{event.location}</p>
+                      <VendorPortalLocationMap venue={event.venue} location={event.location} />
+                    </div>
                   </div>
-                </div>
-                <a
-                  href={event.ticket_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="voxxy-btn-public-secondary inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium"
-                >
-                  View tickets
-                  <ArrowUpRight className="h-4 w-4 opacity-70" aria-hidden />
-                </a>
+                ) : null}
+                {event.age_restriction ? (
+                  <div className="flex gap-3 px-4 py-3.5 md:px-5 md:py-4">
+                    <Users className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Audience
+                      </p>
+                      <p className="text-foreground">{event.age_restriction}</p>
+                    </div>
+                  </div>
+                ) : null}
+                {event.payment_deadline ? (
+                  <div className="flex gap-3 px-4 py-3.5 md:px-5 md:py-4">
+                    <DollarSign className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Payment due
+                      </p>
+                      <p className="text-foreground">{formatDate(event.payment_deadline)}</p>
+                    </div>
+                  </div>
+                ) : null}
+                {event.ticket_url ? (
+                  <div className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between md:px-5 md:py-4">
+                    <div className="flex gap-3">
+                      <ExternalLink className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
+                      <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          Tickets
+                        </p>
+                        <p className="text-sm text-muted-foreground">Public ticket link</p>
+                      </div>
+                    </div>
+                    <a
+                      href={event.ticket_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="voxxy-btn-public-secondary inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium"
+                    >
+                      View tickets
+                      <ArrowUpRight className="h-4 w-4 opacity-70" aria-hidden />
+                    </a>
+                  </div>
+                ) : null}
               </div>
-            ) : null}
-          </div>
-        </VendorPortalSection>
+            </VendorPortalSection>
 
-        {vendor_categories.length > 0 ? (
-          <VendorPortalSection
-            title="Your booth & payment"
-            description="Find your category and complete payment when the organizer has enabled online checkout."
-            icon={Tags}
-            headerClassName="mb-4 md:mb-5"
-          >
-            <div className="flex flex-wrap gap-3 md:gap-4">
-              {vendor_categories.map(category => (
-                <div
-                  key={category.id}
-                  className="flex min-w-[min(100%,17.5rem)] flex-1 basis-[17.5rem] flex-col rounded-2xl border border-border bg-background/5 p-4 shadow-sm ring-1 ring-white/5 transition-[box-shadow] duration-200 hover:shadow-md hover:border-primary/30"
-                >
-                  <div className="flex flex-col gap-3">
-                    <div className="space-y-2">
-                      <h3 className="text-sm font-semibold leading-snug tracking-tight text-foreground md:text-base">
-                        {category.name}
-                      </h3>
-                      {category.categories.length > 0 ? (
-                        <div className="flex flex-wrap gap-1.5">
-                          {category.categories.map((cat, idx) => (
-                            <span
-                              key={idx}
-                              className="inline-flex items-center rounded-md bg-primary/20 px-2 py-0.5 text-xs font-medium text-foreground"
-                            >
-                              {cat}
-                            </span>
-                          ))}
+            {vendor_categories.length > 0 ? (
+              <VendorPortalSection
+                title="Your booth & payment"
+                description="Find your category and complete payment when the organizer has enabled online checkout."
+                icon={Tags}
+                headerClassName="mb-4 md:mb-5"
+              >
+                <div className="flex flex-wrap gap-3 md:gap-4">
+                  {vendor_categories.map((category) => (
+                    <div
+                      key={category.id}
+                      className="flex min-w-[min(100%,17.5rem)] flex-1 basis-[17.5rem] flex-col rounded-2xl border border-border bg-background/5 p-4 shadow-sm ring-1 ring-white/5 transition-[box-shadow] duration-200 hover:shadow-md hover:border-primary/30"
+                    >
+                      <div className="flex flex-col gap-3">
+                        <div className="space-y-2">
+                          <h3 className="text-sm font-semibold leading-snug tracking-tight text-foreground md:text-base">
+                            {category.name}
+                          </h3>
+                          {category.categories.length > 0 ? (
+                            <div className="flex flex-wrap gap-1.5">
+                              {category.categories.map((cat, idx) => (
+                                <span
+                                  key={idx}
+                                  className="inline-flex items-center rounded-md bg-primary/20 px-2 py-0.5 text-xs font-medium text-foreground"
+                                >
+                                  {cat}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
                         </div>
+                        {category.payment_link ? (
+                          <div className="border-t border-border pt-3">
+                            <a
+                              href={category.payment_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="voxxy-btn-cta inline-flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-offset-2"
+                            >
+                              Pay online
+                              <ExternalLink className="h-3.5 w-3.5 opacity-90" aria-hidden />
+                            </a>
+                          </div>
+                        ) : null}
+                      </div>
+                      {category.description ? (
+                        <p className="mt-3 border-t border-border pt-3 text-xs leading-relaxed text-muted-foreground line-clamp-4">
+                          {category.description}
+                        </p>
                       ) : null}
                     </div>
-                    {category.payment_link ? (
-                      <div className="border-t border-border pt-3">
-                        <a
-                          href={category.payment_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="voxxy-btn-cta inline-flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-offset-2"
-                        >
-                          Pay online
-                          <ExternalLink className="h-3.5 w-3.5 opacity-90" aria-hidden />
-                        </a>
-                      </div>
-                    ) : null}
-                  </div>
-                  {category.description ? (
-                    <p className="mt-3 border-t border-border pt-3 text-xs leading-relaxed text-muted-foreground line-clamp-4">
-                      {category.description}
-                    </p>
-                  ) : null}
+                  ))}
                 </div>
-              ))}
-            </div>
-          </VendorPortalSection>
-        ) : null}
+              </VendorPortalSection>
+            ) : null}
 
             {/* Opt-Out Button - Only show if NOT opted out (inside conditional wrapper) */}
             {portalData.registration && (
@@ -761,58 +800,65 @@ export default function VendorEventPortalPage() {
             {/* <VendorPortalFaq event={event} formatDate={formatDate} /> */}
 
             <VendorPortalSection
-          title="Updates from the organizer"
-          description="Official notes about schedule changes, load-in, rules, or anything applicants should know."
-          icon={Megaphone}
-        >
-          {portalData.producer_updates && portalData.producer_updates.length > 0 ? (
-            <div className="space-y-3 md:space-y-4">
-              {portalData.producer_updates.map((bulletin: Bulletin) => {
-                const getInitials = (name: string) =>
-                  name
-                    .split(' ')
-                    .map(n => n[0])
-                    .join('')
-                    .toUpperCase()
-                    .slice(0, 2);
+              title="Updates from the organizer"
+              description="Official notes about schedule changes, load-in, rules, or anything applicants should know."
+              icon={Megaphone}
+            >
+              {portalData.producer_updates && portalData.producer_updates.length > 0 ? (
+                <div className="space-y-3 md:space-y-4">
+                  {portalData.producer_updates.map((bulletin: Bulletin) => {
+                    const getInitials = (name: string) =>
+                      name
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2)
 
-                return (
-                  <article
-                    key={bulletin.id}
-                    className={`rounded-2xl border border-border bg-background/5 p-4 shadow-sm transition-shadow duration-200 hover:shadow-md md:p-5 ${
-                      bulletin.pinned ? 'border-l-4 border-l-primary pl-5 md:pl-6' : ''
-                    }`}
-                  >
-                    <div className="mb-3 flex items-start gap-3 md:mb-4">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-semibold text-foreground md:text-sm">
-                        {getInitials(bulletin.author.name)}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-sm font-semibold text-foreground md:text-base">{bulletin.subject}</h3>
-                          {bulletin.pinned ? (
-                            <Pin className="h-3.5 w-3.5 shrink-0 fill-primary text-primary" aria-label="Pinned" />
-                          ) : null}
+                    return (
+                      <article
+                        key={bulletin.id}
+                        className={`rounded-2xl border border-border bg-background/5 p-4 shadow-sm transition-shadow duration-200 hover:shadow-md md:p-5 ${
+                          bulletin.pinned ? 'border-l-4 border-l-primary pl-5 md:pl-6' : ''
+                        }`}
+                      >
+                        <div className="mb-3 flex items-start gap-3 md:mb-4">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-semibold text-foreground md:text-sm">
+                            {getInitials(bulletin.author.name)}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="text-sm font-semibold text-foreground md:text-base">
+                                {bulletin.subject}
+                              </h3>
+                              {bulletin.pinned ? (
+                                <Pin
+                                  className="h-3.5 w-3.5 shrink-0 fill-primary text-primary"
+                                  aria-label="Pinned"
+                                />
+                              ) : null}
+                            </div>
+                            <p className="text-xs text-muted-foreground md:text-sm">
+                              {bulletin.author.name} ·{' '}
+                              {formatDistanceToNow(new Date(bulletin.created_at), {
+                                addSuffix: true,
+                              })}
+                            </p>
+                          </div>
                         </div>
-                        <p className="text-xs text-muted-foreground md:text-sm">
-                          {bulletin.author.name} ·{' '}
-                          {formatDistanceToNow(new Date(bulletin.created_at), { addSuffix: true })}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground md:text-base">
-                      {bulletin.body}
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="rounded-2xl border border-dashed border-border bg-background/5 py-10 text-center text-sm leading-relaxed text-muted-foreground md:text-base">
-              No announcements yet. When the organizer posts something, it will show up here.
-            </p>
-          )}
-        </VendorPortalSection>
+                        <div className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground md:text-base">
+                          {bulletin.body}
+                        </div>
+                      </article>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="rounded-2xl border border-dashed border-border bg-background/5 py-10 text-center text-sm leading-relaxed text-muted-foreground md:text-base">
+                  No announcements yet. When the organizer posts something, it will show up here.
+                </p>
+              )}
+            </VendorPortalSection>
           </>
         )}
       </div>
@@ -826,9 +872,7 @@ export default function VendorEventPortalPage() {
                 <AlertCircle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  Opt Out of Event?
-                </h3>
+                <h3 className="text-lg font-semibold text-foreground">Opt Out of Event?</h3>
                 <p className="text-sm text-muted-foreground mt-1">
                   This will remove you from all event communications.
                 </p>
@@ -874,5 +918,5 @@ export default function VendorEventPortalPage() {
         </div>
       )}
     </VendorPortalPageCanvas>
-  );
+  )
 }

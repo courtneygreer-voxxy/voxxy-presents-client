@@ -7,103 +7,114 @@ This directory contains comprehensive documentation about the Voxxy Presents Rea
 ### Session Guide — READ EVERY SESSION
 
 #### 0. **SESSION_GUIDE.md** — READ THIS FIRST
-   - Master bootstrap document for coding sessions and AI agents
-   - Rules & Learnings (growing anti-pattern list with IDs)
-   - Rebase workflow and test commands (SESSION_START mode)
-   - Pre-PR validation checklist (PRE_PR mode)
-   - Extended doc references by topic
-   - **Read this at the START of every session and BEFORE every PR**
+
+- Master bootstrap document for coding sessions and AI agents
+- Rules & Learnings (growing anti-pattern list with IDs)
+- Rebase workflow and test commands (SESSION_START mode)
+- Pre-PR validation checklist (PRE_PR mode)
+- Extended doc references by topic
+- **Read this at the START of every session and BEFORE every PR**
 
 ### Core Architecture & Auth Documentation
 
 #### 1. **ARCHITECTURE_SUMMARY.md** (19 KB) - START HERE
-   - Most comprehensive guide to the entire application
-   - Complete authentication flow explanation
-   - Protected routes and authorization
-   - Application structure and folder organization
-   - State management approach
-   - API integration patterns
-   - Environment configuration
-   - Role mapping and permissions
-   - Error handling strategies
-   - **Read this first for a complete understanding**
+
+- Most comprehensive guide to the entire application
+- Complete authentication flow explanation
+- Protected routes and authorization
+- Application structure and folder organization
+- State management approach
+- API integration patterns
+- Environment configuration
+- Role mapping and permissions
+- Error handling strategies
+- **Read this first for a complete understanding**
 
 #### 2. **ARCHITECTURE_DIAGRAM.txt** (24 KB) - VISUAL REFERENCE
-   - ASCII diagrams of system architecture
-   - Entry point flow
-   - Auth system architecture diagram
-   - Routing architecture
-   - Route protection components
-   - Login/logout sequence diagrams
-   - Component hierarchy
-   - State management diagram
-   - Error handling visualization
-   - **Use this for visual understanding of flows**
+
+- ASCII diagrams of system architecture
+- Entry point flow
+- Auth system architecture diagram
+- Routing architecture
+- Route protection components
+- Login/logout sequence diagrams
+- Component hierarchy
+- State management diagram
+- Error handling visualization
+- **Use this for visual understanding of flows**
 
 #### 3. **AUTH_QUICK_REFERENCE.md** (10 KB) - DEVELOPER REFERENCE
-   - Quick lookup guide for common auth tasks
-   - Code examples for authentication methods
-   - Protected route examples
-   - Token management snippets
-   - Component usage patterns
-   - Debugging tips
-   - Common patterns and examples
-   - **Use this when implementing auth features**
+
+- Quick lookup guide for common auth tasks
+- Code examples for authentication methods
+- Protected route examples
+- Token management snippets
+- Component usage patterns
+- Debugging tips
+- Common patterns and examples
+- **Use this when implementing auth features**
 
 ### API & Configuration Documentation
 
 #### 4. **API_CONFIGURATION.md** (11 KB)
-   - API endpoint documentation
-   - Authentication endpoints
-   - Organizations API
-   - Events API
-   - Admin API
-   - Request/response examples
-   - **Reference for API calls**
+
+- API endpoint documentation
+- Authentication endpoints
+- Organizations API
+- Events API
+- Admin API
+- Request/response examples
+- **Reference for API calls**
 
 #### 5. **ROLE_MAPPING.md** (3.8 KB)
-   - User role definitions
-   - Role-to-feature mapping
-   - Permission matrix
-   - **Reference for role-based access control**
+
+- User role definitions
+- Role-to-feature mapping
+- Permission matrix
+- **Reference for role-based access control**
 
 ### Development Guides
 
 #### 6. **ROLE_SWITCH_DEBUG.md** (3.7 KB)
-   - Debug panel usage
-   - Role switching for testing
-   - Debug mode instructions
-   - **Use for development and testing**
+
+- Debug panel usage
+- Role switching for testing
+- Debug mode instructions
+- **Use for development and testing**
 
 #### 7. **PRODUCER_FLOW_STATUS.md** (12 KB)
-   - Producer/venue owner workflows
-   - Feature status
-   - Implementation notes
-   - **Reference for producer-specific features**
+
+- Producer/venue owner workflows
+- Feature status
+- Implementation notes
+- **Reference for producer-specific features**
 
 ### Project Basics
 
 #### 8. **README.md** (1.7 KB)
-   - Project overview
-   - Quick start instructions
-   - Basic setup
+
+- Project overview
+- Quick start instructions
+- Basic setup
 
 ### Email System Documentation
 
 #### 9. **email-system/ Directory** - COMPLETE EMAIL SYSTEM GUIDE
-   - **START HERE:** [email-system/EMAIL_DOCUMENTATION_INDEX.md](./email-system/EMAIL_DOCUMENTATION_INDEX.md)
-   - Producer guide for email editor
-   - Complete variable reference (48 variables)
-   - System architecture and technical specs
-   - Deliverability tracking (100% coverage as of April 9, 2026)
-   - Email Audit Log documentation
-   - **Use this for all email-related work**
+
+- **START HERE:** [email-system/EMAIL_DOCUMENTATION_INDEX.md](./email-system/EMAIL_DOCUMENTATION_INDEX.md)
+- Producer guide for email editor
+- Complete variable reference (48 variables)
+- System architecture and technical specs
+- Deliverability tracking (100% coverage as of April 9, 2026)
+- Email Audit Log documentation
+- **Use this for all email-related work**
 
 **Quick Links:**
-   - Producer Guide: [email-system/EMAIL_EDITOR_GUIDE.md](./email-system/EMAIL_EDITOR_GUIDE.md)
-   - Developer Guide: [email-system/EMAIL_SYSTEM_GUIDE.md](./email-system/EMAIL_SYSTEM_GUIDE.md)
-   - Variables Reference: [email-system/EMAIL_VARIABLES_REFERENCE.md](./email-system/EMAIL_VARIABLES_REFERENCE.md)
-   - Latest Fix (April 9, 2026): [email-system/AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md](./email-system/AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md)
+
+- Producer Guide: [email-system/EMAIL_EDITOR_GUIDE.md](./email-system/EMAIL_EDITOR_GUIDE.md)
+- Developer Guide: [email-system/EMAIL_SYSTEM_GUIDE.md](./email-system/EMAIL_SYSTEM_GUIDE.md)
+- Variables Reference: [email-system/EMAIL_VARIABLES_REFERENCE.md](./email-system/EMAIL_VARIABLES_REFERENCE.md)
+- Latest Fix (April 9, 2026): [email-system/AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md](./email-system/AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md)
 
 ---
 
@@ -112,41 +123,49 @@ This directory contains comprehensive documentation about the Voxxy Presents Rea
 ### I want to understand...
 
 **Authentication Flow**
+
 - Start with: ARCHITECTURE_SUMMARY.md (Section 1)
 - Visual reference: ARCHITECTURE_DIAGRAM.txt (Auth System Architecture)
 - Code examples: AUTH_QUICK_REFERENCE.md
 
 **How Protected Routes Work**
+
 - Details: ARCHITECTURE_SUMMARY.md (Section 2)
 - Diagrams: ARCHITECTURE_DIAGRAM.txt (Route Protection Components)
 - Code: See `/src/components/auth/AdminRoute.tsx` and `ProtectedRouteV2.tsx`
 
 **Application Structure**
+
 - Complete overview: ARCHITECTURE_SUMMARY.md (Section 3)
 - Folder layout: ARCHITECTURE_SUMMARY.md (Section 3.1)
 - Component hierarchy: ARCHITECTURE_DIAGRAM.txt (Component Hierarchy)
 
 **API Integration**
+
 - Details: ARCHITECTURE_SUMMARY.md (Section 3.4)
 - Endpoints: API_CONFIGURATION.md
 - Examples: See `/src/services/api.ts`
 
 **User Roles & Permissions**
+
 - Role mapping: ROLE_MAPPING.md
 - Context details: ARCHITECTURE_SUMMARY.md (Section 8)
 - Role helpers: AUTH_QUICK_REFERENCE.md (Accessing Auth State)
 
 **Environment Configuration**
+
 - Details: ARCHITECTURE_SUMMARY.md (Section 4)
 - Variables: AUTH_QUICK_REFERENCE.md (Environment Variables)
 - Setup: See `/src/config/environments.ts`
 
 **State Management**
+
 - Architecture: ARCHITECTURE_SUMMARY.md (Section 3.3)
 - Diagram: ARCHITECTURE_DIAGRAM.txt (State Management)
 - Code: See `/src/contexts/AuthContext.tsx`
 
 **Error Handling**
+
 - Details: ARCHITECTURE_SUMMARY.md (Section 10)
 - Strategies: ARCHITECTURE_DIAGRAM.txt (Error Handling)
 - Examples: AUTH_QUICK_REFERENCE.md (Error Handling)
@@ -156,6 +175,7 @@ This directory contains comprehensive documentation about the Voxxy Presents Rea
 ## Key Files in the Codebase
 
 ### Authentication (Most Critical)
+
 1. `/src/contexts/AuthContext.tsx` - Auth state management
 2. `/src/services/api.ts` - API calls & token management
 3. `/src/App.tsx` - Router setup & route protection
@@ -163,6 +183,7 @@ This directory contains comprehensive documentation about the Voxxy Presents Rea
 5. `/src/components/auth/ProtectedRouteV2.tsx` - Auth page guard
 
 ### Supporting Files
+
 6. `/src/utils/cache.ts` - User profile caching
 7. `/src/config/environments.ts` - Environment configuration
 8. `/src/pages/LoginPage.tsx` - Login UI
@@ -184,35 +205,39 @@ This directory contains comprehensive documentation about the Voxxy Presents Rea
 
 ## Role-Based Access Summary
 
-| Role | Redirect | Access |
-|------|----------|--------|
+| Role                   | Redirect          | Access                                  |
+| ---------------------- | ----------------- | --------------------------------------- |
 | producer (venue_owner) | /producer/pending | Event management, organization creation |
-| vendor | /vendor/pending | Vendor applications, registration |
-| consumer (guest) | /pending | Beta access pending |
-| admin | /admin/dashboard | Full system access |
+| vendor                 | /vendor/pending   | Vendor applications, registration       |
+| consumer (guest)       | /pending          | Beta access pending                     |
+| admin                  | /admin/dashboard  | Full system access                      |
 
 ---
 
 ## Common Tasks
 
 ### Adding a New Protected Route
+
 1. Create the page component
 2. Wrap in `<AdminRoute>` if admin-only, or `<RedirectIfAuthenticatedV2>` if auth page
 3. Add to routes in `/src/App.tsx`
 4. Reference: ARCHITECTURE_SUMMARY.md Section 2 or AUTH_QUICK_REFERENCE.md
 
 ### Accessing User Data
+
 1. Import: `import { useAuth } from '@/contexts/AuthContext'`
 2. Use: `const { userProfile, isAdmin } = useAuth()`
 3. Examples: AUTH_QUICK_REFERENCE.md (Accessing Auth State)
 
 ### Making API Calls
+
 1. Use existing API methods from `/src/services/api.ts`
 2. Or add new method to relevant API object (authApi, eventsApi, etc.)
 3. Include Authorization header automatically
 4. Reference: API_CONFIGURATION.md
 
 ### Debugging Auth Issues
+
 1. Check localStorage in browser dev tools
 2. View token: `localStorage.getItem('railsAuthToken')`
 3. View cached profile: `JSON.parse(localStorage.getItem('user_profile_rails-user'))`

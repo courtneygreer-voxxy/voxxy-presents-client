@@ -3,6 +3,7 @@
 ## 1. Overall Purpose and Functionality
 
 **Voxxy Presents** is an event management and vendor coordination platform designed for event producers/venue owners to:
+
 - Create and manage events
 - Invite vendors from their network to participate in events
 - Process vendor applications
@@ -10,6 +11,7 @@
 - Track event attendance and registrations
 
 The application serves multiple user roles:
+
 - **Producers/Venue Owners**: Create events, manage vendor participation, track applications
 - **Vendors**: Apply for vendor opportunities at events, track application status
 - **Consumers**: View events, register for attendance, browse opportunities
@@ -20,6 +22,7 @@ The application serves multiple user roles:
 ## 2. Tech Stack
 
 ### Core Framework & Build Tools
+
 - **React 18.3.1** - UI library with hooks
 - **React Router DOM 7.7.1** - Client-side routing
 - **TypeScript 5** - Type-safe development
@@ -27,7 +30,8 @@ The application serves multiple user roles:
 - **TailwindCSS 3.4.17** - Utility-first CSS framework
 
 ### UI Component Library & Styling
-- **Radix UI** - Comprehensive headless UI components (@radix-ui/*)
+
+- **Radix UI** - Comprehensive headless UI components (@radix-ui/\*)
   - Dialogs, dropdowns, menus, tabs, accordion, toast notifications
   - Form inputs (select, checkbox, radio, toggle)
   - Advanced components (navigation menu, popover, hover card, scroll area)
@@ -37,16 +41,19 @@ The application serves multiple user roles:
 - **clsx 2.1.1** - Conditional class names
 
 ### Form Management
+
 - **React Hook Form 7.61.1** - Performant form state management
 - **@hookform/resolvers 3.9.1** - Zod integration for form validation
 - **Zod 3.24.1** - TypeScript-first schema validation
 
 ### Data & State Management
+
 - **React Context API** - For auth state (AuthContext)
 - **Local caching** - Custom cache utility for user profiles
 - **Mixpanel Browser 2.70.0** - Analytics tracking
 
 ### Visualization & Media
+
 - **Recharts 3.1.0** - Chart and graph library
 - **QR Code Styling 1.9.2** - QR code generation
 - **QRCode.React 4.2.0** - React QR code component
@@ -54,6 +61,7 @@ The application serves multiple user roles:
 - **React Resizable Panels 3.0.4** - Resizable UI panels
 
 ### Utilities
+
 - **date-fns 4.1.0** - Date manipulation
 - **sonner 2.0.6** - Toast notifications
 - **react-day-picker 9.8.1** - Calendar/date picker
@@ -62,10 +70,12 @@ The application serves multiple user roles:
 - **Tailwind Animate 1.0.7** - Animation utilities
 
 ### API & Network
+
 - **Native Fetch API** - HTTP requests (custom wrapper)
 - **No external HTTP client** - Uses browser Fetch with custom error handling
 
 ### Testing
+
 - **Vitest 3.2.4** - Unit testing framework
 - **@testing-library/react 16.3.0** - React component testing
 - **@testing-library/user-event 14.6.1** - User interaction testing
@@ -173,17 +183,20 @@ src/
 ### Key Architectural Patterns
 
 **Component Organization:**
+
 - Feature-based folders (producer, auth, analytics)
 - UI components separated from feature components
 - Page components map to routes
 
 **State Management:**
+
 - **Auth State**: React Context (AuthContext) with localStorage token storage
 - **Local State**: useState for component-level state
 - **Caching**: Custom utility for user profile caching
 - **No Redux/Zustand** - Minimal state management approach
 
 **API Integration:**
+
 - Centralized in `/services/api.ts`
 - Organized by domain (auth, events, registrations, etc.)
 - Custom Fetch wrapper with error handling
@@ -197,11 +210,13 @@ src/
 ### Authentication Architecture
 
 **Token Management:**
+
 - JWT tokens stored in localStorage (`railsAuthToken` key)
 - Token included in Authorization header: `Bearer {token}`
 - Functions: `saveAuthToken()`, `getAuthToken()`, `clearAuthToken()`
 
 **Auth Context (AuthContext.tsx) Provides:**
+
 ```typescript
 {
   currentUser: User | null              // Current authenticated user
@@ -224,14 +239,15 @@ src/
 ```
 
 **User Roles:**
+
 ```typescript
-type UserRole = 
-  | 'consumer'     // Regular user
-  | 'vendor'       // Vendor/booth operator
-  | 'producer'     // Event creator/organizer
-  | 'venue_owner'  // Legacy - maps to producer
-  | 'admin'        // Administrator
-  | 'guest'        // Public/unauthenticated
+type UserRole =
+  | 'consumer' // Regular user
+  | 'vendor' // Vendor/booth operator
+  | 'producer' // Event creator/organizer
+  | 'venue_owner' // Legacy - maps to producer
+  | 'admin' // Administrator
+  | 'guest' // Public/unauthenticated
 ```
 
 ### Sign-Up Flow
@@ -246,6 +262,7 @@ type UserRole =
    - Analytics event tracked
 
 **Sign-up Endpoint:**
+
 ```
 POST /users (legacy endpoint)
 Payload: {
@@ -256,6 +273,7 @@ Payload: {
 ```
 
 **Auto-Login on Signup:**
+
 - After signup succeeds, automatically login user
 - Fetch full profile from `/me` endpoint
 - Cache profile locally
@@ -271,6 +289,7 @@ Payload: {
 7. Analytics event tracked
 
 **Login Endpoint:**
+
 ```
 POST /login (legacy endpoint)
 Headers: { 'X-Mobile-App': 'true', product: 'presents' }
@@ -281,12 +300,14 @@ Response: { token, id, email, role, ... }
 ### Role-Based Redirect
 
 After login, `RoleBasedDashboardRedirect` component routes users:
+
 - **Producer/Venue Owner** → `/producer/pending`
 - **Vendor** → `/vendor/pending`
 - **Consumer/Guest** → `/pending`
 - **Admin** → `/admin/dashboard`
 
 **Protected Route:**
+
 - `AdminRoute` wrapper restricts admin endpoints
 - `ProtectedRouteV2` redirects authenticated users away from auth pages
 - Automatic redirects prevent unauthenticated access to dashboards
@@ -315,12 +336,14 @@ After login, `RoleBasedDashboardRedirect` component routes users:
 ### API Service Architecture
 
 **Base Fetch Wrapper:** `fetchApi<T>(endpoint, options)`
+
 - Generic type support for responses
 - Automatic JWT token injection
 - Error handling with ApiError class
 - Supports all HTTP methods (GET, POST, PATCH, DELETE)
 
 **API Organization:**
+
 ```typescript
 export const authApi = { ... }              // Auth endpoints
 export const organizationsApi = { ... }     // Organization CRUD
@@ -334,15 +357,17 @@ export const venuesApi = { ... }            // Venue data
 ### Error Handling
 
 **Custom ApiError Class:**
+
 ```typescript
 class ApiError extends Error {
   status: number
-  errors?: string[]  // Validation errors from backend
-  message: string    // User-friendly error message
+  errors?: string[] // Validation errors from backend
+  message: string // User-friendly error message
 }
 ```
 
 **Error Handling Strategy:**
+
 - Catch non-200 responses
 - Parse error JSON (fallback to status text)
 - Log errors to console (development)
@@ -352,6 +377,7 @@ class ApiError extends Error {
 ### Authentication in API Calls
 
 **Public Endpoints** (no token required):
+
 - `POST /login`
 - `POST /users` (signup)
 - `POST /password_reset`
@@ -359,6 +385,7 @@ class ApiError extends Error {
 - `POST /v1/presents/events/:slug/registrations` (vendor application)
 
 **Protected Endpoints** (Bearer token required):
+
 - All other requests include `Authorization: Bearer {token}`
 - Token auto-fetched from localStorage
 - Missing/invalid token causes 401 error
@@ -366,6 +393,7 @@ class ApiError extends Error {
 ### API Endpoints by Domain
 
 **Authentication**
+
 - `POST /login` - Login
 - `POST /users` - Signup
 - `DELETE /logout` - Logout
@@ -377,6 +405,7 @@ class ApiError extends Error {
 - `POST /resend_verification` - Resend verification email
 
 **Organizations**
+
 - `GET /api/v1/presents/organizations` - List all organizations
 - `GET /api/v1/presents/me/organization` - Get current user's organization
 - `GET /api/v1/presents/organizations/:slug` - Get organization by slug
@@ -385,6 +414,7 @@ class ApiError extends Error {
 - `DELETE /api/v1/presents/organizations/:slug` - Delete organization
 
 **Events**
+
 - `GET /api/v1/presents/events/:id` - Get event details
 - `GET /api/v1/presents/organizations/:slug/events` - Get organization's events
 - `GET /api/v1/presents/events` - List all events (with filters)
@@ -393,11 +423,13 @@ class ApiError extends Error {
 - `DELETE /api/v1/presents/events/:slug` - Delete event
 
 **Event Registrations**
+
 - `POST /api/v1/presents/events/:slug/registrations` - Submit vendor application
 - `GET /api/v1/presents/registrations/track/:ticket_code` - Track application status
 - `PATCH /api/v1/presents/registrations/:id` - Update registration status (producer only)
 
 **Vendor Applications**
+
 - `GET /api/v1/presents/events/:slug/vendor_applications` - Get event's applications
 - `GET /api/v1/presents/vendor_applications/:id` - Get application details
 - `POST /api/v1/presents/events/:slug/vendor_applications` - Create application
@@ -407,6 +439,7 @@ class ApiError extends Error {
 - `GET /api/v1/presents/vendor_applications/lookup/:code` - Lookup by code
 
 **Email**
+
 - `POST /api/email/contact` - Submit contact form
 - `GET /api/email/contact` - Get contact submissions
 - `POST /api/email/send` - Send email
@@ -416,6 +449,7 @@ class ApiError extends Error {
 ### Request/Response Patterns
 
 **Standard Request Body Format:**
+
 ```typescript
 // Single resource
 { [resource_name]: { field1, field2, ... } }
@@ -432,6 +466,7 @@ class ApiError extends Error {
 ```
 
 **Response Format:**
+
 ```typescript
 // Single resource
 { field1, field2, ... }
@@ -447,6 +482,7 @@ class ApiError extends Error {
 ```
 
 **Error Response Format:**
+
 ```typescript
 {
   error: string,           // Main error message
@@ -464,6 +500,7 @@ class ApiError extends Error {
 **Status:** Partially implemented in frontend, backend integration pending
 
 **What Exists:**
+
 1. **Event Creation Wizard (Step 3)**
    - Producers can select vendor contacts from their network
    - Multi-select interface with search/filter
@@ -483,6 +520,7 @@ class ApiError extends Error {
    - Location: `/src/components/producer/CommandCenter.tsx`
 
 **What's Missing (Backend Only):**
+
 - Actual invitation creation and storage
 - Email notifications to invited vendors
 - Public invitation view page
@@ -490,10 +528,11 @@ class ApiError extends Error {
 - Invitation tracking and analytics
 
 **Frontend Ready-to-Implement** (see docs/BACKEND_INVITATION_REQUIREMENTS.md):
+
 ```typescript
 // Currently logs to console but doesn't persist:
 if (wizardState.inviteList.invitedContactIds.length > 0) {
-  console.log(`Inviting ${wizardState.inviteList.invitedContactIds.length} contacts`);
+  console.log(`Inviting ${wizardState.inviteList.invitedContactIds.length} contacts`)
   // TODO: Uncomment when backend is ready
   // await eventInvitationsApi.createBatch(newEvent.slug, invitedContactIds);
 }
@@ -523,6 +562,7 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
    - Uses ticket code from registration
 
 **Short URL Redirect** (`/apply/:code`)
+
 - Short code redirects to actual application form
 - Helps with marketing/sharing
 
@@ -579,6 +619,7 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
 6. Can track application status with ticket code
 
 **Alternative: Invitation-Based Flow (Future)**
+
 1. Producer invites vendor from network
 2. Vendor receives invitation email
 3. Vendor clicks link to view invitation
@@ -590,6 +631,7 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
 ## Summary
 
 This is a modern, role-based SaaS event management platform with:
+
 - **Clean Architecture:** Separation of concerns with services, components, contexts
 - **Type Safety:** Full TypeScript coverage
 - **Scalable UI:** Radix UI + TailwindCSS component system
@@ -599,4 +641,3 @@ This is a modern, role-based SaaS event management platform with:
 - **Progressive Enhancement:** Core features work without authentication
 
 The application is production-ready but the event invitation system (for producers inviting vendors) is awaiting backend implementation per the requirements document.
-

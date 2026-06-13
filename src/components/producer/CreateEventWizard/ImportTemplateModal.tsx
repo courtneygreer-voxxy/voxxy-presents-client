@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
-import { emailCampaignTemplatesApi } from '@/services/api';
-import type { EmailCampaignTemplate } from '@/types/email';
+import { useState, useEffect } from 'react'
+import { X } from 'lucide-react'
+import { emailCampaignTemplatesApi } from '@/services/api'
+import type { EmailCampaignTemplate } from '@/types/email'
 
 interface ImportTemplateModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSelect: (template: EmailCampaignTemplate) => void;
-  currentTemplateId?: number | null;
+  isOpen: boolean
+  onClose: () => void
+  onSelect: (template: EmailCampaignTemplate) => void
+  currentTemplateId?: number | null
 }
 
 export default function ImportTemplateModal({
@@ -16,34 +16,34 @@ export default function ImportTemplateModal({
   onSelect,
   currentTemplateId,
 }: ImportTemplateModalProps) {
-  const [templates, setTemplates] = useState<EmailCampaignTemplate[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [templates, setTemplates] = useState<EmailCampaignTemplate[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (isOpen) {
-      fetchTemplates();
+      fetchTemplates()
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   const fetchTemplates = async () => {
     try {
-      setLoading(true);
-      const response = await emailCampaignTemplatesApi.getAll();
-      setTemplates(response || []);
+      setLoading(true)
+      const response = await emailCampaignTemplatesApi.getAll()
+      setTemplates(response || [])
     } catch (err) {
-      console.error('Failed to fetch templates:', err);
-      setTemplates([]);
+      console.error('Failed to fetch templates:', err)
+      setTemplates([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleSelectTemplate = (template: EmailCampaignTemplate) => {
-    onSelect(template);
-    onClose();
-  };
+    onSelect(template)
+    onClose()
+  }
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -102,7 +102,8 @@ export default function ImportTemplateModal({
                           )}
                         </div>
                         <p className="text-sm text-foreground/70">
-                          {template.description || 'Recommended email workflow with all standard triggers'}
+                          {template.description ||
+                            'Recommended email workflow with all standard triggers'}
                         </p>
                       </div>
                     </div>
@@ -164,5 +165,5 @@ export default function ImportTemplateModal({
         </div>
       </div>
     </div>
-  );
+  )
 }

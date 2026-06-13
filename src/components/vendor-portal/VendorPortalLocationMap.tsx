@@ -1,35 +1,38 @@
-import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, ExternalLink } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useEffect, useRef, useState } from 'react'
+import { ChevronDown, ExternalLink } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-const GOOGLE_EMBED_KEY = import.meta.env.VITE_GOOGLE_MAPS_EMBED_API_KEY as string | undefined;
+const GOOGLE_EMBED_KEY = import.meta.env.VITE_GOOGLE_MAPS_EMBED_API_KEY as string | undefined
 
 function buildPlaceQuery(venue: string, location: string) {
-  return [venue, location].map(s => s?.trim()).filter(Boolean).join(', ');
+  return [venue, location]
+    .map((s) => s?.trim())
+    .filter(Boolean)
+    .join(', ')
 }
 
 export function VendorPortalLocationMap({ venue, location }: { venue: string; location: string }) {
-  const query = buildPlaceQuery(venue, location);
-  const detailsRef = useRef<HTMLDetailsElement>(null);
-  const [embedLoaded, setEmbedLoaded] = useState(false);
+  const query = buildPlaceQuery(venue, location)
+  const detailsRef = useRef<HTMLDetailsElement>(null)
+  const [embedLoaded, setEmbedLoaded] = useState(false)
 
   useEffect(() => {
-    const el = detailsRef.current;
-    if (!el) return;
+    const el = detailsRef.current
+    if (!el) return
     const onToggle = () => {
-      if (el.open) setEmbedLoaded(true);
-    };
-    el.addEventListener('toggle', onToggle);
-    return () => el.removeEventListener('toggle', onToggle);
-  }, []);
+      if (el.open) setEmbedLoaded(true)
+    }
+    el.addEventListener('toggle', onToggle)
+    return () => el.removeEventListener('toggle', onToggle)
+  }, [])
 
-  if (!query) return null;
+  if (!query) return null
 
-  const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
 
   const embedSrc = GOOGLE_EMBED_KEY?.trim()
     ? `https://www.google.com/maps/embed/v1/place?key=${encodeURIComponent(GOOGLE_EMBED_KEY.trim())}&q=${encodeURIComponent(query)}`
-    : `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=en&z=15&output=embed`;
+    : `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=en&z=15&output=embed`
 
   return (
     <details
@@ -39,7 +42,7 @@ export function VendorPortalLocationMap({ venue, location }: { venue: string; lo
       <summary
         className={cn(
           'flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5 text-xs font-medium text-foreground transition-colors hover:bg-white/[0.06]',
-          '[&::-webkit-details-marker]:hidden'
+          '[&::-webkit-details-marker]:hidden',
         )}
       >
         <span>Show map</span>
@@ -72,5 +75,5 @@ export function VendorPortalLocationMap({ venue, location }: { venue: string; lo
         </a>
       </div>
     </details>
-  );
+  )
 }

@@ -3,6 +3,7 @@
 ## What This App Does
 
 Voxxy Presents is an **event management and vendor coordination platform** that allows:
+
 - Event producers to create events and manage vendor participation
 - Vendors to apply for vendor opportunities at events
 - Event organizers to curate vendor networks and send invitations
@@ -10,6 +11,7 @@ Voxxy Presents is an **event management and vendor coordination platform** that 
 ## Core User Flows
 
 ### Producer Workflow
+
 ```
 Sign Up (producer role)
   → Auto-create organization
@@ -25,6 +27,7 @@ Sign Up (producer role)
 ```
 
 ### Vendor Workflow
+
 ```
 Navigate to event page
   → View event details
@@ -34,6 +37,7 @@ Navigate to event page
 ```
 
 ### Authentication
+
 ```
 User submits contact form (beta request)
   → Backend approves
@@ -45,17 +49,17 @@ User submits contact form (beta request)
 
 ## Tech Stack Overview
 
-| Category | Tech |
-|----------|------|
-| **Frontend** | React 18 + TypeScript |
-| **Build** | Vite 6 |
-| **Routing** | React Router 7 |
-| **Styling** | TailwindCSS + Radix UI |
-| **State** | Context API + localStorage |
-| **Forms** | React Hook Form + Zod |
-| **API** | Native Fetch (custom wrapper) |
-| **Analytics** | Mixpanel |
-| **Testing** | Vitest + React Testing Library |
+| Category      | Tech                           |
+| ------------- | ------------------------------ |
+| **Frontend**  | React 18 + TypeScript          |
+| **Build**     | Vite 6                         |
+| **Routing**   | React Router 7                 |
+| **Styling**   | TailwindCSS + Radix UI         |
+| **State**     | Context API + localStorage     |
+| **Forms**     | React Hook Form + Zod          |
+| **API**       | Native Fetch (custom wrapper)  |
+| **Analytics** | Mixpanel                       |
+| **Testing**   | Vitest + React Testing Library |
 
 ## Project Structure
 
@@ -77,44 +81,49 @@ src/
 ## Key Architectural Decisions
 
 ### 1. Authentication Pattern
+
 - **Single Auth Context** - All auth state in one place
 - **JWT in localStorage** - Persisted across sessions
 - **Role-based routing** - Different dashboards for different users
 - **Protected routes** - AdminRoute, ProtectedRouteV2 wrappers
 
 ### 2. API Integration
+
 - **Centralized API service** - Single `api.ts` file with organized API objects
 - **Custom fetch wrapper** - `fetchApi<T>()` handles auth, errors, serialization
 - **Auto token injection** - Bearer token automatically added to requests
 - **Domain organization** - authApi, eventsApi, vendorApplicationsApi, etc.
 
 ### 3. State Management
+
 - **Minimal approach** - Context API for auth, useState for component state
 - **Smart caching** - User profiles cached locally for faster load
 - **No Redux** - Kept simple and maintainable
 
 ### 4. Component Organization
+
 - **Feature-based** - Components grouped by feature (producer, auth)
 - **Separation of concerns** - UI components separate from feature logic
 - **Reusable primitives** - Radix UI for accessibility and consistency
 
 ## Important Files to Know
 
-| File | Purpose |
-|------|---------|
-| `App.tsx` | Main router with all routes defined |
-| `contexts/AuthContext.tsx` | Auth state, login, signup, logout |
-| `services/api.ts` | All API endpoints (40KB) |
-| `pages/ProducerDashboard.tsx` | Main producer dashboard |
-| `components/producer/CreateEventWizard/` | Event creation flow |
-| `components/producer/Network/` | Vendor contacts management |
-| `components/producer/ApplicantsTab.tsx` | Vendors & Applicants tab with CRM merge |
-| `components/producer/EditVendorDetailsModal.tsx` | Edit vendor details with bidirectional sync |
-| `docs/architecture/VENDOR_CRM_BIDIRECTIONAL_SYNC.md` | Complete CRM sync architecture |
+| File                                                 | Purpose                                     |
+| ---------------------------------------------------- | ------------------------------------------- |
+| `App.tsx`                                            | Main router with all routes defined         |
+| `contexts/AuthContext.tsx`                           | Auth state, login, signup, logout           |
+| `services/api.ts`                                    | All API endpoints (40KB)                    |
+| `pages/ProducerDashboard.tsx`                        | Main producer dashboard                     |
+| `components/producer/CreateEventWizard/`             | Event creation flow                         |
+| `components/producer/Network/`                       | Vendor contacts management                  |
+| `components/producer/ApplicantsTab.tsx`              | Vendors & Applicants tab with CRM merge     |
+| `components/producer/EditVendorDetailsModal.tsx`     | Edit vendor details with bidirectional sync |
+| `docs/architecture/VENDOR_CRM_BIDIRECTIONAL_SYNC.md` | Complete CRM sync architecture              |
 
 ## Current Features
 
 ### MVP Features
+
 - User authentication (login, signup, password reset)
 - Producer can create events (4-step wizard)
 - Producer can manage vendor contacts/network
@@ -124,6 +133,7 @@ src/
 - Smart CRM merge (Network ↔ Vendors bidirectional sync)
 
 ### Feature Status
+
 - **Complete**: Auth, event creation, vendor applications, tracking, CRM sync
 - **In Progress**: Event invitation system (frontend complete, awaiting backend)
 - **Planned**: Email notifications, advanced analytics

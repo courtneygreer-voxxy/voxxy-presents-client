@@ -26,7 +26,7 @@ export function trackPageLoad(pageName: string, metadata?: Record<string, any>) 
     page: pageName,
     load_time_ms: Math.round(loadTime),
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   }
 
   // Add core web vitals if available
@@ -60,7 +60,7 @@ export function createPageLoadTracker(pageName: string, metadata?: Record<string
     trackOnUnmount: () => {
       const loadTime = performance.now() - performance.now()
       trackPageLoad(pageName, { ...metadata, component_mount_time_ms: Math.round(loadTime) })
-    }
+    },
   }
 }
 
@@ -94,7 +94,7 @@ export function markEnd(name: string, metadata?: Record<string, any>): number | 
     metric_name: name,
     duration_ms: Math.round(duration),
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   })
 
   if (import.meta.env.DEV) {
@@ -111,7 +111,7 @@ export function markEnd(name: string, metadata?: Record<string, any>): number | 
 export async function trackApiCall<T>(
   endpoint: string,
   fetcher: () => Promise<T>,
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>,
 ): Promise<T> {
   const startTime = performance.now()
 
@@ -124,7 +124,7 @@ export async function trackApiCall<T>(
       duration_ms: Math.round(duration),
       status: 'success',
       timestamp: new Date().toISOString(),
-      ...metadata
+      ...metadata,
     })
 
     if (import.meta.env.DEV) {
@@ -141,7 +141,7 @@ export async function trackApiCall<T>(
       status: 'error',
       error_message: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString(),
-      ...metadata
+      ...metadata,
     })
 
     if (import.meta.env.DEV) {
@@ -159,13 +159,13 @@ export async function trackApiCall<T>(
 export function trackInteraction(
   interactionName: string,
   duration: number,
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>,
 ): void {
   analytics.track('user_interaction_performance', {
     interaction: interactionName,
     duration_ms: Math.round(duration),
     timestamp: new Date().toISOString(),
-    ...metadata
+    ...metadata,
   })
 
   if (import.meta.env.DEV) {
@@ -189,7 +189,7 @@ export function trackCoreWebVitals(): void {
         analytics.track('core_web_vital', {
           metric: 'FCP',
           value: Math.round(entry.startTime),
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         })
 
         if (import.meta.env.DEV) {
@@ -207,7 +207,7 @@ export function trackCoreWebVitals(): void {
       analytics.track('core_web_vital', {
         metric: 'LCP',
         value: Math.round(lastEntry.startTime),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       if (import.meta.env.DEV) {
@@ -228,19 +228,23 @@ export function trackCoreWebVitals(): void {
     clsObserver.observe({ entryTypes: ['layout-shift'] })
 
     // Report CLS on page hide
-    window.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        analytics.track('core_web_vital', {
-          metric: 'CLS',
-          value: clsValue,
-          timestamp: new Date().toISOString()
-        })
+    window.addEventListener(
+      'visibilitychange',
+      () => {
+        if (document.visibilityState === 'hidden') {
+          analytics.track('core_web_vital', {
+            metric: 'CLS',
+            value: clsValue,
+            timestamp: new Date().toISOString(),
+          })
 
-        if (import.meta.env.DEV) {
-          console.log(`📈 CLS: ${clsValue.toFixed(3)}`)
+          if (import.meta.env.DEV) {
+            console.log(`📈 CLS: ${clsValue.toFixed(3)}`)
+          }
         }
-      }
-    }, { once: true })
+      },
+      { once: true },
+    )
   } catch (error) {
     console.error('Error tracking Core Web Vitals:', error)
   }

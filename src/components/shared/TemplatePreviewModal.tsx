@@ -10,26 +10,21 @@
  * - Admin → Template preview
  */
 
-import { X, Mail, Send, Info } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import EmailFooterCard from '@/components/shared/EmailFooterCard';
+import { X, Mail, Send, Info } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import EmailFooterCard from '@/components/shared/EmailFooterCard'
 
 interface TemplatePreviewModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
   template: {
-    name: string;
-    subject_template: string;
-    body_template: string;
-    description?: string;
-  };
-  onSendTest?: () => void;
+    name: string
+    subject_template: string
+    body_template: string
+    description?: string
+  }
+  onSendTest?: () => void
 }
 
 export default function TemplatePreviewModal({
@@ -38,10 +33,10 @@ export default function TemplatePreviewModal({
   template,
   onSendTest,
 }: TemplatePreviewModalProps) {
-  if (!template) return null;
+  if (!template) return null
 
-  const displaySubject = template.subject_template.replace(/<[^>]*>/g, '');
-  const displayBody = template.body_template;
+  const displaySubject = template.subject_template.replace(/<[^>]*>/g, '')
+  const displayBody = template.body_template
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -101,14 +96,11 @@ export default function TemplatePreviewModal({
               Test Email
             </Button>
           )}
-          <Button
-            onClick={onClose}
-            className="voxxy-btn-solid"
-          >
+          <Button onClick={onClose} className="voxxy-btn-solid">
             Close
           </Button>
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

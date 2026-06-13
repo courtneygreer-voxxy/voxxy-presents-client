@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,28 +8,28 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Mail, Users, AlertTriangle } from 'lucide-react';
-import { toast } from 'sonner';
+} from '@/components/ui/alert-dialog'
+import { Mail, Users, AlertTriangle } from 'lucide-react'
+import { toast } from 'sonner'
 
 export interface EmailNotification {
-  type: 'category_changed' | 'event_details_changed' | 'payment_confirmed' | 'event_canceled';
-  requires_confirmation: boolean;
-  recipient_count?: number;
-  recipient_email?: string;
-  warning: string;
-  changed_fields?: string[];
+  type: 'category_changed' | 'event_details_changed' | 'payment_confirmed' | 'event_canceled'
+  requires_confirmation: boolean
+  recipient_count?: number
+  recipient_email?: string
+  warning: string
+  changed_fields?: string[]
   endpoint: {
-    check?: string;
-    send: string;
-  };
+    check?: string
+    send: string
+  }
 }
 
 interface EmailNotificationDialogProps {
-  notification: EmailNotification | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: () => Promise<void>;
+  notification: EmailNotification | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onConfirm: () => Promise<void>
 }
 
 export function EmailNotificationDialog({
@@ -38,45 +38,45 @@ export function EmailNotificationDialog({
   onOpenChange,
   onConfirm,
 }: EmailNotificationDialogProps) {
-  const [sending, setSending] = useState(false);
+  const [sending, setSending] = useState(false)
 
-  if (!notification) return null;
+  if (!notification) return null
 
   const handleConfirm = async () => {
     try {
-      setSending(true);
-      await onConfirm();
-      onOpenChange(false);
-      toast.success('Email notification sent successfully');
+      setSending(true)
+      await onConfirm()
+      onOpenChange(false)
+      toast.success('Email notification sent successfully')
     } catch (error: any) {
-      console.error('Failed to send email:', error);
-      toast.error(error.message || 'Failed to send email notification');
+      console.error('Failed to send email:', error)
+      toast.error(error.message || 'Failed to send email notification')
     } finally {
-      setSending(false);
+      setSending(false)
     }
-  };
+  }
 
   const getIcon = () => {
     if (notification.type === 'event_canceled') {
-      return <AlertTriangle className="h-6 w-6 text-red-500" />;
+      return <AlertTriangle className="h-6 w-6 text-red-500" />
     }
-    return <Mail className="h-6 w-6 text-blue-500" />;
-  };
+    return <Mail className="h-6 w-6 text-blue-500" />
+  }
 
   const getTitle = () => {
     switch (notification.type) {
       case 'category_changed':
-        return 'Send Category Update Email?';
+        return 'Send Category Update Email?'
       case 'event_details_changed':
-        return 'Send Event Update Email?';
+        return 'Send Event Update Email?'
       case 'payment_confirmed':
-        return 'Send Payment Confirmation?';
+        return 'Send Payment Confirmation?'
       case 'event_canceled':
-        return 'Send Cancellation Email?';
+        return 'Send Cancellation Email?'
       default:
-        return 'Send Email Notification?';
+        return 'Send Email Notification?'
     }
-  };
+  }
 
   const getRecipientInfo = () => {
     if (notification.recipient_count !== undefined) {
@@ -89,7 +89,7 @@ export function EmailNotificationDialog({
             {notification.recipient_count === 1 ? 'vendor' : 'vendors'}
           </span>
         </div>
-      );
+      )
     }
 
     if (notification.recipient_email) {
@@ -100,15 +100,15 @@ export function EmailNotificationDialog({
             Recipient: <span className="font-mono">{notification.recipient_email}</span>
           </span>
         </div>
-      );
+      )
     }
 
-    return null;
-  };
+    return null
+  }
 
   const getChangedFieldsInfo = () => {
     if (!notification.changed_fields || notification.changed_fields.length === 0) {
-      return null;
+      return null
     }
 
     return (
@@ -122,8 +122,8 @@ export function EmailNotificationDialog({
           ))}
         </ul>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -147,9 +147,7 @@ export function EmailNotificationDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={sending}>
-            Skip
-          </AlertDialogCancel>
+          <AlertDialogCancel disabled={sending}>Skip</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={sending}
@@ -170,5 +168,5 @@ export function EmailNotificationDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  );
+  )
 }

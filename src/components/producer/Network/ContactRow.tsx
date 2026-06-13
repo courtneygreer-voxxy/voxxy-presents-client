@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { Instagram, Music2, Globe, Pencil, Trash2, MapPin, MoreVertical, MailX } from 'lucide-react';
-import { VendorContact } from '@/services/api';
+import { useState } from 'react'
+import { Instagram, Music2, Globe, Pencil, Trash2, MapPin, MoreVertical, MailX } from 'lucide-react'
+import { VendorContact } from '@/services/api'
 
 interface ContactRowProps {
-  contact: VendorContact;
-  isSelected: boolean;
-  onSelect: () => void;
-  onDelete: () => void;
-  onEdit: () => void;
+  contact: VendorContact
+  isSelected: boolean
+  onSelect: () => void
+  onDelete: () => void
+  onEdit: () => void
 }
 
 export default function ContactRow({
@@ -17,7 +17,7 @@ export default function ContactRow({
   onDelete,
   onEdit,
 }: ContactRowProps) {
-  const [showMenu, setShowMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState(false)
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
@@ -25,11 +25,11 @@ export default function ContactRow({
       'Table Vendor': 'bg-blue-500/20 text-blue-950 dark:text-blue-300 border-blue-500/30',
       Sponsor: 'bg-amber-500/20 text-amber-950 dark:text-amber-300 border-amber-500/30',
       'Food & Beverage': 'bg-green-500/20 text-emerald-900 dark:text-green-300 border-green-500/30',
-    };
-    return colors[category] || 'bg-background/10 text-foreground/70 border-border';
-  };
+    }
+    return colors[category] || 'bg-background/10 text-foreground/70 border-border'
+  }
 
-  const isUnsubscribed = contact.unsubscribe_status?.is_unsubscribed;
+  const isUnsubscribed = contact.unsubscribe_status?.is_unsubscribed
 
   return (
     <div className="voxxy-table-row voxxy-table-row-hover last:border-0">
@@ -189,8 +189,8 @@ export default function ContactRow({
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation();
-              setShowMenu(!showMenu);
+              e.stopPropagation()
+              setShowMenu(!showMenu)
             }}
             className="p-1.5 hover:bg-accent/50 text-foreground/70 hover:text-foreground rounded transition-colors relative z-0"
             title="Actions"
@@ -211,9 +211,9 @@ export default function ContactRow({
                 <button
                   type="button"
                   onClick={(e) => {
-                    e.stopPropagation();
-                    setShowMenu(false);
-                    onEdit();
+                    e.stopPropagation()
+                    setShowMenu(false)
+                    onEdit()
                   }}
                   className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-foreground transition-colors hover:bg-accent/60 dark:hover:bg-background/10"
                 >
@@ -223,9 +223,9 @@ export default function ContactRow({
                 <button
                   type="button"
                   onClick={(e) => {
-                    e.stopPropagation();
-                    setShowMenu(false);
-                    onDelete();
+                    e.stopPropagation()
+                    setShowMenu(false)
+                    onDelete()
                   }}
                   className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-500/10 dark:text-red-400 flex items-center gap-2 transition-colors"
                 >
@@ -238,5 +238,5 @@ export default function ContactRow({
         </div>
       </div>
     </div>
-  );
+  )
 }

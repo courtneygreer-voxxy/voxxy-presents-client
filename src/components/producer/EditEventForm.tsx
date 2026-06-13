@@ -1,56 +1,59 @@
-import { useState } from 'react';
-import { ArrowLeft, Trash2 } from 'lucide-react';
-import { formatDateForInput } from '@/utils/dateHelpers';
+import { useState } from 'react'
+import { ArrowLeft, Trash2 } from 'lucide-react'
+import { formatDateForInput } from '@/utils/dateHelpers'
 
 interface Event {
-  id: number;
-  slug: string;
-  title: string;
-  description?: string;
-  event_date?: string;
-  event_end_date?: string;
-  start_time?: string;
-  end_time?: string;
+  id: number
+  slug: string
+  title: string
+  description?: string
+  event_date?: string
+  event_end_date?: string
+  start_time?: string
+  end_time?: string
   dates?: {
-    start?: string;
-    end?: string;
-    start_time?: string;
-    end_time?: string;
-  };
-  venue?: string;
-  location?: string;
-  age_restriction?: string;
-  ticket_link?: string;
-  application_deadline?: string;
+    start?: string
+    end?: string
+    start_time?: string
+    end_time?: string
+  }
+  venue?: string
+  location?: string
+  age_restriction?: string
+  ticket_link?: string
+  application_deadline?: string
   status?: {
-    published?: boolean;
-    status?: string;
-  };
+    published?: boolean
+    status?: string
+  }
 }
 
 interface EditEventFormProps {
-  event: Event;
-  onCancel: () => void;
-  onUpdate: (eventSlug: string, eventData: {
-    title: string;
-    description: string;
-    event_date: string;
-    event_end_date?: string;
-    start_time?: string;
-    end_time?: string;
-    venue?: string;
-    location: string;
-    age_restriction?: string;
-    ticket_link?: string;
-    application_deadline?: string;
-  }) => Promise<void>;
-  onDelete: (eventSlug: string) => Promise<void>;
+  event: Event
+  onCancel: () => void
+  onUpdate: (
+    eventSlug: string,
+    eventData: {
+      title: string
+      description: string
+      event_date: string
+      event_end_date?: string
+      start_time?: string
+      end_time?: string
+      venue?: string
+      location: string
+      age_restriction?: string
+      ticket_link?: string
+      application_deadline?: string
+    },
+  ) => Promise<void>
+  onDelete: (eventSlug: string) => Promise<void>
 }
 
 export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: EditEventFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [formData, setFormData] = useState({
     title: event.title || '',
     description: event.description || '',
@@ -63,69 +66,69 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
     age_restriction: event.age_restriction || '',
     ticket_link: event.ticket_link || '',
     application_deadline: formatDateForInput(event.application_deadline) || '',
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  })
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string> = {}
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Event name is required';
+      newErrors.title = 'Event name is required'
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
+      newErrors.description = 'Description is required'
     }
 
     if (!formData.event_date) {
-      newErrors.event_date = 'Date is required';
+      newErrors.event_date = 'Date is required'
     }
 
     if (!formData.location.trim()) {
-      newErrors.location = 'Location is required';
+      newErrors.location = 'Location is required'
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!validateForm()) {
-      return;
+      return
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
-      await onUpdate(event.slug, formData);
+      await onUpdate(event.slug, formData)
     } catch (error) {
-      console.error('Failed to update event:', error);
+      console.error('Failed to update event:', error)
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleDelete = async () => {
-    setIsDeleting(true);
+    setIsDeleting(true)
     try {
-      await onDelete(event.slug);
+      await onDelete(event.slug)
     } catch (error) {
-      console.error('Failed to delete event:', error);
-      setIsDeleting(false);
+      console.error('Failed to delete event:', error)
+      setIsDeleting(false)
     }
-  };
+  }
 
   const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
     }
-  };
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-4 pt-2">
@@ -141,12 +144,8 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
-            Edit Event
-          </h1>
-          <p className="text-foreground/60">
-            Update your event details
-          </p>
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">Edit Event</h1>
+          <p className="text-foreground/60">Update your event details</p>
         </div>
 
         {/* Delete Button */}
@@ -207,9 +206,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                 errors.title ? 'border-red-500' : 'border-border'
               } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
             />
-            {errors.title && (
-              <p className="mt-1 text-sm text-red-400">{errors.title}</p>
-            )}
+            {errors.title && <p className="mt-1 text-sm text-red-400">{errors.title}</p>}
           </div>
 
           {/* Description */}
@@ -333,9 +330,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                   errors.location ? 'border-red-500' : 'border-border'
                 } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
               />
-              {errors.location && (
-                <p className="mt-1 text-sm text-red-400">{errors.location}</p>
-              )}
+              {errors.location && <p className="mt-1 text-sm text-red-400">{errors.location}</p>}
             </div>
           </div>
 
@@ -371,7 +366,10 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
 
           {/* Application Deadline */}
           <div>
-            <label htmlFor="application_deadline" className="block text-foreground/90 font-medium mb-2">
+            <label
+              htmlFor="application_deadline"
+              className="block text-foreground/90 font-medium mb-2"
+            >
               Application Deadline
             </label>
             <input
@@ -411,5 +409,5 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
         </div>
       </form>
     </div>
-  );
+  )
 }

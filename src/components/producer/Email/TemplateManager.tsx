@@ -1,32 +1,32 @@
-import { useState } from 'react';
-import TemplateLibraryPage from './TemplateLibraryPage';
-import TemplateBuilderPage from './TemplateBuilderPage';
+import { useState } from 'react'
+import TemplateLibraryPage from './TemplateLibraryPage'
+import TemplateBuilderPage from './TemplateBuilderPage'
 
-type View = 'library' | 'builder';
+type View = 'library' | 'builder'
 
 export default function TemplateManager() {
-  const [currentView, setCurrentView] = useState<View>('library');
-  const [editingTemplateId, setEditingTemplateId] = useState<number | undefined>();
-  const [createFromDefault, setCreateFromDefault] = useState(false);
+  const [currentView, setCurrentView] = useState<View>('library')
+  const [editingTemplateId, setEditingTemplateId] = useState<number | undefined>()
+  const [createFromDefault, setCreateFromDefault] = useState(false)
 
   const navigateToLibrary = () => {
-    setCurrentView('library');
-    setEditingTemplateId(undefined);
-    setCreateFromDefault(false);
-  };
+    setCurrentView('library')
+    setEditingTemplateId(undefined)
+    setCreateFromDefault(false)
+  }
 
   const navigateToBuilder = (templateId?: number) => {
     if (templateId === undefined) {
       // Creating new sequence from default
-      setCreateFromDefault(true);
-      setEditingTemplateId(undefined);
+      setCreateFromDefault(true)
+      setEditingTemplateId(undefined)
     } else {
       // Editing existing sequence
-      setCreateFromDefault(false);
-      setEditingTemplateId(templateId);
+      setCreateFromDefault(false)
+      setEditingTemplateId(templateId)
     }
-    setCurrentView('builder');
-  };
+    setCurrentView('builder')
+  }
 
   if (currentView === 'builder') {
     return (
@@ -35,7 +35,7 @@ export default function TemplateManager() {
         createFromDefault={createFromDefault}
         onBack={navigateToLibrary}
       />
-    );
+    )
   }
 
   return (
@@ -43,5 +43,5 @@ export default function TemplateManager() {
       onNavigateToBuilder={navigateToBuilder}
       onBack={undefined} // No back button - already in dashboard
     />
-  );
+  )
 }

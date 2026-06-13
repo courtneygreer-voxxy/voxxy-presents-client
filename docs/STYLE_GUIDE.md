@@ -13,10 +13,11 @@ The app defaults to **dark mode**. The `<html>` element receives the `.dark` cla
 
 ```ts
 // tailwind.config.ts
-darkMode: ["class"]  // toggled by adding/removing .dark on <html>
+darkMode: ['class'] // toggled by adding/removing .dark on <html>
 ```
 
 CSS tokens live in two blocks inside `src/index.css`:
+
 - `:root { ... }` — light mode values
 - `.dark { ... }` — dark mode overrides
 
@@ -34,28 +35,28 @@ All colors are expressed as HSL channel triplets so Tailwind's opacity modifier 
 
 ### Semantic tokens (`:root` / `.dark`)
 
-| Token | Light | Dark | Notes |
-|---|---|---|---|
-| `--background` | `270 35% 98%` (near-white violet) | `262 38% 10%` (deep indigo) | Body background |
-| `--foreground` | `260 32% 14%` | `240 5% 95%` | Primary text |
-| `--card` | `0 0% 100%` | `262 35% 14%` | Card surface |
-| `--card-foreground` | `260 32% 14%` | `240 5% 95%` | Text on cards |
-| `--primary` | `250 68% 25%` | `262 72% 61%` | Brand violet |
-| `--primary-foreground` | `0 0% 100%` | `0 0% 100%` | Text on primary |
-| `--muted` | `262 14% 93%` | `262 20% 18%` | Subdued surfaces |
-| `--muted-foreground` | `260 12% 40%` | `240 5% 65%` | Subdued text |
-| `--destructive` | `0 72% 48%` | `0 63% 31%` | Red error/danger |
-| `--border` | `260 14% 88%` | `0 0% 100% / 0.1` | Default border |
-| `--ring` | `250 68% 25%` | `262 72% 61%` | Focus ring |
+| Token                  | Light                             | Dark                        | Notes            |
+| ---------------------- | --------------------------------- | --------------------------- | ---------------- |
+| `--background`         | `270 35% 98%` (near-white violet) | `262 38% 10%` (deep indigo) | Body background  |
+| `--foreground`         | `260 32% 14%`                     | `240 5% 95%`                | Primary text     |
+| `--card`               | `0 0% 100%`                       | `262 35% 14%`               | Card surface     |
+| `--card-foreground`    | `260 32% 14%`                     | `240 5% 95%`                | Text on cards    |
+| `--primary`            | `250 68% 25%`                     | `262 72% 61%`               | Brand violet     |
+| `--primary-foreground` | `0 0% 100%`                       | `0 0% 100%`                 | Text on primary  |
+| `--muted`              | `262 14% 93%`                     | `262 20% 18%`               | Subdued surfaces |
+| `--muted-foreground`   | `260 12% 40%`                     | `240 5% 65%`                | Subdued text     |
+| `--destructive`        | `0 72% 48%`                       | `0 63% 31%`                 | Red error/danger |
+| `--border`             | `260 14% 88%`                     | `0 0% 100% / 0.1`           | Default border   |
+| `--ring`               | `250 68% 25%`                     | `262 72% 61%`               | Focus ring       |
 
 ### Sidebar tokens (`.dark` only — producer app shell)
 
-| Token | Value |
-|---|---|
+| Token                  | Value         |
+| ---------------------- | ------------- |
 | `--sidebar-background` | `258 55% 16%` |
-| `--sidebar-foreground` | `240 5% 96%` |
-| `--sidebar-primary` | `262 72% 61%` |
-| `--sidebar-border` | `262 20% 20%` |
+| `--sidebar-foreground` | `240 5% 96%`  |
+| `--sidebar-primary`    | `262 72% 61%` |
+| `--sidebar-border`     | `262 20% 20%` |
 
 ### Brand hex palette (Tailwind config)
 
@@ -81,24 +82,24 @@ All gradient tokens live in the `.dark` block of `src/index.css`. Light-mode gra
 
 ### Dark-mode gradient reference
 
-| Token | Value summary | Usage |
-|---|---|---|
-| `--voxxy-grad-body` | `#221469 → #54309f → #bd2dcf` (0%/30%/100%) | Fixed body background, marketing hero, producer shell |
-| `--voxxy-grad-page` | alias `--voxxy-grad-body` | Generic page wrapper |
-| `--voxxy-grad-page-cool` | alias `--voxxy-grad-body` | Cool-toned page variant (application form) |
-| `--voxxy-grad-brand` | `#cc30e8 → #af3cda → #9054e3 → #651ae9` | Brand CTA buttons, filled accents |
-| `--voxxy-grad-cta` | `#af3cda → #651ae9` | CTA buttons, active nav tabs |
-| `--voxxy-grad-cta-pink` | `#cc30e8 → #9054e3` | Pink-leaning CTA variant |
-| `--voxxy-grad-nav` | `rgba(34,20,105,0.95) → rgba(84,48,159,0.95)` | Fixed nav bar surface |
-| `--voxxy-grad-glass-card` | translucent purple wash | `.glass-card` interior |
-| `--voxxy-grad-card-deep` | `#322848 → #261c38` | `.voxxy-gradient-card-deep` |
-| `--voxxy-grad-panel` | `#221838 → #181222` | Side panels and drawers |
-| `--voxxy-grad-editor` | `#151028 → #221a38 → #151028` | Email / template editor |
-| `--voxxy-grad-hero-split` | `#cc30e8 → #9054e3 → #651ae9` | Hero section with split layout |
-| `--voxxy-grad-table-header` | translucent blue-violet | Table header rows |
-| `--voxxy-grad-modal-header` | `purple/92 → blue/92` | Modal header bars |
-| `--voxxy-grad-nav-tab-active` | alias `--voxxy-grad-cta` | Active navigation pill in sidebar |
-| `--voxxy-grad-application-highlight` | translucent purple-blue | Application card highlights |
+| Token                                | Value summary                                 | Usage                                                 |
+| ------------------------------------ | --------------------------------------------- | ----------------------------------------------------- |
+| `--voxxy-grad-body`                  | `#221469 → #54309f → #bd2dcf` (0%/30%/100%)   | Fixed body background, marketing hero, producer shell |
+| `--voxxy-grad-page`                  | alias `--voxxy-grad-body`                     | Generic page wrapper                                  |
+| `--voxxy-grad-page-cool`             | alias `--voxxy-grad-body`                     | Cool-toned page variant (application form)            |
+| `--voxxy-grad-brand`                 | `#cc30e8 → #af3cda → #9054e3 → #651ae9`       | Brand CTA buttons, filled accents                     |
+| `--voxxy-grad-cta`                   | `#af3cda → #651ae9`                           | CTA buttons, active nav tabs                          |
+| `--voxxy-grad-cta-pink`              | `#cc30e8 → #9054e3`                           | Pink-leaning CTA variant                              |
+| `--voxxy-grad-nav`                   | `rgba(34,20,105,0.95) → rgba(84,48,159,0.95)` | Fixed nav bar surface                                 |
+| `--voxxy-grad-glass-card`            | translucent purple wash                       | `.glass-card` interior                                |
+| `--voxxy-grad-card-deep`             | `#322848 → #261c38`                           | `.voxxy-gradient-card-deep`                           |
+| `--voxxy-grad-panel`                 | `#221838 → #181222`                           | Side panels and drawers                               |
+| `--voxxy-grad-editor`                | `#151028 → #221a38 → #151028`                 | Email / template editor                               |
+| `--voxxy-grad-hero-split`            | `#cc30e8 → #9054e3 → #651ae9`                 | Hero section with split layout                        |
+| `--voxxy-grad-table-header`          | translucent blue-violet                       | Table header rows                                     |
+| `--voxxy-grad-modal-header`          | `purple/92 → blue/92`                         | Modal header bars                                     |
+| `--voxxy-grad-nav-tab-active`        | alias `--voxxy-grad-cta`                      | Active navigation pill in sidebar                     |
+| `--voxxy-grad-application-highlight` | translucent purple-blue                       | Application card highlights                           |
 
 ### Body gradient paint height
 
@@ -112,16 +113,19 @@ All gradient tokens live in the `.dark` block of `src/index.css`. Light-mode gra
 
 ## 4. Typography
 
-| Role | Family | Weight | Style | Class |
-|---|---|---|---|---|
-| VOXXY wordmark | Montserrat → Barlow Condensed (fallback) | 900 (Black) | Italic | `font-nav-logo italic font-black` |
-| Body text | DM Sans | 300–700 | — | default |
-| Display headings | Space Grotesk | 400–700 | — | `font-display` if needed |
+| Role             | Family                                   | Weight      | Style  | Class                             |
+| ---------------- | ---------------------------------------- | ----------- | ------ | --------------------------------- |
+| VOXXY wordmark   | Montserrat → Barlow Condensed (fallback) | 900 (Black) | Italic | `font-nav-logo italic font-black` |
+| Body text        | DM Sans                                  | 300–700     | —      | default                           |
+| Display headings | Space Grotesk                            | 400–700     | —      | `font-display` if needed          |
 
 ### Google Fonts import (`index.html`)
 
 ```html
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,900&family=Barlow+Condensed:ital,wght@1,900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;...&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,900&family=Barlow+Condensed:ital,wght@1,900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;...&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
 ```
 
 ### Wordmark usage
@@ -140,55 +144,55 @@ All Voxxy-specific utility classes are defined in `@layer components` inside `sr
 
 ### Button classes
 
-| Class | Description |
-|---|---|
-| `.voxxy-btn-brand` | Full-spectrum brand gradient (`--voxxy-grad-brand`), white text, no border. Use for primary page CTAs. |
-| `.voxxy-btn-cta` | Violet-to-indigo gradient (`--voxxy-grad-cta`). Use for internal app primary actions. |
-| `.voxxy-btn-cta-pink` | Pink-leaning gradient. Secondary emphasis. |
-| `.voxxy-btn-solid` | Flat violet fill (light: `#9054e3`). For tertiary actions that need contrast without gradient weight. |
-| `.voxxy-btn-public-secondary` | Glassmorphic white-tint button. Sits on dark gradient backgrounds. Has glow on hover. |
-| `.voxxy-nav-cta-link` | Plain text nav link; gradient-text effect on hover. No button shape. |
+| Class                         | Description                                                                                            |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `.voxxy-btn-brand`            | Full-spectrum brand gradient (`--voxxy-grad-brand`), white text, no border. Use for primary page CTAs. |
+| `.voxxy-btn-cta`              | Violet-to-indigo gradient (`--voxxy-grad-cta`). Use for internal app primary actions.                  |
+| `.voxxy-btn-cta-pink`         | Pink-leaning gradient. Secondary emphasis.                                                             |
+| `.voxxy-btn-solid`            | Flat violet fill (light: `#9054e3`). For tertiary actions that need contrast without gradient weight.  |
+| `.voxxy-btn-public-secondary` | Glassmorphic white-tint button. Sits on dark gradient backgrounds. Has glow on hover.                  |
+| `.voxxy-nav-cta-link`         | Plain text nav link; gradient-text effect on hover. No button shape.                                   |
 
 **Rule:** Never add raw `background-image` styles in component files. Always reference a CSS token class or a `--voxxy-grad-*` CSS variable.
 
 ### Input classes
 
-| Class | Description |
-|---|---|
-| `.voxxy-input-frost` | Standard text input for all internal producer forms. Token-controlled surface in dark (`--voxxy-input-frost-bg`), lifted violet fill above glass-card. |
-| `.voxxy-input-public-dark` | Input for public dark-background contexts (e.g. homepage contact form). White-tint fill. |
-| `.voxxy-input-frost-group` | Wrapper shell for prefix-row inputs (e.g. `https://`, `instagram.com/`). Shares frost styling; `focus-within` triggers the frost focus ring. |
-| `.voxxy-input-frost-prefix` | The prefix label cell inside a `voxxy-input-frost-group`. Muted fill, right divider. |
+| Class                       | Description                                                                                                                                            |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `.voxxy-input-frost`        | Standard text input for all internal producer forms. Token-controlled surface in dark (`--voxxy-input-frost-bg`), lifted violet fill above glass-card. |
+| `.voxxy-input-public-dark`  | Input for public dark-background contexts (e.g. homepage contact form). White-tint fill.                                                               |
+| `.voxxy-input-frost-group`  | Wrapper shell for prefix-row inputs (e.g. `https://`, `instagram.com/`). Shares frost styling; `focus-within` triggers the frost focus ring.           |
+| `.voxxy-input-frost-prefix` | The prefix label cell inside a `voxxy-input-frost-group`. Muted fill, right divider.                                                                   |
 
 ### Surface / layout classes
 
-| Class | Description |
-|---|---|
-| `.glass-card` | Primary card surface in the producer app. Dark gradient fill + backdrop blur + inset highlight shadow. |
-| `.voxxy-contact-form-shell` | Glass card for public-page forms (contact, unsubscribe). Higher contrast white-tint border. |
-| `.voxxy-gradient-card-deep` | Lighter gradient card background used inside glass-cards. |
-| `.voxxy-gradient-marketing-hero` | Full page background for all public/marketing pages. Always dark. Same source as `--voxxy-grad-body`. |
-| `.voxxy-gradient-page-cool` | Internal app page background (light: lavender wash, dark: aliases body gradient). |
-| `.voxxy-public-page` | Marker class for public page roots. Combine with `.dark` and `.voxxy-gradient-marketing-hero`. |
-| `.voxxy-nav-surface` | Fixed nav bar surface. Frosted glass over the body gradient (`backdrop-filter: blur(18px)`). |
-| `.voxxy-auth-card` | Auth form card surface (login/register). Deep purple translucent. |
+| Class                            | Description                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `.glass-card`                    | Primary card surface in the producer app. Dark gradient fill + backdrop blur + inset highlight shadow. |
+| `.voxxy-contact-form-shell`      | Glass card for public-page forms (contact, unsubscribe). Higher contrast white-tint border.            |
+| `.voxxy-gradient-card-deep`      | Lighter gradient card background used inside glass-cards.                                              |
+| `.voxxy-gradient-marketing-hero` | Full page background for all public/marketing pages. Always dark. Same source as `--voxxy-grad-body`.  |
+| `.voxxy-gradient-page-cool`      | Internal app page background (light: lavender wash, dark: aliases body gradient).                      |
+| `.voxxy-public-page`             | Marker class for public page roots. Combine with `.dark` and `.voxxy-gradient-marketing-hero`.         |
+| `.voxxy-nav-surface`             | Fixed nav bar surface. Frosted glass over the body gradient (`backdrop-filter: blur(18px)`).           |
+| `.voxxy-auth-card`               | Auth form card surface (login/register). Deep purple translucent.                                      |
 
 ### Table classes
 
-| Class | Description |
-|---|---|
-| `.voxxy-table-shell` | Outer wrapper for data tables. Rounded border, opaque card background, overflow hidden (for border-radius). Inner `overflow-x-auto` div handles horizontal scroll. |
-| `.voxxy-table-header` | Sticky or top-positioned header row container. Light gradient fill. |
-| `.voxxy-table-header-row` | Grid-based header cell row. Use `text-[10px] font-semibold uppercase tracking-wide`. |
-| `.voxxy-table-row` | Data row with bottom border. |
-| `.voxxy-table-row-hover` | Hover state for data rows. In dark mode uses `--voxxy-grad-hover-row-hover`. |
+| Class                     | Description                                                                                                                                                        |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `.voxxy-table-shell`      | Outer wrapper for data tables. Rounded border, opaque card background, overflow hidden (for border-radius). Inner `overflow-x-auto` div handles horizontal scroll. |
+| `.voxxy-table-header`     | Sticky or top-positioned header row container. Light gradient fill.                                                                                                |
+| `.voxxy-table-header-row` | Grid-based header cell row. Use `text-[10px] font-semibold uppercase tracking-wide`.                                                                               |
+| `.voxxy-table-row`        | Data row with bottom border.                                                                                                                                       |
+| `.voxxy-table-row-hover`  | Hover state for data rows. In dark mode uses `--voxxy-grad-hover-row-hover`.                                                                                       |
 
 ### Hover effects
 
-| Class | Description |
-|---|---|
+| Class                | Description                                           |
+| -------------------- | ----------------------------------------------------- |
 | `.voxxy-hover-panel` | Card-level hover with panel gradient and border glow. |
-| `.voxxy-hover-row` | Row-level hover (lighter than panel). |
+| `.voxxy-hover-row`   | Row-level hover (lighter than panel).                 |
 
 ---
 
@@ -214,6 +218,7 @@ All public-facing pages — homepage, features, pricing, about, legal, contact, 
 ### Utility / transactional pages (always dark)
 
 Unsubscribe, email opt-out, legal pages:
+
 - Force dark by including `dark` class on page root div
 - Use `voxxy-gradient-marketing-hero` background
 - No light/dark toggle
@@ -268,17 +273,17 @@ Each layer must be visually distinguishable from the one below it. Do not set `b
 
 ## 10. File Map
 
-| File | Role |
-|---|---|
-| `src/index.css` | All CSS tokens, component classes, gradient utilities |
-| `tailwind.config.ts` | Font families, brand colors, border radius, animation keyframes |
-| `index.html` | Google Fonts import, dark-mode init script, Mixpanel init |
-| `src/components/Navigation.tsx` | Public marketing nav (frosted glass, wordmark, text CTA links) |
-| `src/pages/HomePage.tsx` | Main marketing page — reference for public page structure |
-| `src/pages/UnsubscribePage.tsx` | Unsubscribe / email opt-out — always dark, glass card layout |
-| `src/pages/Dashboard.tsx` | Producer app shell — sidebar, header, nav tabs, guide button |
-| `src/pages/SettingsPage.tsx` | Settings form reference for glass-card + voxxy-input-frost usage |
-| `src/components/producer/CreateEventWizard/` | Wizard with WizardProgress (compact bar) + 6 step pages |
-| `src/components/producer/Network/NetworkPage.tsx` | Network contacts — Actions dropdown, frost search, filter buttons |
-| `src/components/ui/button.tsx` | shadcn Button base — default size `h-7`; use `h-auto` for large public CTAs |
-| `src/components/ui/input.tsx` | shadcn Input base — for internal use; prefer `voxxy-input-frost` class override |
+| File                                              | Role                                                                            |
+| ------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `src/index.css`                                   | All CSS tokens, component classes, gradient utilities                           |
+| `tailwind.config.ts`                              | Font families, brand colors, border radius, animation keyframes                 |
+| `index.html`                                      | Google Fonts import, dark-mode init script, Mixpanel init                       |
+| `src/components/Navigation.tsx`                   | Public marketing nav (frosted glass, wordmark, text CTA links)                  |
+| `src/pages/HomePage.tsx`                          | Main marketing page — reference for public page structure                       |
+| `src/pages/UnsubscribePage.tsx`                   | Unsubscribe / email opt-out — always dark, glass card layout                    |
+| `src/pages/Dashboard.tsx`                         | Producer app shell — sidebar, header, nav tabs, guide button                    |
+| `src/pages/SettingsPage.tsx`                      | Settings form reference for glass-card + voxxy-input-frost usage                |
+| `src/components/producer/CreateEventWizard/`      | Wizard with WizardProgress (compact bar) + 6 step pages                         |
+| `src/components/producer/Network/NetworkPage.tsx` | Network contacts — Actions dropdown, frost search, filter buttons               |
+| `src/components/ui/button.tsx`                    | shadcn Button base — default size `h-7`; use `h-auto` for large public CTAs     |
+| `src/components/ui/input.tsx`                     | shadcn Input base — for internal use; prefer `voxxy-input-frost` class override |

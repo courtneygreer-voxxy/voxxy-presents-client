@@ -9,8 +9,9 @@ Events are identified by a URL-friendly "slug" generated from their title. Curre
 3. Testing/development creates duplicate event names
 
 **Error Example:**
+
 ```json
-{"errors": ["Slug has already been taken"]}
+{ "errors": ["Slug has already been taken"] }
 ```
 
 ## Current State
@@ -34,31 +35,32 @@ Add a utility function to generate unique slug suffixes:
 // src/utils/slugHelpers.ts
 export function generateUniqueSuffix(): string {
   // Generate 5-character random string (base36: 0-9, a-z)
-  return Math.random().toString(36).substring(2, 7);
+  return Math.random().toString(36).substring(2, 7)
 }
 
 export function ensureUniqueTitle(title: string): string {
   // Append short suffix to title
   // Backend will slugify this to: "summer-art-fair-2025-x7k9"
-  const suffix = generateUniqueSuffix();
-  return `${title} ${suffix}`;
+  const suffix = generateUniqueSuffix()
+  return `${title} ${suffix}`
 }
 ```
 
 Modify event creation in [ProducerDashboard.tsx:209](src/pages/ProducerDashboard.tsx#L209):
 
 ```typescript
-import { ensureUniqueTitle } from '@/utils/slugHelpers';
+import { ensureUniqueTitle } from '@/utils/slugHelpers'
 
 // In handleCreateEvent function:
 const newEvent = await eventsApi.create(organization.slug, {
   title: ensureUniqueTitle(wizardState.eventDetails.title), // Modified
   description: wizardState.eventDetails.description || undefined,
   // ... rest of fields
-});
+})
 ```
 
 ### Pros
+
 - ✅ Zero backend changes required
 - ✅ Immediate deployment (hours, not days)
 - ✅100% prevents slug collisions
@@ -66,12 +68,14 @@ const newEvent = await eventsApi.create(organization.slug, {
 - ✅ Works with existing backend validation
 
 ### Cons
+
 - ❌ Event titles in database have random suffix (e.g., "Summer Art Fair 2025 x7k9")
 - ❌ URLs are slightly less clean: `/events/summer-art-fair-2025-x7k9`
 - ❌ Not ideal for user-facing event names
 - ❌ Doesn't solve the root architectural issue
 
 ### When to Use
+
 - Before go-live with first customer
 - During testing/development
 - As emergency fallback if scoped slugs aren't ready
@@ -89,12 +93,14 @@ const newEvent = await eventsApi.create(organization.slug, {
 #### 1. Database Schema Migration
 
 **Current uniqueness constraint:**
+
 ```ruby
 # app/models/event.rb (Rails backend)
 validates :slug, presence: true, uniqueness: true
 ```
 
 **New scoped uniqueness constraint:**
+
 ```ruby
 # app/models/event.rb
 validates :slug, presence: true,
@@ -111,6 +117,7 @@ end
 ```
 
 **Migration:**
+
 ```ruby
 class AddScopedSlugUniquenessToEvents < ActiveRecord::Migration[7.0]
   def change
@@ -140,12 +147,14 @@ end
 #### 2. URL Structure
 
 **Current URLs:**
+
 ```
 /events/summer-art-fair-2025
 /events/spring-show
 ```
 
 **New scoped URLs (Option A - Flat):**
+
 ```
 /events/summer-art-fair-2025        # team-voxxy, 2025
 /events/summer-art-fair-2025        # another-org, 2025 - ALLOWED
@@ -153,6 +162,7 @@ end
 ```
 
 **New scoped URLs (Option B - Hierarchical):**
+
 ```
 /organizations/team-voxxy/2025/summer-art-fair
 /organizations/another-org/2025/summer-art-fair
@@ -186,6 +196,7 @@ No changes needed if using flat URLs - organization context is already available
 ### Migration Plan
 
 #### Phase 1: Backend Preparation (Week 1 post-launch)
+
 1. Add `event_year` column to events table
 2. Backfill `event_year` from `event_date` for existing events
 3. Update Event model validations (keep old index temporarily)
@@ -193,12 +204,14 @@ No changes needed if using flat URLs - organization context is already available
 5. Test event creation, updates, lookups
 
 #### Phase 2: Dual-Mode Operation (Week 2)
+
 1. Backend supports both global and scoped slug lookups
 2. New events use scoped uniqueness
 3. Old events continue to work with global slugs
 4. Monitor for any issues
 
 #### Phase 3: Full Migration (Week 3)
+
 1. Remove global uniqueness index
 2. Add scoped uniqueness index
 3. Update all event lookups to use scoped resolution
@@ -206,12 +219,14 @@ No changes needed if using flat URLs - organization context is already available
 5. Verify all existing events still accessible
 
 #### Phase 4: Cleanup (Week 4)
+
 1. Remove dual-mode compatibility code
 2. Update API documentation
 3. Update frontend error handling
 4. Document new slug behavior
 
 ### Pros
+
 - ✅ Natural, scalable solution
 - ✅ Clean, readable URLs
 - ✅ Supports multiple orgs with same event names
@@ -220,6 +235,7 @@ No changes needed if using flat URLs - organization context is already available
 - ✅ Aligns with multi-tenant architecture
 
 ### Cons
+
 - ❌ Requires database migration
 - ❌ Requires backend code changes
 - ❌ Needs careful testing with existing data
@@ -229,6 +245,7 @@ No changes needed if using flat URLs - organization context is already available
 ### Dependencies
 
 **Backend Changes Required:**
+
 - [ ] Add `event_year` column to `events` table
 - [ ] Update Event model validations
 - [ ] Modify slug generation logic
@@ -237,11 +254,13 @@ No changes needed if using flat URLs - organization context is already available
 - [ ] Write comprehensive tests for scoped lookups
 
 **Frontend Changes Required:**
+
 - [ ] Remove short-term random suffix logic
 - [ ] Update error handling for slug collisions (should be rare now)
 - [ ] Update documentation/help text
 
 **Infrastructure:**
+
 - [ ] Database migration (requires downtime or careful zero-downtime strategy)
 - [ ] Staging environment testing
 - [ ] Production deployment coordination
@@ -250,19 +269,20 @@ No changes needed if using flat URLs - organization context is already available
 
 ## Decision Matrix
 
-| Scenario | Recommended Approach |
-|----------|---------------------|
-| Before go-live (next 2 days) | **Method 1** (Frontend timestamp) |
-| During first customer onboarding | **Method 1** (Frontend timestamp) |
-| After first customer is stable | **Start Method 4 planning** |
+| Scenario                          | Recommended Approach                         |
+| --------------------------------- | -------------------------------------------- |
+| Before go-live (next 2 days)      | **Method 1** (Frontend timestamp)            |
+| During first customer onboarding  | **Method 1** (Frontend timestamp)            |
+| After first customer is stable    | **Start Method 4 planning**                  |
 | Before second customer onboarding | **Method 4** (Scoped slugs) must be complete |
-| Multiple active customers | **Method 4** (Scoped slugs) required |
+| Multiple active customers         | **Method 4** (Scoped slugs) required         |
 
 ---
 
 ## Testing Strategy
 
 ### Short-Term (Method 1)
+
 1. Create multiple events with identical base names
 2. Verify each gets unique slug
 3. Verify all event operations work correctly
@@ -270,6 +290,7 @@ No changes needed if using flat URLs - organization context is already available
 5. Verify no collisions in rapid succession
 
 ### Long-Term (Method 4)
+
 1. **Scoped Uniqueness:**
    - Same org, same year, same title → Collision (expected)
    - Same org, different year, same title → Success
@@ -291,9 +312,11 @@ No changes needed if using flat URLs - organization context is already available
 ## Rollback Plans
 
 ### Method 1 Rollback
+
 Simply remove the `ensureUniqueTitle()` call - immediate rollback with no data issues.
 
 ### Method 4 Rollback
+
 1. Keep global uniqueness index during phase 2
 2. If issues arise, revert to global slug lookups
 3. Database schema changes are harder to rollback - plan carefully
@@ -304,6 +327,7 @@ Simply remove the `ensureUniqueTitle()` call - immediate rollback with no data i
 ## Cost-Benefit Analysis
 
 ### Method 1 (Short-Term)
+
 - **Development Time:** 1-2 hours
 - **Testing Time:** 1 hour
 - **Deployment Risk:** Very low
@@ -311,6 +335,7 @@ Simply remove the `ensureUniqueTitle()` call - immediate rollback with no data i
 - **Technical Debt:** Medium (must migrate later)
 
 ### Method 4 (Long-Term)
+
 - **Development Time:** 2-3 days backend + 1 day frontend
 - **Testing Time:** 1 week (includes staging validation)
 - **Deployment Risk:** Medium (database migration)

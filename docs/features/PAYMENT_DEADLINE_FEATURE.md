@@ -14,6 +14,7 @@ Added a new `payment_deadline` field to the Events table, allowing producers to 
 ## 🗄️ Database Changes
 
 ### Migration Created
+
 **File:** `db/migrate/20260107041851_add_payment_deadline_to_events.rb`
 
 ```ruby
@@ -31,9 +32,11 @@ end
 ## 🔧 Backend Changes
 
 ### 1. Event Model Validations
+
 **File:** `app/models/event.rb`
 
 **Added validations:**
+
 - Payment deadline must be on or after application deadline
 - Payment deadline must be on or before event start date
 
@@ -55,14 +58,17 @@ end
 ```
 
 **Business Logic:**
+
 - ✅ `application_deadline` ≤ `payment_deadline` ≤ `event_date`
 - ✅ Field is optional (no presence validation)
 - ✅ Automatically validated on create/update
 
 ### 2. Events Controller
+
 **File:** `app/controllers/api/v1/presents/events_controller.rb`
 
 **Updated params to permit:**
+
 ```ruby
 def event_params
   params.require(:event).permit(
@@ -82,10 +88,12 @@ end
 ### 1. TypeScript Interfaces Updated
 
 **Files:**
+
 - `src/components/producer/CreateEventWizard/types.ts`
 - `src/components/producer/CommandCenter.tsx`
 
 **Changes:**
+
 ```typescript
 // WizardState eventDetails
 eventDetails: {
@@ -107,6 +115,7 @@ interface Event {
 **File:** `src/components/producer/CreateEventWizard/steps/Step1EventDetails.tsx`
 
 **Added payment deadline input:**
+
 - Positioned next to Application Deadline in a 2-column grid
 - Date input type
 - Optional field (no asterisk)
@@ -116,16 +125,10 @@ interface Event {
 
 ```tsx
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div>{/* Application Deadline * */}</div>
   <div>
-    {/* Application Deadline * */}
-  </div>
-  <div>
-    <label htmlFor="payment_deadline">
-      Payment Deadline
-    </label>
-    <p className="text-white/50 text-xs mb-2">
-      Deadline for approved vendors to pay
-    </p>
+    <label htmlFor="payment_deadline">Payment Deadline</label>
+    <p className="text-white/50 text-xs mb-2">Deadline for approved vendors to pay</p>
     <input
       id="payment_deadline"
       type="date"
@@ -142,16 +145,17 @@ interface Event {
 **File:** `src/components/producer/CreateEventWizard/CreateEventWizard.tsx`
 
 **Updated initial state:**
+
 ```typescript
 const [wizardState, setWizardState] = useState<WizardState>({
   currentStep: 1,
   eventDetails: {
     // ... existing fields
     application_deadline: '',
-    payment_deadline: '',  // ✅ Added
+    payment_deadline: '', // ✅ Added
   },
   // ...
-});
+})
 ```
 
 ### 4. API Integration
@@ -159,13 +163,14 @@ const [wizardState, setWizardState] = useState<WizardState>({
 **File:** `src/pages/ProducerDashboard.tsx` - `handleCreateEvent` function
 
 **Updated API call:**
+
 ```typescript
 const newEvent = await eventsApi.create(organization.slug, {
   // ... existing fields
   application_deadline: wizardState.eventDetails.application_deadline,
-  payment_deadline: wizardState.eventDetails.payment_deadline || undefined,  // ✅ Added
+  payment_deadline: wizardState.eventDetails.payment_deadline || undefined, // ✅ Added
   // ...
-});
+})
 ```
 
 ---
@@ -190,6 +195,7 @@ const newEvent = await eventsApi.create(organization.slug, {
 ### Using Payment Deadline
 
 The payment deadline will be used in:
+
 - ✅ **Email templates** - Already references `[paymentDueDate]` variable
 - ✅ **Payment reminder emails** - Scheduled based on payment_deadline
 - ✅ **Vendor dashboard** - Shows payment deadline to approved vendors
@@ -200,11 +206,13 @@ The payment deadline will be used in:
 ## 📋 Files Modified
 
 ### Backend (`voxxy-rails`)
+
 1. ✅ `db/migrate/20260107041851_add_payment_deadline_to_events.rb` - Migration
 2. ✅ `app/models/event.rb` - Added validations
 3. ✅ `app/controllers/api/v1/presents/events_controller.rb` - Permit param
 
 ### Frontend (`voxxy-presents-client`)
+
 1. ✅ `src/components/producer/CreateEventWizard/types.ts` - TypeScript interface
 2. ✅ `src/components/producer/CreateEventWizard/CreateEventWizard.tsx` - Initial state
 3. ✅ `src/components/producer/CreateEventWizard/steps/Step1EventDetails.tsx` - Form field
@@ -216,6 +224,7 @@ The payment deadline will be used in:
 ## 🧪 Testing Checklist
 
 ### Backend Tests
+
 - [ ] Migration runs successfully ✅ (Completed)
 - [ ] Payment deadline can be nil (optional field)
 - [ ] Validation: payment_deadline >= application_deadline
@@ -224,6 +233,7 @@ The payment deadline will be used in:
 - [ ] API returns payment_deadline in event JSON
 
 ### Frontend Tests
+
 - [ ] Payment deadline field appears in Step 1
 - [ ] Field is optional (form submits without it)
 - [ ] Date picker works correctly
@@ -232,6 +242,7 @@ The payment deadline will be used in:
 - [ ] Field displays correctly on mobile (responsive)
 
 ### Integration Tests
+
 - [ ] Create event with payment deadline → Saves correctly
 - [ ] Create event without payment deadline → Still works
 - [ ] Edit event to add payment deadline → Updates correctly
@@ -242,13 +253,14 @@ The payment deadline will be used in:
 
 ## 🔍 Validation Rules
 
-| Field | Required | Must be >= | Must be <= | Notes |
-|-------|----------|------------|------------|-------|
-| `application_deadline` | ✅ Yes | today | `event_date` | When applications close |
-| `payment_deadline` | ❌ No | `application_deadline` | `event_date` | When approved vendors must pay |
-| `event_date` | ✅ Yes | today | - | When event starts |
+| Field                  | Required | Must be >=             | Must be <=   | Notes                          |
+| ---------------------- | -------- | ---------------------- | ------------ | ------------------------------ |
+| `application_deadline` | ✅ Yes   | today                  | `event_date` | When applications close        |
+| `payment_deadline`     | ❌ No    | `application_deadline` | `event_date` | When approved vendors must pay |
+| `event_date`           | ✅ Yes   | today                  | -            | When event starts              |
 
 **Logical Flow:**
+
 ```
 Today → Application Deadline → Payment Deadline → Event Date
          [Vendors Apply]        [Approved Pay]     [Event Happens]
@@ -281,6 +293,7 @@ Today → Application Deadline → Payment Deadline → Event Date
 ## ✅ Completion Status
 
 All tasks completed successfully! The payment_deadline feature is now:
+
 - ✅ Added to database (migrated)
 - ✅ Validated in backend model
 - ✅ Accepted by API endpoint
@@ -289,6 +302,7 @@ All tasks completed successfully! The payment_deadline feature is now:
 - ✅ Ready for production use
 
 **Next Steps:**
+
 1. Test the feature end-to-end
 2. Update email templates to use payment_deadline
 3. Add payment deadline to event edit form

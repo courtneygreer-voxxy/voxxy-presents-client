@@ -84,8 +84,7 @@ export default function ForgotPasswordPage() {
           <p className="voxxy-auth-hero-copy max-w-md text-center text-xl">
             {!emailSent
               ? "No worries! We'll send you reset instructions."
-              : "Check your email for the reset link"
-            }
+              : 'Check your email for the reset link'}
           </p>
         </div>
       </div>
@@ -130,8 +129,7 @@ export default function ForgotPasswordPage() {
                 <CardDescription>
                   {!emailSent
                     ? "Enter your email and we'll send you a secure link to reset your password"
-                    : `We've sent a password reset link to ${email}`
-                  }
+                    : `We've sent a password reset link to ${email}`}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -150,7 +148,9 @@ export default function ForgotPasswordPage() {
                     <form onSubmit={handleSubmit} className="space-y-4">
                       {/* Email Field */}
                       <div className="space-y-2">
-                        <Label htmlFor="email" className="text-foreground">Email Address</Label>
+                        <Label htmlFor="email" className="text-foreground">
+                          Email Address
+                        </Label>
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
@@ -233,9 +233,7 @@ export default function ForgotPasswordPage() {
 
                     {/* Try Different Email */}
                     <div className="mt-6 text-center">
-                      <p className="text-muted-foreground text-sm mb-2">
-                        Wrong email?
-                      </p>
+                      <p className="text-muted-foreground text-sm mb-2">Wrong email?</p>
                       <button
                         onClick={handleTryDifferentEmail}
                         className="voxxy-auth-link text-sm font-medium transition-colors"

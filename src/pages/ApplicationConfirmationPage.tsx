@@ -1,20 +1,20 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CheckCircle, Mail } from 'lucide-react';
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { CheckCircle, Mail } from 'lucide-react'
 
 export default function ApplicationConfirmationPage() {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [applicationCode, setApplicationCode] = useState('');
-  const [eventSlug, setEventSlug] = useState('');
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const [applicationCode, setApplicationCode] = useState('')
+  const [eventSlug, setEventSlug] = useState('')
 
   useEffect(() => {
-    const code = searchParams.get('application_code');
-    const event = searchParams.get('event');
+    const code = searchParams.get('application_code')
+    const event = searchParams.get('event')
 
-    if (code) setApplicationCode(code);
-    if (event) setEventSlug(event);
-  }, [searchParams]);
+    if (code) setApplicationCode(code)
+    if (event) setEventSlug(event)
+  }, [searchParams])
 
   return (
     <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center p-4">
@@ -31,7 +31,8 @@ export default function ApplicationConfirmationPage() {
           </h1>
 
           <p className="text-foreground/80 mb-8">
-            Thank you for applying! Your application has been received and is being reviewed by the event organizers.
+            Thank you for applying! Your application has been received and is being reviewed by the
+            event organizers.
           </p>
 
           {/* Application Code */}
@@ -58,25 +59,19 @@ export default function ApplicationConfirmationPage() {
                 <span className="inline-block w-6 h-6 rounded-full bg-primary/20 text-violet-950 dark:text-primary text-sm font-medium flex items-center justify-center flex-shrink-0 mt-0.5">
                   1
                 </span>
-                <span>
-                  You'll receive a confirmation email with your application details
-                </span>
+                <span>You'll receive a confirmation email with your application details</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="inline-block w-6 h-6 rounded-full bg-primary/20 text-violet-950 dark:text-primary text-sm font-medium flex items-center justify-center flex-shrink-0 mt-0.5">
                   2
                 </span>
-                <span>
-                  The event organizers will review your application
-                </span>
+                <span>The event organizers will review your application</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="inline-block w-6 h-6 rounded-full bg-primary/20 text-violet-950 dark:text-primary text-sm font-medium flex items-center justify-center flex-shrink-0 mt-0.5">
                   3
                 </span>
-                <span>
-                  You'll be notified by email when your application status changes
-                </span>
+                <span>You'll be notified by email when your application status changes</span>
               </li>
             </ul>
           </div>
@@ -93,5 +88,5 @@ export default function ApplicationConfirmationPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

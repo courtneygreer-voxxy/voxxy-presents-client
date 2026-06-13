@@ -8,6 +8,7 @@
 ## What Was Built
 
 ### Directory Structure Created
+
 ```
 src/components/producer/CreateEventWizard/
 ├── index.tsx                       # Export wrapper
@@ -29,6 +30,7 @@ src/components/producer/CreateEventWizard/
 ## Features Implemented
 
 ### ✅ Step 1: Event Details
+
 - Event Name (required, min 3 chars)
 - Description (required, min 10 chars)
 - Event Date (required, must be future)
@@ -37,6 +39,7 @@ src/components/producer/CreateEventWizard/
 - Glass morphism design maintained
 
 ### ✅ Step 2: Application Details
+
 - **Application Deadline** (required, must be ≤ event_date)
 - **Dynamic Application Rows:**
   - Title (required, unique)
@@ -48,6 +51,7 @@ src/components/producer/CreateEventWizard/
 - Validation for duplicates and required fields
 
 ### ✅ Step 3: Invite Vendors (IMPLEMENTED)
+
 - **Fetch contacts** from organization's vendor network
 - **Search functionality** (name, business, email, tags)
 - **Filter by contact type** (vendor, partner, sponsor, staff)
@@ -61,12 +65,14 @@ src/components/producer/CreateEventWizard/
 - Contact IDs stored in wizard state for backend integration
 
 ### ⏳ Step 4: Automatic Messages (Placeholder)
+
 - "Coming Soon" UI
 - Email automation description
 - Always valid (enables submission)
 - Future implementation pending
 
 ### ✅ Wizard Features
+
 - **Progress Indicator:** Visual 1→2→3→4 with completion tracking
 - **Navigation:** Back/Next/Submit buttons with validation
 - **State Management:** Full wizard state preserved across steps
@@ -81,7 +87,9 @@ src/components/producer/CreateEventWizard/
 ### Modified Files
 
 #### 1. `/src/pages/ProducerDashboard.tsx`
+
 **Changes:**
+
 - Import changed: `CreateEventForm` → `CreateEventWizard`
 - Added import: `vendorApplicationsApi` from api.ts
 - Updated `handleCreateEvent()` function signature to accept `WizardState`
@@ -90,6 +98,7 @@ src/components/producer/CreateEventWizard/
 - Handle invited contacts (logged for now, backend integration pending)
 
 **Submission Flow:**
+
 ```typescript
 1. Create event (with application_deadline)
 2. Batch create vendor applications (with booth_price)
@@ -99,17 +108,22 @@ src/components/producer/CreateEventWizard/
 ```
 
 #### 2. `/src/services/api.ts`
+
 **Changes:**
+
 - `application_deadline` field: ✅ **ACTIVE** - sent to backend
 - `booth_price` field: ✅ **ACTIVE** - sent to backend
 - Backend migrations completed and integrated
 
 #### 3. `/src/components/producer/CreateEventWizard/types.ts`
+
 **Changes:**
+
 - Updated `inviteList` interface to use `invitedContactIds: number[]`
 - Changed from generic `invitedUsers: string[]` to specific vendor contact IDs
 
 #### 4. Deleted Files
+
 - ❌ `/src/components/producer/CreateEventForm.tsx` (replaced by wizard)
 
 ---
@@ -117,6 +131,7 @@ src/components/producer/CreateEventWizard/
 ## Backend Integration Status
 
 ### ✅ Completed Integrations
+
 1. **Events Table:** `application_deadline` field - **ACTIVE**
 2. **Vendor Applications Table:** `booth_price` field - **ACTIVE**
 3. Both fields are being sent to backend and persisted
@@ -124,19 +139,18 @@ src/components/producer/CreateEventWizard/
 ### ⏳ Pending Backend Integration
 
 **Event Invitations API** - Not yet implemented
+
 - Frontend captures: `invitedContactIds: number[]`
 - Logged in console for now
 - TODO: Create endpoint `/api/v1/presents/events/:slug/invitations`
 - Uncomment API call in `ProducerDashboard.tsx:222`
 
 Example future implementation:
+
 ```typescript
 // Step 3: Handle invited contacts
 if (wizardState.inviteList.invitedContactIds.length > 0) {
-  await eventInvitationsApi.createBatch(
-    newEvent.slug,
-    wizardState.inviteList.invitedContactIds
-  );
+  await eventInvitationsApi.createBatch(newEvent.slug, wizardState.inviteList.invitedContactIds)
 }
 ```
 
@@ -145,12 +159,14 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
 ## Validation Rules
 
 ### Step 1 Validation
+
 - `title`: Required, min 3 characters
 - `description`: Required, min 10 characters
 - `event_date`: Required, must be future date
 - `location`: Required, non-empty
 
 ### Step 2 Validation
+
 - `application_deadline`: Required, must be ≤ event_date
 - `applications`: Minimum 1 required
 - Each application:
@@ -159,10 +175,12 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
   - `description`: Optional
 
 ### Step 3
+
 - Always valid (optional step - can proceed with 0 or more contacts selected)
 - No minimum selection required
 
 ### Step 4
+
 - Always valid (placeholder)
 
 ---
@@ -188,18 +206,21 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
 ## Design Patterns Used
 
 ### Glass Morphism Maintained
+
 - `bg-white/5` for cards and inputs
 - `border-white/10` for borders
 - `text-white` with opacity variants
 - `bg-gradient-to-r from-purple-600 to-blue-500` for CTAs
 
 ### State Management
+
 - Single `wizardState` object for all 4 steps
 - `completedSteps` array to track progress
 - `errors` Record for validation messages
 - Lifted state pattern with update callbacks
 
 ### Validation Pattern
+
 - Per-step validation functions
 - Clear errors on field change
 - Show errors only after validation attempt
@@ -210,6 +231,7 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
 ## Testing Checklist
 
 ### Manual Testing
+
 - [ ] Navigate through all 4 steps
 - [ ] Go back and edit Step 1
 - [ ] Go back and edit Step 2
@@ -227,6 +249,7 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
 - [ ] Test mobile responsive layout
 
 ### Edge Cases
+
 - [ ] Try to create event with 0 applications (should fail validation)
 - [ ] Try duplicate application titles (should fail validation)
 - [ ] Try booth price of $0 (should fail validation)
@@ -238,11 +261,13 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
 ## Next Steps
 
 ### ✅ Completed
+
 1. ~~Backend migrations for `application_deadline` and `booth_price`~~
 2. ~~API integration for event and application creation~~
 3. ~~Step 3 implementation for vendor invitations~~
 
 ### Immediate (Before Production)
+
 1. Test the wizard in staging environment
 2. Verify all validation rules work correctly
 3. Test mobile responsiveness
@@ -250,7 +275,9 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
 5. Verify empty states work correctly
 
 ### Backend Integration (Pending)
+
 **Event Invitations API:**
+
 1. Create backend endpoint: `POST /api/v1/presents/events/:slug/invitations`
 2. Accept array of `vendor_contact_ids`
 3. Create invitation records in database
@@ -258,6 +285,7 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
 5. Uncomment API call in `ProducerDashboard.tsx:222`
 
 ### Future Phases
+
 - **Phase 4:** Implement Step 4 (Automatic Messages)
   - Email template customization
   - Event lifecycle triggers
@@ -268,6 +296,7 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
 ## Success Metrics
 
 ### Technical
+
 - ✅ TypeScript compilation: No errors
 - ✅ All step components created
 - ✅ Validation working per spec
@@ -278,6 +307,7 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
 - ✅ Clean console logging
 
 ### User Experience
+
 - Multi-step flow reduces cognitive load
 - Progress indicator provides clarity
 - Can go back to edit previous steps
@@ -291,17 +321,17 @@ if (wizardState.inviteList.invitedContactIds.length > 0) {
 
 ## File Size Summary
 
-| File | Size | Purpose |
-|------|------|---------|
-| Step3InviteList.tsx | 12.5KB | Contact invitation with search/filter ✨ |
-| Step2ApplicationDetails.tsx | 11.3KB | Dynamic application rows |
-| CreateEventWizard.tsx | 7.8KB | Main wizard logic & state |
-| Step1EventDetails.tsx | 4.4KB | Event form fields |
-| WizardProgress.tsx | 3KB | Progress indicator UI |
-| WizardNavigation.tsx | 2.4KB | Navigation controls |
-| Step4AutoMessages.tsx | 2KB | Placeholder component |
-| types.ts | 1.7KB | TypeScript interfaces |
-| index.tsx | 93B | Export wrapper |
+| File                        | Size   | Purpose                                  |
+| --------------------------- | ------ | ---------------------------------------- |
+| Step3InviteList.tsx         | 12.5KB | Contact invitation with search/filter ✨ |
+| Step2ApplicationDetails.tsx | 11.3KB | Dynamic application rows                 |
+| CreateEventWizard.tsx       | 7.8KB  | Main wizard logic & state                |
+| Step1EventDetails.tsx       | 4.4KB  | Event form fields                        |
+| WizardProgress.tsx          | 3KB    | Progress indicator UI                    |
+| WizardNavigation.tsx        | 2.4KB  | Navigation controls                      |
+| Step4AutoMessages.tsx       | 2KB    | Placeholder component                    |
+| types.ts                    | 1.7KB  | TypeScript interfaces                    |
+| index.tsx                   | 93B    | Export wrapper                           |
 
 **Total:** ~45KB of functional code
 

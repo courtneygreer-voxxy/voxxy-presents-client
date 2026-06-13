@@ -1,14 +1,14 @@
-import { Category } from '@/types/category';
-import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles';
+import { Category } from '@/types/category'
+import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles'
 
 interface CategoryBadgeProps {
-  category: Category | null;
-  size?: 'sm' | 'md' | 'lg';
-  variant?: 'default' | 'outline';
-  showIcon?: boolean;
-  onClick?: () => void;
-  className?: string;
-  children?: React.ReactNode;
+  category: Category | null
+  size?: 'sm' | 'md' | 'lg'
+  variant?: 'default' | 'outline'
+  showIcon?: boolean
+  onClick?: () => void
+  className?: string
+  children?: React.ReactNode
 }
 
 export function CategoryBadge({
@@ -37,11 +37,11 @@ export function CategoryBadge({
       >
         All Categories
       </span>
-    );
+    )
   }
 
   // Get badge color from category or use default
-  const badgeColor = category.color || '#9054e3'; // Default purple
+  const badgeColor = category.color || '#9054e3' // Default purple
 
   return (
     <span
@@ -62,11 +62,9 @@ export function CategoryBadge({
       }}
       onClick={onClick}
     >
-      {showIcon && category.icon && (
-        <span className="text-current">{category.icon}</span>
-      )}
+      {showIcon && category.icon && <span className="text-current">{category.icon}</span>}
       {category.name}
       {children}
     </span>
-  );
+  )
 }

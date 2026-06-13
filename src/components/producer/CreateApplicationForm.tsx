@@ -1,35 +1,35 @@
-import { useState } from 'react';
-import { ArrowLeft, Plus, X } from 'lucide-react';
-import { vendorApplicationsApi } from '@/services/api';
-import { formatDateForInput, formatEventDate } from '@/utils/dateHelpers';
+import { useState } from 'react'
+import { ArrowLeft, Plus, X } from 'lucide-react'
+import { vendorApplicationsApi } from '@/services/api'
+import { formatDateForInput, formatEventDate } from '@/utils/dateHelpers'
 
 interface Event {
-  slug: string;
-  title: string;
-  event_date?: string;
-  location?: string;
+  slug: string
+  title: string
+  event_date?: string
+  location?: string
 }
 
 interface CreateApplicationFormProps {
-  event: Event;
-  onBack: () => void;
-  onSuccess: () => void;
+  event: Event
+  onBack: () => void
+  onSuccess: () => void
   existingApplication?: {
-    id: number;
-    name: string;
-    description?: string;
+    id: number
+    name: string
+    description?: string
     pricing?: {
-      booth_price: number;
-      currency: string;
-    };
-    categories: string[];
-    install_date?: string;
-    install_start_time?: string;
-    install_end_time?: string;
-    payment_link?: string;
-    application_tags?: string;
-    status: 'active' | 'inactive';
-  };
+      booth_price: number
+      currency: string
+    }
+    categories: string[]
+    install_date?: string
+    install_start_time?: string
+    install_end_time?: string
+    payment_link?: string
+    application_tags?: string
+    status: 'active' | 'inactive'
+  }
 }
 
 export default function CreateApplicationForm({
@@ -46,49 +46,50 @@ export default function CreateApplicationForm({
     install_start_time: existingApplication?.install_start_time || '',
     install_end_time: existingApplication?.install_end_time || '',
     payment_link: existingApplication?.payment_link || '',
-    status: existingApplication?.status || 'active' as 'active' | 'inactive',
-  });
-
+    status: existingApplication?.status || ('active' as 'active' | 'inactive'),
+  })
 
   // Initialize tags from application_tags (comma-separated string)
   const [tags, setTags] = useState<string[]>(
     existingApplication?.application_tags
-      ? existingApplication.application_tags.split(',').map(t => t.trim()).filter(t => t)
-      : []
-  );
-  const [newTag, setNewTag] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
+      ? existingApplication.application_tags
+          .split(',')
+          .map((t) => t.trim())
+          .filter((t) => t)
+      : [],
+  )
+  const [newTag, setNewTag] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleAddTag = () => {
-    const trimmed = newTag.trim();
+    const trimmed = newTag.trim()
     if (trimmed && !tags.includes(trimmed)) {
-      setTags([...tags, trimmed]);
-      setNewTag('');
+      setTags([...tags, trimmed])
+      setNewTag('')
     }
-  };
+  }
 
   const handleRemoveTag = (tag: string) => {
-    setTags(tags.filter(t => t !== tag));
-  };
+    setTags(tags.filter((t) => t !== tag))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!formData.name.trim()) {
-      setError('Application name is required');
-      return;
+      setError('Application name is required')
+      return
     }
 
     if (formData.booth_price === undefined || formData.booth_price < 0) {
-      setError('Booth price must be $0 or greater');
-      return;
+      setError('Booth price must be $0 or greater')
+      return
     }
 
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
       const data = {
         name: formData.name.trim(),
@@ -100,22 +101,22 @@ export default function CreateApplicationForm({
         install_end_time: formData.install_end_time || undefined,
         payment_link: formData.payment_link || undefined,
         application_tags: tags.length > 0 ? tags.join(',') : undefined,
-      };
-
-      if (existingApplication) {
-        await vendorApplicationsApi.update(existingApplication.id, data);
-      } else {
-        await vendorApplicationsApi.create(event.slug, data);
       }
 
-      onSuccess();
+      if (existingApplication) {
+        await vendorApplicationsApi.update(existingApplication.id, data)
+      } else {
+        await vendorApplicationsApi.create(event.slug, data)
+      }
+
+      onSuccess()
     } catch (err: any) {
-      console.error('Failed to save application:', err);
-      setError(err.message || 'Failed to save application');
+      console.error('Failed to save application:', err)
+      setError(err.message || 'Failed to save application')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -132,7 +133,9 @@ export default function CreateApplicationForm({
           {existingApplication ? 'Edit Application' : 'Create Application'}
         </h1>
         <p className="text-foreground/60">
-          {existingApplication ? 'Update your vendor application form' : 'Set up your vendor application form'}
+          {existingApplication
+            ? 'Update your vendor application form'
+            : 'Set up your vendor application form'}
         </p>
       </div>
 
@@ -159,9 +162,7 @@ export default function CreateApplicationForm({
 
           {/* Description */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Description
-            </label>
+            <label className="block text-sm font-medium text-foreground mb-2">Description</label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -175,16 +176,12 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
 
           {/* Booth Price */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Booth Price *
-            </label>
+            <label className="block text-sm font-medium text-foreground mb-2">Booth Price *</label>
             <p className="text-foreground/50 text-sm mb-2">
               Price vendors will pay for this booth type
             </p>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60">
-                $
-              </span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60">$</span>
               <input
                 type="number"
                 min="0"
@@ -214,9 +211,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
             <input
               type="date"
               value={formData.install_date}
-              onChange={(e) =>
-                setFormData({ ...formData, install_date: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, install_date: e.target.value })}
               className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:border-primary transition-colors"
             />
           </div>
@@ -230,9 +225,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
               <input
                 type="time"
                 value={formData.install_start_time}
-                onChange={(e) =>
-                  setFormData({ ...formData, install_start_time: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, install_start_time: e.target.value })}
                 className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
@@ -243,9 +236,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
               <input
                 type="time"
                 value={formData.install_end_time}
-                onChange={(e) =>
-                  setFormData({ ...formData, install_end_time: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, install_end_time: e.target.value })}
                 className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
@@ -262,9 +253,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
             <input
               type="url"
               value={formData.payment_link}
-              onChange={(e) =>
-                setFormData({ ...formData, payment_link: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, payment_link: e.target.value })}
               placeholder="https://example.com/pay"
               className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
             />
@@ -277,9 +266,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
                 Event Date
               </label>
               <div className="px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground/80">
-                {event.event_date
-                  ? formatEventDate(event.event_date, 'MMMM d, yyyy')
-                  : 'Not set'}
+                {event.event_date ? formatEventDate(event.event_date, 'MMMM d, yyyy') : 'Not set'}
               </div>
             </div>
 
@@ -311,8 +298,8 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
               onChange={(e) => setNewTag(e.target.value)}
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddTag();
+                  e.preventDefault()
+                  handleAddTag()
                 }
               }}
               placeholder="e.g., handmade, food, jewelry"
@@ -381,11 +368,11 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
             {loading
               ? 'Saving...'
               : existingApplication
-              ? 'Update Application'
-              : 'Create Application'}
+                ? 'Update Application'
+                : 'Create Application'}
           </button>
         </div>
       </form>
     </div>
-  );
+  )
 }

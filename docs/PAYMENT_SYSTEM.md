@@ -11,6 +11,7 @@
 This document describes the frontend implementation of the producer subscription payment system in Voxxy Presents. Producers must have an active paid subscription to create events and use platform features.
 
 **Related Backend Docs:**
+
 - `/voxxy-rails/docs/SUBSCRIPTION_PAYMENT_SYSTEM.md` - Complete backend implementation
 - `/voxxy-rails/docs/TIER_SYSTEM_ROADMAP.md` - Future multi-tier plan
 - `/voxxy-rails/docs/PAYMENT_SECURITY_FIX.md` - Security implementation details
@@ -62,6 +63,7 @@ User redirected to Stripe hosted checkout
 ```
 
 **Components:**
+
 - `src/pages/BetaPendingPage.tsx` - Main payment hub
 - `src/services/stripeService.ts` - Stripe API client
 
@@ -85,6 +87,7 @@ Stripe redirects to:
 ```
 
 **Stripe handles:**
+
 - Payment form UI
 - PCI compliance
 - 3D Secure authentication
@@ -160,6 +163,7 @@ src/
 **Purpose:** Unified account setup hub for email verification and payment.
 
 **Features:**
+
 - Shows email verification form (if not verified)
 - Shows payment section (if verified but unpaid)
 - Displays organization details (debugging)
@@ -167,6 +171,7 @@ src/
 - Delete account option
 
 **Key State:**
+
 ```tsx
 const isEmailVerified = userProfile?.confirmed_at !== null
 const isPaid = userProfile?.paid === true
@@ -174,15 +179,17 @@ const needsPayment = isProducer && !isPaid
 ```
 
 **Payment Section:**
+
 ```tsx
-{needsPayment && isEmailVerified && (
-  <Button onClick={handleStartPayment}>
-    Start Your Producer Account ($80/mo)
-  </Button>
-)}
+{
+  needsPayment && isEmailVerified && (
+    <Button onClick={handleStartPayment}>Start Your Producer Account ($80/mo)</Button>
+  )
+}
 ```
 
 **Payment Handler:**
+
 ```tsx
 const handleStartPayment = async () => {
   setIsProcessingPayment(true)
@@ -205,6 +212,7 @@ const handleStartPayment = async () => {
 **Purpose:** Post-payment confirmation and redirect.
 
 **Features:**
+
 - Refreshes user profile to get updated `paid` status
 - Shows success message and invoice details
 - Shows "What's Next" checklist
@@ -212,10 +220,11 @@ const handleStartPayment = async () => {
 - Manual "Go to Dashboard Now" button
 
 **Key Logic:**
+
 ```tsx
 useEffect(() => {
   const refreshProfile = async () => {
-    await refreshUserProfile()  // Fetches user.paid = true
+    await refreshUserProfile() // Fetches user.paid = true
     setIsRefreshing(false)
   }
   refreshProfile()
@@ -225,9 +234,9 @@ useEffect(() => {
   if (isRefreshing) return
 
   const interval = setInterval(() => {
-    setCountdown(prev => {
+    setCountdown((prev) => {
       if (prev <= 1) {
-        navigate('/dashboard')  // Auto-redirect
+        navigate('/dashboard') // Auto-redirect
         return 0
       }
       return prev - 1
@@ -270,12 +279,13 @@ async getSubscriptionStatus(): Promise<SubscriptionStatus> {
 ```
 
 **Response Type:**
+
 ```typescript
 interface SubscriptionStatus {
   subscribed: boolean
   subscription_active: boolean
   requires_payment: boolean
-  status: string  // 'active', 'inactive', 'past_due', 'canceled'
+  status: string // 'active', 'inactive', 'past_due', 'canceled'
   display_status: string
   current_period_end: string | null
   stripe_customer_id: string | null
@@ -304,6 +314,7 @@ async openBillingPortal(): Promise<void> {
 **File:** `src/App.tsx`
 
 **Payment Checks:**
+
 ```tsx
 const isProducer = role === 'producer' || role === 'venue_owner'
 const isPaid = userProfile.paid === true
@@ -323,6 +334,7 @@ return <Dashboard />
 ```
 
 **Flow:**
+
 ```
 User visits /dashboard
   ↓
@@ -344,6 +356,7 @@ User visits /dashboard
 **When:** Unpaid producer tries to create event/email/contact via API.
 
 **Response:**
+
 ```json
 {
   "error": "Active subscription required to access this feature",
@@ -356,6 +369,7 @@ User visits /dashboard
 Frontend doesn't specifically handle 402 yet (payment checks prevent reaching this point).
 
 **Future Improvement:**
+
 ```tsx
 // src/services/api.ts
 if (response.status === 402) {
@@ -364,7 +378,7 @@ if (response.status === 402) {
   // Show upgrade modal
   showUpgradeModal({
     message: errorData.error,
-    upgradeUrl: errorData.upgrade_url
+    upgradeUrl: errorData.upgrade_url,
   })
 
   // Or redirect
@@ -442,19 +456,21 @@ if (response.status === 402) {
 **File:** `src/contexts/AuthContext.tsx`
 
 **User Profile:**
+
 ```tsx
 interface User {
   id: number
   email: string
   name: string
   role: 'venue_owner' | 'vendor' | 'consumer' | 'admin'
-  confirmed_at: string | null  // Email verification
-  paid: boolean                 // Payment status
+  confirmed_at: string | null // Email verification
+  paid: boolean // Payment status
   organization_id?: number
 }
 ```
 
 **Key Methods:**
+
 ```tsx
 const { userProfile, refreshUserProfile } = useAuth()
 
@@ -463,6 +479,7 @@ await refreshUserProfile()
 ```
 
 **Payment Checks:**
+
 ```tsx
 const isEmailVerified = userProfile.confirmed_at !== null
 const isPaid = userProfile.paid === true
@@ -476,6 +493,7 @@ const needsPayment = userProfile.role === 'venue_owner' && !isPaid
 ### Manual Testing Checklist
 
 **New Producer Signup:**
+
 - [ ] Sign up as producer
 - [ ] Verify email with 6-digit code
 - [ ] See payment section on /pending
@@ -489,6 +507,7 @@ const needsPayment = userProfile.role === 'venue_owner' && !isPaid
 - [ ] Can create events
 
 **Payment Failure:**
+
 - [ ] Sign up as producer
 - [ ] Verify email
 - [ ] Click payment button
@@ -498,6 +517,7 @@ const needsPayment = userProfile.role === 'venue_owner' && !isPaid
 - [ ] Can retry payment
 
 **Subscription Management:**
+
 - [ ] Paid user clicks "Manage Subscription" in settings
 - [ ] Redirected to Stripe billing portal
 - [ ] Can view invoices
@@ -509,6 +529,7 @@ const needsPayment = userProfile.role === 'venue_owner' && !isPaid
 ## Environment Variables
 
 **Frontend:**
+
 ```bash
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxx  # Stripe publishable key (not used in current flow)
 VITE_API_BASE_URL=http://localhost:3001  # Backend API URL
@@ -532,9 +553,7 @@ export function UpgradeModal({ show, error, onClose }) {
       <h2>Subscription Required</h2>
       <p>{error.message}</p>
       <p>Current plan: {error.current_plan}</p>
-      <Button onClick={() => window.location.href = error.upgrade_url}>
-        Upgrade Now
-      </Button>
+      <Button onClick={() => (window.location.href = error.upgrade_url)}>Upgrade Now</Button>
     </Modal>
   )
 }
@@ -567,11 +586,7 @@ Show current usage vs. limits:
     limit={maxEvents}
     percentage={(eventsThisYear / maxEvents) * 100}
   />
-  <UsageStat
-    label="Vendor Contacts"
-    current={totalContacts}
-    limit={maxContacts}
-  />
+  <UsageStat label="Vendor Contacts" current={totalContacts} limit={maxContacts} />
 </UsageStats>
 ```
 
@@ -582,12 +597,9 @@ Use Stripe Elements for updating payment method without leaving app:
 ```tsx
 // Future: src/components/PaymentMethodForm.tsx
 import { Elements, CardElement } from '@stripe/react-stripe-js'
-
-<Elements stripe={stripePromise}>
+;<Elements stripe={stripePromise}>
   <CardElement />
-  <Button onClick={handleUpdateCard}>
-    Update Card
-  </Button>
+  <Button onClick={handleUpdateCard}>Update Card</Button>
 </Elements>
 ```
 
@@ -596,12 +608,14 @@ import { Elements, CardElement } from '@stripe/react-stripe-js'
 ## Related Documentation
 
 **Backend:**
+
 - `/voxxy-rails/docs/SUBSCRIPTION_PAYMENT_SYSTEM.md` - Complete backend implementation
 - `/voxxy-rails/docs/TIER_SYSTEM_ROADMAP.md` - Multi-tier plan
 - `/voxxy-rails/docs/PAYMENT_SECURITY_FIX.md` - Security implementation
 - `/voxxy-rails/docs/API_REFERENCE.md` - Stripe API endpoints
 
 **Frontend:**
+
 - `src/pages/BetaPendingPage.tsx` - Payment hub implementation
 - `src/services/stripeService.ts` - Stripe service code
 - `src/contexts/AuthContext.tsx` - Auth state management
@@ -613,16 +627,19 @@ import { Elements, CardElement } from '@stripe/react-stripe-js'
 ### Common Issues
 
 **Issue:** User paid but still sees paywall
+
 - **Check:** `userProfile.paid` in React DevTools
 - **Fix:** Call `refreshUserProfile()` to refetch from backend
 - **Workaround:** Logout and login again
 
 **Issue:** Stripe checkout not opening
+
 - **Check:** Browser console for errors
 - **Check:** Network tab for 500 errors from `/create_checkout_session`
 - **Fix:** Check backend logs for Stripe API errors
 
 **Issue:** User stuck on /pending after payment
+
 - **Check:** Did webhook fire? Check backend logs
 - **Check:** `subscription_status` in database
 - **Fix:** Manually trigger webhook from Stripe dashboard

@@ -1,32 +1,37 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { X, Download, Loader2, ArrowUpDown, ArrowUp, ArrowDown, CalendarDays, Users } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  eventsApi,
-  vendorContactsApi,
-  type VendorContact,
-} from '@/services/api';
-import { Checkbox } from '@/components/ui/checkbox';
-import { formatTsCell, csvEscape } from '@/components/producer/Network/unifiedDataExport';
+  X,
+  Download,
+  Loader2,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  CalendarDays,
+  Users,
+} from 'lucide-react'
+import { eventsApi, vendorContactsApi, type VendorContact } from '@/services/api'
+import { Checkbox } from '@/components/ui/checkbox'
+import { formatTsCell, csvEscape } from '@/components/producer/Network/unifiedDataExport'
 import {
   EXPORT_EVENT_COLUMNS,
   EXPORT_COLUMNS,
   eventsToCsv,
   contactsToCsv,
   triggerCsvDownload,
-} from '@/components/producer/Network/contactsCsvExport';
-import { buildEventLocationMap } from '@/utils/eventLocation';
+} from '@/components/producer/Network/contactsCsvExport'
+import { buildEventLocationMap } from '@/utils/eventLocation'
 import {
   enrichContactsWithEventHistory,
   getShowLocationsForContact,
-} from '@/utils/enrichContactsEventHistory';
+} from '@/utils/enrichContactsEventHistory'
 
-type TabId = 'events' | 'contacts';
+type TabId = 'events' | 'contacts'
 
 interface FullDataExportModalProps {
-  open: boolean;
-  onClose: () => void;
-  organizationId: number;
-  organizationSlug: string;
+  open: boolean
+  onClose: () => void
+  organizationId: number
+  organizationSlug: string
 }
 
 export default function FullDataExportModal({
@@ -35,251 +40,330 @@ export default function FullDataExportModal({
   organizationId,
   organizationSlug,
 }: FullDataExportModalProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('events');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabId>('events')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const [events, setEvents] = useState<Record<string, unknown>[]>([]);
-  const [contacts, setContacts] = useState<VendorContact[]>([]);
+  const [events, setEvents] = useState<Record<string, unknown>[]>([])
+  const [contacts, setContacts] = useState<VendorContact[]>([])
 
-  const [selectedEventKeys, setSelectedEventKeys] = useState<Set<string>>(() => new Set());
-  const [selectedContactKeys, setSelectedContactKeys] = useState<Set<string>>(() => new Set());
+  const [selectedEventKeys, setSelectedEventKeys] = useState<Set<string>>(() => new Set())
+  const [selectedContactKeys, setSelectedContactKeys] = useState<Set<string>>(() => new Set())
 
   // Events sorting
-  const [eventSortCol, setEventSortCol] = useState<string>('event_date');
-  const [eventSortDir, setEventSortDir] = useState<'asc' | 'desc'>('desc');
+  const [eventSortCol, setEventSortCol] = useState<string>('event_date')
+  const [eventSortDir, setEventSortDir] = useState<'asc' | 'desc'>('desc')
 
   // Contacts sorting
-  const [contactSortCol, setContactSortCol] = useState<string>('updated_at');
-  const [contactSortDir, setContactSortDir] = useState<'asc' | 'desc'>('desc');
+  const [contactSortCol, setContactSortCol] = useState<string>('updated_at')
+  const [contactSortDir, setContactSortDir] = useState<'asc' | 'desc'>('desc')
 
   useEffect(() => {
     if (open) {
-      setSelectedEventKeys(new Set());
-      setSelectedContactKeys(new Set());
+      setSelectedEventKeys(new Set())
+      setSelectedContactKeys(new Set())
     }
-  }, [open]);
+  }, [open])
 
   const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setEvents([]);
-    setContacts([]);
+    setLoading(true)
+    setError(null)
+    setEvents([])
+    setContacts([])
 
     try {
       const [eventsResult, contactsResult] = await Promise.allSettled([
         eventsApi.getByOrganization(organizationSlug),
         vendorContactsApi.getAll(organizationId, { page: 1, per_page: 500 }),
-      ]);
+      ])
 
       if (eventsResult.status === 'fulfilled') {
-        setEvents(Array.isArray(eventsResult.value) ? (eventsResult.value as Record<string, unknown>[]) : []);
+        setEvents(
+          Array.isArray(eventsResult.value)
+            ? (eventsResult.value as Record<string, unknown>[])
+            : [],
+        )
       }
 
       let eventList: Record<string, unknown>[] =
         eventsResult.status === 'fulfilled' && Array.isArray(eventsResult.value)
           ? (eventsResult.value as Record<string, unknown>[])
-          : [];
+          : []
 
       if (contactsResult.status === 'fulfilled') {
-        const res = contactsResult.value;
-        let contactList = res.vendor_contacts ?? [];
-        const totalPages = res.meta?.total_pages ?? 1;
+        const res = contactsResult.value
+        let contactList = res.vendor_contacts ?? []
+        const totalPages = res.meta?.total_pages ?? 1
         if (totalPages > 1) {
           for (let p = 2; p <= totalPages; p++) {
-            const pageRes = await vendorContactsApi.getAll(organizationId, { page: p, per_page: 500 });
-            contactList = [...contactList, ...(pageRes.vendor_contacts ?? [])];
+            const pageRes = await vendorContactsApi.getAll(organizationId, {
+              page: p,
+              per_page: 500,
+            })
+            contactList = [...contactList, ...(pageRes.vendor_contacts ?? [])]
           }
         }
         if (eventList.length > 0) {
-          contactList = await enrichContactsWithEventHistory(contactList, eventList);
+          contactList = await enrichContactsWithEventHistory(contactList, eventList)
         }
-        setContacts(contactList);
+        setContacts(contactList)
       }
 
       if (eventsResult.status === 'rejected') {
-        setError(`Events failed: ${eventsResult.reason instanceof Error ? eventsResult.reason.message : String(eventsResult.reason)}`);
+        setError(
+          `Events failed: ${eventsResult.reason instanceof Error ? eventsResult.reason.message : String(eventsResult.reason)}`,
+        )
       } else if (contactsResult.status === 'rejected') {
-        setError(`Contacts failed: ${contactsResult.reason instanceof Error ? contactsResult.reason.message : String(contactsResult.reason)}`);
+        setError(
+          `Contacts failed: ${contactsResult.reason instanceof Error ? contactsResult.reason.message : String(contactsResult.reason)}`,
+        )
       }
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to load data');
+      setError(e instanceof Error ? e.message : 'Failed to load data')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [organizationId, organizationSlug]);
+  }, [organizationId, organizationSlug])
 
   useEffect(() => {
-    if (open) load();
-  }, [open, load]);
+    if (open) load()
+  }, [open, load])
 
   useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open, onClose])
 
   /* ---------- Events sorting ---------- */
   const sortedEvents = useMemo(() => {
-    const mult = eventSortDir === 'asc' ? 1 : -1;
-    const tsCols = new Set(['event_date', 'event_end_date', 'application_deadline', 'payment_deadline', 'created_at', 'updated_at']);
+    const mult = eventSortDir === 'asc' ? 1 : -1
+    const tsCols = new Set([
+      'event_date',
+      'event_end_date',
+      'application_deadline',
+      'payment_deadline',
+      'created_at',
+      'updated_at',
+    ])
     return [...events].sort((a, b) => {
-      const colDef = EXPORT_EVENT_COLUMNS.find(c => c.key === eventSortCol);
-      if (!colDef) return 0;
-      const va = colDef.getValue(a);
-      const vb = colDef.getValue(b);
+      const colDef = EXPORT_EVENT_COLUMNS.find((c) => c.key === eventSortCol)
+      if (!colDef) return 0
+      const va = colDef.getValue(a)
+      const vb = colDef.getValue(b)
       if (tsCols.has(eventSortCol)) {
-        const ta = va ? Date.parse(va) : NaN;
-        const tb = vb ? Date.parse(vb) : NaN;
-        if (Number.isNaN(ta) && Number.isNaN(tb)) return 0;
-        if (Number.isNaN(ta)) return 1;
-        if (Number.isNaN(tb)) return -1;
-        return (ta - tb) * mult;
+        const ta = va ? Date.parse(va) : NaN
+        const tb = vb ? Date.parse(vb) : NaN
+        if (Number.isNaN(ta) && Number.isNaN(tb)) return 0
+        if (Number.isNaN(ta)) return 1
+        if (Number.isNaN(tb)) return -1
+        return (ta - tb) * mult
       }
-      if (!va && !vb) return 0;
-      if (!va) return 1;
-      if (!vb) return -1;
-      return va.localeCompare(vb) * mult;
-    });
-  }, [events, eventSortCol, eventSortDir]);
+      if (!va && !vb) return 0
+      if (!va) return 1
+      if (!vb) return -1
+      return va.localeCompare(vb) * mult
+    })
+  }, [events, eventSortCol, eventSortDir])
 
   /* ---------- Contacts sorting ---------- */
   const sortedContacts = useMemo(() => {
-    const mult = contactSortDir === 'asc' ? 1 : -1;
-    const tsCols = new Set(['updated_at', 'created_at', 'last_contacted']);
+    const mult = contactSortDir === 'asc' ? 1 : -1
+    const tsCols = new Set(['updated_at', 'created_at', 'last_contacted'])
     return [...contacts].sort((a, b) => {
-      const colDef = EXPORT_COLUMNS.find(c => c.key === contactSortCol);
-      if (!colDef) return 0;
-      const va = colDef.getValue(a);
-      const vb = colDef.getValue(b);
+      const colDef = EXPORT_COLUMNS.find((c) => c.key === contactSortCol)
+      if (!colDef) return 0
+      const va = colDef.getValue(a)
+      const vb = colDef.getValue(b)
       if (tsCols.has(contactSortCol)) {
-        const ta = va ? Date.parse(va) : NaN;
-        const tb = vb ? Date.parse(vb) : NaN;
-        if (Number.isNaN(ta) && Number.isNaN(tb)) return 0;
-        if (Number.isNaN(ta)) return 1;
-        if (Number.isNaN(tb)) return -1;
-        return (ta - tb) * mult;
+        const ta = va ? Date.parse(va) : NaN
+        const tb = vb ? Date.parse(vb) : NaN
+        if (Number.isNaN(ta) && Number.isNaN(tb)) return 0
+        if (Number.isNaN(ta)) return 1
+        if (Number.isNaN(tb)) return -1
+        return (ta - tb) * mult
       }
-      if (!va && !vb) return 0;
-      if (!va) return 1;
-      if (!vb) return -1;
-      return va.localeCompare(vb) * mult;
-    });
-  }, [contacts, contactSortCol, contactSortDir]);
+      if (!va && !vb) return 0
+      if (!va) return 1
+      if (!vb) return -1
+      return va.localeCompare(vb) * mult
+    })
+  }, [contacts, contactSortCol, contactSortDir])
 
   /* ---------- Event key helpers ---------- */
-  const eventKey = (ev: Record<string, unknown>) => `ev-${ev.id ?? ev.slug}`;
-  const eventVisibleKeys = useMemo(() => sortedEvents.map(eventKey), [sortedEvents]);
-  const evSelectedInView = useMemo(() => eventVisibleKeys.filter(k => selectedEventKeys.has(k)), [eventVisibleKeys, selectedEventKeys]);
-  const allEventsSelected = eventVisibleKeys.length > 0 && evSelectedInView.length === eventVisibleKeys.length;
-  const someEventsSelected = evSelectedInView.length > 0 && !allEventsSelected;
+  const eventKey = (ev: Record<string, unknown>) => `ev-${ev.id ?? ev.slug}`
+  const eventVisibleKeys = useMemo(() => sortedEvents.map(eventKey), [sortedEvents])
+  const evSelectedInView = useMemo(
+    () => eventVisibleKeys.filter((k) => selectedEventKeys.has(k)),
+    [eventVisibleKeys, selectedEventKeys],
+  )
+  const allEventsSelected =
+    eventVisibleKeys.length > 0 && evSelectedInView.length === eventVisibleKeys.length
+  const someEventsSelected = evSelectedInView.length > 0 && !allEventsSelected
 
   /* ---------- Contact key helpers ---------- */
-  const contactKey = (c: VendorContact) => `ct-${c.id}`;
-  const contactVisibleKeys = useMemo(() => sortedContacts.map(contactKey), [sortedContacts]);
-  const ctSelectedInView = useMemo(() => contactVisibleKeys.filter(k => selectedContactKeys.has(k)), [contactVisibleKeys, selectedContactKeys]);
-  const allContactsSelected = contactVisibleKeys.length > 0 && ctSelectedInView.length === contactVisibleKeys.length;
-  const someContactsSelected = ctSelectedInView.length > 0 && !allContactsSelected;
+  const contactKey = (c: VendorContact) => `ct-${c.id}`
+  const contactVisibleKeys = useMemo(() => sortedContacts.map(contactKey), [sortedContacts])
+  const ctSelectedInView = useMemo(
+    () => contactVisibleKeys.filter((k) => selectedContactKeys.has(k)),
+    [contactVisibleKeys, selectedContactKeys],
+  )
+  const allContactsSelected =
+    contactVisibleKeys.length > 0 && ctSelectedInView.length === contactVisibleKeys.length
+  const someContactsSelected = ctSelectedInView.length > 0 && !allContactsSelected
 
   /* ---------- Selection toggles ---------- */
   const toggleEventSelect = (key: string) => {
-    setSelectedEventKeys(prev => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key); else next.add(key);
-      return next;
-    });
-  };
+    setSelectedEventKeys((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
   const toggleAllEvents = () => {
-    setSelectedEventKeys(prev => {
-      const next = new Set(prev);
-      if (allEventsSelected) eventVisibleKeys.forEach(k => next.delete(k));
-      else eventVisibleKeys.forEach(k => next.add(k));
-      return next;
-    });
-  };
+    setSelectedEventKeys((prev) => {
+      const next = new Set(prev)
+      if (allEventsSelected) eventVisibleKeys.forEach((k) => next.delete(k))
+      else eventVisibleKeys.forEach((k) => next.add(k))
+      return next
+    })
+  }
   const toggleContactSelect = (key: string) => {
-    setSelectedContactKeys(prev => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key); else next.add(key);
-      return next;
-    });
-  };
+    setSelectedContactKeys((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
   const toggleAllContacts = () => {
-    setSelectedContactKeys(prev => {
-      const next = new Set(prev);
-      if (allContactsSelected) contactVisibleKeys.forEach(k => next.delete(k));
-      else contactVisibleKeys.forEach(k => next.add(k));
-      return next;
-    });
-  };
+    setSelectedContactKeys((prev) => {
+      const next = new Set(prev)
+      if (allContactsSelected) contactVisibleKeys.forEach((k) => next.delete(k))
+      else contactVisibleKeys.forEach((k) => next.add(k))
+      return next
+    })
+  }
 
   /* ---------- Sort toggles ---------- */
   const toggleEventSort = (col: string) => {
-    if (eventSortCol === col) setEventSortDir(d => d === 'asc' ? 'desc' : 'asc');
-    else { setEventSortCol(col); setEventSortDir(col === 'title' || col === 'venue' ? 'asc' : 'desc'); }
-  };
+    if (eventSortCol === col) setEventSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    else {
+      setEventSortCol(col)
+      setEventSortDir(col === 'title' || col === 'venue' ? 'asc' : 'desc')
+    }
+  }
   const toggleContactSort = (col: string) => {
-    if (contactSortCol === col) setContactSortDir(d => d === 'asc' ? 'desc' : 'asc');
-    else { setContactSortCol(col); setContactSortDir(col === 'name' || col === 'email' ? 'asc' : 'desc'); }
-  };
+    if (contactSortCol === col) setContactSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    else {
+      setContactSortCol(col)
+      setContactSortDir(col === 'name' || col === 'email' ? 'asc' : 'desc')
+    }
+  }
 
   /* ---------- Export handlers ---------- */
   const handleExportEvents = (selected: boolean) => {
     const rows = selected
-      ? sortedEvents.filter(ev => selectedEventKeys.has(eventKey(ev)))
-      : sortedEvents;
-    if (rows.length === 0) return;
-    const csv = eventsToCsv(rows);
-    const date = new Date().toISOString().slice(0, 10);
-    triggerCsvDownload(csv, `events-export-${organizationSlug}-${date}.csv`);
-  };
+      ? sortedEvents.filter((ev) => selectedEventKeys.has(eventKey(ev)))
+      : sortedEvents
+    if (rows.length === 0) return
+    const csv = eventsToCsv(rows)
+    const date = new Date().toISOString().slice(0, 10)
+    triggerCsvDownload(csv, `events-export-${organizationSlug}-${date}.csv`)
+  }
 
   const handleExportContacts = (selected: boolean) => {
     const rows = selected
-      ? sortedContacts.filter(c => selectedContactKeys.has(contactKey(c)))
-      : sortedContacts;
-    if (rows.length === 0) return;
+      ? sortedContacts.filter((c) => selectedContactKeys.has(contactKey(c)))
+      : sortedContacts
+    if (rows.length === 0) return
     // Build CSV with the derived "Show Locations" column appended
-    const baseCsv = contactsToCsv(rows);
-    const lines = baseCsv.split('\n');
-    const headerLine = lines[0] + ',' + csvEscape('Show Locations');
-    const dataLines = rows.map((c, i) => lines[i + 1] + ',' + csvEscape(getShowLocations(c)));
-    const csv = [headerLine, ...dataLines].join('\n');
-    const date = new Date().toISOString().slice(0, 10);
-    triggerCsvDownload(csv, `contacts-export-${organizationSlug}-${date}.csv`);
-  };
+    const baseCsv = contactsToCsv(rows)
+    const lines = baseCsv.split('\n')
+    const headerLine = lines[0] + ',' + csvEscape('Show Locations')
+    const dataLines = rows.map((c, i) => lines[i + 1] + ',' + csvEscape(getShowLocations(c)))
+    const csv = [headerLine, ...dataLines].join('\n')
+    const date = new Date().toISOString().slice(0, 10)
+    triggerCsvDownload(csv, `contacts-export-${organizationSlug}-${date}.csv`)
+  }
 
-  const eventLocationMap = useMemo(() => buildEventLocationMap(events), [events]);
+  const eventLocationMap = useMemo(() => buildEventLocationMap(events), [events])
 
   const getShowLocations = (c: VendorContact): string =>
-    getShowLocationsForContact(c, eventLocationMap, events);
+    getShowLocationsForContact(c, eventLocationMap, events)
 
   /* ---------- Columns to display in table (subset for readability) ---------- */
-  const eventTableCols = ['title', 'event_date', 'start_time', 'end_time', 'venue', 'location', 'status', 'ticket_url', 'capacity', 'registered', 'application_deadline', 'created_at', 'updated_at'];
-  const contactTableCols = ['name', 'email', 'phone', 'location', 'show_locations', 'category', 'events', 'unsubscribed', 'updated_at', 'created_at'];
+  const eventTableCols = [
+    'title',
+    'event_date',
+    'start_time',
+    'end_time',
+    'venue',
+    'location',
+    'status',
+    'ticket_url',
+    'capacity',
+    'registered',
+    'application_deadline',
+    'created_at',
+    'updated_at',
+  ]
+  const contactTableCols = [
+    'name',
+    'email',
+    'phone',
+    'location',
+    'show_locations',
+    'category',
+    'events',
+    'unsubscribed',
+    'updated_at',
+    'created_at',
+  ]
 
   // Inject the derived "Show Locations" column into the contact columns for display
-  const showLocationsCol = { key: 'show_locations', label: 'Show Locations', getValue: getShowLocations, defaultOn: false };
-  const displayEventCols = EXPORT_EVENT_COLUMNS.filter(c => eventTableCols.includes(c.key));
-  const displayContactCols = EXPORT_COLUMNS
-    .filter(c => contactTableCols.includes(c.key))
-    .flatMap(c => c.key === 'location' ? [c, showLocationsCol] : [c]);
+  const showLocationsCol = {
+    key: 'show_locations',
+    label: 'Show Locations',
+    getValue: getShowLocations,
+    defaultOn: false,
+  }
+  const displayEventCols = EXPORT_EVENT_COLUMNS.filter((c) => eventTableCols.includes(c.key))
+  const displayContactCols = EXPORT_COLUMNS.filter((c) => contactTableCols.includes(c.key)).flatMap(
+    (c) => (c.key === 'location' ? [c, showLocationsCol] : [c]),
+  )
 
   /* ---------- Shared classes ---------- */
-  const thClass = 'px-2 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap cursor-pointer select-none text-foreground/80 hover:text-foreground transition-colors';
-  const tdClass = 'px-2 py-1.5 align-middle text-foreground/90 dark:text-foreground/80 text-[11px]';
+  const thClass =
+    'px-2 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap cursor-pointer select-none text-foreground/80 hover:text-foreground transition-colors'
+  const tdClass = 'px-2 py-1.5 align-middle text-foreground/90 dark:text-foreground/80 text-[11px]'
 
-  const SortIcon = ({ col, activeCol, activeDir }: { col: string; activeCol: string; activeDir: 'asc' | 'desc' }) => {
-    const active = activeCol === col;
+  const SortIcon = ({
+    col,
+    activeCol,
+    activeDir,
+  }: {
+    col: string
+    activeCol: string
+    activeDir: 'asc' | 'desc'
+  }) => {
+    const active = activeCol === col
     const iconClass = active
       ? 'inline w-3 h-3 text-purple-600 dark:text-purple-400'
-      : 'inline w-3 h-3 text-foreground/40 dark:text-foreground/35';
-    if (!active) return <ArrowUpDown className={iconClass} />;
-    return activeDir === 'asc' ? <ArrowUp className={iconClass} /> : <ArrowDown className={iconClass} />;
-  };
+      : 'inline w-3 h-3 text-foreground/40 dark:text-foreground/35'
+    if (!active) return <ArrowUpDown className={iconClass} />
+    return activeDir === 'asc' ? (
+      <ArrowUp className={iconClass} />
+    ) : (
+      <ArrowDown className={iconClass} />
+    )
+  }
 
-  if (!open) return null;
+  if (!open) return null
 
   return (
     <div
@@ -287,7 +371,9 @@ export default function FullDataExportModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="full-data-export-title"
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
     >
       <div className="voxxy-modal-surface flex max-h-[92vh] w-full max-w-[min(80rem,calc(100vw-1rem))] flex-col overflow-hidden rounded-xl">
         {/* Header */}
@@ -297,7 +383,10 @@ export default function FullDataExportModal({
               <Download className="h-4 w-4 text-primary" />
             </div>
             <div className="min-w-0">
-              <h2 id="full-data-export-title" className="truncate text-base font-semibold text-foreground md:text-lg">
+              <h2
+                id="full-data-export-title"
+                className="truncate text-base font-semibold text-foreground md:text-lg"
+              >
                 Data Export
               </h2>
               <p className="mt-0.5 text-[11px] text-muted-foreground md:text-xs">
@@ -305,17 +394,22 @@ export default function FullDataExportModal({
               </p>
             </div>
           </div>
-          <button type="button" onClick={onClose} className="flex-shrink-0 text-foreground/60 transition-colors hover:text-foreground" aria-label="Close">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-shrink-0 text-foreground/60 transition-colors hover:text-foreground"
+            aria-label="Close"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Tabs */}
         <div className="flex flex-shrink-0 border-b border-border bg-muted/20">
-          {([
+          {[
             { id: 'events' as const, label: 'Events', count: events.length, Icon: CalendarDays },
             { id: 'contacts' as const, label: 'Contacts', count: contacts.length, Icon: Users },
-          ]).map(tab => (
+          ].map((tab) => (
             <button
               key={tab.id}
               type="button"
@@ -390,12 +484,16 @@ export default function FullDataExportModal({
           )}
 
           {!loading && error && (
-            <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-900 dark:text-red-200 my-4">{error}</div>
+            <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-900 dark:text-red-200 my-4">
+              {error}
+            </div>
           )}
 
           {/* Events tab */}
-          {!loading && !error && activeTab === 'events' && (
-            sortedEvents.length === 0 ? (
+          {!loading &&
+            !error &&
+            activeTab === 'events' &&
+            (sortedEvents.length === 0 ? (
               <p className="text-center text-sm text-foreground/60 py-12">No events found.</p>
             ) : (
               <div className="voxxy-table-shell mt-2">
@@ -405,28 +503,46 @@ export default function FullDataExportModal({
                       <tr className="voxxy-table-header-row">
                         <th className={`${thClass} w-10`}>
                           <Checkbox
-                            checked={allEventsSelected ? true : someEventsSelected ? 'indeterminate' : false}
+                            checked={
+                              allEventsSelected
+                                ? true
+                                : someEventsSelected
+                                  ? 'indeterminate'
+                                  : false
+                            }
                             onCheckedChange={() => toggleAllEvents()}
                             aria-label="Select all events"
                             className="translate-y-0.5"
                           />
                         </th>
-                        {displayEventCols.map(col => (
-                          <th key={col.key} className={thClass} onClick={() => toggleEventSort(col.key)}>
-                            {col.label} <SortIcon col={col.key} activeCol={eventSortCol} activeDir={eventSortDir} />
+                        {displayEventCols.map((col) => (
+                          <th
+                            key={col.key}
+                            className={thClass}
+                            onClick={() => toggleEventSort(col.key)}
+                          >
+                            {col.label}{' '}
+                            <SortIcon
+                              col={col.key}
+                              activeCol={eventSortCol}
+                              activeDir={eventSortDir}
+                            />
                           </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-purple-500/[0.12] dark:divide-white/[0.06]">
-                      {sortedEvents.map(ev => {
-                        const key = eventKey(ev);
+                      {sortedEvents.map((ev) => {
+                        const key = eventKey(ev)
                         return (
                           <tr key={key} className="voxxy-table-row voxxy-table-row-hover">
                             <td className={tdClass}>
-                              <Checkbox checked={selectedEventKeys.has(key)} onCheckedChange={() => toggleEventSelect(key)} />
+                              <Checkbox
+                                checked={selectedEventKeys.has(key)}
+                                onCheckedChange={() => toggleEventSelect(key)}
+                              />
                             </td>
-                            {displayEventCols.map(col => (
+                            {displayEventCols.map((col) => (
                               <td
                                 key={col.key}
                                 className={`${tdClass} max-w-[200px] truncate ${col.key === 'title' ? 'font-medium' : ''}`}
@@ -438,18 +554,19 @@ export default function FullDataExportModal({
                               </td>
                             ))}
                           </tr>
-                        );
+                        )
                       })}
                     </tbody>
                   </table>
                 </div>
               </div>
-            )
-          )}
+            ))}
 
           {/* Contacts tab */}
-          {!loading && !error && activeTab === 'contacts' && (
-            sortedContacts.length === 0 ? (
+          {!loading &&
+            !error &&
+            activeTab === 'contacts' &&
+            (sortedContacts.length === 0 ? (
               <p className="text-center text-sm text-foreground/60 py-12">No contacts found.</p>
             ) : (
               <div className="voxxy-table-shell mt-2">
@@ -459,28 +576,46 @@ export default function FullDataExportModal({
                       <tr className="voxxy-table-header-row">
                         <th className={`${thClass} w-10`}>
                           <Checkbox
-                            checked={allContactsSelected ? true : someContactsSelected ? 'indeterminate' : false}
+                            checked={
+                              allContactsSelected
+                                ? true
+                                : someContactsSelected
+                                  ? 'indeterminate'
+                                  : false
+                            }
                             onCheckedChange={() => toggleAllContacts()}
                             aria-label="Select all contacts"
                             className="translate-y-0.5"
                           />
                         </th>
-                        {displayContactCols.map(col => (
-                          <th key={col.key} className={thClass} onClick={() => toggleContactSort(col.key)}>
-                            {col.label} <SortIcon col={col.key} activeCol={contactSortCol} activeDir={contactSortDir} />
+                        {displayContactCols.map((col) => (
+                          <th
+                            key={col.key}
+                            className={thClass}
+                            onClick={() => toggleContactSort(col.key)}
+                          >
+                            {col.label}{' '}
+                            <SortIcon
+                              col={col.key}
+                              activeCol={contactSortCol}
+                              activeDir={contactSortDir}
+                            />
                           </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-purple-500/[0.12] dark:divide-white/[0.06]">
-                      {sortedContacts.map(c => {
-                        const key = contactKey(c);
+                      {sortedContacts.map((c) => {
+                        const key = contactKey(c)
                         return (
                           <tr key={key} className="voxxy-table-row voxxy-table-row-hover">
                             <td className={tdClass}>
-                              <Checkbox checked={selectedContactKeys.has(key)} onCheckedChange={() => toggleContactSelect(key)} />
+                              <Checkbox
+                                checked={selectedContactKeys.has(key)}
+                                onCheckedChange={() => toggleContactSelect(key)}
+                              />
                             </td>
-                            {displayContactCols.map(col => (
+                            {displayContactCols.map((col) => (
                               <td
                                 key={col.key}
                                 className={`${tdClass} max-w-[200px] truncate ${col.key === 'name' ? 'font-medium' : ''}`}
@@ -492,16 +627,15 @@ export default function FullDataExportModal({
                               </td>
                             ))}
                           </tr>
-                        );
+                        )
                       })}
                     </tbody>
                   </table>
                 </div>
               </div>
-            )
-          )}
+            ))}
         </div>
       </div>
     </div>
-  );
+  )
 }

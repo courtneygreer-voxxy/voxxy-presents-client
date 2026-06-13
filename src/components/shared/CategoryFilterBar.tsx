@@ -1,11 +1,11 @@
-import { Category } from '@/types/category';
+import { Category } from '@/types/category'
 
 interface CategoryFilterBarProps {
-  categories: Category[];
-  selectedCategoryIds: number[];
-  onToggleCategory: (categoryId: number) => void;
-  onSelectAll: () => void;
-  showAll?: boolean;
+  categories: Category[]
+  selectedCategoryIds: number[]
+  onToggleCategory: (categoryId: number) => void
+  onSelectAll: () => void
+  showAll?: boolean
 }
 
 export function CategoryFilterBar({
@@ -15,8 +15,8 @@ export function CategoryFilterBar({
   onSelectAll,
   showAll = true,
 }: CategoryFilterBarProps) {
-  const allSelected = categories.length > 0 && selectedCategoryIds.length === categories.length;
-  const noneSelected = selectedCategoryIds.length === 0;
+  const allSelected = categories.length > 0 && selectedCategoryIds.length === categories.length
+  const noneSelected = selectedCategoryIds.length === 0
 
   return (
     <div className="space-y-3">
@@ -28,9 +28,10 @@ export function CategoryFilterBar({
             onClick={onSelectAll}
             className={`
               px-3 py-1.5 rounded-lg text-xs font-medium transition-all border-2
-              ${allSelected || noneSelected
-                ? 'border-primary bg-primary/20 text-violet-950 dark:text-primary shadow-sm'
-                : 'border-border/80 bg-card/80 dark:bg-card/40 text-foreground dark:text-foreground/70 hover:border-primary/40 hover:bg-primary/10 shadow-sm'
+              ${
+                allSelected || noneSelected
+                  ? 'border-primary bg-primary/20 text-violet-950 dark:text-primary shadow-sm'
+                  : 'border-border/80 bg-card/80 dark:bg-card/40 text-foreground dark:text-foreground/70 hover:border-primary/40 hover:bg-primary/10 shadow-sm'
               }
             `}
           >
@@ -40,8 +41,8 @@ export function CategoryFilterBar({
 
         {/* Individual Category Buttons */}
         {categories.map((category) => {
-          const isSelected = selectedCategoryIds.includes(category.id);
-          const badgeColor = category.color || '#9054e3';
+          const isSelected = selectedCategoryIds.includes(category.id)
+          const badgeColor = category.color || '#9054e3'
 
           return (
             <button
@@ -51,9 +52,10 @@ export function CategoryFilterBar({
               className={`
                 relative px-3 py-1.5 rounded-lg text-xs font-medium transition-all border-2
                 flex items-center gap-1.5
-                ${isSelected
-                  ? 'text-foreground shadow-md'
-                  : 'border-border/80 bg-card/80 dark:bg-card/40 text-foreground dark:text-foreground/70 hover:border-primary/40 hover:bg-primary/10 shadow-sm'
+                ${
+                  isSelected
+                    ? 'text-foreground shadow-md'
+                    : 'border-border/80 bg-card/80 dark:bg-card/40 text-foreground dark:text-foreground/70 hover:border-primary/40 hover:bg-primary/10 shadow-sm'
                 }
               `}
               style={{
@@ -61,15 +63,11 @@ export function CategoryFilterBar({
                 backgroundColor: isSelected ? `${badgeColor}66` : undefined,
               }}
             >
-              {category.icon && (
-                <span className="text-sm">{category.icon}</span>
-              )}
+              {category.icon && <span className="text-sm">{category.icon}</span>}
               {category.name}
-              {isSelected && (
-                <span className="text-[10px]">✓</span>
-              )}
+              {isSelected && <span className="text-[10px]">✓</span>}
             </button>
-          );
+          )
         })}
       </div>
 
@@ -80,5 +78,5 @@ export function CategoryFilterBar({
         </div>
       )}
     </div>
-  );
+  )
 }

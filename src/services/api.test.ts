@@ -1,10 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import {
-  saveAuthToken,
-  getAuthToken,
-  clearAuthToken,
-  organizationsApi,
-} from './api'
+import { saveAuthToken, getAuthToken, clearAuthToken, organizationsApi } from './api'
 
 // ─── Helpers ────────────────────────────────────────────────────────
 // We mock global fetch to test how fetchApi (internal) handles
@@ -72,36 +67,28 @@ describe('fetchApi behavior (via organizationsApi)', () => {
   // ── HTTP error handling ─────────────────────────────────────────
 
   it('throws with status and message on 404', async () => {
-    globalThis.fetch = mockFetchResponse(
-      { message: 'Organization not found' },
-      404
-    )
+    globalThis.fetch = mockFetchResponse({ message: 'Organization not found' }, 404)
 
-    await expect(organizationsApi.getBySlug('no-such-org'))
-      .rejects.toMatchObject({
-        name: 'ApiError',
-        status: 404,
-        message: 'Organization not found',
-      })
+    await expect(organizationsApi.getBySlug('no-such-org')).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 404,
+      message: 'Organization not found',
+    })
   })
 
   it('throws with status on 500 server error', async () => {
-    globalThis.fetch = mockFetchResponse(
-      { error: 'Internal server error' },
-      500
-    )
+    globalThis.fetch = mockFetchResponse({ error: 'Internal server error' }, 500)
 
-    await expect(organizationsApi.getBySlug('test-org'))
-      .rejects.toMatchObject({
-        name: 'ApiError',
-        status: 500,
-      })
+    await expect(organizationsApi.getBySlug('test-org')).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 500,
+    })
   })
 
   it('handles error response with errors array', async () => {
     globalThis.fetch = mockFetchResponse(
       { message: 'Validation failed', errors: ['Name is required', 'Slug is taken'] },
-      422
+      422,
     )
 
     try {
@@ -119,15 +106,16 @@ describe('fetchApi behavior (via organizationsApi)', () => {
       ok: false,
       status: 502,
       statusText: 'Bad Gateway',
-      json: async () => { throw new SyntaxError('Unexpected token') },
+      json: async () => {
+        throw new SyntaxError('Unexpected token')
+      },
     })
 
-    await expect(organizationsApi.getBySlug('test-org'))
-      .rejects.toMatchObject({
-        name: 'ApiError',
-        status: 502,
-        message: expect.stringContaining('502'),
-      })
+    await expect(organizationsApi.getBySlug('test-org')).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 502,
+      message: expect.stringContaining('502'),
+    })
   })
 
   // ── Network error handling ──────────────────────────────────────
@@ -135,12 +123,11 @@ describe('fetchApi behavior (via organizationsApi)', () => {
   it('wraps network errors in ApiError with status 0', async () => {
     globalThis.fetch = mockFetchNetworkError('Failed to fetch')
 
-    await expect(organizationsApi.getBySlug('test-org'))
-      .rejects.toMatchObject({
-        name: 'ApiError',
-        status: 0,
-        message: expect.stringContaining('Failed to fetch'),
-      })
+    await expect(organizationsApi.getBySlug('test-org')).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 0,
+      message: expect.stringContaining('Failed to fetch'),
+    })
   })
 
   // ── Content-Type header ─────────────────────────────────────────

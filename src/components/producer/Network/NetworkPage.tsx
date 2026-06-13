@@ -1,20 +1,44 @@
-import { useState, useEffect, useRef } from 'react';
-import { UserPlus, Upload, Save, X, Filter, Tag, Plus, Edit2, Trash2, Users, Search, ChevronDown, ChevronUp, Check, DollarSign, Percent, Download } from 'lucide-react';
-import { MapPin, Tags } from 'lucide-react';
-import { vendorContactsApi, contactListsApi, categoriesApi, eventsApi, VendorContact } from '@/services/api';
-import type { Category, CategoryFeePreference } from '@/types/category';
-import { PAYMENT_PRICE_TYPES } from '@/components/producer/CreateEventWizard/types';
-import ContactsTable from './ContactsTable';
-import AddContactModal from './AddContactModal';
-import EditContactModal from './EditContactModal';
-import { CSVUploadModal } from './CSVUploadModal';
-import ListsManagement from './Lists/ListsManagement';
-import SmartListBuilder from './Lists/SmartListBuilder';
-import { BulkActionToolbar } from './BulkActionToolbar';
-import ContactExportModal from './ContactExportModal';
-import type { ActiveFilter, FilterFieldConfig } from '@/components/shared/SearchFilterBar';
+import { useState, useEffect, useRef } from 'react'
+import {
+  UserPlus,
+  Upload,
+  Save,
+  X,
+  Filter,
+  Tag,
+  Plus,
+  Edit2,
+  Trash2,
+  Users,
+  Search,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  DollarSign,
+  Percent,
+  Download,
+} from 'lucide-react'
+import { MapPin, Tags } from 'lucide-react'
+import {
+  vendorContactsApi,
+  contactListsApi,
+  categoriesApi,
+  eventsApi,
+  VendorContact,
+} from '@/services/api'
+import type { Category, CategoryFeePreference } from '@/types/category'
+import { PAYMENT_PRICE_TYPES } from '@/components/producer/CreateEventWizard/types'
+import ContactsTable from './ContactsTable'
+import AddContactModal from './AddContactModal'
+import EditContactModal from './EditContactModal'
+import { CSVUploadModal } from './CSVUploadModal'
+import ListsManagement from './Lists/ListsManagement'
+import SmartListBuilder from './Lists/SmartListBuilder'
+import { BulkActionToolbar } from './BulkActionToolbar'
+import ContactExportModal from './ContactExportModal'
+import type { ActiveFilter, FilterFieldConfig } from '@/components/shared/SearchFilterBar'
 
-type NetworkTab = 'contacts' | 'lists' | 'categories';
+type NetworkTab = 'contacts' | 'lists' | 'categories'
 
 // Filter Dropdown Component
 function FilterDropdownButton({
@@ -22,38 +46,36 @@ function FilterDropdownButton({
   selectedValues,
   onChange,
 }: {
-  field: FilterFieldConfig;
-  selectedValues: string[];
-  onChange: (values: string[]) => void;
+  field: FilterFieldConfig
+  selectedValues: string[]
+  onChange: (values: string[]) => void
 }) {
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const ref = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-        setSearch('');
+        setOpen(false)
+        setSearch('')
       }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
-  const filtered = field.options.filter(opt =>
-    opt.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = field.options.filter((opt) => opt.toLowerCase().includes(search.toLowerCase()))
 
   const handleToggle = (value: string) => {
     if (selectedValues.includes(value)) {
-      onChange(selectedValues.filter(v => v !== value));
+      onChange(selectedValues.filter((v) => v !== value))
     } else {
-      onChange([...selectedValues, value]);
+      onChange([...selectedValues, value])
     }
-  };
+  }
 
-  const Icon = field.icon;
+  const Icon = field.icon
 
   return (
     <div className="relative" ref={ref}>
@@ -72,7 +94,9 @@ function FilterDropdownButton({
             {selectedValues.length}
           </span>
         )}
-        <ChevronDown className={`w-3 h-3 text-foreground/65 dark:text-foreground/40 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown
+          className={`w-3 h-3 text-foreground/65 dark:text-foreground/40 transition-transform ${open ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {open && (
@@ -91,9 +115,11 @@ function FilterDropdownButton({
           )}
           <div className="max-h-48 overflow-y-auto p-1">
             {filtered.length === 0 ? (
-              <p className="px-3 py-2 text-xs text-foreground/75 dark:text-muted-foreground">No options found</p>
+              <p className="px-3 py-2 text-xs text-foreground/75 dark:text-muted-foreground">
+                No options found
+              </p>
             ) : (
-              filtered.map(option => (
+              filtered.map((option) => (
                 <button
                   key={option}
                   onClick={() => handleToggle(option)}
@@ -128,18 +154,18 @@ function FilterDropdownButton({
         </div>
       )}
     </div>
-  );
+  )
 }
 
 interface NetworkPageProps {
-  organizationId: number;
-  organizationSlug: string;
-  activeTab: NetworkTab;
-  showAddModal: boolean;
-  setShowAddModal: (show: boolean) => void;
-  showCSVUploadModal: boolean;
-  setShowCSVUploadModal: (show: boolean) => void;
-  onTabChange?: (tab: NetworkTab) => void;
+  organizationId: number
+  organizationSlug: string
+  activeTab: NetworkTab
+  showAddModal: boolean
+  setShowAddModal: (show: boolean) => void
+  showCSVUploadModal: boolean
+  setShowCSVUploadModal: (show: boolean) => void
+  onTabChange?: (tab: NetworkTab) => void
 }
 
 export default function NetworkPage({
@@ -150,161 +176,181 @@ export default function NetworkPage({
   setShowAddModal,
   showCSVUploadModal,
   setShowCSVUploadModal,
-  onTabChange
+  onTabChange,
 }: NetworkPageProps) {
-  const [contacts, setContacts] = useState<VendorContact[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
-  const [editingContact, setEditingContact] = useState<VendorContact | null>(null);
-  const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+  const [contacts, setContacts] = useState<VendorContact[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedContacts, setSelectedContacts] = useState<number[]>([])
+  const [editingContact, setEditingContact] = useState<VendorContact | null>(null)
+  const [actionsMenuOpen, setActionsMenuOpen] = useState(false)
 
   // Client-side filter states
-  const [updatedAtRange, setUpdatedAtRange] = useState<'all' | '24h' | '48h' | '7d' | '30d'>('all');
-  const [eventFilter, setEventFilter] = useState<string>('all'); // 'all' | 'none' | event_id
-  const [eventStatusFilter, setEventStatusFilter] = useState<string>('all'); // 'all' | 'approved' | 'pending' | 'rejected' etc.
-  const [orgEvents, setOrgEvents] = useState<{ id: number; title: string }[]>([]);
-  const [showExportModal, setShowExportModal] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const actionsMenuRef = useRef<HTMLDivElement>(null);
+  const [updatedAtRange, setUpdatedAtRange] = useState<'all' | '24h' | '48h' | '7d' | '30d'>('all')
+  const [eventFilter, setEventFilter] = useState<string>('all') // 'all' | 'none' | event_id
+  const [eventStatusFilter, setEventStatusFilter] = useState<string>('all') // 'all' | 'approved' | 'pending' | 'rejected' etc.
+  const [orgEvents, setOrgEvents] = useState<{ id: number; title: string }[]>([])
+  const [showExportModal, setShowExportModal] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
+  const actionsMenuRef = useRef<HTMLDivElement>(null)
 
   // SearchFilterBar state
-  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([])
 
   // Category objects
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>([])
 
   // Category CRUD state
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [showCategoryModal, setShowCategoryModal] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [categoryFormData, setCategoryFormData] = useState({
     name: '',
     color: '#FF6B6B',
     description: '',
-  });
-  const [paymentPreferences, setPaymentPreferences] = useState<CategoryFeePreference[]>([]);
-  const [feeTypeDropdownOpen, setFeeTypeDropdownOpen] = useState(false);
+  })
+  const [paymentPreferences, setPaymentPreferences] = useState<CategoryFeePreference[]>([])
+  const [feeTypeDropdownOpen, setFeeTypeDropdownOpen] = useState(false)
 
   // Filter options from backend
   const [filterOptions, setFilterOptions] = useState<{
-    locations: string[];
-    categories: string[];
-    tags: string[];
-  }>({ locations: [], categories: [], tags: [] });
+    locations: string[]
+    categories: string[]
+    tags: string[]
+  }>({ locations: [], categories: [], tags: [] })
 
   // Inline save list state
-  const [showSaveInput, setShowSaveInput] = useState(false);
-  const [listName, setListName] = useState('');
-  const [savingList, setSavingList] = useState(false);
+  const [showSaveInput, setShowSaveInput] = useState(false)
+  const [listName, setListName] = useState('')
+  const [savingList, setSavingList] = useState(false)
 
   // Create smart list modal state
-  const [isCreatingList, setIsCreatingList] = useState(false);
-  const [createListName, setCreateListName] = useState('');
-  const [createListDescription, setCreateListDescription] = useState('');
+  const [isCreatingList, setIsCreatingList] = useState(false)
+  const [createListName, setCreateListName] = useState('')
+  const [createListDescription, setCreateListDescription] = useState('')
   const [createListFilters, setCreateListFilters] = useState<{
-    categories?: string[];
-    locations?: string[];
-    tags?: string[];
-  }>({});
-  const [savingCreateList, setSavingCreateList] = useState(false);
+    categories?: string[]
+    locations?: string[]
+    tags?: string[]
+  }>({})
+  const [savingCreateList, setSavingCreateList] = useState(false)
 
   // Pagination states
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage] = useState(100);
+  const [currentPage, setCurrentPage] = useState(1)
+  const [perPage] = useState(100)
   const [paginationMeta, setPaginationMeta] = useState({
     current_page: 1,
     per_page: 100,
     total_count: 0,
     total_pages: 1,
-  });
+  })
 
   // Bulk update state
-  const [bulkUpdateLoading, setBulkUpdateLoading] = useState(false);
+  const [bulkUpdateLoading, setBulkUpdateLoading] = useState(false)
 
   // Derive filter arrays from activeFilters
-  const locationFilters = activeFilters.find(f => f.fieldKey === 'location')?.values || [];
-  const categoryFilters = activeFilters.find(f => f.fieldKey === 'category')?.values || [];
-  const tagFilters = activeFilters.find(f => f.fieldKey === 'tags')?.values || [];
-  const hasActiveFilters = locationFilters.length > 0 || categoryFilters.length > 0 || tagFilters.length > 0 || updatedAtRange !== 'all' || eventFilter !== 'all' || eventStatusFilter !== 'all';
+  const locationFilters = activeFilters.find((f) => f.fieldKey === 'location')?.values || []
+  const categoryFilters = activeFilters.find((f) => f.fieldKey === 'category')?.values || []
+  const tagFilters = activeFilters.find((f) => f.fieldKey === 'tags')?.values || []
+  const hasActiveFilters =
+    locationFilters.length > 0 ||
+    categoryFilters.length > 0 ||
+    tagFilters.length > 0 ||
+    updatedAtRange !== 'all' ||
+    eventFilter !== 'all' ||
+    eventStatusFilter !== 'all'
 
   // Filter field config for SearchFilterBar
   const filterFieldConfigs: FilterFieldConfig[] = [
-    { key: 'category', label: 'Category', icon: Tag, options: filterOptions.categories, multi: true },
-    { key: 'location', label: 'Location', icon: MapPin, options: filterOptions.locations, multi: true },
+    {
+      key: 'category',
+      label: 'Category',
+      icon: Tag,
+      options: filterOptions.categories,
+      multi: true,
+    },
+    {
+      key: 'location',
+      label: 'Location',
+      icon: MapPin,
+      options: filterOptions.locations,
+      multi: true,
+    },
     { key: 'tags', label: 'Tags', icon: Tags, options: filterOptions.tags, multi: true },
-  ];
+  ]
 
   // Close actions menu on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (actionsMenuRef.current && !actionsMenuRef.current.contains(e.target as Node)) {
-        setActionsMenuOpen(false);
+        setActionsMenuOpen(false)
       }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   // Fetch filter options from backend on mount
   useEffect(() => {
     const loadFilterOptions = async () => {
       try {
-        const options = await vendorContactsApi.getFilterOptions(organizationId);
+        const options = await vendorContactsApi.getFilterOptions(organizationId)
         setFilterOptions({
           locations: options.locations || [],
           categories: options.categories || [],
           tags: options.tags || [],
-        });
+        })
       } catch (err) {
-        console.error('Failed to load filter options:', err);
+        console.error('Failed to load filter options:', err)
       }
-    };
-    loadFilterOptions();
-  }, [organizationId]);
+    }
+    loadFilterOptions()
+  }, [organizationId])
 
   // Fetch org events for the event filter dropdown
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const events = await eventsApi.getByOrganization(organizationSlug);
-        const list = Array.isArray(events) ? events : [];
-        setOrgEvents(list.map((ev: Record<string, unknown>) => ({
-          id: Number(ev.id),
-          title: String(ev.title || 'Untitled'),
-        })));
+        const events = await eventsApi.getByOrganization(organizationSlug)
+        const list = Array.isArray(events) ? events : []
+        setOrgEvents(
+          list.map((ev: Record<string, unknown>) => ({
+            id: Number(ev.id),
+            title: String(ev.title || 'Untitled'),
+          })),
+        )
       } catch (err) {
-        console.error('Failed to load events for filter:', err);
+        console.error('Failed to load events for filter:', err)
       }
-    };
-    loadEvents();
-  }, [organizationSlug]);
+    }
+    loadEvents()
+  }, [organizationSlug])
 
   // Load categories
   const loadCategories = async () => {
     try {
-      const response = await categoriesApi.getAll(organizationId, true);
-      setCategories(response.categories);
+      const response = await categoriesApi.getAll(organizationId, true)
+      setCategories(response.categories)
     } catch (error) {
-      console.error('Failed to load categories:', error);
+      console.error('Failed to load categories:', error)
     }
-  };
+  }
 
   useEffect(() => {
-    loadCategories();
-  }, [organizationId]);
+    loadCategories()
+  }, [organizationId])
 
   // Reset to page 1 when filters change
   useEffect(() => {
-    setCurrentPage(1);
-    fetchContacts(1);
-  }, [organizationId, locationFilters.join(','), categoryFilters.join(','), tagFilters.join(',')]);
+    setCurrentPage(1)
+    fetchContacts(1)
+  }, [organizationId, locationFilters.join(','), categoryFilters.join(','), tagFilters.join(',')])
 
   const fetchContacts = async (page: number = currentPage) => {
     try {
-      setLoading(true);
-      setError(null);
-      setViewingManualList(null);
+      setLoading(true)
+      setError(null)
+      setViewingManualList(null)
 
       const response = await vendorContactsApi.getAll(organizationId, {
         search: searchTerm || undefined,
@@ -313,90 +359,88 @@ export default function NetworkPage({
         tags: tagFilters.length > 0 ? tagFilters : undefined,
         page: page,
         per_page: perPage,
-      });
+      })
 
-      let contactsData = response?.vendor_contacts || [];
+      let contactsData = response?.vendor_contacts || []
       const meta = response?.meta || {
         current_page: page,
         per_page: perPage,
         total_count: contactsData.length,
         total_pages: 1,
-      };
+      }
 
       // Client-side filtering for multi-select values beyond the first
       if (locationFilters.length > 1) {
-        contactsData = contactsData.filter((c: VendorContact) =>
-          c.location && locationFilters.includes(c.location)
-        );
+        contactsData = contactsData.filter(
+          (c: VendorContact) => c.location && locationFilters.includes(c.location),
+        )
       }
       if (categoryFilters.length > 1) {
         contactsData = contactsData.filter((c: VendorContact) =>
-          c.categories?.some(cat => categoryFilters.includes(cat))
-        );
+          c.categories?.some((cat) => categoryFilters.includes(cat)),
+        )
       }
 
-      setContacts(contactsData);
-      setPaginationMeta(meta);
-      setCurrentPage(page);
+      setContacts(contactsData)
+      setPaginationMeta(meta)
+      setCurrentPage(page)
     } catch (err: any) {
-      setError(err.message || 'Failed to load contacts');
-      setContacts([]);
+      setError(err.message || 'Failed to load contacts')
+      setContacts([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleViewManualList = async (listId: number, listName: string) => {
     try {
-      setLoading(true);
-      setError(null);
-      setActiveFilters([]);
-      setSearchTerm('');
-      setViewingManualList({ id: listId, name: listName });
+      setLoading(true)
+      setError(null)
+      setActiveFilters([])
+      setSearchTerm('')
+      setViewingManualList({ id: listId, name: listName })
 
-      const response = await contactListsApi.getContacts(listId);
-      setContacts(response.vendor_contacts || []);
+      const response = await contactListsApi.getContacts(listId)
+      setContacts(response.vendor_contacts || [])
       setPaginationMeta({
         current_page: 1,
         per_page: response.vendor_contacts?.length || 0,
         total_count: response.vendor_contacts?.length || 0,
         total_pages: 1,
-      });
-      setCurrentPage(1);
-      onTabChange?.('contacts');
+      })
+      setCurrentPage(1)
+      onTabChange?.('contacts')
     } catch (err: any) {
-      setError(err.message || 'Failed to load list contacts');
-      setContacts([]);
+      setError(err.message || 'Failed to load list contacts')
+      setContacts([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    fetchContacts(page);
-    setSelectedContacts([]);
-  };
+    setCurrentPage(page)
+    fetchContacts(page)
+    setSelectedContacts([])
+  }
 
   const handleSearchSubmit = () => {
-    setCurrentPage(1);
-    fetchContacts(1);
-  };
+    setCurrentPage(1)
+    fetchContacts(1)
+  }
 
   const handleSelectContact = (contactId: number) => {
-    setSelectedContacts(prev =>
-      prev.includes(contactId)
-        ? prev.filter(id => id !== contactId)
-        : [...prev, contactId]
-    );
-  };
+    setSelectedContacts((prev) =>
+      prev.includes(contactId) ? prev.filter((id) => id !== contactId) : [...prev, contactId],
+    )
+  }
 
   const handleSelectAll = async () => {
-    const currentPageIds = contacts.map(c => c.id);
-    const allCurrentPageSelected = currentPageIds.every(id => selectedContacts.includes(id));
+    const currentPageIds = contacts.map((c) => c.id)
+    const allCurrentPageSelected = currentPageIds.every((id) => selectedContacts.includes(id))
 
     if (allCurrentPageSelected && selectedContacts.length > 0) {
-      setSelectedContacts([]);
+      setSelectedContacts([])
     } else {
       try {
         const result = await vendorContactsApi.getAllIds(organizationId, {
@@ -404,137 +448,162 @@ export default function NetworkPage({
           location: locationFilters.length > 0 ? locationFilters[0] : undefined,
           category: categoryFilters.length > 0 ? categoryFilters[0] : undefined,
           tags: tagFilters.length > 0 ? tagFilters : undefined,
-        });
-        setSelectedContacts(result.ids);
+        })
+        setSelectedContacts(result.ids)
       } catch (err) {
-        console.error('Failed to fetch all contact IDs:', err);
-        setSelectedContacts(currentPageIds);
+        console.error('Failed to fetch all contact IDs:', err)
+        setSelectedContacts(currentPageIds)
       }
     }
-  };
+  }
 
   const handleDeleteContact = async (contactId: number) => {
-    if (!confirm('Are you sure you want to remove this contact from your network?')) return;
+    if (!confirm('Are you sure you want to remove this contact from your network?')) return
 
     try {
-      await vendorContactsApi.delete(contactId);
-      setContacts(prev => prev.filter(c => c.id !== contactId));
-      setSelectedContacts(prev => prev.filter(id => id !== contactId));
+      await vendorContactsApi.delete(contactId)
+      setContacts((prev) => prev.filter((c) => c.id !== contactId))
+      setSelectedContacts((prev) => prev.filter((id) => id !== contactId))
     } catch (err: any) {
-      alert(err.message || 'Failed to delete contact');
+      alert(err.message || 'Failed to delete contact')
     }
-  };
+  }
 
   const handleBulkDelete = async () => {
-    if (selectedContacts.length === 0) return;
-    if (!confirm(`Are you sure you want to delete ${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'}? This action cannot be undone.`)) return;
+    if (selectedContacts.length === 0) return
+    if (
+      !confirm(
+        `Are you sure you want to delete ${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'}? This action cannot be undone.`,
+      )
+    )
+      return
 
     try {
-      setBulkUpdateLoading(true);
-      const result = await vendorContactsApi.bulkDelete(organizationId, selectedContacts);
-      alert(result.message || `Successfully deleted ${result.deleted_count} contacts`);
-      await fetchContacts(currentPage);
+      setBulkUpdateLoading(true)
+      const result = await vendorContactsApi.bulkDelete(organizationId, selectedContacts)
+      alert(result.message || `Successfully deleted ${result.deleted_count} contacts`)
+      await fetchContacts(currentPage)
       try {
-        const options = await vendorContactsApi.getFilterOptions(organizationId);
-        setFilterOptions({ locations: options.locations || [], categories: options.categories || [], tags: options.tags || [] });
-      } catch { /* ignore */ }
-      setSelectedContacts([]);
+        const options = await vendorContactsApi.getFilterOptions(organizationId)
+        setFilterOptions({
+          locations: options.locations || [],
+          categories: options.categories || [],
+          tags: options.tags || [],
+        })
+      } catch {
+        /* ignore */
+      }
+      setSelectedContacts([])
     } catch (error: any) {
-      alert(`Failed to delete contacts: ${error.message || 'Unknown error'}`);
+      alert(`Failed to delete contacts: ${error.message || 'Unknown error'}`)
     } finally {
-      setBulkUpdateLoading(false);
+      setBulkUpdateLoading(false)
     }
-  };
+  }
 
   const handleBulkCategoryUpdate = async (categoryNames: string[]) => {
-    if (selectedContacts.length === 0) return;
+    if (selectedContacts.length === 0) return
 
-    const selectedContactObjects = contacts.filter(c => selectedContacts.includes(c.id));
-    const hasExistingCategories = selectedContactObjects.some(c => c.categories && c.categories.length > 0);
-    let categoryMode: 'replace' | 'append' = 'replace';
+    const selectedContactObjects = contacts.filter((c) => selectedContacts.includes(c.id))
+    const hasExistingCategories = selectedContactObjects.some(
+      (c) => c.categories && c.categories.length > 0,
+    )
+    let categoryMode: 'replace' | 'append' = 'replace'
     if (hasExistingCategories) {
       const userChoice = confirm(
-        `Some selected contacts already have categories.\n\nClick "OK" to ADD this category to their existing categories.\nClick "Cancel" to REPLACE their categories with this new category.`
-      );
-      categoryMode = userChoice ? 'append' : 'replace';
+        `Some selected contacts already have categories.\n\nClick "OK" to ADD this category to their existing categories.\nClick "Cancel" to REPLACE their categories with this new category.`,
+      )
+      categoryMode = userChoice ? 'append' : 'replace'
     }
 
     try {
-      setBulkUpdateLoading(true);
-      const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, { categories: categoryNames, category_mode: categoryMode });
-      alert(result.message || `Successfully updated ${result.updated_count} contacts`);
-      await fetchContacts(currentPage);
-      setSelectedContacts([]);
+      setBulkUpdateLoading(true)
+      const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
+        categories: categoryNames,
+        category_mode: categoryMode,
+      })
+      alert(result.message || `Successfully updated ${result.updated_count} contacts`)
+      await fetchContacts(currentPage)
+      setSelectedContacts([])
     } catch (error: any) {
-      alert(`Failed to update contacts: ${error.message || 'Unknown error'}`);
+      alert(`Failed to update contacts: ${error.message || 'Unknown error'}`)
     } finally {
-      setBulkUpdateLoading(false);
+      setBulkUpdateLoading(false)
     }
-  };
+  }
 
   const handleBulkLocationUpdate = async (location: string) => {
-    if (selectedContacts.length === 0) return;
+    if (selectedContacts.length === 0) return
 
     try {
-      setBulkUpdateLoading(true);
-      const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, { location });
-      alert(result.message || `Successfully updated ${result.updated_count} contacts`);
-      await fetchContacts(currentPage);
-      setSelectedContacts([]);
+      setBulkUpdateLoading(true)
+      const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
+        location,
+      })
+      alert(result.message || `Successfully updated ${result.updated_count} contacts`)
+      await fetchContacts(currentPage)
+      setSelectedContacts([])
     } catch (error: any) {
-      alert(`Failed to update location: ${error.message || 'Unknown error'}`);
+      alert(`Failed to update location: ${error.message || 'Unknown error'}`)
     } finally {
-      setBulkUpdateLoading(false);
+      setBulkUpdateLoading(false)
     }
-  };
+  }
 
   // Manual list viewing state
-  const [viewingManualList, setViewingManualList] = useState<{ id: number; name: string } | null>(null);
+  const [viewingManualList, setViewingManualList] = useState<{ id: number; name: string } | null>(
+    null,
+  )
 
   const clearAllFilters = () => {
-    setActiveFilters([]);
-    setUpdatedAtRange('all');
-    setEventFilter('all');
-    setEventStatusFilter('all');
-    setViewingManualList(null);
-    setShowSaveInput(false);
-    setListName('');
-  };
+    setActiveFilters([])
+    setUpdatedAtRange('all')
+    setEventFilter('all')
+    setEventStatusFilter('all')
+    setViewingManualList(null)
+    setShowSaveInput(false)
+    setListName('')
+  }
 
   // Apply client-side filters that the backend doesn't support
   const applyClientSideFilters = (data: VendorContact[]): VendorContact[] => {
-    let filtered = data;
+    let filtered = data
     if (updatedAtRange !== 'all') {
-      const now = Date.now();
-      const ranges: Record<string, number> = { '24h': 86400000, '48h': 172800000, '7d': 604800000, '30d': 2592000000 };
-      const cutoff = now - ranges[updatedAtRange];
-      filtered = filtered.filter(c => new Date(c.updated_at).getTime() >= cutoff);
+      const now = Date.now()
+      const ranges: Record<string, number> = {
+        '24h': 86400000,
+        '48h': 172800000,
+        '7d': 604800000,
+        '30d': 2592000000,
+      }
+      const cutoff = now - ranges[updatedAtRange]
+      filtered = filtered.filter((c) => new Date(c.updated_at).getTime() >= cutoff)
     }
     if (eventFilter === 'none') {
-      filtered = filtered.filter(c => (c.events_participated || 0) === 0);
+      filtered = filtered.filter((c) => (c.events_participated || 0) === 0)
     } else if (eventFilter !== 'all') {
       // Filter by specific event ID
-      const eventId = Number(eventFilter);
-      filtered = filtered.filter(c =>
-        (c.event_history || []).some(eh => {
-          if (eh.event_id !== eventId) return false;
-          if (eventStatusFilter !== 'all') return eh.status?.toLowerCase() === eventStatusFilter;
-          return true;
-        })
-      );
+      const eventId = Number(eventFilter)
+      filtered = filtered.filter((c) =>
+        (c.event_history || []).some((eh) => {
+          if (eh.event_id !== eventId) return false
+          if (eventStatusFilter !== 'all') return eh.status?.toLowerCase() === eventStatusFilter
+          return true
+        }),
+      )
     } else if (eventStatusFilter !== 'all') {
       // Status filter without specific event — match any event with that status
-      filtered = filtered.filter(c =>
-        (c.event_history || []).some(eh => eh.status?.toLowerCase() === eventStatusFilter)
-      );
+      filtered = filtered.filter((c) =>
+        (c.event_history || []).some((eh) => eh.status?.toLowerCase() === eventStatusFilter),
+      )
     }
-    return filtered;
-  };
+    return filtered
+  }
 
   // Fetch all filtered contacts (used by export modal)
   const fetchAllFilteredContacts = async (): Promise<VendorContact[]> => {
-    let allContacts: VendorContact[] = [];
-    const totalPages = paginationMeta.total_pages;
+    let allContacts: VendorContact[] = []
+    const totalPages = paginationMeta.total_pages
     for (let p = 1; p <= totalPages; p++) {
       const response = await vendorContactsApi.getAll(organizationId, {
         search: searchTerm || undefined,
@@ -543,133 +612,147 @@ export default function NetworkPage({
         tags: tagFilters.length > 0 ? tagFilters : undefined,
         page: p,
         per_page: 200,
-      });
-      allContacts.push(...(response.vendor_contacts || []));
+      })
+      allContacts.push(...(response.vendor_contacts || []))
     }
     if (locationFilters.length > 1) {
-      allContacts = allContacts.filter(c => c.location && locationFilters.includes(c.location));
+      allContacts = allContacts.filter((c) => c.location && locationFilters.includes(c.location))
     }
     if (categoryFilters.length > 1) {
-      allContacts = allContacts.filter(c => c.categories?.some(cat => categoryFilters.includes(cat)));
+      allContacts = allContacts.filter((c) =>
+        c.categories?.some((cat) => categoryFilters.includes(cat)),
+      )
     }
-    return applyClientSideFilters(allContacts);
-  };
+    return applyClientSideFilters(allContacts)
+  }
 
   // Fetch full contact details before opening edit modal
   const handleEditContact = async (contact: VendorContact) => {
     try {
       // Fetch full contact with event history and change history
-      const fullContact = await vendorContactsApi.getById(contact.id);
-      setEditingContact(fullContact);
+      const fullContact = await vendorContactsApi.getById(contact.id)
+      setEditingContact(fullContact)
     } catch (error) {
-      console.error('Failed to fetch contact details:', error);
+      console.error('Failed to fetch contact details:', error)
       // Fallback to partial contact if fetch fails
-      setEditingContact(contact);
+      setEditingContact(contact)
     }
-  };
+  }
 
   const emptyCategory = {
     name: '',
     color: '#FF6B6B',
     description: '',
-  };
+  }
 
   // Category CRUD functions
   const openAddCategoryModal = () => {
-    setEditingCategory(null);
-    setCategoryFormData({ ...emptyCategory });
-    setPaymentPreferences([]);
-    setFeeTypeDropdownOpen(false);
-    setShowCategoryModal(true);
-  };
+    setEditingCategory(null)
+    setCategoryFormData({ ...emptyCategory })
+    setPaymentPreferences([])
+    setFeeTypeDropdownOpen(false)
+    setShowCategoryModal(true)
+  }
 
   const openEditCategoryModal = (category: Category) => {
-    setEditingCategory(category);
+    setEditingCategory(category)
     setCategoryFormData({
       name: category.name,
       color: category.color || '#FF6B6B',
       description: category.description || '',
-    });
-    setPaymentPreferences(category.payment_preferences || []);
-    setFeeTypeDropdownOpen(false);
-    setShowCategoryModal(true);
-  };
+    })
+    setPaymentPreferences(category.payment_preferences || [])
+    setFeeTypeDropdownOpen(false)
+    setShowCategoryModal(true)
+  }
 
   const addFeeType = (type: CategoryFeePreference['type']) => {
-    const typeDef = PAYMENT_PRICE_TYPES.find(p => p.value === type);
-    setPaymentPreferences(prev => [
+    const typeDef = PAYMENT_PRICE_TYPES.find((p) => p.value === type)
+    setPaymentPreferences((prev) => [
       ...prev,
-      { type, label: typeDef?.label || type, amount: 0, is_percentage: typeDef?.isPercentage || false },
-    ]);
-    setFeeTypeDropdownOpen(false);
-  };
+      {
+        type,
+        label: typeDef?.label || type,
+        amount: 0,
+        is_percentage: typeDef?.isPercentage || false,
+      },
+    ])
+    setFeeTypeDropdownOpen(false)
+  }
 
   const removeFeeType = (index: number) => {
-    setPaymentPreferences(prev => prev.filter((_, i) => i !== index));
-  };
+    setPaymentPreferences((prev) => prev.filter((_, i) => i !== index))
+  }
 
   const updateFeeAmount = (index: number, amount: number) => {
-    setPaymentPreferences(prev =>
-      prev.map((p, i) => (i === index ? { ...p, amount } : p))
-    );
-  };
+    setPaymentPreferences((prev) => prev.map((p, i) => (i === index ? { ...p, amount } : p)))
+  }
 
-  const availableFeeTypes = PAYMENT_PRICE_TYPES.filter(pt => pt.value !== 'custom');
+  const availableFeeTypes = PAYMENT_PRICE_TYPES.filter((pt) => pt.value !== 'custom')
 
   const handleSaveCategory = async () => {
     if (!categoryFormData.name.trim()) {
-      alert('Category name is required');
-      return;
+      alert('Category name is required')
+      return
     }
     const payload = {
       name: categoryFormData.name.trim(),
       color: categoryFormData.color,
       description: categoryFormData.description.trim() || undefined,
       payment_preferences: paymentPreferences.length > 0 ? paymentPreferences : undefined,
-    };
+    }
     try {
       if (editingCategory) {
-        await categoriesApi.update(editingCategory.id, payload);
+        await categoriesApi.update(editingCategory.id, payload)
       } else {
-        await categoriesApi.create(organizationId, payload);
+        await categoriesApi.create(organizationId, payload)
       }
-      await loadCategories();
-      setShowCategoryModal(false);
-      setEditingCategory(null);
-      setCategoryFormData({ ...emptyCategory });
-      setPaymentPreferences([]);
+      await loadCategories()
+      setShowCategoryModal(false)
+      setEditingCategory(null)
+      setCategoryFormData({ ...emptyCategory })
+      setPaymentPreferences([])
     } catch (error: any) {
-      alert(`Failed to save category: ${error.response?.data?.error || error.message || 'Please try again.'}`);
+      alert(
+        `Failed to save category: ${error.response?.data?.error || error.message || 'Please try again.'}`,
+      )
     }
-  };
+  }
 
   const handleDeleteCategory = async (category: Category) => {
     if (category.in_use) {
-      const stats = category.usage_stats;
-      const usageDetails = [];
-      if (stats?.applications_count) usageDetails.push(`${stats.applications_count} vendor application(s)`);
-      if (stats?.email_templates_count) usageDetails.push(`${stats.email_templates_count} email template(s)`);
-      if (stats?.scheduled_emails_count) usageDetails.push(`${stats.scheduled_emails_count} scheduled email(s)`);
-      alert(`Cannot delete this category. It is currently being used by:\n\n${usageDetails.join('\n')}\n\nPlease remove these associations first.`);
-      return;
+      const stats = category.usage_stats
+      const usageDetails = []
+      if (stats?.applications_count)
+        usageDetails.push(`${stats.applications_count} vendor application(s)`)
+      if (stats?.email_templates_count)
+        usageDetails.push(`${stats.email_templates_count} email template(s)`)
+      if (stats?.scheduled_emails_count)
+        usageDetails.push(`${stats.scheduled_emails_count} scheduled email(s)`)
+      alert(
+        `Cannot delete this category. It is currently being used by:\n\n${usageDetails.join('\n')}\n\nPlease remove these associations first.`,
+      )
+      return
     }
-    if (!confirm(`Are you sure you want to delete the category "${category.name}"?`)) return;
+    if (!confirm(`Are you sure you want to delete the category "${category.name}"?`)) return
     try {
-      await categoriesApi.delete(category.id);
-      await loadCategories();
+      await categoriesApi.delete(category.id)
+      await loadCategories()
     } catch (error: any) {
-      alert(`Failed to delete category: ${error.response?.data?.error || error.message || 'Please try again.'}`);
+      alert(
+        `Failed to delete category: ${error.response?.data?.error || error.message || 'Please try again.'}`,
+      )
     }
-  };
+  }
 
   const handleViewCategory = (category: Category) => {
-    setActiveFilters([{ fieldKey: 'category', values: [category.name] }]);
-    onTabChange?.('contacts');
-  };
+    setActiveFilters([{ fieldKey: 'category', values: [category.name] }])
+    onTabChange?.('contacts')
+  }
 
   const handleSaveList = async () => {
-    if (!listName.trim()) return;
-    setSavingList(true);
+    if (!listName.trim()) return
+    setSavingList(true)
     try {
       await contactListsApi.create(organizationId, {
         name: listName.trim(),
@@ -679,55 +762,55 @@ export default function NetworkPage({
           categories: categoryFilters.length > 0 ? categoryFilters : undefined,
           tags: tagFilters.length > 0 ? tagFilters : undefined,
         },
-      });
-      setListName('');
-      setShowSaveInput(false);
-      onTabChange?.('lists');
+      })
+      setListName('')
+      setShowSaveInput(false)
+      onTabChange?.('lists')
     } catch (err: any) {
-      alert(err.message || 'Failed to save list');
+      alert(err.message || 'Failed to save list')
     } finally {
-      setSavingList(false);
+      setSavingList(false)
     }
-  };
+  }
 
   const handleStartCreateList = () => {
-    setIsCreatingList(true);
-    setCreateListName('');
-    setCreateListDescription('');
-    setCreateListFilters({});
-  };
+    setIsCreatingList(true)
+    setCreateListName('')
+    setCreateListDescription('')
+    setCreateListFilters({})
+  }
 
   const handleCancelCreateList = () => {
-    setIsCreatingList(false);
-    setCreateListName('');
-    setCreateListDescription('');
-    setCreateListFilters({});
-  };
+    setIsCreatingList(false)
+    setCreateListName('')
+    setCreateListDescription('')
+    setCreateListFilters({})
+  }
 
   const handleSaveCreateList = async () => {
-    if (!createListName.trim()) return;
-    setSavingCreateList(true);
+    if (!createListName.trim()) return
+    setSavingCreateList(true)
     try {
       await contactListsApi.create(organizationId, {
         name: createListName.trim(),
         description: createListDescription.trim() || undefined,
         list_type: 'smart',
         filters: createListFilters,
-      });
-      setIsCreatingList(false);
-      setCreateListName('');
-      setCreateListDescription('');
-      setCreateListFilters({});
-      onTabChange?.('lists');
+      })
+      setIsCreatingList(false)
+      setCreateListName('')
+      setCreateListDescription('')
+      setCreateListFilters({})
+      onTabChange?.('lists')
     } catch (err: any) {
-      alert(err.message || 'Failed to create list');
+      alert(err.message || 'Failed to create list')
     } finally {
-      setSavingCreateList(false);
+      setSavingCreateList(false)
     }
-  };
+  }
 
   // Get displayed contacts (with client-side filters applied)
-  const displayedContacts = applyClientSideFilters(contacts);
+  const displayedContacts = applyClientSideFilters(contacts)
 
   // Loading state
   if (loading && contacts.length === 0 && activeTab === 'contacts') {
@@ -738,7 +821,7 @@ export default function NetworkPage({
           <p className="text-foreground/60">Loading your network...</p>
         </div>
       </div>
-    );
+    )
   }
 
   // Error state
@@ -747,12 +830,15 @@ export default function NetworkPage({
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <p className="text-red-400 mb-4">{error}</p>
-          <button onClick={() => fetchContacts()} className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors">
+          <button
+            onClick={() => fetchContacts()}
+            className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors"
+          >
             Try Again
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   // Empty state (no contacts at all)
@@ -764,13 +850,23 @@ export default function NetworkPage({
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-card/80 dark:bg-background/10">
               <UserPlus className="w-8 h-8 text-foreground/40" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">Start Building Your Network</h3>
-            <p className="text-foreground/50 text-sm mb-6">Add vendors to your network to easily invite them to future events.</p>
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              Start Building Your Network
+            </h3>
+            <p className="text-foreground/50 text-sm mb-6">
+              Add vendors to your network to easily invite them to future events.
+            </p>
             <div className="flex items-center justify-center gap-3">
-              <button onClick={() => setShowAddModal(true)} className="px-5 py-2.5 voxxy-btn-cta text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="px-5 py-2.5 voxxy-btn-cta text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+              >
                 Add Your First Contact
               </button>
-              <button onClick={() => setShowCSVUploadModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-background/10 hover:bg-background/20 text-foreground text-sm font-medium rounded-lg transition-all border border-border">
+              <button
+                onClick={() => setShowCSVUploadModal(true)}
+                className="flex items-center gap-2 px-5 py-2.5 bg-background/10 hover:bg-background/20 text-foreground text-sm font-medium rounded-lg transition-all border border-border"
+              >
                 <Upload className="w-4 h-4" />
                 Import CSV
               </button>
@@ -779,13 +875,26 @@ export default function NetworkPage({
         </div>
 
         {showAddModal && (
-          <AddContactModal organizationId={organizationId} onClose={() => setShowAddModal(false)} onSuccess={(newContact) => { setContacts(prev => [newContact, ...prev]); setShowAddModal(false); }} />
+          <AddContactModal
+            organizationId={organizationId}
+            onClose={() => setShowAddModal(false)}
+            onSuccess={(newContact) => {
+              setContacts((prev) => [newContact, ...prev])
+              setShowAddModal(false)
+            }}
+          />
         )}
         {showCSVUploadModal && (
-          <CSVUploadModal open={showCSVUploadModal} onClose={() => setShowCSVUploadModal(false)} onSuccess={() => { fetchContacts(); }} />
+          <CSVUploadModal
+            open={showCSVUploadModal}
+            onClose={() => setShowCSVUploadModal(false)}
+            onSuccess={() => {
+              fetchContacts()
+            }}
+          />
         )}
       </>
-    );
+    )
   }
 
   return (
@@ -808,38 +917,49 @@ export default function NetworkPage({
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
                   placeholder="Search contacts..."
-                className="voxxy-input-frost w-full rounded-lg py-2.5 pl-10 pr-3 text-sm focus:ring-2 focus:ring-ring/40"
+                  className="voxxy-input-frost w-full rounded-lg py-2.5 pl-10 pr-3 text-sm focus:ring-2 focus:ring-ring/40"
                 />
               </div>
 
               {/* Actions dropdown */}
               <div className="relative" ref={actionsMenuRef}>
                 <button
-                  onClick={() => setActionsMenuOpen(prev => !prev)}
+                  onClick={() => setActionsMenuOpen((prev) => !prev)}
                   className="flex items-center gap-1.5 px-3 py-2.5 voxxy-btn-cta text-xs font-semibold rounded-lg hover:shadow-lg transition-all whitespace-nowrap"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Actions</span>
-                  <ChevronDown className={`w-3 h-3 transition-transform ${actionsMenuOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`w-3 h-3 transition-transform ${actionsMenuOpen ? 'rotate-180' : ''}`}
+                  />
                 </button>
                 {actionsMenuOpen && (
                   <div className="voxxy-select-surface absolute right-0 top-full mt-1 z-50 w-48 rounded-lg shadow-xl overflow-hidden">
                     <button
-                      onClick={() => { setShowAddModal(true); setActionsMenuOpen(false); }}
+                      onClick={() => {
+                        setShowAddModal(true)
+                        setActionsMenuOpen(false)
+                      }}
                       className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
                     >
                       <UserPlus className="w-3.5 h-3.5" />
                       Add Contact
                     </button>
                     <button
-                      onClick={() => { handleStartCreateList(); setActionsMenuOpen(false); }}
+                      onClick={() => {
+                        handleStartCreateList()
+                        setActionsMenuOpen(false)
+                      }}
                       className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
                     >
                       <Filter className="w-3.5 h-3.5" />
                       Create List
                     </button>
                     <button
-                      onClick={() => { setShowCSVUploadModal(true); setActionsMenuOpen(false); }}
+                      onClick={() => {
+                        setShowCSVUploadModal(true)
+                        setActionsMenuOpen(false)
+                      }}
                       className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
                     >
                       <Upload className="w-3.5 h-3.5" />
@@ -864,17 +984,23 @@ export default function NetworkPage({
                 Filters
                 {hasActiveFilters && (
                   <span className="flex items-center justify-center w-4 h-4 bg-primary/50 text-primary-foreground text-[10px] font-bold rounded-full">
-                    {[
-                      categoryFilters.length > 0,
-                      locationFilters.length > 0,
-                      tagFilters.length > 0,
-                      updatedAtRange !== 'all',
-                      eventFilter !== 'all',
-                      eventStatusFilter !== 'all',
-                    ].filter(Boolean).length}
+                    {
+                      [
+                        categoryFilters.length > 0,
+                        locationFilters.length > 0,
+                        tagFilters.length > 0,
+                        updatedAtRange !== 'all',
+                        eventFilter !== 'all',
+                        eventStatusFilter !== 'all',
+                      ].filter(Boolean).length
+                    }
                   </span>
                 )}
-                {showFilters ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                {showFilters ? (
+                  <ChevronUp className="w-3 h-3" />
+                ) : (
+                  <ChevronDown className="w-3 h-3" />
+                )}
               </button>
 
               {hasActiveFilters && (
@@ -904,68 +1030,89 @@ export default function NetworkPage({
               <div className="flex items-center gap-2 flex-wrap pt-1">
                 {/* 1. Category */}
                 {(() => {
-                  const field = filterFieldConfigs.find(f => f.key === 'category');
-                  if (!field) return null;
-                  const selectedValues = activeFilters.find(f => f.fieldKey === 'category')?.values || [];
+                  const field = filterFieldConfigs.find((f) => f.key === 'category')
+                  if (!field) return null
+                  const selectedValues =
+                    activeFilters.find((f) => f.fieldKey === 'category')?.values || []
                   return (
                     <FilterDropdownButton
                       field={field}
                       selectedValues={selectedValues}
                       onChange={(values) => {
-                        const existing = activeFilters.find(f => f.fieldKey === 'category');
+                        const existing = activeFilters.find((f) => f.fieldKey === 'category')
                         if (existing) {
-                          if (values.length === 0) setActiveFilters(activeFilters.filter(f => f.fieldKey !== 'category'));
-                          else setActiveFilters(activeFilters.map(f => f.fieldKey === 'category' ? { ...f, values } : f));
+                          if (values.length === 0)
+                            setActiveFilters(activeFilters.filter((f) => f.fieldKey !== 'category'))
+                          else
+                            setActiveFilters(
+                              activeFilters.map((f) =>
+                                f.fieldKey === 'category' ? { ...f, values } : f,
+                              ),
+                            )
                         } else if (values.length > 0) {
-                          setActiveFilters([...activeFilters, { fieldKey: 'category', values }]);
+                          setActiveFilters([...activeFilters, { fieldKey: 'category', values }])
                         }
                       }}
                     />
-                  );
+                  )
                 })()}
 
                 {/* 2. Location */}
                 {(() => {
-                  const field = filterFieldConfigs.find(f => f.key === 'location');
-                  if (!field) return null;
-                  const selectedValues = activeFilters.find(f => f.fieldKey === 'location')?.values || [];
+                  const field = filterFieldConfigs.find((f) => f.key === 'location')
+                  if (!field) return null
+                  const selectedValues =
+                    activeFilters.find((f) => f.fieldKey === 'location')?.values || []
                   return (
                     <FilterDropdownButton
                       field={field}
                       selectedValues={selectedValues}
                       onChange={(values) => {
-                        const existing = activeFilters.find(f => f.fieldKey === 'location');
+                        const existing = activeFilters.find((f) => f.fieldKey === 'location')
                         if (existing) {
-                          if (values.length === 0) setActiveFilters(activeFilters.filter(f => f.fieldKey !== 'location'));
-                          else setActiveFilters(activeFilters.map(f => f.fieldKey === 'location' ? { ...f, values } : f));
+                          if (values.length === 0)
+                            setActiveFilters(activeFilters.filter((f) => f.fieldKey !== 'location'))
+                          else
+                            setActiveFilters(
+                              activeFilters.map((f) =>
+                                f.fieldKey === 'location' ? { ...f, values } : f,
+                              ),
+                            )
                         } else if (values.length > 0) {
-                          setActiveFilters([...activeFilters, { fieldKey: 'location', values }]);
+                          setActiveFilters([...activeFilters, { fieldKey: 'location', values }])
                         }
                       }}
                     />
-                  );
+                  )
                 })()}
 
                 {/* 3. Tags */}
                 {(() => {
-                  const field = filterFieldConfigs.find(f => f.key === 'tags');
-                  if (!field) return null;
-                  const selectedValues = activeFilters.find(f => f.fieldKey === 'tags')?.values || [];
+                  const field = filterFieldConfigs.find((f) => f.key === 'tags')
+                  if (!field) return null
+                  const selectedValues =
+                    activeFilters.find((f) => f.fieldKey === 'tags')?.values || []
                   return (
                     <FilterDropdownButton
                       field={field}
                       selectedValues={selectedValues}
                       onChange={(values) => {
-                        const existing = activeFilters.find(f => f.fieldKey === 'tags');
+                        const existing = activeFilters.find((f) => f.fieldKey === 'tags')
                         if (existing) {
-                          if (values.length === 0) setActiveFilters(activeFilters.filter(f => f.fieldKey !== 'tags'));
-                          else setActiveFilters(activeFilters.map(f => f.fieldKey === 'tags' ? { ...f, values } : f));
+                          if (values.length === 0)
+                            setActiveFilters(activeFilters.filter((f) => f.fieldKey !== 'tags'))
+                          else
+                            setActiveFilters(
+                              activeFilters.map((f) =>
+                                f.fieldKey === 'tags' ? { ...f, values } : f,
+                              ),
+                            )
                         } else if (values.length > 0) {
-                          setActiveFilters([...activeFilters, { fieldKey: 'tags', values }]);
+                          setActiveFilters([...activeFilters, { fieldKey: 'tags', values }])
                         }
                       }}
                     />
-                  );
+                  )
                 })()}
 
                 {/* 4. Updated */}
@@ -989,8 +1136,9 @@ export default function NetworkPage({
                 <select
                   value={eventFilter}
                   onChange={(e) => {
-                    setEventFilter(e.target.value);
-                    if (e.target.value === 'all' || e.target.value === 'none') setEventStatusFilter('all');
+                    setEventFilter(e.target.value)
+                    if (e.target.value === 'all' || e.target.value === 'none')
+                      setEventStatusFilter('all')
                   }}
                   className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer max-w-[180px] truncate ${
                     eventFilter !== 'all'
@@ -1000,8 +1148,10 @@ export default function NetworkPage({
                 >
                   <option value="all">Shows Attended</option>
                   <option value="none">No Shows</option>
-                  {orgEvents.map(ev => (
-                    <option key={ev.id} value={String(ev.id)}>{ev.title}</option>
+                  {orgEvents.map((ev) => (
+                    <option key={ev.id} value={String(ev.id)}>
+                      {ev.title}
+                    </option>
                   ))}
                 </select>
 
@@ -1034,10 +1184,14 @@ export default function NetworkPage({
             <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/15 border border-purple-500/30 rounded-lg">
               <Users className="w-4 h-4 text-purple-400 flex-shrink-0" />
               <span className="text-sm text-foreground/80">
-                Viewing list: <span className="font-semibold text-foreground">{viewingManualList.name}</span>
+                Viewing list:{' '}
+                <span className="font-semibold text-foreground">{viewingManualList.name}</span>
               </span>
               <button
-                onClick={() => { setViewingManualList(null); fetchContacts(1); }}
+                onClick={() => {
+                  setViewingManualList(null)
+                  fetchContacts(1)
+                }}
                 className="ml-auto flex items-center gap-1 text-xs text-foreground/60 hover:text-foreground transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
@@ -1068,11 +1222,21 @@ export default function NetworkPage({
                     className="w-40 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary dark:bg-background/10"
                     autoFocus
                   />
-                  <button onClick={handleSaveList} disabled={savingList || !listName.trim()} className="flex items-center gap-1 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg disabled:opacity-50 transition-colors">
+                  <button
+                    onClick={handleSaveList}
+                    disabled={savingList || !listName.trim()}
+                    className="flex items-center gap-1 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg disabled:opacity-50 transition-colors"
+                  >
                     <Save className="w-3 h-3" />
                     {savingList ? 'Saving...' : 'Save'}
                   </button>
-                  <button onClick={() => { setShowSaveInput(false); setListName(''); }} className="p-1.5 text-foreground/65 dark:text-foreground/40 hover:text-foreground transition-colors">
+                  <button
+                    onClick={() => {
+                      setShowSaveInput(false)
+                      setListName('')
+                    }}
+                    className="p-1.5 text-foreground/65 dark:text-foreground/40 hover:text-foreground transition-colors"
+                  >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -1081,16 +1245,28 @@ export default function NetworkPage({
           )}
 
           {/* No results */}
-          {displayedContacts.length === 0 && (searchTerm || hasActiveFilters || viewingManualList) && (
-            <div className="voxxy-surface-subtle text-center rounded-lg py-12">
-              <p className="text-foreground/80 dark:text-foreground/50 text-sm">
-                {searchTerm ? `No contacts found for "${searchTerm}"` : viewingManualList ? 'This list has no contacts' : 'No contacts match the selected filters'}
-              </p>
-              <button onClick={() => { setSearchTerm(''); clearAllFilters(); fetchContacts(1); }} className="mt-3 text-violet-900 hover:text-violet-800 dark:text-primary dark:hover:text-primary/70 text-sm underline transition-colors">
-                Clear all filters
-              </button>
-            </div>
-          )}
+          {displayedContacts.length === 0 &&
+            (searchTerm || hasActiveFilters || viewingManualList) && (
+              <div className="voxxy-surface-subtle text-center rounded-lg py-12">
+                <p className="text-foreground/80 dark:text-foreground/50 text-sm">
+                  {searchTerm
+                    ? `No contacts found for "${searchTerm}"`
+                    : viewingManualList
+                      ? 'This list has no contacts'
+                      : 'No contacts match the selected filters'}
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchTerm('')
+                    clearAllFilters()
+                    fetchContacts(1)
+                  }}
+                  className="mt-3 text-violet-900 hover:text-violet-800 dark:text-primary dark:hover:text-primary/70 text-sm underline transition-colors"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            )}
 
           {/* Bulk Action Toolbar */}
           <BulkActionToolbar
@@ -1119,13 +1295,36 @@ export default function NetworkPage({
 
           {/* Modals */}
           {showAddModal && (
-            <AddContactModal organizationId={organizationId} onClose={() => setShowAddModal(false)} onSuccess={(newContact) => { setContacts(prev => [newContact, ...prev]); setShowAddModal(false); }} />
+            <AddContactModal
+              organizationId={organizationId}
+              onClose={() => setShowAddModal(false)}
+              onSuccess={(newContact) => {
+                setContacts((prev) => [newContact, ...prev])
+                setShowAddModal(false)
+              }}
+            />
           )}
           {editingContact && (
-            <EditContactModal organizationId={organizationId} contact={editingContact} onClose={() => setEditingContact(null)} onSuccess={(updatedContact) => { setContacts(prev => prev.map(c => (c.id === updatedContact.id ? updatedContact : c))); setEditingContact(null); }} />
+            <EditContactModal
+              organizationId={organizationId}
+              contact={editingContact}
+              onClose={() => setEditingContact(null)}
+              onSuccess={(updatedContact) => {
+                setContacts((prev) =>
+                  prev.map((c) => (c.id === updatedContact.id ? updatedContact : c)),
+                )
+                setEditingContact(null)
+              }}
+            />
           )}
           {showCSVUploadModal && (
-            <CSVUploadModal open={showCSVUploadModal} onClose={() => setShowCSVUploadModal(false)} onSuccess={() => { fetchContacts(); }} />
+            <CSVUploadModal
+              open={showCSVUploadModal}
+              onClose={() => setShowCSVUploadModal(false)}
+              onSuccess={() => {
+                fetchContacts()
+              }}
+            />
           )}
           <ContactExportModal
             open={showExportModal}
@@ -1142,13 +1341,15 @@ export default function NetworkPage({
         <ListsManagement
           organizationId={organizationId}
           onViewList={(filters) => {
-            setViewingManualList(null);
-            const newFilters: ActiveFilter[] = [];
-            if (filters.locations?.length) newFilters.push({ fieldKey: 'location', values: filters.locations });
-            if (filters.categories?.length) newFilters.push({ fieldKey: 'category', values: filters.categories });
-            if (filters.tags?.length) newFilters.push({ fieldKey: 'tags', values: filters.tags });
-            setActiveFilters(newFilters);
-            onTabChange?.('contacts');
+            setViewingManualList(null)
+            const newFilters: ActiveFilter[] = []
+            if (filters.locations?.length)
+              newFilters.push({ fieldKey: 'location', values: filters.locations })
+            if (filters.categories?.length)
+              newFilters.push({ fieldKey: 'category', values: filters.categories })
+            if (filters.tags?.length) newFilters.push({ fieldKey: 'tags', values: filters.tags })
+            setActiveFilters(newFilters)
+            onTabChange?.('contacts')
           }}
           onViewManualList={handleViewManualList}
         />
@@ -1158,7 +1359,9 @@ export default function NetworkPage({
       {activeTab === 'categories' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-foreground/60">Manage vendor categories for organizing contacts</p>
+            <p className="text-sm text-foreground/60">
+              Manage vendor categories for organizing contacts
+            </p>
             <button
               onClick={openAddCategoryModal}
               className="flex items-center gap-2 px-4 py-2.5 voxxy-btn-cta text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
@@ -1172,15 +1375,19 @@ export default function NetworkPage({
             <div className="voxxy-surface-subtle text-center rounded-lg py-12">
               <Tag className="w-12 h-12 text-foreground/20 mx-auto mb-3" />
               <p className="text-foreground/60 text-sm">No categories yet</p>
-              <p className="text-foreground/40 text-xs mt-1">Create your first category to organize your vendors</p>
+              <p className="text-foreground/40 text-xs mt-1">
+                Create your first category to organize your vendors
+              </p>
             </div>
           ) : (
             <div className="voxxy-table-shell divide-y divide-border rounded-lg overflow-hidden">
               {categories.map((category) => {
-                const prefs = category.payment_preferences || [];
-                const defaultBoothPrice = category.default_booth_price ? Number(category.default_booth_price) : 0;
-                const hasPrefs = prefs.length > 0;
-                const hasSmartDefaults = defaultBoothPrice > 0 && !hasPrefs;
+                const prefs = category.payment_preferences || []
+                const defaultBoothPrice = category.default_booth_price
+                  ? Number(category.default_booth_price)
+                  : 0
+                const hasPrefs = prefs.length > 0
+                const hasSmartDefaults = defaultBoothPrice > 0 && !hasPrefs
 
                 return (
                   <div
@@ -1195,9 +1402,13 @@ export default function NetworkPage({
 
                     {/* Name + description */}
                     <div className="min-w-0 w-40 flex-shrink-0">
-                      <div className="font-semibold text-sm text-foreground truncate">{category.name}</div>
+                      <div className="font-semibold text-sm text-foreground truncate">
+                        {category.name}
+                      </div>
                       {category.description ? (
-                        <div className="text-xs text-foreground/50 truncate">{category.description}</div>
+                        <div className="text-xs text-foreground/50 truncate">
+                          {category.description}
+                        </div>
                       ) : (
                         <div className="text-xs text-foreground/30 italic">No description</div>
                       )}
@@ -1207,12 +1418,19 @@ export default function NetworkPage({
                     <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
                       {hasPrefs ? (
                         prefs.map((pref, i) => (
-                          <div key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
-                            {pref.is_percentage
-                              ? <Percent className="w-3 h-3 text-primary/70" />
-                              : <DollarSign className="w-3 h-3 text-primary/70" />}
+                          <div
+                            key={i}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20"
+                          >
+                            {pref.is_percentage ? (
+                              <Percent className="w-3 h-3 text-primary/70" />
+                            ) : (
+                              <DollarSign className="w-3 h-3 text-primary/70" />
+                            )}
                             <span className="text-xs font-semibold text-primary/90">
-                              {pref.is_percentage ? `${pref.amount}%` : `$${Number(pref.amount).toFixed(2)}`}
+                              {pref.is_percentage
+                                ? `${pref.amount}%`
+                                : `$${Number(pref.amount).toFixed(2)}`}
                             </span>
                             <span className="text-[10px] text-primary/60">{pref.label}</span>
                           </div>
@@ -1220,8 +1438,12 @@ export default function NetworkPage({
                       ) : hasSmartDefaults ? (
                         <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20">
                           <DollarSign className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-                          <span className="text-xs font-medium text-blue-700 dark:text-blue-300">${defaultBoothPrice.toFixed(2)}</span>
-                          <span className="text-[10px] text-blue-600/70 dark:text-blue-400/70">last event</span>
+                          <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                            ${defaultBoothPrice.toFixed(2)}
+                          </span>
+                          <span className="text-[10px] text-blue-600/70 dark:text-blue-400/70">
+                            last event
+                          </span>
                         </div>
                       ) : (
                         <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-foreground/5 border border-border">
@@ -1234,7 +1456,10 @@ export default function NetworkPage({
                     {/* Contact count */}
                     <div className="flex items-center gap-1.5 text-xs text-foreground/50 flex-shrink-0">
                       <Users className="w-3.5 h-3.5" />
-                      <span>{category.usage_stats?.contacts_count || 0} contact{category.usage_stats?.contacts_count !== 1 ? 's' : ''}</span>
+                      <span>
+                        {category.usage_stats?.contacts_count || 0} contact
+                        {category.usage_stats?.contacts_count !== 1 ? 's' : ''}
+                      </span>
                     </div>
 
                     {/* Actions */}
@@ -1262,7 +1487,7 @@ export default function NetworkPage({
                       </button>
                     </div>
                   </div>
-                );
+                )
               })}
             </div>
           )}
@@ -1280,10 +1505,10 @@ export default function NetworkPage({
               </h3>
               <button
                 onClick={() => {
-                  setShowCategoryModal(false);
-                  setEditingCategory(null);
-                  setCategoryFormData({ ...emptyCategory });
-                  setPaymentPreferences([]);
+                  setShowCategoryModal(false)
+                  setEditingCategory(null)
+                  setCategoryFormData({ ...emptyCategory })
+                  setPaymentPreferences([])
                 }}
                 className="p-1 rounded-lg hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
               >
@@ -1294,11 +1519,15 @@ export default function NetworkPage({
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-5 space-y-3">
               <div>
-                <label className="block text-xs font-medium text-foreground/70 mb-1">Category Name <span className="text-red-400">*</span></label>
+                <label className="block text-xs font-medium text-foreground/70 mb-1">
+                  Category Name <span className="text-red-400">*</span>
+                </label>
                 <input
                   type="text"
                   value={categoryFormData.name}
-                  onChange={(e) => setCategoryFormData(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setCategoryFormData((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   placeholder="e.g., Food Vendor, Artist, Sponsor"
                   className="voxxy-input-frost w-full"
                   autoFocus
@@ -1310,7 +1539,9 @@ export default function NetworkPage({
                   <input
                     type="color"
                     value={categoryFormData.color}
-                    onChange={(e) => setCategoryFormData(prev => ({ ...prev, color: e.target.value }))}
+                    onChange={(e) =>
+                      setCategoryFormData((prev) => ({ ...prev, color: e.target.value }))
+                    }
                     className="h-8 w-12 cursor-pointer rounded border border-border bg-transparent"
                   />
                   <input
@@ -1318,7 +1549,7 @@ export default function NetworkPage({
                     value={categoryFormData.color}
                     onChange={(e) => {
                       if (/^#[0-9A-Fa-f]{0,6}$/.test(e.target.value)) {
-                        setCategoryFormData(prev => ({ ...prev, color: e.target.value }));
+                        setCategoryFormData((prev) => ({ ...prev, color: e.target.value }))
                       }
                     }}
                     placeholder="#FF6B6B"
@@ -1328,10 +1559,14 @@ export default function NetworkPage({
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-foreground/70 mb-1">Description <span className="text-foreground/40 font-normal">— Optional</span></label>
+                <label className="block text-xs font-medium text-foreground/70 mb-1">
+                  Description <span className="text-foreground/40 font-normal">— Optional</span>
+                </label>
                 <textarea
                   value={categoryFormData.description}
-                  onChange={(e) => setCategoryFormData(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setCategoryFormData((prev) => ({ ...prev, description: e.target.value }))
+                  }
                   placeholder="Internal notes about this vendor category"
                   rows={2}
                   className="voxxy-input-frost w-full resize-none"
@@ -1342,22 +1577,31 @@ export default function NetworkPage({
               <div className="bg-background/5 rounded-xl p-4 border border-border space-y-3">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-semibold text-foreground/70">Payment Preferences</p>
-                  <p className="text-[10px] text-foreground/40">Amounts pre-fill the event wizard. Dates set per event.</p>
+                  <p className="text-[10px] text-foreground/40">
+                    Amounts pre-fill the event wizard. Dates set per event.
+                  </p>
                 </div>
 
                 {/* Added fee rows */}
                 {paymentPreferences.length === 0 && (
-                  <p className="text-xs text-foreground/40 italic py-1">No fee types added yet. Use "+ Add Fee Type" to set a preference.</p>
+                  <p className="text-xs text-foreground/40 italic py-1">
+                    No fee types added yet. Use "+ Add Fee Type" to set a preference.
+                  </p>
                 )}
                 {paymentPreferences.map((pref, idx) => (
-                  <div key={idx} className="bg-background/5 rounded-lg p-3 border border-border/60 space-y-2">
+                  <div
+                    key={idx}
+                    className="bg-background/5 rounded-lg p-3 border border-border/60 space-y-2"
+                  >
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
                         value={pref.label}
-                        onChange={(e) => setPaymentPreferences(prev =>
-                          prev.map((p, i) => i === idx ? { ...p, label: e.target.value } : p)
-                        )}
+                        onChange={(e) =>
+                          setPaymentPreferences((prev) =>
+                            prev.map((p, i) => (i === idx ? { ...p, label: e.target.value } : p)),
+                          )
+                        }
                         className="voxxy-input-frost flex-1 text-xs py-1"
                         placeholder="Label (e.g. Early Bird - Aug)"
                       />
@@ -1386,7 +1630,6 @@ export default function NetworkPage({
                     </div>
                   </div>
                 ))}
-
               </div>
             </div>
 
@@ -1394,7 +1637,7 @@ export default function NetworkPage({
             <div className="px-5 py-2.5 border-t border-border/40 flex-shrink-0 relative">
               <button
                 type="button"
-                onClick={() => setFeeTypeDropdownOpen(prev => !prev)}
+                onClick={() => setFeeTypeDropdownOpen((prev) => !prev)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg voxxy-btn-solid transition-colors"
               >
                 <Plus className="w-3 h-3" />
@@ -1402,9 +1645,12 @@ export default function NetworkPage({
               </button>
               {feeTypeDropdownOpen && (
                 <>
-                  <div className="fixed inset-0 z-[90]" onClick={() => setFeeTypeDropdownOpen(false)} />
+                  <div
+                    className="fixed inset-0 z-[90]"
+                    onClick={() => setFeeTypeDropdownOpen(false)}
+                  />
                   <div className="absolute left-5 bottom-full mb-1 w-72 bg-card border border-border rounded-lg shadow-xl z-[91] overflow-hidden">
-                    {availableFeeTypes.map(pt => (
+                    {availableFeeTypes.map((pt) => (
                       <button
                         key={pt.value}
                         type="button"
@@ -1424,10 +1670,10 @@ export default function NetworkPage({
             <div className="px-5 py-3 border-t border-border flex justify-end gap-2 flex-shrink-0">
               <button
                 onClick={() => {
-                  setShowCategoryModal(false);
-                  setEditingCategory(null);
-                  setCategoryFormData({ ...emptyCategory });
-                  setPaymentPreferences([]);
+                  setShowCategoryModal(false)
+                  setEditingCategory(null)
+                  setCategoryFormData({ ...emptyCategory })
+                  setPaymentPreferences([])
                 }}
                 className="px-3 py-1.5 text-xs rounded-lg border border-border text-foreground hover:bg-background/10 transition-all"
               >
@@ -1464,7 +1710,9 @@ export default function NetworkPage({
             <div className="p-6 space-y-5">
               {/* List Name */}
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">List Name</label>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">
+                  List Name
+                </label>
                 <input
                   type="text"
                   value={createListName}
@@ -1477,7 +1725,9 @@ export default function NetworkPage({
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">Description (optional)</label>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">
+                  Description (optional)
+                </label>
                 <textarea
                   value={createListDescription}
                   onChange={(e) => setCreateListDescription(e.target.value)}
@@ -1489,7 +1739,9 @@ export default function NetworkPage({
 
               {/* Filters */}
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">Filters</label>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">
+                  Filters
+                </label>
                 <SmartListBuilder
                   organizationId={organizationId}
                   filters={createListFilters}
@@ -1527,7 +1779,6 @@ export default function NetworkPage({
           </div>
         </div>
       )}
-
     </div>
-  );
+  )
 }

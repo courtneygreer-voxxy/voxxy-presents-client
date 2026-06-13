@@ -1,169 +1,201 @@
-import { useState, useEffect } from 'react';
-import { Filter, Users, Calendar, Trash2, Edit3, Eye, X, Save, Plus, Download, Loader2 } from 'lucide-react';
-import { contactListsApi, ContactList } from '@/services/api';
-import type { VendorContact } from '@/services/api';
-import { formatDistanceToNow } from 'date-fns';
-import SmartListBuilder from './SmartListBuilder';
-import { contactsToCsv, triggerCsvDownload } from '../contactsCsvExport';
+import { useState, useEffect } from 'react'
+import {
+  Filter,
+  Users,
+  Calendar,
+  Trash2,
+  Edit3,
+  Eye,
+  X,
+  Save,
+  Plus,
+  Download,
+  Loader2,
+} from 'lucide-react'
+import { contactListsApi, ContactList } from '@/services/api'
+import type { VendorContact } from '@/services/api'
+import { formatDistanceToNow } from 'date-fns'
+import SmartListBuilder from './SmartListBuilder'
+import { contactsToCsv, triggerCsvDownload } from '../contactsCsvExport'
 
 interface ListsManagementProps {
-  organizationId: number;
-  onViewList?: (filters: { locations?: string[]; categories?: string[]; tags?: string[] }) => void;
-  onViewManualList?: (listId: number, listName: string) => void;
+  organizationId: number
+  onViewList?: (filters: { locations?: string[]; categories?: string[]; tags?: string[] }) => void
+  onViewManualList?: (listId: number, listName: string) => void
 }
 
-export default function ListsManagement({ organizationId, onViewList, onViewManualList }: ListsManagementProps) {
-  const [lists, setLists] = useState<ContactList[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function ListsManagement({
+  organizationId,
+  onViewList,
+  onViewManualList,
+}: ListsManagementProps) {
+  const [lists, setLists] = useState<ContactList[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   // Inline edit state
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editDescription, setEditDescription] = useState('');
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editDescription, setEditDescription] = useState('')
   const [editFilters, setEditFilters] = useState<{
-    categories?: string[];
-    locations?: string[];
-    tags?: string[];
-  }>({});
-  const [savingEdit, setSavingEdit] = useState(false);
+    categories?: string[]
+    locations?: string[]
+    tags?: string[]
+  }>({})
+  const [savingEdit, setSavingEdit] = useState(false)
 
   // Create list state
-  const [isCreating, setIsCreating] = useState(false);
-  const [createName, setCreateName] = useState('');
-  const [createDescription, setCreateDescription] = useState('');
+  const [isCreating, setIsCreating] = useState(false)
+  const [createName, setCreateName] = useState('')
+  const [createDescription, setCreateDescription] = useState('')
   const [createFilters, setCreateFilters] = useState<{
-    categories?: string[];
-    locations?: string[];
-    tags?: string[];
-  }>({});
-  const [savingCreate, setSavingCreate] = useState(false);
+    categories?: string[]
+    locations?: string[]
+    tags?: string[]
+  }>({})
+  const [savingCreate, setSavingCreate] = useState(false)
 
   // Download state
-  const [downloadingListId, setDownloadingListId] = useState<number | null>(null);
+  const [downloadingListId, setDownloadingListId] = useState<number | null>(null)
 
   const handleDownloadList = async (listId: number, listName: string) => {
-    setDownloadingListId(listId);
+    setDownloadingListId(listId)
     try {
-      let allContacts: VendorContact[] = [];
-      let page = 1;
-      let totalPages = 1;
+      let allContacts: VendorContact[] = []
+      let page = 1
+      let totalPages = 1
       do {
-        const response = await contactListsApi.getContacts(listId, page, 200);
-        allContacts.push(...(response.vendor_contacts || []));
-        totalPages = response.meta?.total_pages || 1;
-        page++;
-      } while (page <= totalPages);
+        const response = await contactListsApi.getContacts(listId, page, 200)
+        allContacts.push(...(response.vendor_contacts || []))
+        totalPages = response.meta?.total_pages || 1
+        page++
+      } while (page <= totalPages)
 
-      const csv = contactsToCsv(allContacts);
-      const safeName = listName.replace(/[^a-zA-Z0-9-_]/g, '_').toLowerCase();
-      const date = new Date().toISOString().slice(0, 10);
-      triggerCsvDownload(csv, `list-${safeName}-${date}.csv`);
+      const csv = contactsToCsv(allContacts)
+      const safeName = listName.replace(/[^a-zA-Z0-9-_]/g, '_').toLowerCase()
+      const date = new Date().toISOString().slice(0, 10)
+      triggerCsvDownload(csv, `list-${safeName}-${date}.csv`)
     } catch (err: any) {
-      alert(err.message || 'Failed to export list');
+      alert(err.message || 'Failed to export list')
     } finally {
-      setDownloadingListId(null);
+      setDownloadingListId(null)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchLists();
-  }, [organizationId]);
+    fetchLists()
+  }, [organizationId])
 
   const fetchLists = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const response = await contactListsApi.getAll(organizationId);
-      setLists(response.contact_lists);
+      setLoading(true)
+      setError(null)
+      const response = await contactListsApi.getAll(organizationId)
+      setLists(response.contact_lists)
     } catch (err: any) {
-      setError(err.message || 'Failed to load lists');
+      setError(err.message || 'Failed to load lists')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleDeleteList = async (listId: number, listName: string) => {
-    if (!confirm(`Are you sure you want to delete the list "${listName}"? This action cannot be undone.`)) {
-      return;
+    if (
+      !confirm(
+        `Are you sure you want to delete the list "${listName}"? This action cannot be undone.`,
+      )
+    ) {
+      return
     }
 
     try {
-      await contactListsApi.delete(listId);
-      setLists(prev => prev.filter(l => l.id !== listId));
-      if (editingId === listId) setEditingId(null);
+      await contactListsApi.delete(listId)
+      setLists((prev) => prev.filter((l) => l.id !== listId))
+      if (editingId === listId) setEditingId(null)
     } catch (err: any) {
-      alert(err.message || 'Failed to delete list');
+      alert(err.message || 'Failed to delete list')
     }
-  };
+  }
 
   const handleStartEdit = (list: ContactList) => {
-    setEditingId(list.id);
-    setEditName(list.name);
-    setEditDescription(list.description || '');
-    setEditFilters(list.filters || {});
-  };
+    setEditingId(list.id)
+    setEditName(list.name)
+    setEditDescription(list.description || '')
+    setEditFilters(list.filters || {})
+  }
 
   const handleCancelEdit = () => {
-    setEditingId(null);
-    setEditName('');
-    setEditDescription('');
-    setEditFilters({});
-  };
+    setEditingId(null)
+    setEditName('')
+    setEditDescription('')
+    setEditFilters({})
+  }
 
   const handleSaveEdit = async () => {
-    if (!editingId || !editName.trim()) return;
-    setSavingEdit(true);
+    if (!editingId || !editName.trim()) return
+    setSavingEdit(true)
     try {
       const updated = await contactListsApi.update(editingId, {
         name: editName.trim(),
         description: editDescription.trim() || undefined,
         filters: editFilters,
-      });
-      setLists(prev => prev.map(l => l.id === editingId ? { ...l, ...updated, name: editName.trim(), description: editDescription.trim(), filters: editFilters } : l));
-      setEditingId(null);
+      })
+      setLists((prev) =>
+        prev.map((l) =>
+          l.id === editingId
+            ? {
+                ...l,
+                ...updated,
+                name: editName.trim(),
+                description: editDescription.trim(),
+                filters: editFilters,
+              }
+            : l,
+        ),
+      )
+      setEditingId(null)
     } catch (err: any) {
-      alert(err.message || 'Failed to update list');
+      alert(err.message || 'Failed to update list')
     } finally {
-      setSavingEdit(false);
+      setSavingEdit(false)
     }
-  };
+  }
 
   const handleStartCreate = () => {
-    setIsCreating(true);
-    setCreateName('');
-    setCreateDescription('');
-    setCreateFilters({});
-  };
+    setIsCreating(true)
+    setCreateName('')
+    setCreateDescription('')
+    setCreateFilters({})
+  }
 
   const handleCancelCreate = () => {
-    setIsCreating(false);
-    setCreateName('');
-    setCreateDescription('');
-    setCreateFilters({});
-  };
+    setIsCreating(false)
+    setCreateName('')
+    setCreateDescription('')
+    setCreateFilters({})
+  }
 
   const handleSaveCreate = async () => {
-    if (!createName.trim()) return;
-    setSavingCreate(true);
+    if (!createName.trim()) return
+    setSavingCreate(true)
     try {
       const newList = await contactListsApi.create(organizationId, {
         name: createName.trim(),
         description: createDescription.trim() || undefined,
         list_type: 'smart',
         filters: createFilters,
-      });
-      setLists(prev => [newList, ...prev]);
-      setIsCreating(false);
-      setCreateName('');
-      setCreateDescription('');
-      setCreateFilters({});
+      })
+      setLists((prev) => [newList, ...prev])
+      setIsCreating(false)
+      setCreateName('')
+      setCreateDescription('')
+      setCreateFilters({})
     } catch (err: any) {
-      alert(err.message || 'Failed to create list');
+      alert(err.message || 'Failed to create list')
     } finally {
-      setSavingCreate(false);
+      setSavingCreate(false)
     }
-  };
+  }
 
   // Loading state
   if (loading) {
@@ -174,7 +206,7 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
           <p className="text-foreground/60">Loading your lists...</p>
         </div>
       </div>
-    );
+    )
   }
 
   // Error state
@@ -191,7 +223,7 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   // Empty state
@@ -203,11 +235,10 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-card/80 dark:bg-background/10">
               <Filter className="w-8 h-8 text-foreground/40" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              No Saved Lists Yet
-            </h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">No Saved Lists Yet</h3>
             <p className="text-foreground/50 text-sm mb-4">
-              Create a smart list with filter combinations or use the filters on the All Contacts tab and save them as a reusable list.
+              Create a smart list with filter combinations or use the filters on the All Contacts
+              tab and save them as a reusable list.
             </p>
             <button
               onClick={handleStartCreate}
@@ -247,7 +278,9 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
               <div className="p-6 space-y-5">
                 {/* List Name */}
                 <div>
-                  <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">List Name</label>
+                  <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">
+                    List Name
+                  </label>
                   <input
                     type="text"
                     value={createName}
@@ -260,7 +293,9 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">Description (optional)</label>
+                  <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">
+                    Description (optional)
+                  </label>
                   <textarea
                     value={createDescription}
                     onChange={(e) => setCreateDescription(e.target.value)}
@@ -272,7 +307,9 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
 
                 {/* Filters */}
                 <div>
-                  <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">Filters</label>
+                  <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">
+                    Filters
+                  </label>
                   <SmartListBuilder
                     organizationId={organizationId}
                     filters={createFilters}
@@ -311,7 +348,7 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
           </div>
         )}
       </>
-    );
+    )
   }
 
   return (
@@ -339,40 +376,43 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
           <thead>
             <tr className="voxxy-table-header">
               <th className="px-4 py-3 text-left">
-                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Name</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">
+                  Name
+                </span>
               </th>
               <th className="px-4 py-3 text-left">
-                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Filters</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">
+                  Filters
+                </span>
               </th>
               <th className="px-4 py-3 text-left">
-                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Contacts</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">
+                  Contacts
+                </span>
               </th>
               <th className="px-4 py-3 text-left">
-                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Last Used</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">
+                  Last Used
+                </span>
               </th>
               <th className="px-4 py-3 text-right">
-                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Actions</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">
+                  Actions
+                </span>
               </th>
             </tr>
           </thead>
           <tbody>
-            {lists.map(list => (
-              <tr
-                key={list.id}
-                className="voxxy-table-row voxxy-table-row-hover group"
-              >
+            {lists.map((list) => (
+              <tr key={list.id} className="voxxy-table-row voxxy-table-row-hover group">
                 {/* Name */}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <Filter className="w-4 h-4 text-primary flex-shrink-0" />
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {list.name}
-                      </p>
+                      <p className="text-sm font-medium text-foreground truncate">{list.name}</p>
                       {list.description && (
-                        <p className="text-xs text-foreground/50 truncate">
-                          {list.description}
-                        </p>
+                        <p className="text-xs text-foreground/50 truncate">{list.description}</p>
                       )}
                     </div>
                   </div>
@@ -382,33 +422,48 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
                 <td className="px-4 py-3">
                   {list.filters ? (
                     <div className="flex flex-wrap gap-1 max-w-xs">
-                      {list.filters.categories && list.filters.categories.length > 0 && (
-                        list.filters.categories.map(cat => (
-                          <span key={cat} className="text-xs px-1.5 py-0.5 bg-blue-500/15 text-blue-950 dark:text-blue-300 rounded">
+                      {list.filters.categories &&
+                        list.filters.categories.length > 0 &&
+                        list.filters.categories.map((cat) => (
+                          <span
+                            key={cat}
+                            className="text-xs px-1.5 py-0.5 bg-blue-500/15 text-blue-950 dark:text-blue-300 rounded"
+                          >
                             {cat}
                           </span>
-                        ))
-                      )}
-                      {list.filters.locations && list.filters.locations.length > 0 && (
-                        list.filters.locations.map(loc => (
-                          <span key={loc} className="text-xs px-1.5 py-0.5 bg-primary/15 text-violet-950 dark:text-primary rounded">
+                        ))}
+                      {list.filters.locations &&
+                        list.filters.locations.length > 0 &&
+                        list.filters.locations.map((loc) => (
+                          <span
+                            key={loc}
+                            className="text-xs px-1.5 py-0.5 bg-primary/15 text-violet-950 dark:text-primary rounded"
+                          >
                             {loc}
                           </span>
-                        ))
-                      )}
-                      {list.filters.tags && list.filters.tags.length > 0 && (
-                        list.filters.tags.map(tag => (
-                          <span key={tag} className="text-xs px-1.5 py-0.5 bg-green-500/15 text-emerald-950 dark:text-green-300 rounded">
+                        ))}
+                      {list.filters.tags &&
+                        list.filters.tags.length > 0 &&
+                        list.filters.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-xs px-1.5 py-0.5 bg-green-500/15 text-emerald-950 dark:text-green-300 rounded"
+                          >
                             {tag}
                           </span>
-                        ))
-                      )}
-                      {!list.filters.categories?.length && !list.filters.locations?.length && !list.filters.tags?.length && (
-                        <span className="text-xs text-foreground/75 dark:text-muted-foreground">No filters</span>
-                      )}
+                        ))}
+                      {!list.filters.categories?.length &&
+                        !list.filters.locations?.length &&
+                        !list.filters.tags?.length && (
+                          <span className="text-xs text-foreground/75 dark:text-muted-foreground">
+                            No filters
+                          </span>
+                        )}
                     </div>
                   ) : (
-                    <span className="text-xs text-foreground/75 dark:text-muted-foreground">No filters</span>
+                    <span className="text-xs text-foreground/75 dark:text-muted-foreground">
+                      No filters
+                    </span>
                   )}
                 </td>
 
@@ -452,13 +507,17 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
                     <button
                       onClick={() => {
                         if (list.filters && onViewList) {
-                          onViewList(list.filters);
+                          onViewList(list.filters)
                         } else if (list.list_type === 'manual' && onViewManualList) {
-                          onViewManualList(list.id, list.name);
+                          onViewManualList(list.id, list.name)
                         }
                       }}
                       className="rounded p-1.5 text-foreground/60 transition-colors hover:bg-accent/60 hover:text-foreground dark:hover:bg-background/10"
-                      title={list.list_type === 'manual' ? 'View list contacts' : 'View filtered contacts'}
+                      title={
+                        list.list_type === 'manual'
+                          ? 'View list contacts'
+                          : 'View filtered contacts'
+                      }
                       disabled={!list.filters && list.list_type !== 'manual'}
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -504,7 +563,9 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
             <div className="p-6 space-y-5">
               {/* List Name */}
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">List Name</label>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">
+                  List Name
+                </label>
                 <input
                   type="text"
                   value={editName}
@@ -516,7 +577,9 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">Description (optional)</label>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">
+                  Description (optional)
+                </label>
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
@@ -528,7 +591,9 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
 
               {/* Filters */}
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">Filters</label>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">
+                  Filters
+                </label>
                 <SmartListBuilder
                   organizationId={organizationId}
                   filters={editFilters}
@@ -586,7 +651,9 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
             <div className="p-6 space-y-5">
               {/* List Name */}
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">List Name</label>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">
+                  List Name
+                </label>
                 <input
                   type="text"
                   value={createName}
@@ -599,7 +666,9 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">Description (optional)</label>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">
+                  Description (optional)
+                </label>
                 <textarea
                   value={createDescription}
                   onChange={(e) => setCreateDescription(e.target.value)}
@@ -611,7 +680,9 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
 
               {/* Filters */}
               <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">Filters</label>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">
+                  Filters
+                </label>
                 <SmartListBuilder
                   organizationId={organizationId}
                   filters={createFilters}
@@ -650,5 +721,5 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
         </div>
       )}
     </div>
-  );
+  )
 }

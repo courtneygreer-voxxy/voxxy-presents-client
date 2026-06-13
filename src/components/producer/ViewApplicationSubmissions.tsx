@@ -1,26 +1,26 @@
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Check, X, Clock } from 'lucide-react';
-import { vendorApplicationsApi, registrationsApi } from '@/services/api';
+import { useState, useEffect } from 'react'
+import { ArrowLeft, Check, X, Clock } from 'lucide-react'
+import { vendorApplicationsApi, registrationsApi } from '@/services/api'
 
 interface VendorApplication {
-  id: number;
-  name: string;
-  categories: string[];
+  id: number
+  name: string
+  categories: string[]
 }
 
 interface Submission {
-  id: number;
-  business_name: string;
-  contact_name?: string;
-  vendor_category: string;
-  email: string;
-  status: string;
-  created_at: string;
+  id: number
+  business_name: string
+  contact_name?: string
+  vendor_category: string
+  email: string
+  status: string
+  created_at: string
 }
 
 interface ViewApplicationSubmissionsProps {
-  application: VendorApplication;
-  onBack: () => void;
+  application: VendorApplication
+  onBack: () => void
 }
 
 const STATUS_COLORS = {
@@ -29,7 +29,7 @@ const STATUS_COLORS = {
   rejected: 'bg-red-500/20 text-red-950 dark:text-red-400',
   waitlist: 'bg-yellow-500/20 text-yellow-950 dark:text-yellow-400',
   confirmed: 'bg-primary/20 text-violet-950 dark:text-primary',
-};
+}
 
 const STATUS_LABELS = {
   pending: 'New',
@@ -37,80 +37,78 @@ const STATUS_LABELS = {
   rejected: 'Rejected',
   waitlist: 'Waitlist',
   confirmed: 'Paid',
-};
+}
 
 export default function ViewApplicationSubmissions({
   application,
   onBack,
 }: ViewApplicationSubmissionsProps) {
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-  const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [submissions, setSubmissions] = useState<Submission[]>([])
+  const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+  const [updatingId, setUpdatingId] = useState<number | null>(null)
 
   useEffect(() => {
-    fetchSubmissions();
-  }, [application.id]);
+    fetchSubmissions()
+  }, [application.id])
 
   useEffect(() => {
-    filterSubmissions();
-  }, [submissions, selectedStatus]);
+    filterSubmissions()
+  }, [submissions, selectedStatus])
 
   const fetchSubmissions = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const data = await vendorApplicationsApi.getSubmissions(application.id);
-      setSubmissions(data);
+      setLoading(true)
+      setError(null)
+      const data = await vendorApplicationsApi.getSubmissions(application.id)
+      setSubmissions(data)
     } catch (err: any) {
-      console.error('Failed to fetch submissions:', err);
-      setError(err.message || 'Failed to load submissions');
+      console.error('Failed to fetch submissions:', err)
+      setError(err.message || 'Failed to load submissions')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const filterSubmissions = () => {
-    let filtered = [...submissions];
+    let filtered = [...submissions]
 
     if (selectedStatus) {
-      filtered = filtered.filter(s => s.status === selectedStatus);
+      filtered = filtered.filter((s) => s.status === selectedStatus)
     }
 
-    setFilteredSubmissions(filtered);
-  };
+    setFilteredSubmissions(filtered)
+  }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
-    });
-  };
+    })
+  }
 
   const handleUpdateStatus = async (
     submissionId: number,
-    newStatus: 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed'
+    newStatus: 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed',
   ) => {
     try {
-      setUpdatingId(submissionId);
-      await registrationsApi.updateStatus(submissionId, newStatus);
+      setUpdatingId(submissionId)
+      await registrationsApi.updateStatus(submissionId, newStatus)
 
       // Update local state
       setSubmissions((prev) =>
-        prev.map((sub) =>
-          sub.id === submissionId ? { ...sub, status: newStatus } : sub
-        )
-      );
+        prev.map((sub) => (sub.id === submissionId ? { ...sub, status: newStatus } : sub)),
+      )
     } catch (err: any) {
-      console.error('Failed to update submission status:', err);
-      alert(`Failed to update status: ${err.message}`);
+      console.error('Failed to update submission status:', err)
+      alert(`Failed to update status: ${err.message}`)
     } finally {
-      setUpdatingId(null);
+      setUpdatingId(null)
     }
-  };
+  }
 
   if (loading) {
     return (
@@ -119,7 +117,7 @@ export default function ViewApplicationSubmissions({
           <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
         </div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -135,7 +133,7 @@ export default function ViewApplicationSubmissions({
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -149,16 +147,16 @@ export default function ViewApplicationSubmissions({
           <ArrowLeft className="w-4 h-4" />
           Back to Command Center
         </button>
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          {application.name}
-        </h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">{application.name}</h1>
         <p className="text-foreground/60">Review and manage applicants</p>
       </div>
 
       {/* Filters */}
       <div className="mb-6">
         <div className="flex flex-wrap gap-2">
-          <span className="text-foreground dark:text-foreground/60 text-sm self-center mr-2">Filter by Status:</span>
+          <span className="text-foreground dark:text-foreground/60 text-sm self-center mr-2">
+            Filter by Status:
+          </span>
 
           {/* Status Filters */}
           {Object.entries(STATUS_LABELS).map(([status, label]) => (
@@ -232,7 +230,9 @@ export default function ViewApplicationSubmissions({
                     className="border-b border-border hover:bg-background/5 transition-colors"
                   >
                     <td className="px-6 py-4">
-                      <p className="text-foreground font-medium">{submission.contact_name || submission.business_name}</p>
+                      <p className="text-foreground font-medium">
+                        {submission.contact_name || submission.business_name}
+                      </p>
                       {submission.business_name && submission.contact_name && (
                         <p className="text-foreground/60 text-xs">{submission.business_name}</p>
                       )}
@@ -291,7 +291,12 @@ export default function ViewApplicationSubmissions({
                             onChange={(e) =>
                               handleUpdateStatus(
                                 submission.id,
-                                e.target.value as 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed'
+                                e.target.value as
+                                  | 'pending'
+                                  | 'approved'
+                                  | 'rejected'
+                                  | 'waitlist'
+                                  | 'confirmed',
                               )
                             }
                             className="px-3 py-1.5 rounded bg-background/10 text-foreground text-sm border border-border hover:bg-background/20 transition-colors"
@@ -313,5 +318,5 @@ export default function ViewApplicationSubmissions({
         </div>
       )}
     </div>
-  );
+  )
 }

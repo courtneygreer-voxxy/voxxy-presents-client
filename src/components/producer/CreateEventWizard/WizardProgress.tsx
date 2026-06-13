@@ -1,5 +1,5 @@
-import { Check } from 'lucide-react';
-import { WizardProgressProps } from './types';
+import { Check } from 'lucide-react'
+import { WizardProgressProps } from './types'
 
 const STEP_LABELS = [
   'Event Details',
@@ -8,21 +8,21 @@ const STEP_LABELS = [
   'Email Customization',
   'Invite List',
   'Review Details',
-];
+]
 
-const STEP_SHORT = ['Details', 'Categories', 'Payment', 'Email', 'Invites', 'Review'];
+const STEP_SHORT = ['Details', 'Categories', 'Payment', 'Email', 'Invites', 'Review']
 
 export default function WizardProgress({
   currentStep,
   completedSteps,
   onStepClick,
 }: WizardProgressProps) {
-  const isStepCompleted = (step: number) => completedSteps.includes(step);
-  const isStepCurrent = (step: number) => currentStep === step;
-  const isStepClickable = (step: number) => isStepCompleted(step) || isStepCurrent(step);
-  const totalSteps = STEP_LABELS.length;
+  const isStepCompleted = (step: number) => completedSteps.includes(step)
+  const isStepCurrent = (step: number) => currentStep === step
+  const isStepClickable = (step: number) => isStepCompleted(step) || isStepCurrent(step)
+  const totalSteps = STEP_LABELS.length
   const fillRatio =
-    totalSteps <= 1 ? 0 : Math.min(1, Math.max(0, (currentStep - 1) / (totalSteps - 1)));
+    totalSteps <= 1 ? 0 : Math.min(1, Math.max(0, (currentStep - 1) / (totalSteps - 1)))
 
   return (
     <div className="mb-3 max-w-5xl mx-auto">
@@ -58,10 +58,10 @@ export default function WizardProgress({
 
         <div className="mt-2 flex justify-between gap-1">
           {[1, 2, 3, 4, 5, 6].map((step) => {
-            const completed = isStepCompleted(step);
-            const current = isStepCurrent(step);
-            const clickable = isStepClickable(step);
-            const idx = step - 1;
+            const completed = isStepCompleted(step)
+            const current = isStepCurrent(step)
+            const clickable = isStepClickable(step)
+            const idx = step - 1
 
             return (
               <button
@@ -102,10 +102,10 @@ export default function WizardProgress({
                   {STEP_SHORT[idx]}
                 </span>
               </button>
-            );
+            )
           })}
         </div>
       </div>
     </div>
-  );
+  )
 }

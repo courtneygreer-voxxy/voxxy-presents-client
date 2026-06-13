@@ -58,7 +58,8 @@ export function EmailConfirmationDialog({
                 <div className="flex items-center gap-2 rounded-lg bg-primary/10 border border-primary/20 p-3 text-sm">
                   <Users className="h-4 w-4 text-primary" />
                   <span className="text-primary font-medium">
-                    {recipientCount} {recipientCount === 1 ? 'recipient' : 'recipients'} will receive this email
+                    {recipientCount} {recipientCount === 1 ? 'recipient' : 'recipients'} will
+                    receive this email
                   </span>
                 </div>
               )}
@@ -66,9 +67,7 @@ export function EmailConfirmationDialog({
               {recipientEmail && (
                 <div className="flex items-center gap-2 rounded-lg bg-blue-500/10 border border-blue-500/20 p-3 text-sm">
                   <Mail className="h-4 w-4 text-blue-400" />
-                  <span className="text-blue-300 font-medium">
-                    Recipient: {recipientEmail}
-                  </span>
+                  <span className="text-blue-300 font-medium">Recipient: {recipientEmail}</span>
                 </div>
               )}
 
@@ -99,7 +98,13 @@ export function EmailConfirmationDialog({
                 : 'voxxy-btn-solid'
             }
           >
-            {isLoading ? 'Sending...' : type === 'category_changed' ? 'Send Notification' : isBulkEmail ? 'Yes, Send Emails' : 'Yes, Send Email'}
+            {isLoading
+              ? 'Sending...'
+              : type === 'category_changed'
+                ? 'Send Notification'
+                : isBulkEmail
+                  ? 'Yes, Send Emails'
+                  : 'Yes, Send Email'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

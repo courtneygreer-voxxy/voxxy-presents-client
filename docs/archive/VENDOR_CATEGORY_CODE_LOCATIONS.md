@@ -45,22 +45,23 @@ src/
 
 ```typescript
 export interface VendorCategory {
-  id: number;
-  name: string;
-  description: string;
-  categories: string[];
-  booth_price: number | null;
-  payment_link: string | null;
+  id: number
+  name: string
+  description: string
+  categories: string[]
+  booth_price: number | null
+  payment_link: string | null
   install: {
-    install_date: string | null;
-    install_start_time: string | null;
-    install_end_time: string | null;
-  };
-  application_tags: string[];
+    install_date: string | null
+    install_start_time: string | null
+    install_end_time: string | null
+  }
+  application_tags: string[]
 }
 ```
 
 **Used in:**
+
 - `EventPortalData.vendor_categories: VendorCategory[]` (line 9)
 - Vendor Event Portal page
 - Event detail pages
@@ -71,20 +72,21 @@ export interface VendorCategory {
 
 ```typescript
 export interface ApplicationRow {
-  id: string;
-  name: string;
-  booth_price: number;
-  description: string;
-  categories?: string[];
-  install_date?: string;
-  install_start_time?: string;
-  install_end_time?: string;
-  payment_link?: string;
-  application_tags?: string[];
+  id: string
+  name: string
+  booth_price: number
+  description: string
+  categories?: string[]
+  install_date?: string
+  install_start_time?: string
+  install_end_time?: string
+  payment_link?: string
+  application_tags?: string[]
 }
 ```
 
 **Used in:**
+
 - Event Creation Wizard Step 2
 - Represents VendorApplication during creation
 
@@ -94,12 +96,12 @@ export interface ApplicationRow {
 
 ```typescript
 export interface EventPortalData {
-  id: number;
-  view_count: number;
-  last_viewed_at: string | null;
-  event: EventDetails;
-  vendor_categories: VendorCategory[];  // Array of categories per event
-  producer_updates: Bulletin[];
+  id: number
+  view_count: number
+  last_viewed_at: string | null
+  event: EventDetails
+  vendor_categories: VendorCategory[] // Array of categories per event
+  producer_updates: Bulletin[]
 }
 ```
 
@@ -144,7 +146,9 @@ export interface EventPortalData {
    - Resolves: `payment_link` from category
 
 ### Full EMAIL_VARIABLES Array
+
 **File:** `/src/utils/emailVariables.ts` (lines 36-308)
+
 - 26 total variables
 - 8 are category-specific
 - 3 missing implementations
@@ -158,6 +162,7 @@ export interface EventPortalData {
 **File:** `/src/services/api.ts` (lines 915-1007)
 
 #### Create Application
+
 ```typescript
 vendorApplicationsApi.create(eventSlug: string, data: {
   name: string
@@ -172,21 +177,26 @@ vendorApplicationsApi.create(eventSlug: string, data: {
   application_tags?: string
 })
 ```
+
 **Endpoint:** POST `/v1/presents/events/{eventSlug}/vendor_applications`
 
 #### Update Application
+
 ```typescript
 vendorApplicationsApi.update(id: number, data: Partial<{...}>)
 ```
+
 **Endpoint:** PATCH `/v1/presents/vendor_applications/{id}`
 
 #### Get Submissions
+
 ```typescript
 vendorApplicationsApi.getSubmissions(id: number, params?: {
   category?: string
   status?: string
 })
 ```
+
 **Endpoint:** GET `/v1/presents/vendor_applications/{id}/submissions`
 
 ### Scheduled Emails API
@@ -194,13 +204,15 @@ vendorApplicationsApi.getSubmissions(id: number, params?: {
 **File:** `/src/services/api.ts`
 
 #### Email Preview (with category context)
+
 ```typescript
 scheduledEmailsApi.preview(
-  eventSlug: string, 
-  id: number, 
+  eventSlug: string,
+  id: number,
   data: { category?: string }  // Pass category here
 )
 ```
+
 **Endpoint:** POST `/v1/presents/events/{eventSlug}/scheduled_emails/{id}/preview`
 **Returns:** `{ subject: string, body: string, recipient_email: string, recipient_name: string }`
 
@@ -213,6 +225,7 @@ scheduledEmailsApi.preview(
 **File:** `/src/components/shared/EventEmailPreviewModal.tsx`
 
 **Key lines:**
+
 - Lines 55-57: Props with category support
 - Lines 69-74: Default categories
 - Lines 114-116: Category selection state
@@ -220,6 +233,7 @@ scheduledEmailsApi.preview(
 - Lines 187-190: Category change handler
 
 **Features:**
+
 - Detects category-specific variables
 - Shows category dropdown
 - Passes `{ category: selectedCategory }` to backend
@@ -230,12 +244,14 @@ scheduledEmailsApi.preview(
 **File:** `/src/components/producer/CreateApplicationForm.tsx`
 
 **Key lines:**
+
 - Lines 17-32: Interface with category fields
 - Lines 41-50: Form data state initialization
 - Lines 54-58: Application tags parsing
 - Lines 94-103: Data preparation for API
 
 **Features:**
+
 - Edit form for vendor applications
 - Handles all category-specific fields
 - Supports tags array
@@ -246,6 +262,7 @@ scheduledEmailsApi.preview(
 **File:** `/src/components/producer/CreateEventWizard/steps/Step2ApplicationDetails.tsx`
 
 **Key sections:**
+
 - Lines 188-212: Default application templates with install times
 - Lines 435-490: Form fields for category details
 - Handles: name, description, booth_price, install times, payment_link, tags
@@ -255,11 +272,13 @@ scheduledEmailsApi.preview(
 **File:** `/src/pages/VendorEventPortalPage.tsx`
 
 **Key lines:**
+
 - Lines 162-213: Mock data with multiple categories
 - Lines 340: Destructuring vendor_categories
 - Lines 491-510: Rendering category cards with details
 
 **Shows:**
+
 - Category name and description
 - Booth price
 - Install date and times
@@ -271,6 +290,7 @@ scheduledEmailsApi.preview(
 **File:** `/src/pages/InvitationViewPage.tsx`
 
 **Key lines:**
+
 - Lines 283-287: Display install_date from category
 - Shows category information when viewing invitation
 
@@ -286,17 +306,17 @@ scheduledEmailsApi.preview(
 vendor_categories: [
   {
     id: 1,
-    name: "Artist Booth",
-    description: "For visual artists and craftspeople",
-    categories: ["artist", "visual_artist"],
+    name: 'Artist Booth',
+    description: 'For visual artists and craftspeople',
+    categories: ['artist', 'visual_artist'],
     booth_price: 150,
-    payment_link: "https://pay.stripe.com/artist",
+    payment_link: 'https://pay.stripe.com/artist',
     install: {
       install_date: '2026-06-14',
       install_start_time: '08:00',
       install_end_time: '10:00',
     },
-    application_tags: ["outdoor", "equipment_provided"],
+    application_tags: ['outdoor', 'equipment_provided'],
   },
   // ... more categories
 ]
@@ -381,4 +401,3 @@ All code locations as absolute paths:
 - `/Users/beaulazear/Desktop/voxxy-presents-client/src/pages/VendorEventPortalPage.tsx`
 - `/Users/beaulazear/Desktop/voxxy-presents-client/src/pages/VendorApplicationForm.tsx`
 - `/Users/beaulazear/Desktop/voxxy-presents-client/src/pages/InvitationViewPage.tsx`
-

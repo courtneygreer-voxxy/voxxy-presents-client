@@ -4,7 +4,7 @@ import path from 'path'
 
 const source = readFileSync(
   path.resolve(__dirname, '../../components/producer/ApplicantsTab.tsx'),
-  'utf-8'
+  'utf-8',
 )
 
 describe('ApplicantsTab — source-level checks', () => {
@@ -35,10 +35,7 @@ describe('ApplicantsTab — source-level checks', () => {
   })
 
   it('sidebar tab label is "Applicants" not "Vendors"', () => {
-    const dashSource = readFileSync(
-      path.resolve(__dirname, '../../pages/Dashboard.tsx'),
-      'utf-8'
-    )
+    const dashSource = readFileSync(path.resolve(__dirname, '../../pages/Dashboard.tsx'), 'utf-8')
     expect(dashSource).toContain("label: 'Applicants'")
     expect(dashSource).not.toContain("label: 'Vendors'")
   })
@@ -64,7 +61,7 @@ describe('ApplicantsTab — category change modal', () => {
     // The new flow sends email directly in handleUpdateCategory.
     const categoryUpdateFn = source.slice(
       source.indexOf('const handleUpdateCategory'),
-      source.indexOf('const handleUpdateStatus')
+      source.indexOf('const handleUpdateStatus'),
     )
     expect(categoryUpdateFn).not.toContain('handleEmailNotification')
     expect(categoryUpdateFn).toContain('sendCategoryChangeNotification')

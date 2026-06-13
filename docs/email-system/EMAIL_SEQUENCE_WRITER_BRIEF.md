@@ -25,20 +25,22 @@ These emails are automatically generated when a producer creates an event. They 
 
 ### Email 1: Initial Invitation
 
-| Field | Value |
-|-------|-------|
-| **Position** | 1 of 9 |
-| **Category** | Event Announcements |
-| **Fires When** | Immediately when the producer "Goes Live" (opens applications) |
-| **Sent To** | All invited vendor contacts |
-| **Trigger Type** | `on_application_open` |
+| Field            | Value                                                          |
+| ---------------- | -------------------------------------------------------------- |
+| **Position**     | 1 of 9                                                         |
+| **Category**     | Event Announcements                                            |
+| **Fires When**   | Immediately when the producer "Goes Live" (opens applications) |
+| **Sent To**      | All invited vendor contacts                                    |
+| **Trigger Type** | `on_application_open`                                          |
 
 **Subject:**
+
 ```
 Submissions Open for [eventName]
 ```
 
 **Body:**
+
 ```
 Hi [firstName],
 
@@ -63,26 +65,29 @@ Powered by Voxxy Presents
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### Email 2: Application Received
 
-| Field | Value |
-|-------|-------|
-| **Position** | 2 of 9 |
-| **Category** | Application Updates |
-| **Fires When** | Immediately when a vendor submits an application |
-| **Sent To** | The vendor who just applied |
-| **Trigger Type** | `on_application_submit` |
+| Field            | Value                                            |
+| ---------------- | ------------------------------------------------ |
+| **Position**     | 2 of 9                                           |
+| **Category**     | Application Updates                              |
+| **Fires When**   | Immediately when a vendor submits an application |
+| **Sent To**      | The vendor who just applied                      |
+| **Trigger Type** | `on_application_submit`                          |
 
 **Subject:**
+
 ```
 Application Received - [eventName]
 ```
 
 **Body:**
+
 ```
 Hi [firstName],
 
@@ -99,26 +104,29 @@ Powered by Voxxy Presents
 ```
 
 **Writer Notes:**
+
 > _The Instagram handle is hardcoded to Pancakes & Booze. This needs to be made dynamic or generic for other producers._
 
 ---
 
 ### Email 3: 1 Day Before Application Deadline
 
-| Field | Value |
-|-------|-------|
-| **Position** | 3 of 9 |
-| **Category** | Event Announcements |
-| **Fires When** | 1 day before the application deadline, at 9:00 AM |
-| **Sent To** | Invited contacts who have NOT yet applied (pending status) |
-| **Trigger Type** | `days_before_deadline` / Value: `1` |
+| Field            | Value                                                      |
+| ---------------- | ---------------------------------------------------------- |
+| **Position**     | 3 of 9                                                     |
+| **Category**     | Event Announcements                                        |
+| **Fires When**   | 1 day before the application deadline, at 9:00 AM          |
+| **Sent To**      | Invited contacts who have NOT yet applied (pending status) |
+| **Trigger Type** | `days_before_deadline` / Value: `1`                        |
 
 **Subject:**
+
 ```
 Last Chance: [eventName] Applications Close Tomorrow
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -143,26 +151,29 @@ Powered by Voxxy Presents
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### Email 4: Application Deadline Day
 
-| Field | Value |
-|-------|-------|
-| **Position** | 4 of 9 |
-| **Category** | Event Announcements |
-| **Fires When** | Day of the application deadline, at 8:00 AM |
-| **Sent To** | Invited contacts who have NOT yet applied (pending status) |
-| **Trigger Type** | `days_before_deadline` / Value: `0` |
+| Field            | Value                                                      |
+| ---------------- | ---------------------------------------------------------- |
+| **Position**     | 4 of 9                                                     |
+| **Category**     | Event Announcements                                        |
+| **Fires When**   | Day of the application deadline, at 8:00 AM                |
+| **Sent To**      | Invited contacts who have NOT yet applied (pending status) |
+| **Trigger Type** | `days_before_deadline` / Value: `0`                        |
 
 **Subject:**
+
 ```
 URGENT: [eventName] Applications Close Today
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -187,26 +198,29 @@ Powered by Voxxy Presents
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### Email 5: 1 Day Before Payment Due
 
-| Field | Value |
-|-------|-------|
-| **Position** | 5 of 9 |
-| **Category** | Payment Reminders |
-| **Fires When** | 1 day before the payment deadline, at 10:00 AM |
-| **Sent To** | Approved vendors who have NOT paid (payment status: pending or overdue) |
-| **Trigger Type** | `days_before_payment_deadline` / Value: `1` |
+| Field            | Value                                                                   |
+| ---------------- | ----------------------------------------------------------------------- |
+| **Position**     | 5 of 9                                                                  |
+| **Category**     | Payment Reminders                                                       |
+| **Fires When**   | 1 day before the payment deadline, at 10:00 AM                          |
+| **Sent To**      | Approved vendors who have NOT paid (payment status: pending or overdue) |
+| **Trigger Type** | `days_before_payment_deadline` / Value: `1`                             |
 
 **Subject:**
+
 ```
 Reminder: Payment Due Tomorrow - [eventName]
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -231,26 +245,29 @@ Powered by Voxxy Presents
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### Email 6: Payment Due Today
 
-| Field | Value |
-|-------|-------|
-| **Position** | 6 of 9 |
-| **Category** | Payment Reminders |
-| **Fires When** | Day of the payment deadline, at 8:00 AM |
-| **Sent To** | Approved vendors who have NOT paid (payment status: pending or overdue) |
-| **Trigger Type** | `on_payment_deadline` / Value: `0` |
+| Field            | Value                                                                   |
+| ---------------- | ----------------------------------------------------------------------- |
+| **Position**     | 6 of 9                                                                  |
+| **Category**     | Payment Reminders                                                       |
+| **Fires When**   | Day of the payment deadline, at 8:00 AM                                 |
+| **Sent To**      | Approved vendors who have NOT paid (payment status: pending or overdue) |
+| **Trigger Type** | `on_payment_deadline` / Value: `0`                                      |
 
 **Subject:**
+
 ```
 URGENT: Payment Due Today - [eventName]
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -277,26 +294,29 @@ Powered by Voxxy Presents
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### Email 7: 1 Day Before Event
 
-| Field | Value |
-|-------|-------|
-| **Position** | 7 of 9 |
-| **Category** | Event Countdown |
-| **Fires When** | 1 day before the event date, at 5:00 PM |
-| **Sent To** | Approved and confirmed vendors only |
-| **Trigger Type** | `days_before_event` / Value: `1` |
+| Field            | Value                                   |
+| ---------------- | --------------------------------------- |
+| **Position**     | 7 of 9                                  |
+| **Category**     | Event Countdown                         |
+| **Fires When**   | 1 day before the event date, at 5:00 PM |
+| **Sent To**      | Approved and confirmed vendors only     |
+| **Trigger Type** | `days_before_event` / Value: `1`        |
 
 **Subject:**
+
 ```
 Tomorrow: [eventName] Final Details
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -328,26 +348,29 @@ Powered by Voxxy Presents
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### Email 8: Day of Event
 
-| Field | Value |
-|-------|-------|
-| **Position** | 8 of 9 |
-| **Category** | Event Countdown |
-| **Fires When** | Morning of the event, at 7:00 AM |
-| **Sent To** | Approved and confirmed vendors only |
-| **Trigger Type** | `on_event_date` / Value: `0` |
+| Field            | Value                               |
+| ---------------- | ----------------------------------- |
+| **Position**     | 8 of 9                              |
+| **Category**     | Event Countdown                     |
+| **Fires When**   | Morning of the event, at 7:00 AM    |
+| **Sent To**      | Approved and confirmed vendors only |
+| **Trigger Type** | `on_event_date` / Value: `0`        |
 
 **Subject:**
+
 ```
 Today: [eventName]
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -379,26 +402,29 @@ Powered by Voxxy Presents
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### Email 9: Day After Event - Thank You
 
-| Field | Value |
-|-------|-------|
-| **Position** | 9 of 9 |
-| **Category** | Event Countdown |
-| **Fires When** | 1 day after the event, at 10:00 AM |
-| **Sent To** | Approved and confirmed vendors only |
-| **Trigger Type** | `days_after_event` / Value: `1` |
+| Field            | Value                               |
+| ---------------- | ----------------------------------- |
+| **Position**     | 9 of 9                              |
+| **Category**     | Event Countdown                     |
+| **Fires When**   | 1 day after the event, at 10:00 AM  |
+| **Sent To**      | Approved and confirmed vendors only |
+| **Trigger Type** | `days_after_event` / Value: `1`     |
 
 **Subject:**
+
 ```
 Thank You for Participating in [eventName]
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -420,6 +446,7 @@ Powered by Voxxy Presents
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
@@ -432,14 +459,15 @@ These emails fire automatically from system events (a vendor applies, gets appro
 
 ### System Email A: Application Received Confirmation
 
-| Field | Value |
-|-------|-------|
-| **Fires When** | Immediately when a vendor submits an application |
-| **Sent To** | The vendor who applied |
-| **Current Status** | Hardcoded in `RegistrationEmailService` |
-| **Note** | This overlaps with Sequence Email #2. Decide which one to keep or merge. |
+| Field              | Value                                                                    |
+| ------------------ | ------------------------------------------------------------------------ |
+| **Fires When**     | Immediately when a vendor submits an application                         |
+| **Sent To**        | The vendor who applied                                                   |
+| **Current Status** | Hardcoded in `RegistrationEmailService`                                  |
+| **Note**           | This overlaps with Sequence Email #2. Decide which one to keep or merge. |
 
 **Subject:**
+
 ```
 Application Received - [eventName]
 ```
@@ -447,6 +475,7 @@ Application Received - [eventName]
 **Body (varies by vendor category):**
 
 For Artist/Gallery categories:
+
 ```
 Hi [firstName],
 
@@ -461,6 +490,7 @@ Questions? Reply to this email.
 ```
 
 For Table Vendor categories:
+
 ```
 Hi [firstName],
 
@@ -475,19 +505,21 @@ Questions? Reply to this email.
 ```
 
 **Writer Notes:**
+
 > _DUPLICATE ALERT: This fires at the same time as Sequence Email #2 (Application Received). Need to decide: keep one, merge them, or differentiate them._
 
 ---
 
 ### System Email B: Application Approved
 
-| Field | Value |
-|-------|-------|
-| **Fires When** | Immediately when a producer approves a vendor's application |
-| **Sent To** | The approved vendor |
-| **Current Status** | Hardcoded in `RegistrationEmailService` |
+| Field              | Value                                                       |
+| ------------------ | ----------------------------------------------------------- |
+| **Fires When**     | Immediately when a producer approves a vendor's application |
+| **Sent To**        | The approved vendor                                         |
+| **Current Status** | Hardcoded in `RegistrationEmailService`                     |
 
 **Subject:**
+
 ```
 You're in - [eventName]
 ```
@@ -495,6 +527,7 @@ You're in - [eventName]
 **Body (varies by vendor category):**
 
 For Artist/Gallery categories:
+
 ```
 Hi [firstName],
 
@@ -517,29 +550,33 @@ Questions? Reply to this email.
 ```
 
 For Table Vendor categories:
+
 ```
 [Similar structure with table-vendor-specific content]
 ```
 
 **Writer Notes:**
+
 > _This is a critical email - it's the acceptance notification. Needs to be clear, exciting, and include all logistics._
 
 ---
 
 ### System Email C: Application Rejected
 
-| Field | Value |
-|-------|-------|
-| **Fires When** | Immediately when a producer rejects a vendor's application |
-| **Sent To** | The rejected vendor |
-| **Current Status** | Hardcoded in `RegistrationEmailService` |
+| Field              | Value                                                      |
+| ------------------ | ---------------------------------------------------------- |
+| **Fires When**     | Immediately when a producer rejects a vendor's application |
+| **Sent To**        | The rejected vendor                                        |
+| **Current Status** | Hardcoded in `RegistrationEmailService`                    |
 
 **Subject:**
+
 ```
 Update on your application - [eventName]
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -555,24 +592,27 @@ Questions? Reply to this email.
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### System Email D: Waitlisted
 
-| Field | Value |
-|-------|-------|
-| **Fires When** | Immediately when a producer moves a vendor to the waitlist |
-| **Sent To** | The waitlisted vendor |
-| **Current Status** | Hardcoded in `RegistrationEmailService` |
+| Field              | Value                                                      |
+| ------------------ | ---------------------------------------------------------- |
+| **Fires When**     | Immediately when a producer moves a vendor to the waitlist |
+| **Sent To**        | The waitlisted vendor                                      |
+| **Current Status** | Hardcoded in `RegistrationEmailService`                    |
 
 **Subject:**
+
 ```
 Waitlist - [eventName]
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -591,24 +631,27 @@ Questions? Reply to this email.
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### System Email E: Payment Confirmed
 
-| Field | Value |
-|-------|-------|
-| **Fires When** | When a vendor's payment is marked as confirmed/received |
-| **Sent To** | The vendor who paid |
-| **Current Status** | Hardcoded in `RegistrationEmailService` |
+| Field              | Value                                                   |
+| ------------------ | ------------------------------------------------------- |
+| **Fires When**     | When a vendor's payment is marked as confirmed/received |
+| **Sent To**        | The vendor who paid                                     |
+| **Current Status** | Hardcoded in `RegistrationEmailService`                 |
 
 **Subject:**
+
 ```
 Payment confirmed - [eventName]
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -632,25 +675,28 @@ Questions? Reply to this email.
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### System Email F: Category Changed
 
-| Field | Value |
-|-------|-------|
-| **Fires When** | When a producer changes a vendor's assigned category |
-| **Sent To** | The vendor whose category changed |
-| **Current Status** | Hardcoded in `RegistrationEmailService` |
-| **Note** | Only sent when producer explicitly triggers it (not automatic) |
+| Field              | Value                                                          |
+| ------------------ | -------------------------------------------------------------- |
+| **Fires When**     | When a producer changes a vendor's assigned category           |
+| **Sent To**        | The vendor whose category changed                              |
+| **Current Status** | Hardcoded in `RegistrationEmailService`                        |
+| **Note**           | Only sent when producer explicitly triggers it (not automatic) |
 
 **Subject:**
+
 ```
 Category Updated - [eventName]
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -668,24 +714,27 @@ Questions? Reply to this email.
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### System Email G: Event Details Changed
 
-| Field | Value |
-|-------|-------|
-| **Fires When** | When a producer changes the event date, venue, location, or time |
-| **Sent To** | All vendors with approved or confirmed status |
-| **Current Status** | Hardcoded in `RegistrationEmailService` |
+| Field              | Value                                                            |
+| ------------------ | ---------------------------------------------------------------- |
+| **Fires When**     | When a producer changes the event date, venue, location, or time |
+| **Sent To**        | All vendors with approved or confirmed status                    |
+| **Current Status** | Hardcoded in `RegistrationEmailService`                          |
 
 **Subject:**
+
 ```
 Event Update - [eventName]
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -706,24 +755,27 @@ Questions? Reply to this email.
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### System Email H: Event Cancelled
 
-| Field | Value |
-|-------|-------|
-| **Fires When** | When a producer cancels the event |
-| **Sent To** | ALL vendors (approved, confirmed, waitlisted, and pending) |
-| **Current Status** | Hardcoded in `RegistrationEmailService` |
+| Field              | Value                                                      |
+| ------------------ | ---------------------------------------------------------- |
+| **Fires When**     | When a producer cancels the event                          |
+| **Sent To**        | ALL vendors (approved, confirmed, waitlisted, and pending) |
+| **Current Status** | Hardcoded in `RegistrationEmailService`                    |
 
 **Subject:**
+
 ```
 Event Canceled - [eventName]
 ```
 
 **Body:**
+
 ```
 Hi [greetingName],
 
@@ -741,25 +793,28 @@ Questions? Contact us at [organizationEmail].
 ```
 
 **Writer Notes:**
+
 > _Add your notes/feedback here_
 
 ---
 
 ### System Email I: Owner Notification (New Application)
 
-| Field | Value |
-|-------|-------|
-| **Fires When** | When a vendor submits an application |
-| **Sent To** | The producer/event owner (NOT the vendor) |
-| **Current Status** | Hardcoded in `RegistrationEmailService` |
-| **Note** | Currently DISABLED in code (commented out). May want to re-enable. |
+| Field              | Value                                                              |
+| ------------------ | ------------------------------------------------------------------ |
+| **Fires When**     | When a vendor submits an application                               |
+| **Sent To**        | The producer/event owner (NOT the vendor)                          |
+| **Current Status** | Hardcoded in `RegistrationEmailService`                            |
+| **Note**           | Currently DISABLED in code (commented out). May want to re-enable. |
 
 **Subject:**
+
 ```
 New Vendor Application for [eventName]
 ```
 
 **Body:**
+
 ```
 New application from [vendorName] ([vendorEmail]) for [eventName].
 
@@ -770,6 +825,7 @@ Review applications in your dashboard.
 ```
 
 **Writer Notes:**
+
 > _This is currently disabled. Should we re-enable it? Producers may want to know immediately when someone applies._
 
 ---
@@ -779,46 +835,50 @@ Review applications in your dashboard.
 Writers: use these exactly as shown (including the brackets). They get replaced with real data when the email is sent.
 
 ### Event Info
-| Variable | What It Becomes | Example |
-|----------|----------------|---------|
-| `[eventName]` | Event title | Spring Art Market 2026 |
-| `[eventDate]` | Event date | Saturday, April 15, 2026 |
-| `[eventTime]` | Event time | 10:00 AM - 6:00 PM |
-| `[eventVenue]` | Venue name | The Warehouse Gallery |
-| `[eventLocation]` | Full address | 123 Main St, Los Angeles, CA |
-| `[applicationDeadline]` | App deadline date | March 30, 2026 |
-| `[paymentDueDate]` | Payment due date | April 1, 2026 |
-| `[categoryList]` | Bulleted list of all vendor categories | - Fine Art ($150)\n- Table Vendor ($100) |
+
+| Variable                | What It Becomes                        | Example                                  |
+| ----------------------- | -------------------------------------- | ---------------------------------------- |
+| `[eventName]`           | Event title                            | Spring Art Market 2026                   |
+| `[eventDate]`           | Event date                             | Saturday, April 15, 2026                 |
+| `[eventTime]`           | Event time                             | 10:00 AM - 6:00 PM                       |
+| `[eventVenue]`          | Venue name                             | The Warehouse Gallery                    |
+| `[eventLocation]`       | Full address                           | 123 Main St, Los Angeles, CA             |
+| `[applicationDeadline]` | App deadline date                      | March 30, 2026                           |
+| `[paymentDueDate]`      | Payment due date                       | April 1, 2026                            |
+| `[categoryList]`        | Bulleted list of all vendor categories | - Fine Art ($150)\n- Table Vendor ($100) |
 
 ### Organization Info
-| Variable | What It Becomes | Example |
-|----------|----------------|---------|
-| `[organizationName]` | Producer's org name | Pancakes & Booze Art Show |
+
+| Variable              | What It Becomes          | Example                    |
+| --------------------- | ------------------------ | -------------------------- |
+| `[organizationName]`  | Producer's org name      | Pancakes & Booze Art Show  |
 | `[organizationEmail]` | Producer's contact email | hello@pancakesandbooze.com |
 
 ### Vendor Info
-| Variable | What It Becomes | Example |
-|----------|----------------|---------|
-| `[firstName]` | Vendor's first name | Sarah |
-| `[lastName]` | Vendor's last name | Mitchell |
-| `[fullName]` | Vendor's full name | Sarah Mitchell |
-| `[greetingName]` | Business name (or first name if none) | Sarah's Ceramics |
-| `[businessName]` | Vendor's business name | Sarah's Ceramics |
-| `[email]` | Vendor's email | sarah@ceramics.com |
-| `[vendorCategory]` | Their assigned category | Fine Art |
-| `[boothNumber]` | Assigned booth number | A-12 |
-| `[boothPrice]` | Category price | $150.00 |
-| `[applicationDate]` | When they applied | March 1, 2026 |
-| `[installDate]` | Setup date | April 14, 2026 |
-| `[installTime]` | Setup time window | 2:00 PM - 5:00 PM |
+
+| Variable            | What It Becomes                       | Example            |
+| ------------------- | ------------------------------------- | ------------------ |
+| `[firstName]`       | Vendor's first name                   | Sarah              |
+| `[lastName]`        | Vendor's last name                    | Mitchell           |
+| `[fullName]`        | Vendor's full name                    | Sarah Mitchell     |
+| `[greetingName]`    | Business name (or first name if none) | Sarah's Ceramics   |
+| `[businessName]`    | Vendor's business name                | Sarah's Ceramics   |
+| `[email]`           | Vendor's email                        | sarah@ceramics.com |
+| `[vendorCategory]`  | Their assigned category               | Fine Art           |
+| `[boothNumber]`     | Assigned booth number                 | A-12               |
+| `[boothPrice]`      | Category price                        | $150.00            |
+| `[applicationDate]` | When they applied                     | March 1, 2026      |
+| `[installDate]`     | Setup date                            | April 14, 2026     |
+| `[installTime]`     | Setup time window                     | 2:00 PM - 5:00 PM  |
 
 ### Links (Auto-Generated)
-| Variable | What It Becomes |
-|----------|----------------|
-| `[eventLink]` | Public event page URL |
-| `[dashboardLink]` | Vendor's event portal URL |
-| `[invitationLink]` | Invitation/application URL |
-| `[unsubscribeLink]` | Email unsubscribe URL |
+
+| Variable                    | What It Becomes                              |
+| --------------------------- | -------------------------------------------- |
+| `[eventLink]`               | Public event page URL                        |
+| `[dashboardLink]`           | Vendor's event portal URL                    |
+| `[invitationLink]`          | Invitation/application URL                   |
+| `[unsubscribeLink]`         | Email unsubscribe URL                        |
 | `[categoryApplicationLink]` | Direct link to apply for a specific category |
 
 ---
@@ -843,4 +903,4 @@ Writers: use these exactly as shown (including the brackets). They get replaced 
 
 ---
 
-*Hand this file back to engineering when edits are complete. Engineering will update the seed data and RegistrationEmailService accordingly.*
+_Hand this file back to engineering when edits are complete. Engineering will update the seed data and RegistrationEmailService accordingly._

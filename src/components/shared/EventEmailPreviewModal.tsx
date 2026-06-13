@@ -10,61 +10,56 @@
  * - Event Creation Wizard → Email preview step
  */
 
-import { useEffect, useState } from 'react';
-import { X, Mail, Calendar, Users, Loader2, Send, AlertTriangle } from 'lucide-react';
-import { format } from 'date-fns';
-import { scheduledEmailsApi, eventInvitationsApi } from '@/services/api';
-import type { ScheduledEmail } from '@/types/email';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { useEffect, useState } from 'react'
+import { X, Mail, Calendar, Users, Loader2, Send, AlertTriangle } from 'lucide-react'
+import { format } from 'date-fns'
+import { scheduledEmailsApi, eventInvitationsApi } from '@/services/api'
+import type { ScheduledEmail } from '@/types/email'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Badge, type BadgeVariant } from '@/components/ui/badge';
-import EmailFooterCard from '@/components/shared/EmailFooterCard';
+} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { Badge, type BadgeVariant } from '@/components/ui/badge'
+import EmailFooterCard from '@/components/shared/EmailFooterCard'
 
 // Flexible email type that works with both ScheduledEmail and EmailTemplateItem
 type EmailPreviewData = {
-  id: number;
-  name: string;
-  subject_template?: string;
-  body_template?: string;
-  scheduled_for?: string;
-  recipient_count?: number;
-  status?: 'sent' | 'scheduled' | 'pending' | 'sending';
-  overdue?: boolean;
-  overdue_message?: string;
-  trigger_type?: string;
-  trigger_value?: number | null;
-};
+  id: number
+  name: string
+  subject_template?: string
+  body_template?: string
+  scheduled_for?: string
+  recipient_count?: number
+  status?: 'sent' | 'scheduled' | 'pending' | 'sending'
+  overdue?: boolean
+  overdue_message?: string
+  trigger_type?: string
+  trigger_value?: number | null
+}
 
 interface EventEmailPreviewModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  email: (ScheduledEmail | EmailPreviewData) | null;
-  eventSlug: string;
+  isOpen: boolean
+  onClose: () => void
+  email: (ScheduledEmail | EmailPreviewData) | null
+  eventSlug: string
 
   // Category support for emails with category-specific variables
-  hasCategorySpecificContent?: boolean;
-  availableCategories?: Array<{ value: string; label: string }>;
+  hasCategorySpecificContent?: boolean
+  availableCategories?: Array<{ value: string; label: string }>
 
-  onSendTest?: (category?: string) => void;
+  onSendTest?: (category?: string) => void
 }
 
 interface PreviewData {
-  subject: string;
-  body: string;
-  recipient_email: string;
-  recipient_name: string;
+  subject: string
+  body: string
+  recipient_email: string
+  recipient_name: string
 }
 
 const DEFAULT_CATEGORIES = [
@@ -72,37 +67,37 @@ const DEFAULT_CATEGORIES = [
   { value: 'food_vendor', label: 'Food Vendor' },
   { value: 'table_vendor', label: 'Table Vendor' },
   { value: 'sponsor', label: 'Sponsor' },
-];
+]
 
 // Format trigger type for display
 const formatTrigger = (triggerType?: string, triggerValue?: number | null): string => {
-  if (!triggerType) return '';
+  if (!triggerType) return ''
 
   switch (triggerType) {
     case 'days_before_event':
-      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before event`;
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before event`
     case 'days_after_event':
-      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after event`;
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after event`
     case 'days_before_deadline':
-      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before payment deadline`;
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before payment deadline`
     case 'days_after_payment_deadline':
-      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after payment deadline`;
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after payment deadline`
     case 'on_application_open':
-      return 'When applications open';
+      return 'When applications open'
     case 'on_application_submit':
-      return 'On application submission';
+      return 'On application submission'
     case 'on_approval':
-      return 'On application approval';
+      return 'On application approval'
     case 'on_payment_deadline':
-      return 'On payment deadline';
+      return 'On payment deadline'
     case 'on_event_date':
-      return 'On event day';
+      return 'On event day'
     case 'on_bulletin_post':
-      return 'On bulletin post';
+      return 'On bulletin post'
     default:
-      return triggerType.replace(/_/g, ' ');
+      return triggerType.replace(/_/g, ' ')
   }
-};
+}
 
 export default function EventEmailPreviewModal({
   isOpen,
@@ -113,17 +108,17 @@ export default function EventEmailPreviewModal({
   availableCategories = DEFAULT_CATEGORIES,
   onSendTest,
 }: EventEmailPreviewModalProps) {
-  const [previewData, setPreviewData] = useState<PreviewData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [previewData, setPreviewData] = useState<PreviewData | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>(
-    availableCategories[0]?.value || 'artist'
-  );
+    availableCategories[0]?.value || 'artist',
+  )
 
   // Remove footer text from body since we have hard-coded footer card
   // Works with both HTML and plain text
   const removeFooter = (html: string): string => {
-    if (!html) return '';
+    if (!html) return ''
 
     // Remove common footer patterns (handles both HTML and text)
     const footerPatterns = [
@@ -141,80 +136,74 @@ export default function EventEmailPreviewModal({
       /If you have any questions,?\s*please contact us at\s*\[?organizationEmail\]?\.?/gi,
       /Please do not reply to this email\.?/gi,
       /Powered by Voxxy\.?/gi,
-    ];
+    ]
 
-    let cleanedHtml = html;
-    footerPatterns.forEach(pattern => {
-      cleanedHtml = cleanedHtml.replace(pattern, '');
-    });
+    let cleanedHtml = html
+    footerPatterns.forEach((pattern) => {
+      cleanedHtml = cleanedHtml.replace(pattern, '')
+    })
 
     // Remove trailing empty paragraphs
-    cleanedHtml = cleanedHtml.replace(/(<p[^>]*>\s*<\/p>\s*)+$/gi, '');
+    cleanedHtml = cleanedHtml.replace(/(<p[^>]*>\s*<\/p>\s*)+$/gi, '')
 
-    return cleanedHtml.trim();
-  };
+    return cleanedHtml.trim()
+  }
 
   useEffect(() => {
     if (isOpen && email) {
-      loadPreview();
+      loadPreview()
     } else {
-      setPreviewData(null);
-      setError(null);
+      setPreviewData(null)
+      setError(null)
     }
-  }, [isOpen, email, selectedCategory]);
+  }, [isOpen, email, selectedCategory])
 
   const loadPreview = async () => {
-    if (!email) return;
+    if (!email) return
 
-    setIsLoading(true);
-    setError(null);
+    setIsLoading(true)
+    setError(null)
     try {
       // All emails (including Position 1 Initial Invitation) use the standard preview endpoint
-      const context = hasCategorySpecificContent
-        ? { category: selectedCategory }
-        : {};
+      const context = hasCategorySpecificContent ? { category: selectedCategory } : {}
 
-      const data = await scheduledEmailsApi.preview(
-        eventSlug,
-        email.id,
-        context as any
-      );
-      setPreviewData(data);
+      const data = await scheduledEmailsApi.preview(eventSlug, email.id, context as any)
+      setPreviewData(data)
     } catch (err: any) {
-      const errorMessage = err.message || 'Failed to load email preview';
-      console.error('Preview error:', errorMessage);
-      setError(errorMessage);
+      const errorMessage = err.message || 'Failed to load email preview'
+      console.error('Preview error:', errorMessage)
+      setError(errorMessage)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
+    setSelectedCategory(category)
     // loadPreview will be triggered by useEffect
-  };
+  }
 
   const handleSendTest = () => {
     if (onSendTest) {
-      onSendTest(hasCategorySpecificContent ? selectedCategory : undefined);
+      onSendTest(hasCategorySpecificContent ? selectedCategory : undefined)
     }
-  };
+  }
 
-  if (!email) return null;
+  if (!email) return null
 
   const statusVariant: Record<string, BadgeVariant> = {
     sent: 'tintGreen',
     scheduled: 'tintBlue',
     pending: 'tintYellow',
     sending: 'tintPurple',
-  };
+  }
 
   const statusLabel = {
     sent: 'Sent',
     scheduled: 'Scheduled',
     pending: 'Pending',
     sending: 'Sending',
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -315,7 +304,7 @@ export default function EventEmailPreviewModal({
                   <div
                     className="email-preview-content voxxy-rich-text-base"
                     dangerouslySetInnerHTML={{
-                      __html: removeFooter(previewData.body)
+                      __html: removeFooter(previewData.body),
                     }}
                   />
                 </div>
@@ -356,14 +345,11 @@ export default function EventEmailPreviewModal({
               Test Email
             </Button>
           )}
-          <Button
-            onClick={onClose}
-            className="voxxy-btn-solid"
-          >
+          <Button onClick={onClose} className="voxxy-btn-solid">
             Close
           </Button>
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

@@ -2,17 +2,18 @@
 
 ## VendorContact Fields (Email Invitations)
 
-| Database Field | Type | Example | Usage |
-|---|---|---|---|
-| `name` | string | "John Doe" | Full name (stored as single field) |
-| `business_name` | string | "John's Tacos" | Business/company name |
-| `email` | string | "john@example.com" | Email address |
-| `phone` | string | "(555) 123-4567" | Phone number |
-| `website` | string | "https://johnstacos.com" | Website URL |
-| `job_title` | string | "Owner" | Job title |
-| `location` | string | "Atlanta, GA" | Location/city |
+| Database Field  | Type   | Example                  | Usage                              |
+| --------------- | ------ | ------------------------ | ---------------------------------- |
+| `name`          | string | "John Doe"               | Full name (stored as single field) |
+| `business_name` | string | "John's Tacos"           | Business/company name              |
+| `email`         | string | "john@example.com"       | Email address                      |
+| `phone`         | string | "(555) 123-4567"         | Phone number                       |
+| `website`       | string | "https://johnstacos.com" | Website URL                        |
+| `job_title`     | string | "Owner"                  | Job title                          |
+| `location`      | string | "Atlanta, GA"            | Location/city                      |
 
 **Serialized as:**
+
 - `contact_name` (from `name`)
 - `business_name`
 - `email`, `phone`, `website`, `job_title`, `location`
@@ -21,14 +22,14 @@
 
 ## Registration Fields (Post-Application Emails)
 
-| Database Field | Type | Example | Usage |
-|---|---|---|---|
-| `name` | string | "John Doe" | Full name (stored as single field) |
-| `business_name` | string | "John's Tacos" | Business/company name |
-| `email` | string | "john@example.com" | Email address |
-| `phone` | string | "(555) 123-4567" | Phone number |
-| `website` | string | "https://johnstacos.com" | Website URL |
-| `vendor_category` | string | "Food" | Vendor category |
+| Database Field    | Type   | Example                  | Usage                              |
+| ----------------- | ------ | ------------------------ | ---------------------------------- |
+| `name`            | string | "John Doe"               | Full name (stored as single field) |
+| `business_name`   | string | "John's Tacos"           | Business/company name              |
+| `email`           | string | "john@example.com"       | Email address                      |
+| `phone`           | string | "(555) 123-4567"         | Phone number                       |
+| `website`         | string | "https://johnstacos.com" | Website URL                        |
+| `vendor_category` | string | "Food"                   | Vendor category                    |
 
 ---
 
@@ -102,6 +103,7 @@
 **File:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/utils/emailVariables.ts`
 
 All 50+ email variables are defined here with:
+
 - Frontend format: `[bracketFormat]`
 - Backend format: `{{mustacheFormat}}` (legacy, converted to bracket)
 - Descriptions and examples
@@ -112,9 +114,11 @@ All 50+ email variables are defined here with:
 ## Serializers
 
 ### VendorContact Serializer
+
 **File:** `/Users/beaulazear/Desktop/voxxy-rails/app/serializers/api/v1/presents/vendor_contact_serializer.rb`
 
 Maps database fields → JSON:
+
 ```ruby
 contact_name: vendor_contact.name         # Maps name → contact_name
 business_name: vendor_contact.business_name
@@ -126,9 +130,11 @@ location: vendor_contact.location
 ```
 
 ### Registration Serializer
+
 **File:** `/Users/beaulazear/Desktop/voxxy-rails/app/serializers/api/v1/presents/registration_serializer.rb`
 
 Maps database fields → JSON:
+
 ```ruby
 name: registration.name                    # Full name directly
 business_name: registration.business_name

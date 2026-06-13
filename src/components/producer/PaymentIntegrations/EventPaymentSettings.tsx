@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import {
   DollarSign,
   Plus,
@@ -13,23 +13,23 @@ import {
   Edit2,
   X,
   Save,
-} from 'lucide-react';
+} from 'lucide-react'
 import {
   organizationIntegrationsApi,
   paymentIntegrationsApi,
   PaymentApiError,
-} from '@/services/paymentApi';
-import { cn } from '@/lib/utils';
+} from '@/services/paymentApi'
+import { cn } from '@/lib/utils'
 import type {
   PaymentIntegration,
   EventbriteEvent,
   CreatePaymentIntegrationRequest,
-} from '@/types/payment';
+} from '@/types/payment'
 
 interface EventPaymentSettingsProps {
-  eventSlug: string;
-  organizationId: number;
-  onIntegrationChange?: (integration: PaymentIntegration | null) => void;
+  eventSlug: string
+  organizationId: number
+  onIntegrationChange?: (integration: PaymentIntegration | null) => void
 }
 
 export default function EventPaymentSettings({
@@ -38,121 +38,122 @@ export default function EventPaymentSettings({
   onIntegrationChange,
 }: EventPaymentSettingsProps) {
   const panelClass =
-    'rounded-xl border border-border bg-card p-6 shadow-sm dark:bg-background/5 dark:shadow-none';
+    'rounded-xl border border-border bg-card p-6 shadow-sm dark:bg-background/5 dark:shadow-none'
   const subPanelClass =
-    'rounded-lg border border-border bg-muted/35 p-4 shadow-sm dark:bg-background/5 dark:shadow-none';
+    'rounded-lg border border-border bg-muted/35 p-4 shadow-sm dark:bg-background/5 dark:shadow-none'
   const inputClass =
-    'w-full rounded-lg border border-input bg-background px-4 py-2 text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30 dark:bg-background/5';
-  const fieldLabelClass = 'mb-2 block text-xs font-semibold uppercase tracking-wide text-foreground/75';
-  const helpTextClass = 'mt-2 text-sm leading-relaxed text-muted-foreground';
-  const sectionHeadingClass = 'text-lg font-semibold tracking-tight text-foreground';
-  const sectionBodyClass = 'text-sm leading-relaxed text-muted-foreground';
+    'w-full rounded-lg border border-input bg-background px-4 py-2 text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30 dark:bg-background/5'
+  const fieldLabelClass =
+    'mb-2 block text-xs font-semibold uppercase tracking-wide text-foreground/75'
+  const helpTextClass = 'mt-2 text-sm leading-relaxed text-muted-foreground'
+  const sectionHeadingClass = 'text-lg font-semibold tracking-tight text-foreground'
+  const sectionBodyClass = 'text-sm leading-relaxed text-muted-foreground'
   const toggleOptionClass = (selected: boolean) =>
     cn(
       'flex-1 rounded-xl border-2 p-4 text-left transition-all',
       selected
         ? 'border-violet-300 bg-violet-50 text-slate-950 dark:border-primary dark:bg-primary/20 dark:text-foreground'
-        : 'border-border bg-background/50 text-foreground/70 hover:bg-accent/50 hover:text-foreground dark:bg-transparent'
-    );
+        : 'border-border bg-background/50 text-foreground/70 hover:bg-accent/50 hover:text-foreground dark:bg-transparent',
+    )
   const accentIconClass =
-    'rounded-lg border border-violet-200 bg-violet-50 p-2 dark:border-transparent dark:bg-primary/20';
+    'rounded-lg border border-violet-200 bg-violet-50 p-2 dark:border-transparent dark:bg-primary/20'
   const secondaryIconButtonClass =
-    'rounded-lg border border-violet-200 bg-violet-50 p-2 text-violet-800 transition-colors hover:bg-violet-100 disabled:opacity-50 dark:border-transparent dark:bg-primary/20 dark:text-primary dark:hover:bg-primary/30';
+    'rounded-lg border border-violet-200 bg-violet-50 p-2 text-violet-800 transition-colors hover:bg-violet-100 disabled:opacity-50 dark:border-transparent dark:bg-primary/20 dark:text-primary dark:hover:bg-primary/30'
   const subtleLinkClass =
-    'text-xs text-violet-700 hover:text-violet-900 hover:underline dark:text-primary dark:hover:text-primary/70 transition-colors';
+    'text-xs text-violet-700 hover:text-violet-900 hover:underline dark:text-primary dark:hover:text-primary/70 transition-colors'
   const syncMetricClass =
-    'rounded-lg border border-violet-200/70 bg-white/85 px-3 py-3 shadow-sm dark:border-primary/20 dark:bg-background/10';
+    'rounded-lg border border-violet-200/70 bg-white/85 px-3 py-3 shadow-sm dark:border-primary/20 dark:bg-background/10'
 
-  const [integration, setIntegration] = useState<PaymentIntegration | null>(null);
-  const [eventbriteEvents, setEventbriteEvents] = useState<EventbriteEvent[]>([]);
-  const [isConnected, setIsConnected] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [integration, setIntegration] = useState<PaymentIntegration | null>(null)
+  const [eventbriteEvents, setEventbriteEvents] = useState<EventbriteEvent[]>([])
+  const [isConnected, setIsConnected] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   // Form state
-  const [inputMethod, setInputMethod] = useState<'url' | 'dropdown'>('url');
-  const [eventbriteUrl, setEventbriteUrl] = useState('');
-  const [selectedEventId, setSelectedEventId] = useState('');
-  const [autoSync, setAutoSync] = useState(true);
-  const [autoUpdate, setAutoUpdate] = useState(true);
+  const [inputMethod, setInputMethod] = useState<'url' | 'dropdown'>('url')
+  const [eventbriteUrl, setEventbriteUrl] = useState('')
+  const [selectedEventId, setSelectedEventId] = useState('')
+  const [autoSync, setAutoSync] = useState(true)
+  const [autoUpdate, setAutoUpdate] = useState(true)
 
   // Edit mode state
-  const [isEditingUrl, setIsEditingUrl] = useState(false);
-  const [editedUrl, setEditedUrl] = useState('');
+  const [isEditingUrl, setIsEditingUrl] = useState(false)
+  const [editedUrl, setEditedUrl] = useState('')
 
   useEffect(() => {
-    fetchIntegration();
-    checkEventbriteConnection();
-  }, [eventSlug, organizationId]);
+    fetchIntegration()
+    checkEventbriteConnection()
+  }, [eventSlug, organizationId])
 
   const checkEventbriteConnection = async () => {
     try {
-      const status = await organizationIntegrationsApi.getEventbriteStatus(organizationId);
-      setIsConnected(status.connected);
+      const status = await organizationIntegrationsApi.getEventbriteStatus(organizationId)
+      setIsConnected(status.connected)
 
       if (status.connected) {
-        fetchEventbriteEvents();
+        fetchEventbriteEvents()
       }
     } catch (err) {
-      console.error('Failed to check Eventbrite connection:', err);
+      console.error('Failed to check Eventbrite connection:', err)
     }
-  };
+  }
 
   const fetchEventbriteEvents = async () => {
     try {
-      const response = await organizationIntegrationsApi.getEventbriteEvents(organizationId);
-      setEventbriteEvents(response.events || []);
+      const response = await organizationIntegrationsApi.getEventbriteEvents(organizationId)
+      setEventbriteEvents(response.events || [])
     } catch (err) {
-      console.error('Failed to fetch Eventbrite events:', err);
+      console.error('Failed to fetch Eventbrite events:', err)
     }
-  };
+  }
 
   const fetchIntegration = async () => {
     try {
-      setIsLoading(true);
-      setError(null);
-      const integrations = await paymentIntegrationsApi.getByEvent(eventSlug);
-      const eventbriteIntegration = integrations.find((i) => i.provider === 'eventbrite');
-      setIntegration(eventbriteIntegration || null);
+      setIsLoading(true)
+      setError(null)
+      const integrations = await paymentIntegrationsApi.getByEvent(eventSlug)
+      const eventbriteIntegration = integrations.find((i) => i.provider === 'eventbrite')
+      setIntegration(eventbriteIntegration || null)
 
       if (eventbriteIntegration) {
-        setAutoSync(eventbriteIntegration.auto_sync_enabled);
-        setAutoUpdate(eventbriteIntegration.auto_update_payment_status);
+        setAutoSync(eventbriteIntegration.auto_sync_enabled)
+        setAutoUpdate(eventbriteIntegration.auto_update_payment_status)
       }
     } catch (err: any) {
-      console.error('Failed to fetch payment integration:', err);
-      setError('Failed to load payment integration');
+      console.error('Failed to fetch payment integration:', err)
+      setError('Failed to load payment integration')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleCreateIntegration = async () => {
     try {
-      setIsLoading(true);
-      setError(null);
-      setSuccess(null);
+      setIsLoading(true)
+      setError(null)
+      setSuccess(null)
 
-      let providerEventId: string | undefined;
-      let providerUrl: string | undefined;
+      let providerEventId: string | undefined
+      let providerUrl: string | undefined
 
       if (inputMethod === 'url') {
         if (!eventbriteUrl.trim()) {
-          setError('Please enter an Eventbrite event URL');
-          return;
+          setError('Please enter an Eventbrite event URL')
+          return
         }
-        providerUrl = eventbriteUrl.trim();
+        providerUrl = eventbriteUrl.trim()
       } else {
         if (!selectedEventId) {
-          setError('Please select an Eventbrite event');
-          return;
+          setError('Please select an Eventbrite event')
+          return
         }
-        providerEventId = selectedEventId;
-        const selectedEvent = eventbriteEvents.find((e) => e.id === selectedEventId);
+        providerEventId = selectedEventId
+        const selectedEvent = eventbriteEvents.find((e) => e.id === selectedEventId)
         if (selectedEvent) {
-          providerUrl = selectedEvent.url;
+          providerUrl = selectedEvent.url
         }
       }
 
@@ -163,135 +164,135 @@ export default function EventPaymentSettings({
         auto_sync_enabled: autoSync,
         auto_update_payment_status: autoUpdate,
         auto_send_confirmations: false,
-      };
+      }
 
-      const newIntegration = await paymentIntegrationsApi.create(eventSlug, data);
-      setIntegration(newIntegration);
-      setSuccess('Payment integration created successfully!');
-      setEventbriteUrl('');
-      setSelectedEventId('');
-      onIntegrationChange?.(newIntegration);
+      const newIntegration = await paymentIntegrationsApi.create(eventSlug, data)
+      setIntegration(newIntegration)
+      setSuccess('Payment integration created successfully!')
+      setEventbriteUrl('')
+      setSelectedEventId('')
+      onIntegrationChange?.(newIntegration)
     } catch (err: any) {
-      console.error('Failed to create integration:', err);
-      setError(err.message || 'Failed to create payment integration');
+      console.error('Failed to create integration:', err)
+      setError(err.message || 'Failed to create payment integration')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleToggleAutoSync = async () => {
-    if (!integration) return;
+    if (!integration) return
 
     try {
-      setIsLoading(true);
-      setError(null);
+      setIsLoading(true)
+      setError(null)
 
       const updated = await paymentIntegrationsApi.update(eventSlug, integration.id, {
         auto_sync_enabled: !integration.auto_sync_enabled,
-      });
+      })
 
-      setIntegration(updated);
-      setAutoSync(updated.auto_sync_enabled);
-      setSuccess(`Auto-sync ${updated.auto_sync_enabled ? 'enabled' : 'disabled'}`);
-      onIntegrationChange?.(updated);
+      setIntegration(updated)
+      setAutoSync(updated.auto_sync_enabled)
+      setSuccess(`Auto-sync ${updated.auto_sync_enabled ? 'enabled' : 'disabled'}`)
+      onIntegrationChange?.(updated)
     } catch (err: any) {
-      console.error('Failed to toggle auto-sync:', err);
-      setError(err.message || 'Failed to update settings');
+      console.error('Failed to toggle auto-sync:', err)
+      setError(err.message || 'Failed to update settings')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleStartEditUrl = () => {
-    setEditedUrl(integration?.provider_url || '');
-    setIsEditingUrl(true);
-    setError(null);
-    setSuccess(null);
-  };
+    setEditedUrl(integration?.provider_url || '')
+    setIsEditingUrl(true)
+    setError(null)
+    setSuccess(null)
+  }
 
   const handleCancelEditUrl = () => {
-    setIsEditingUrl(false);
-    setEditedUrl('');
-  };
+    setIsEditingUrl(false)
+    setEditedUrl('')
+  }
 
   const handleSaveUrl = async () => {
-    if (!integration) return;
+    if (!integration) return
 
     if (!editedUrl.trim()) {
-      setError('Please enter a valid Eventbrite URL');
-      return;
+      setError('Please enter a valid Eventbrite URL')
+      return
     }
 
     try {
-      setIsLoading(true);
-      setError(null);
-      setSuccess(null);
+      setIsLoading(true)
+      setError(null)
+      setSuccess(null)
 
       const updated = await paymentIntegrationsApi.update(eventSlug, integration.id, {
         provider_url: editedUrl.trim(),
-      });
+      })
 
-      setIntegration(updated);
-      setIsEditingUrl(false);
-      setEditedUrl('');
-      setSuccess('Ticket link updated successfully!');
-      onIntegrationChange?.(updated);
+      setIntegration(updated)
+      setIsEditingUrl(false)
+      setEditedUrl('')
+      setSuccess('Ticket link updated successfully!')
+      onIntegrationChange?.(updated)
     } catch (err: any) {
-      console.error('Failed to update ticket link:', err);
-      setError(err.message || 'Failed to update ticket link');
+      console.error('Failed to update ticket link:', err)
+      setError(err.message || 'Failed to update ticket link')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleManualSync = async () => {
-    if (!integration) return;
+    if (!integration) return
 
     try {
-      setIsSyncing(true);
-      setError(null);
-      setSuccess(null);
+      setIsSyncing(true)
+      setError(null)
+      setSuccess(null)
 
-      const response = await paymentIntegrationsApi.sync(eventSlug, integration.id);
+      const response = await paymentIntegrationsApi.sync(eventSlug, integration.id)
       setSuccess(
-        `Sync completed! Fetched ${response.sync_log.transactions_fetched} transactions, matched ${response.sync_log.contacts_matched} vendors`
-      );
+        `Sync completed! Fetched ${response.sync_log.transactions_fetched} transactions, matched ${response.sync_log.contacts_matched} vendors`,
+      )
 
-      await fetchIntegration();
+      await fetchIntegration()
     } catch (err: any) {
-      console.error('Failed to sync payments:', err);
-      setError(err.message || 'Failed to sync payments');
+      console.error('Failed to sync payments:', err)
+      setError(err.message || 'Failed to sync payments')
     } finally {
-      setIsSyncing(false);
+      setIsSyncing(false)
     }
-  };
+  }
 
   const handleDeleteIntegration = async () => {
-    if (!integration) return;
+    if (!integration) return
 
     if (
       !confirm(
-        'Are you sure you want to delete this payment integration? This will not delete existing payment records.'
+        'Are you sure you want to delete this payment integration? This will not delete existing payment records.',
       )
     ) {
-      return;
+      return
     }
 
     try {
-      setIsLoading(true);
-      setError(null);
+      setIsLoading(true)
+      setError(null)
 
-      await paymentIntegrationsApi.delete(eventSlug, integration.id);
-      setIntegration(null);
-      setSuccess('Payment integration deleted');
-      onIntegrationChange?.(null);
+      await paymentIntegrationsApi.delete(eventSlug, integration.id)
+      setIntegration(null)
+      setSuccess('Payment integration deleted')
+      onIntegrationChange?.(null)
     } catch (err: any) {
-      console.error('Failed to delete integration:', err);
-      setError(err.message || 'Failed to delete integration');
+      console.error('Failed to delete integration:', err)
+      setError(err.message || 'Failed to delete integration')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   if (!isConnected) {
     return (
@@ -299,15 +300,17 @@ export default function EventPaymentSettings({
         <div className="flex items-start gap-3">
           <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-700 dark:text-yellow-400" />
           <div>
-            <h3 className="mb-1 font-medium text-amber-900 dark:text-yellow-200">Eventbrite Not Connected</h3>
+            <h3 className="mb-1 font-medium text-amber-900 dark:text-yellow-200">
+              Eventbrite Not Connected
+            </h3>
             <p className="text-sm leading-relaxed text-amber-800/90 dark:text-yellow-300/80">
-              Please connect your Eventbrite account in Organization Settings before enabling payment
-              syncing for events.
+              Please connect your Eventbrite account in Organization Settings before enabling
+              payment syncing for events.
             </p>
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -341,9 +344,7 @@ export default function EventPaymentSettings({
           </div>
 
           <div>
-            <label className={fieldLabelClass}>
-              How would you like to connect?
-            </label>
+            <label className={fieldLabelClass}>How would you like to connect?</label>
             <div className="flex gap-4">
               <button
                 onClick={() => setInputMethod('url')}
@@ -421,7 +422,9 @@ export default function EventPaymentSettings({
                 className="mt-1 h-4 w-4 rounded border-input text-primary focus:ring-ring"
               />
               <div>
-                <span className="text-sm font-semibold text-foreground">Auto-sync every 15 minutes</span>
+                <span className="text-sm font-semibold text-foreground">
+                  Auto-sync every 15 minutes
+                </span>
                 <p className={helpTextClass}>
                   Automatically check for new payments and update vendor statuses
                 </p>
@@ -549,7 +552,9 @@ export default function EventPaymentSettings({
                 </div>
               ) : (
                 <>
-                  <p className="text-sm font-semibold text-foreground truncate">{integration.provider_event_id || 'Connected'}</p>
+                  <p className="text-sm font-semibold text-foreground truncate">
+                    {integration.provider_event_id || 'Connected'}
+                  </p>
                   {integration.provider_url && (
                     <a
                       href={integration.provider_url}
@@ -577,22 +582,30 @@ export default function EventPaymentSettings({
 
           {integration.latest_sync_log && (
             <div className="rounded-lg border border-violet-200/80 bg-violet-50 p-4 dark:border-primary/20 dark:bg-primary/10">
-              <h4 className="mb-2 font-medium text-sm text-violet-950 dark:text-primary">Latest Sync Results</h4>
+              <h4 className="mb-2 font-medium text-sm text-violet-950 dark:text-primary">
+                Latest Sync Results
+              </h4>
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div className={syncMetricClass}>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Transactions</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Transactions
+                  </p>
                   <p className="mt-1 text-base font-semibold text-slate-900 dark:text-primary">
                     {integration.latest_sync_log.transactions_fetched}
                   </p>
                 </div>
                 <div className={syncMetricClass}>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Matched</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Matched
+                  </p>
                   <p className="mt-1 text-base font-semibold text-slate-900 dark:text-primary">
                     {integration.latest_sync_log.contacts_matched}
                   </p>
                 </div>
                 <div className={syncMetricClass}>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Updated</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Updated
+                  </p>
                   <p className="mt-1 text-base font-semibold text-slate-900 dark:text-primary">
                     {integration.latest_sync_log.registrations_updated}
                   </p>
@@ -622,5 +635,5 @@ export default function EventPaymentSettings({
         </div>
       )}
     </div>
-  );
+  )
 }

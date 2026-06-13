@@ -27,7 +27,9 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     if (!token) {
-      setError('Invalid or missing token. Please check your email again or request a new reset link.')
+      setError(
+        'Invalid or missing token. Please check your email again or request a new reset link.',
+      )
     }
   }, [token])
 
@@ -106,9 +108,8 @@ export default function ResetPasswordPage() {
           <h1 className="text-4xl font-bold mb-4">Reset Password</h1>
           <p className="voxxy-auth-hero-copy max-w-md text-center text-xl">
             {!success
-              ? "Create a new secure password for your Voxxy account"
-              : "Your password has been reset successfully!"
-            }
+              ? 'Create a new secure password for your Voxxy account'
+              : 'Your password has been reset successfully!'}
           </p>
         </div>
       </div>
@@ -142,8 +143,7 @@ export default function ResetPasswordPage() {
                 <CardDescription>
                   {!success
                     ? 'Create a new secure password for your account'
-                    : "You'll be redirected to login in a few seconds..."
-                  }
+                    : "You'll be redirected to login in a few seconds..."}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -166,8 +166,10 @@ export default function ResetPasswordPage() {
                           <div className="flex items-start gap-3">
                             <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
                             <div>
-                              <div className="text-foreground font-medium mb-2">Password Requirements:</div>
-                                <ul className="space-y-1 text-sm text-red-700 dark:text-red-300">
+                              <div className="text-foreground font-medium mb-2">
+                                Password Requirements:
+                              </div>
+                              <ul className="space-y-1 text-sm text-red-700 dark:text-red-300">
                                 {passwordErrors.map((err, index) => (
                                   <li key={index}>• {err}</li>
                                 ))}
@@ -181,7 +183,9 @@ export default function ResetPasswordPage() {
                     <form onSubmit={handleSubmit} className="space-y-4">
                       {/* New Password Field */}
                       <div className="space-y-2">
-                        <Label htmlFor="password" className="text-foreground">New Password</Label>
+                        <Label htmlFor="password" className="text-foreground">
+                          New Password
+                        </Label>
                         <div className="relative">
                           <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
@@ -200,14 +204,20 @@ export default function ResetPasswordPage() {
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                             disabled={loading || !token}
                           >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
                           </button>
                         </div>
                       </div>
 
                       {/* Confirm Password Field */}
                       <div className="space-y-2">
-                        <Label htmlFor="confirmPassword" className="text-foreground">Confirm New Password</Label>
+                        <Label htmlFor="confirmPassword" className="text-foreground">
+                          Confirm New Password
+                        </Label>
                         <div className="relative">
                           <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
@@ -225,7 +235,11 @@ export default function ResetPasswordPage() {
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                             disabled={loading || !token}
                           >
-                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -249,9 +263,7 @@ export default function ResetPasswordPage() {
 
                     {/* Request New Link */}
                     <div className="mt-6 text-center">
-                      <p className="text-muted-foreground text-sm mb-2">
-                        Link expired or invalid?
-                      </p>
+                      <p className="text-muted-foreground text-sm mb-2">Link expired or invalid?</p>
                       <button
                         onClick={() => navigate('/forgot-password')}
                         className="voxxy-auth-link text-sm font-medium transition-colors"
@@ -268,7 +280,8 @@ export default function ResetPasswordPage() {
                       <AlertDescription className="flex items-start gap-3">
                         <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
                         <div className="text-foreground font-medium">
-                          Your password has been updated successfully. You can now sign in with your new password.
+                          Your password has been updated successfully. You can now sign in with your
+                          new password.
                         </div>
                       </AlertDescription>
                     </Alert>

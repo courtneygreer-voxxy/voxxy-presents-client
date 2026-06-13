@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import {
-  Mail,
-  ArrowRight,
-  CheckCircle,
-  Sparkles,
-  MapPin,
-  Building
-} from "lucide-react"
-import { Link } from "react-router-dom"
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
+import { Mail, ArrowRight, CheckCircle, Sparkles, MapPin, Building } from 'lucide-react'
+import { Link } from 'react-router-dom'
 // Inline types and API for contact form
 interface CreateContactSubmissionData {
   type: string
@@ -40,19 +33,19 @@ const contactFormApi = {
     const response = await fetch(`${API_BASE_URL}/contact_submissions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contact_submission: data })
+      body: JSON.stringify({ contact_submission: data }),
     })
     if (!response.ok) {
       throw new EmailServiceError('Failed to submit contact form')
     }
     return response.json()
-  }
+  },
 }
-import { usePageTracking } from "@/hooks/usePageTracking"
-import { useFormTracking } from "@/hooks/useFormTracking"
-import { analytics } from "@/lib/analytics"
-import Navigation from "@/components/Navigation"
-import Footer from "@/components/Footer"
+import { usePageTracking } from '@/hooks/usePageTracking'
+import { useFormTracking } from '@/hooks/useFormTracking'
+import { analytics } from '@/lib/analytics'
+import Navigation from '@/components/Navigation'
+import Footer from '@/components/Footer'
 import { useForceTheme } from '@/hooks/useForceTheme'
 
 interface BetaFormData {
@@ -74,7 +67,7 @@ export default function ContactPage() {
   const [formData, setFormData] = useState<BetaFormData>({
     name: '',
     email: '',
-    message: ''
+    message: '',
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -89,7 +82,7 @@ export default function ContactPage() {
       setFormStarted(true)
       betaFormTracking.trackFormStart('hero_form')
     }
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,7 +105,7 @@ export default function ContactPage() {
         name: formData.name,
         email: formData.email,
         description: formData.message,
-        source: 'contact_page'
+        source: 'contact_page',
       }
 
       await contactFormApi.submitForm(submissionData)
@@ -126,14 +119,18 @@ export default function ContactPage() {
         // Increase profile confidence since we have form data
         profile_confidence: 'high',
       })
-
     } catch (error) {
       console.error('Beta access submission failed:', error)
-      betaFormTracking.trackFormError('submission', error instanceof Error ? error.message : 'Unknown error')
+      betaFormTracking.trackFormError(
+        'submission',
+        error instanceof Error ? error.message : 'Unknown error',
+      )
       if (error instanceof EmailServiceError) {
         setSubmissionError(`Failed to submit: ${error.message}`)
       } else {
-        setSubmissionError('An unexpected error occurred. Please try again or email us at team@heyvoxxy.com')
+        setSubmissionError(
+          'An unexpected error occurred. Please try again or email us at team@heyvoxxy.com',
+        )
       }
     } finally {
       setIsSubmitting(false)
@@ -155,7 +152,7 @@ export default function ContactPage() {
           </div>
 
           <h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl">
-            Request{" "}
+            Request{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#cc30e8] to-[#9054e3]">
               Pilot Access
             </span>
@@ -170,7 +167,9 @@ export default function ContactPage() {
       {/* Pilot Program Benefits */}
       <section className="relative z-10 border-y border-slate-200 bg-[#faf9fc] py-24">
         <div className="container mx-auto max-w-4xl px-4">
-          <h2 className="mb-12 text-center text-3xl font-bold text-slate-950 md:text-4xl">What You Get with the Pilot Program:</h2>
+          <h2 className="mb-12 text-center text-3xl font-bold text-slate-950 md:text-4xl">
+            What You Get with the Pilot Program:
+          </h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="flex items-start space-x-3">
               <CheckCircle className="mt-1 h-6 w-6 flex-shrink-0 text-violet-700" />
@@ -182,7 +181,9 @@ export default function ContactPage() {
             <div className="flex items-start space-x-3">
               <CheckCircle className="mt-1 h-6 w-6 flex-shrink-0 text-violet-700" />
               <div>
-                <h3 className="mb-1 text-lg font-semibold text-slate-950">Vendor Coordination Tools</h3>
+                <h3 className="mb-1 text-lg font-semibold text-slate-950">
+                  Vendor Coordination Tools
+                </h3>
                 <p className="text-slate-600">Vendor CRM & automated email workflows</p>
               </div>
             </div>
@@ -213,11 +214,16 @@ export default function ContactPage() {
                 <div className="w-16 h-16 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-6">
                   <CheckCircle className="h-8 w-8 text-green-300" />
                 </div>
-                <h2 className="mb-4 text-2xl font-bold text-slate-950">Thanks for your interest!</h2>
+                <h2 className="mb-4 text-2xl font-bold text-slate-950">
+                  Thanks for your interest!
+                </h2>
                 <p className="mb-6 text-slate-600">
                   We'll review your application and get back to you within 2-3 business days.
                 </p>
-                <Button className="voxxy-btn-brand text-white hover:-translate-y-0.5 hover:brightness-105" asChild>
+                <Button
+                  className="voxxy-btn-brand text-white hover:-translate-y-0.5 hover:brightness-105"
+                  asChild
+                >
                   <Link to="/">Return to Home</Link>
                 </Button>
               </CardContent>
@@ -225,7 +231,9 @@ export default function ContactPage() {
           ) : (
             <Card className="marketing-card border border-slate-200 shadow-2xl">
               <CardHeader className="text-center pb-8">
-                <CardTitle className="mb-3 text-3xl font-bold text-slate-950">Request Pilot Access</CardTitle>
+                <CardTitle className="mb-3 text-3xl font-bold text-slate-950">
+                  Request Pilot Access
+                </CardTitle>
                 <CardDescription className="text-lg">
                   Tell us about yourself and we'll get you set up
                 </CardDescription>
@@ -291,16 +299,17 @@ export default function ContactPage() {
               Coming Soon
             </div>
           </div>
-          <h2 className="mb-6 text-4xl font-bold text-white md:text-5xl">
-            Are You a Vendor?
-          </h2>
+          <h2 className="mb-6 text-4xl font-bold text-white md:text-5xl">Are You a Vendor?</h2>
           <p className="mx-auto mb-8 max-w-2xl text-xl leading-relaxed text-white/70">
-            Voxxy vendor sign up is coming soon. We're building the platform to make your life easier.
+            Voxxy vendor sign up is coming soon. We're building the platform to make your life
+            easier.
           </p>
 
           {/* Feature Preview */}
           <div className="max-w-3xl mx-auto mb-10">
-            <p className="mb-6 text-lg font-semibold text-white/80">Here's what you can look forward to:</p>
+            <p className="mb-6 text-lg font-semibold text-white/80">
+              Here's what you can look forward to:
+            </p>
             <div className="grid md:grid-cols-2 gap-4 text-left">
               <div className="rounded-lg border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
                 <CheckCircle className="h-5 w-5 text-blue-400 mb-2" />
@@ -315,12 +324,16 @@ export default function ContactPage() {
               <div className="rounded-lg border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
                 <CheckCircle className="h-5 w-5 text-blue-400 mb-2" />
                 <h3 className="mb-1 font-medium text-white">Centralized Messaging</h3>
-                <p className="text-sm text-white/65">All event communication in one hub - no emails or texts</p>
+                <p className="text-sm text-white/65">
+                  All event communication in one hub - no emails or texts
+                </p>
               </div>
               <div className="rounded-lg border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
                 <CheckCircle className="h-5 w-5 text-blue-400 mb-2" />
                 <h3 className="mb-1 font-medium text-white">Simple Coordination</h3>
-                <p className="text-sm text-white/65">Everything you need for each event in one place</p>
+                <p className="text-sm text-white/65">
+                  Everything you need for each event in one place
+                </p>
               </div>
             </div>
           </div>

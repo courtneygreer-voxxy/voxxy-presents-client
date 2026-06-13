@@ -42,9 +42,9 @@ export class RailsAuthService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Mobile-App': 'true'
+        'X-Mobile-App': 'true',
       },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
     })
 
     if (!response.ok) {
@@ -59,7 +59,7 @@ export class RailsAuthService {
     const response = await fetch(`${API_BASE_URL}/v1/shared/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user: data })
+      body: JSON.stringify({ user: data }),
     })
 
     if (!response.ok) {
@@ -74,18 +74,18 @@ export class RailsAuthService {
     await fetch(`${API_BASE_URL}/v1/shared/logout`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     })
   }
 
   static async getCurrentUser(token: string): Promise<User> {
     const response = await fetch(`${API_BASE_URL}/v1/shared/me`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     })
 
     if (!response.ok) {
@@ -129,92 +129,99 @@ export function useRailsApi() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<ApiError | null>(null)
 
-  const request = useCallback(async <T,>(
-    endpoint: string,
-    options?: {
-      method?: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT'
-      body?: any
-      requiresAuth?: boolean
-    }
-  ): Promise<T | null> => {
-    try {
-      setLoading(true)
-      setError(null)
+  const request = useCallback(
+    async <T>(
+      endpoint: string,
+      options?: {
+        method?: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT'
+        body?: any
+        requiresAuth?: boolean
+      },
+    ): Promise<T | null> => {
+      try {
+        setLoading(true)
+        setError(null)
 
-      const token = RailsAuthService.getToken()
-      const requiresAuth = options?.requiresAuth !== false
+        const token = RailsAuthService.getToken()
+        const requiresAuth = options?.requiresAuth !== false
 
-      if (requiresAuth && !token) {
-        throw { status: 401, error: 'Not authenticated' }
-      }
-
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json'
-      }
-
-      if (token && requiresAuth) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
-
-      const fetchOptions: RequestInit = {
-        method: options?.method || 'GET',
-        headers
-      }
-
-      if (options?.body) {
-        fetchOptions.body = JSON.stringify(options.body)
-      }
-
-      const response = await fetch(
-        `${API_BASE_URL}/v1${endpoint}`,
-        fetchOptions
-      )
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        const apiError: ApiError = {
-          status: response.status,
-          error: errorData.error,
-          errors: errorData.errors
+        if (requiresAuth && !token) {
+          throw { status: 401, error: 'Not authenticated' }
         }
-        setError(apiError)
-        throw apiError
-      }
 
-      // Handle 204 No Content
-      if (response.status === 204) {
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        }
+
+        if (token && requiresAuth) {
+          headers['Authorization'] = `Bearer ${token}`
+        }
+
+        const fetchOptions: RequestInit = {
+          method: options?.method || 'GET',
+          headers,
+        }
+
+        if (options?.body) {
+          fetchOptions.body = JSON.stringify(options.body)
+        }
+
+        const response = await fetch(`${API_BASE_URL}/v1${endpoint}`, fetchOptions)
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          const apiError: ApiError = {
+            status: response.status,
+            error: errorData.error,
+            errors: errorData.errors,
+          }
+          setError(apiError)
+          throw apiError
+        }
+
+        // Handle 204 No Content
+        if (response.status === 204) {
+          return null
+        }
+
+        const data: T = await response.json()
+        return data
+      } catch (err) {
+        if (err instanceof Error && 'status' in err) {
+          setError(err as ApiError)
+        } else {
+          setError({ status: 0, error: 'Unknown error' })
+        }
         return null
+      } finally {
+        setLoading(false)
       }
+    },
+    [],
+  )
 
-      const data: T = await response.json()
-      return data
-    } catch (err) {
-      if (err instanceof Error && 'status' in err) {
-        setError(err as ApiError)
-      } else {
-        setError({ status: 0, error: 'Unknown error' })
-      }
-      return null
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const get = useCallback(
+    <T>(endpoint: string, requiresAuth = true) =>
+      request<T>(endpoint, { method: 'GET', requiresAuth }),
+    [request],
+  )
 
-  const get = useCallback(<T,>(endpoint: string, requiresAuth = true) =>
-    request<T>(endpoint, { method: 'GET', requiresAuth })
-  , [request])
+  const post = useCallback(
+    <T>(endpoint: string, body?: any, requiresAuth = true) =>
+      request<T>(endpoint, { method: 'POST', body, requiresAuth }),
+    [request],
+  )
 
-  const post = useCallback(<T,>(endpoint: string, body?: any, requiresAuth = true) =>
-    request<T>(endpoint, { method: 'POST', body, requiresAuth })
-  , [request])
+  const patch = useCallback(
+    <T>(endpoint: string, body?: any) =>
+      request<T>(endpoint, { method: 'PATCH', body, requiresAuth: true }),
+    [request],
+  )
 
-  const patch = useCallback(<T,>(endpoint: string, body?: any) =>
-    request<T>(endpoint, { method: 'PATCH', body, requiresAuth: true })
-  , [request])
-
-  const delete_ = useCallback(<T,>(endpoint: string) =>
-    request<T>(endpoint, { method: 'DELETE', requiresAuth: true })
-  , [request])
+  const delete_ = useCallback(
+    <T>(endpoint: string) => request<T>(endpoint, { method: 'DELETE', requiresAuth: true }),
+    [request],
+  )
 
   return { get, post, patch, delete: delete_, loading, error }
 }
@@ -241,11 +248,11 @@ interface AuthContextType {
   token: string | null
   loading: boolean
   error: string | null
-  
+
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, name: string) => Promise<void>
   signOut: () => Promise<void>
-  
+
   isAuthenticated: boolean
   isVendor: boolean
   isVenueOwner: boolean
@@ -292,7 +299,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(true)
       setError(null)
       const response = await RailsAuthService.login(email, password)
-      
+
       setUser({
         id: response.id,
         email: response.email,
@@ -320,7 +327,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name,
         role: 'consumer'
       })
-      
+
       setUser({
         id: response.id,
         email: response.email,
@@ -417,36 +424,37 @@ export function useVendorApi() {
 
   return {
     listVendors: () => get<Vendor[]>('/presents/vendors'),
-    
+
     getVendor: (id: string) => get<Vendor>(`/presents/vendors/${id}`),
-    
-    searchVendors: (query: string, filters?: {
-      vendor_type?: string
-      city?: string
-      state?: string
-      verified?: boolean
-    }) => {
+
+    searchVendors: (
+      query: string,
+      filters?: {
+        vendor_type?: string
+        city?: string
+        state?: string
+        verified?: boolean
+      },
+    ) => {
       const params = new URLSearchParams()
       if (query) params.append('query', query)
       if (filters?.vendor_type) params.append('vendor_type', filters.vendor_type)
       if (filters?.city) params.append('city', filters.city)
       if (filters?.state) params.append('state', filters.state)
       if (filters?.verified) params.append('verified', 'true')
-      
+
       return get<Vendor[]>(`/presents/vendors/search?${params.toString()}`)
     },
-    
-    createVendor: (data: Partial<Vendor>) =>
-      post<Vendor>('/presents/vendors', { vendor: data }),
-    
+
+    createVendor: (data: Partial<Vendor>) => post<Vendor>('/presents/vendors', { vendor: data }),
+
     updateVendor: (id: string, data: Partial<Vendor>) =>
       patch<Vendor>(`/presents/vendors/${id}`, { vendor: data }),
-    
-    deleteVendor: (id: string) =>
-      delete_(`/presents/vendors/${id}`),
-    
+
+    deleteVendor: (id: string) => delete_(`/presents/vendors/${id}`),
+
     loading,
-    error
+    error,
   }
 }
 ```
@@ -586,18 +594,16 @@ export function useOrganizationApi() {
 
   return {
     listOrganizations: () => get<Organization[]>('/presents/organizations'),
-    
-    getOrganization: (id: string) =>
-      get<Organization>(`/presents/organizations/${id}`),
-    
+
+    getOrganization: (id: string) => get<Organization>(`/presents/organizations/${id}`),
+
     createOrganization: (data: Partial<Organization>) =>
       post<Organization>('/presents/organizations', { organization: data }),
-    
+
     updateOrganization: (id: string, data: Partial<Organization>) =>
       patch<Organization>(`/presents/organizations/${id}`, { organization: data }),
-    
-    deleteOrganization: (id: string) =>
-      delete_(`/presents/organizations/${id}`)
+
+    deleteOrganization: (id: string) => delete_(`/presents/organizations/${id}`),
   }
 }
 ```
@@ -666,7 +672,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit}>
       {error && <div className="error">{getErrorMessage(error)}</div>}
-      
+
       <input
         type="email"
         placeholder="Email"
@@ -674,7 +680,7 @@ export function LoginForm() {
         onChange={(e) => setEmail(e.target.value)}
         required
       />
-      
+
       <input
         type="password"
         placeholder="Password"
@@ -682,7 +688,7 @@ export function LoginForm() {
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      
+
       <button type="submit">Sign In</button>
     </form>
   )
@@ -700,4 +706,3 @@ export function LoginForm() {
 5. **Implement proper error handling** for 422 validation errors
 6. **Use custom hooks** for API calls to keep components clean
 7. **Test with cURL** before integrating with React
-

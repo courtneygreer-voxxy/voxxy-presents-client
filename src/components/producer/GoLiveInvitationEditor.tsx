@@ -1,18 +1,31 @@
-import { useState, useEffect, useRef } from 'react';
-import { Users, Search, X, Mail, Check, AlertTriangle, Plus, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react'
+import {
+  Users,
+  Search,
+  X,
+  Mail,
+  Check,
+  AlertTriangle,
+  Plus,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+} from 'lucide-react'
 
-const PAGE_SIZE = 50;
-import { vendorContactsApi, contactListsApi, VendorContact, ContactList } from '@/services/api';
+const PAGE_SIZE = 50
+import { vendorContactsApi, contactListsApi, VendorContact, ContactList } from '@/services/api'
 
 interface GoLiveInvitationEditorProps {
-  event: any;
-  organizationId?: number;
+  event: any
+  organizationId?: number
   onSave: (data: {
-    invitation_list_ids: number[];
-    invitation_contact_ids: number[];
-    invitation_excluded_ids: number[];
-  }) => void | Promise<void>;
-  onCancel: () => void;
+    invitation_list_ids: number[]
+    invitation_contact_ids: number[]
+    invitation_excluded_ids: number[]
+  }) => void | Promise<void>
+  onCancel: () => void
 }
 
 // ── Compact List Dropdown ─────────────────────────────────────────────────────
@@ -22,39 +35,39 @@ function ListDropdown({
   selectedListIds,
   onListsChange,
 }: {
-  organizationId: number;
-  selectedListIds: number[];
-  onListsChange: (ids: number[]) => void;
+  organizationId: number
+  selectedListIds: number[]
+  onListsChange: (ids: number[]) => void
 }) {
-  const [lists, setLists] = useState<ContactList[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [lists, setLists] = useState<ContactList[]>([])
+  const [loading, setLoading] = useState(true)
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     contactListsApi
       .getAll(organizationId)
       .then((res) => {
-        setLists(res.contact_lists);
-        setLoading(false);
+        setLists(res.contact_lists)
+        setLoading(false)
       })
-      .catch(() => setLoading(false));
-  }, [organizationId]);
+      .catch(() => setLoading(false))
+  }, [organizationId])
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   const handleToggle = (listId: number) => {
     const updated = selectedListIds.includes(listId)
       ? selectedListIds.filter((id) => id !== listId)
-      : [...selectedListIds, listId];
-    onListsChange(updated);
-  };
+      : [...selectedListIds, listId]
+    onListsChange(updated)
+  }
 
   return (
     <div className="relative" ref={ref}>
@@ -121,8 +134,8 @@ function ListDropdown({
                   <button
                     type="button"
                     onClick={() => {
-                      onListsChange([]);
-                      setOpen(false);
+                      onListsChange([])
+                      setOpen(false)
                     }}
                     className="w-full rounded px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-background/10 hover:text-foreground"
                   >
@@ -135,7 +148,7 @@ function ListDropdown({
         </div>
       )}
     </div>
-  );
+  )
 }
 
 // ── Main Editor ───────────────────────────────────────────────────────────────
@@ -148,27 +161,27 @@ export default function GoLiveInvitationEditor({
 }: GoLiveInvitationEditorProps) {
   // ── Invitation state ──
   // Lists are purely a filter — selecting a list shows its contacts, doesn't auto-invite
-  const [selectedListIds, setSelectedListIds] = useState<number[]>([]);
+  const [selectedListIds, setSelectedListIds] = useState<number[]>([])
   const [invitedContactIds, setInvitedContactIds] = useState<number[]>(
-    event.invitation_draft?.contact_ids || []
-  );
+    event.invitation_draft?.contact_ids || [],
+  )
 
   // ── Contact data ──
-  const [contacts, setContacts] = useState<VendorContact[]>([]);
-  const [allContactIds, setAllContactIds] = useState<number[]>([]); // OPTIMIZATION: Store all IDs
-  const [listContacts, setListContacts] = useState<VendorContact[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingListContacts, setLoadingListContacts] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [contacts, setContacts] = useState<VendorContact[]>([])
+  const [allContactIds, setAllContactIds] = useState<number[]>([]) // OPTIMIZATION: Store all IDs
+  const [listContacts, setListContacts] = useState<VendorContact[]>([])
+  const [loading, setLoading] = useState(true)
+  const [loadingListContacts, setLoadingListContacts] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // ── View mode: show only invited contacts by default ──
-  const [showAllContacts, setShowAllContacts] = useState(false);
+  const [showAllContacts, setShowAllContacts] = useState(false)
 
   // ── Search, filter, sort, pagination ──
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortColumn, setSortColumn] = useState<'name' | 'email'>('name');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortColumn, setSortColumn] = useState<'name' | 'email'>('name')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+  const [currentPage, setCurrentPage] = useState(1)
 
   // OPTIMIZATION: Backend pagination state
   const [paginationMeta, setPaginationMeta] = useState({
@@ -176,265 +189,267 @@ export default function GoLiveInvitationEditor({
     total_pages: 1,
     total_count: 0,
     per_page: PAGE_SIZE,
-  });
+  })
 
   // ── Add email ──
-  const [showAddEmailRow, setShowAddEmailRow] = useState(false);
-  const [newEmailData, setNewEmailData] = useState({ name: '', email: '', type: 'vendor' });
-  const [addingEmail, setAddingEmail] = useState(false);
-  const [addEmailError, setAddEmailError] = useState<string | null>(null);
+  const [showAddEmailRow, setShowAddEmailRow] = useState(false)
+  const [newEmailData, setNewEmailData] = useState({ name: '', email: '', type: 'vendor' })
+  const [addingEmail, setAddingEmail] = useState(false)
+  const [addEmailError, setAddEmailError] = useState<string | null>(null)
 
   // OPTIMIZATION: Fetch contact IDs only, then paginate
   useEffect(() => {
-    if (organizationId) fetchContactIds();
-  }, [organizationId]);
+    if (organizationId) fetchContactIds()
+  }, [organizationId])
 
   // Fetch paginated contacts when IDs, filters, or page changes
   useEffect(() => {
     if (allContactIds.length > 0 || invitedContactIds.length > 0) {
-      fetchContactsPage(currentPage);
+      fetchContactsPage(currentPage)
     }
-  }, [allContactIds, currentPage, showAllContacts, invitedContactIds, selectedListIds]);
+  }, [allContactIds, currentPage, showAllContacts, invitedContactIds, selectedListIds])
 
   // ── Fetch contacts from selected lists ──
   useEffect(() => {
     if (selectedListIds.length > 0 && organizationId) {
-      fetchListContacts();
+      fetchListContacts()
     } else {
-      setListContacts([]);
+      setListContacts([])
     }
-  }, [selectedListIds, organizationId]);
+  }, [selectedListIds, organizationId])
 
   // OPTIMIZATION: Client-side filtering on current page only (fast since only 50 contacts)
   const filteredContacts = contacts.filter((contact) => {
-    if (!searchTerm.trim()) return true;
-    const search = searchTerm.toLowerCase();
+    if (!searchTerm.trim()) return true
+    const search = searchTerm.toLowerCase()
     return (
       contact.contact_name.toLowerCase().includes(search) ||
       contact.business_name?.toLowerCase().includes(search) ||
       contact.email.toLowerCase().includes(search) ||
       contact.tags?.some((tag) => tag.toLowerCase().includes(search))
-    );
-  });
+    )
+  })
 
   const handleSort = (column: 'name' | 'email') => {
     if (sortColumn === column) {
-      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))
     } else {
-      setSortColumn(column);
-      setSortDirection('asc');
+      setSortColumn(column)
+      setSortDirection('asc')
     }
-  };
+  }
 
   // OPTIMIZATION: Fetch only contact IDs (fast!)
   const fetchContactIds = async () => {
     if (!organizationId) {
-      setError('Organization ID is required');
-      setLoading(false);
-      return;
+      setError('Organization ID is required')
+      setLoading(false)
+      return
     }
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
       // Fetch only IDs from backend (very fast)
-      const result = await vendorContactsApi.getAllIds(organizationId, {});
-      setAllContactIds(result.ids);
+      const result = await vendorContactsApi.getAllIds(organizationId, {})
+      setAllContactIds(result.ids)
 
       // One-time: resolve any previously saved list IDs into invitedContactIds
-      const draftListIds: number[] = event.invitation_draft?.list_ids || [];
-      const draftExcludedIds: number[] = event.invitation_draft?.excluded_ids || [];
+      const draftListIds: number[] = event.invitation_draft?.list_ids || []
+      const draftExcludedIds: number[] = event.invitation_draft?.excluded_ids || []
       if (draftListIds.length > 0) {
         const promises = draftListIds.map(async (listId: number) => {
-          const res = await contactListsApi.getContacts(listId, 1, 10000);
-          return (res.vendor_contacts || []).map((c: VendorContact) => c.id);
-        });
-        const listContactIdArrays = await Promise.all(promises);
-        const listContactIds = listContactIdArrays.flat();
+          const res = await contactListsApi.getContacts(listId, 1, 10000)
+          return (res.vendor_contacts || []).map((c: VendorContact) => c.id)
+        })
+        const listContactIdArrays = await Promise.all(promises)
+        const listContactIds = listContactIdArrays.flat()
         setInvitedContactIds((prev) => {
-          const merged = Array.from(new Set([...prev, ...listContactIds]));
-          return merged.filter((id) => !draftExcludedIds.includes(id));
-        });
+          const merged = Array.from(new Set([...prev, ...listContactIds]))
+          return merged.filter((id) => !draftExcludedIds.includes(id))
+        })
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load contact IDs');
-      setAllContactIds([]);
+      setError(err.message || 'Failed to load contact IDs')
+      setAllContactIds([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // OPTIMIZATION: Fetch one page of contacts at a time (backend pagination)
   const fetchContactsPage = async (page: number) => {
-    if (!organizationId) return;
+    if (!organizationId) return
 
     try {
-      setLoading(true);
+      setLoading(true)
 
       // Determine which IDs to fetch based on mode
-      let idsToFetch: number[] = [];
+      let idsToFetch: number[] = []
 
       if (!showAllContacts) {
         // "Selected only" mode - show only invited contacts
-        idsToFetch = invitedContactIds;
+        idsToFetch = invitedContactIds
       } else {
         // "Show all" mode - show all org contacts
-        idsToFetch = allContactIds;
+        idsToFetch = allContactIds
       }
 
       // Apply list filter if lists are selected
       if (selectedListIds.length > 0 && listContacts.length > 0) {
-        const listContactIdSet = new Set(listContacts.map((c) => c.id));
-        idsToFetch = idsToFetch.filter((id) => listContactIdSet.has(id));
+        const listContactIdSet = new Set(listContacts.map((c) => c.id))
+        idsToFetch = idsToFetch.filter((id) => listContactIdSet.has(id))
       }
 
       if (idsToFetch.length === 0) {
-        setContacts([]);
-        setPaginationMeta({ current_page: 1, total_pages: 1, total_count: 0, per_page: PAGE_SIZE });
-        setLoading(false);
-        return;
+        setContacts([])
+        setPaginationMeta({ current_page: 1, total_pages: 1, total_count: 0, per_page: PAGE_SIZE })
+        setLoading(false)
+        return
       }
 
       // Calculate pagination
-      const startIndex = (page - 1) * PAGE_SIZE;
-      const endIndex = startIndex + PAGE_SIZE;
-      const pageIds = idsToFetch.slice(startIndex, endIndex);
+      const startIndex = (page - 1) * PAGE_SIZE
+      const endIndex = startIndex + PAGE_SIZE
+      const pageIds = idsToFetch.slice(startIndex, endIndex)
 
       // Fetch only this page's contacts
-      const response = await vendorContactsApi.getByIds(organizationId, pageIds, { per_page: PAGE_SIZE });
-      const contactsData = response?.vendor_contacts || [];
+      const response = await vendorContactsApi.getByIds(organizationId, pageIds, {
+        per_page: PAGE_SIZE,
+      })
+      const contactsData = response?.vendor_contacts || []
 
-      setContacts(contactsData);
+      setContacts(contactsData)
       setPaginationMeta({
         current_page: page,
         total_pages: Math.ceil(idsToFetch.length / PAGE_SIZE),
         total_count: idsToFetch.length,
         per_page: PAGE_SIZE,
-      });
+      })
     } catch (err: any) {
-      console.error('Failed to fetch contacts page:', err);
-      setContacts([]);
+      console.error('Failed to fetch contacts page:', err)
+      setContacts([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const fetchListContacts = async () => {
     try {
-      setLoadingListContacts(true);
+      setLoadingListContacts(true)
       const listContactPromises = selectedListIds.map(async (listId) => {
-        const response = await contactListsApi.getContacts(listId, 1, 1000);
-        return response.vendor_contacts || [];
-      });
-      const listContactArrays = await Promise.all(listContactPromises);
-      const allListContacts = listContactArrays.flat();
+        const response = await contactListsApi.getContacts(listId, 1, 1000)
+        return response.vendor_contacts || []
+      })
+      const listContactArrays = await Promise.all(listContactPromises)
+      const allListContacts = listContactArrays.flat()
       const uniqueContacts = Array.from(
-        new Map(allListContacts.map((contact) => [contact.id, contact])).values()
-      );
-      setListContacts(uniqueContacts);
+        new Map(allListContacts.map((contact) => [contact.id, contact])).values(),
+      )
+      setListContacts(uniqueContacts)
     } catch (err: any) {
-      console.error('Failed to fetch list contacts:', err);
-      setListContacts([]);
+      console.error('Failed to fetch list contacts:', err)
+      setListContacts([])
     } finally {
-      setLoadingListContacts(false);
+      setLoadingListContacts(false)
     }
-  };
+  }
 
   // ── Toggle logic (simple: check/uncheck in invitedContactIds) ──
   const handleToggleContact = (contactId: number) => {
     setInvitedContactIds((prev) =>
-      prev.includes(contactId) ? prev.filter((id) => id !== contactId) : [...prev, contactId]
-    );
-  };
+      prev.includes(contactId) ? prev.filter((id) => id !== contactId) : [...prev, contactId],
+    )
+  }
 
   const handleSelectAll = () => {
-    const visibleIds = filteredContacts.map((c) => c.id);
-    const allSelected = visibleIds.every((id) => invitedContactIds.includes(id));
+    const visibleIds = filteredContacts.map((c) => c.id)
+    const allSelected = visibleIds.every((id) => invitedContactIds.includes(id))
 
     if (allSelected) {
       // Deselect all visible
-      setInvitedContactIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
+      setInvitedContactIds((prev) => prev.filter((id) => !visibleIds.includes(id)))
     } else {
       // Select all visible
-      setInvitedContactIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
+      setInvitedContactIds((prev) => Array.from(new Set([...prev, ...visibleIds])))
     }
-  };
+  }
 
   const handleClearAll = () => {
-    setSelectedListIds([]);
-    setInvitedContactIds([]);
-  };
+    setSelectedListIds([])
+    setInvitedContactIds([])
+  }
 
   const handleSave = () => {
     onSave({
       invitation_list_ids: [],
       invitation_contact_ids: invitedContactIds,
       invitation_excluded_ids: [],
-    });
-  };
+    })
+  }
 
   // ── Add new email contact ──
   const handleAddNewEmail = async () => {
-    if (!organizationId) return;
+    if (!organizationId) return
     if (!newEmailData.name.trim() || !newEmailData.email.trim()) {
-      setAddEmailError('Name and email are required');
-      return;
+      setAddEmailError('Name and email are required')
+      return
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmailData.email)) {
-      setAddEmailError('Invalid email format');
-      return;
+      setAddEmailError('Invalid email format')
+      return
     }
     if (contacts.some((c) => c.email.toLowerCase() === newEmailData.email.toLowerCase())) {
-      setAddEmailError('This email already exists in your contacts');
-      return;
+      setAddEmailError('This email already exists in your contacts')
+      return
     }
 
-    setAddingEmail(true);
-    setAddEmailError(null);
+    setAddingEmail(true)
+    setAddEmailError(null)
     try {
       const newContact = await vendorContactsApi.create(organizationId, {
         contact_name: newEmailData.name,
         email: newEmailData.email,
         contact_type: newEmailData.type as 'vendor' | 'partner' | 'sponsor' | 'staff',
         source: 'manual',
-      });
-      setContacts((prev) => [newContact, ...prev]);
-      setInvitedContactIds((prev) => [...prev, newContact.id]);
-      setNewEmailData({ name: '', email: '', type: 'vendor' });
-      setShowAddEmailRow(false);
+      })
+      setContacts((prev) => [newContact, ...prev])
+      setInvitedContactIds((prev) => [...prev, newContact.id])
+      setNewEmailData({ name: '', email: '', type: 'vendor' })
+      setShowAddEmailRow(false)
     } catch (err: any) {
-      setAddEmailError(err.message || 'Failed to add contact');
+      setAddEmailError(err.message || 'Failed to add contact')
     } finally {
-      setAddingEmail(false);
+      setAddingEmail(false)
     }
-  };
+  }
 
   // ── Reset to page 1 when filters/search change ──
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedListIds, listContacts, showAllContacts]);
+    setCurrentPage(1)
+  }, [searchTerm, selectedListIds, listContacts, showAllContacts])
 
   // ── Computed values ──
   const unsubscribedCount = contacts.filter(
-    (c) => invitedContactIds.includes(c.id) && c.unsubscribe_status?.is_unsubscribed
-  ).length;
+    (c) => invitedContactIds.includes(c.id) && c.unsubscribe_status?.is_unsubscribed,
+  ).length
 
   const allFilteredSelected =
-    filteredContacts.length > 0 && filteredContacts.every((c) => invitedContactIds.includes(c.id));
+    filteredContacts.length > 0 && filteredContacts.every((c) => invitedContactIds.includes(c.id))
 
   // OPTIMIZATION: Sort current page only (fast since only 50 contacts)
   const sortedContacts = [...filteredContacts].sort((a, b) => {
-    const aSelected = invitedContactIds.includes(a.id) ? 0 : 1;
-    const bSelected = invitedContactIds.includes(b.id) ? 0 : 1;
-    if (aSelected !== bSelected) return aSelected - bSelected;
+    const aSelected = invitedContactIds.includes(a.id) ? 0 : 1
+    const bSelected = invitedContactIds.includes(b.id) ? 0 : 1
+    if (aSelected !== bSelected) return aSelected - bSelected
 
-    const aVal = sortColumn === 'name' ? a.contact_name : a.email;
-    const bVal = sortColumn === 'name' ? b.contact_name : b.email;
-    const cmp = aVal.localeCompare(bVal);
-    return sortDirection === 'asc' ? cmp : -cmp;
-  });
+    const aVal = sortColumn === 'name' ? a.contact_name : a.email
+    const bVal = sortColumn === 'name' ? b.contact_name : b.email
+    const cmp = aVal.localeCompare(bVal)
+    return sortDirection === 'asc' ? cmp : -cmp
+  })
 
-  const paginatedContacts = sortedContacts;
+  const paginatedContacts = sortedContacts
 
   // ── Guard states ──
   if (!organizationId) {
@@ -451,7 +466,7 @@ export default function GoLiveInvitationEditor({
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   if (loading) {
@@ -462,7 +477,7 @@ export default function GoLiveInvitationEditor({
           <p className="text-foreground/60">Loading your contacts...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -479,7 +494,7 @@ export default function GoLiveInvitationEditor({
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   // ── Render ──
@@ -509,8 +524,8 @@ export default function GoLiveInvitationEditor({
           <button
             type="button"
             onClick={() => {
-              setShowAllContacts(false);
-              setCurrentPage(1); // Reset to page 1 when toggling
+              setShowAllContacts(false)
+              setCurrentPage(1) // Reset to page 1 when toggling
             }}
             className={`px-3 py-1.5 text-xs font-medium transition-colors ${
               !showAllContacts
@@ -523,8 +538,8 @@ export default function GoLiveInvitationEditor({
           <button
             type="button"
             onClick={() => {
-              setShowAllContacts(true);
-              setCurrentPage(1); // Reset to page 1 when toggling
+              setShowAllContacts(true)
+              setCurrentPage(1) // Reset to page 1 when toggling
             }}
             className={`px-3 py-1.5 text-xs font-medium transition-colors ${
               showAllContacts
@@ -579,7 +594,8 @@ export default function GoLiveInvitationEditor({
 
           {selectedListIds.length > 0 && (
             <span className="text-muted-foreground">
-              Showing {filteredContacts.length} from {selectedListIds.length} list{selectedListIds.length !== 1 ? 's' : ''}
+              Showing {filteredContacts.length} from {selectedListIds.length} list
+              {selectedListIds.length !== 1 ? 's' : ''}
             </span>
           )}
 
@@ -661,8 +677,8 @@ export default function GoLiveInvitationEditor({
             <button
               type="button"
               onClick={() => {
-                setShowAddEmailRow(false);
-                setAddEmailError(null);
+                setShowAddEmailRow(false)
+                setAddEmailError(null)
               }}
               className="p-1.5 text-muted-foreground transition-colors hover:text-foreground"
             >
@@ -694,7 +710,11 @@ export default function GoLiveInvitationEditor({
               >
                 Name
                 {sortColumn === 'name' ? (
-                  sortDirection === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                  sortDirection === 'asc' ? (
+                    <ChevronUp className="w-3 h-3" />
+                  ) : (
+                    <ChevronDown className="w-3 h-3" />
+                  )
                 ) : (
                   <ChevronDown className="w-3 h-3 opacity-30" />
                 )}
@@ -707,7 +727,11 @@ export default function GoLiveInvitationEditor({
               >
                 Email
                 {sortColumn === 'email' ? (
-                  sortDirection === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                  sortDirection === 'asc' ? (
+                    <ChevronUp className="w-3 h-3" />
+                  ) : (
+                    <ChevronDown className="w-3 h-3" />
+                  )
                 ) : (
                   <ChevronDown className="w-3 h-3 opacity-30" />
                 )}
@@ -727,8 +751,8 @@ export default function GoLiveInvitationEditor({
                     <button
                       type="button"
                       onClick={() => {
-                        setShowAllContacts(true);
-                        setCurrentPage(1);
+                        setShowAllContacts(true)
+                        setCurrentPage(1)
                       }}
                       className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 voxxy-btn-solid rounded-lg text-sm font-medium transition-colors"
                     >
@@ -738,7 +762,9 @@ export default function GoLiveInvitationEditor({
                   </>
                 ) : (
                   <>
-                    <p className="text-foreground/50 text-sm">No contacts match your search criteria</p>
+                    <p className="text-foreground/50 text-sm">
+                      No contacts match your search criteria
+                    </p>
                     <button
                       type="button"
                       onClick={() => setSearchTerm('')}
@@ -751,9 +777,9 @@ export default function GoLiveInvitationEditor({
               </div>
             ) : (
               paginatedContacts.map((contact) => {
-                const isSelected = invitedContactIds.includes(contact.id);
-                const isUnsubscribed = contact.unsubscribe_status?.is_unsubscribed;
-                const unsubscribeScope = contact.unsubscribe_status?.scope;
+                const isSelected = invitedContactIds.includes(contact.id)
+                const isUnsubscribed = contact.unsubscribe_status?.is_unsubscribed
+                const unsubscribeScope = contact.unsubscribe_status?.scope
 
                 return (
                   <div
@@ -780,7 +806,9 @@ export default function GoLiveInvitationEditor({
 
                     {/* Name */}
                     <div className="min-w-0 flex items-center gap-1.5">
-                      <span className="font-medium text-foreground truncate">{contact.contact_name}</span>
+                      <span className="font-medium text-foreground truncate">
+                        {contact.contact_name}
+                      </span>
                       {isUnsubscribed && (
                         <span
                           className={`text-[9px] px-1.5 py-0.5 rounded-full flex-shrink-0 ${
@@ -814,7 +842,7 @@ export default function GoLiveInvitationEditor({
                       </span>
                     </div>
                   </div>
-                );
+                )
               })
             )}
           </div>
@@ -837,8 +865,8 @@ export default function GoLiveInvitationEditor({
             <button
               type="button"
               onClick={() => {
-                const newPage = Math.max(1, paginationMeta.current_page - 1);
-                setCurrentPage(newPage);
+                const newPage = Math.max(1, paginationMeta.current_page - 1)
+                setCurrentPage(newPage)
               }}
               disabled={paginationMeta.current_page <= 1}
               className="p-1.5 rounded-lg text-foreground/60 hover:text-foreground hover:bg-background/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
@@ -851,8 +879,11 @@ export default function GoLiveInvitationEditor({
             <button
               type="button"
               onClick={() => {
-                const newPage = Math.min(paginationMeta.total_pages, paginationMeta.current_page + 1);
-                setCurrentPage(newPage);
+                const newPage = Math.min(
+                  paginationMeta.total_pages,
+                  paginationMeta.current_page + 1,
+                )
+                setCurrentPage(newPage)
               }}
               disabled={paginationMeta.current_page >= paginationMeta.total_pages}
               className="p-1.5 rounded-lg text-foreground/60 hover:text-foreground hover:bg-background/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
@@ -872,5 +903,5 @@ export default function GoLiveInvitationEditor({
         </button>
       </div>
     </div>
-  );
+  )
 }

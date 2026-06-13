@@ -27,13 +27,13 @@ export const validatePassword = (password: string): { isValid: boolean; errors: 
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   }
 }
 
 export const validatePhone = (phoneNumber: string): boolean => {
-  let digits = phoneNumber.replace(/\D/g, '');
-  if (digits.length === 11 && digits.startsWith('1')) digits = digits.slice(1);
-  const valid = /^[2-9]\d{9}$/.test(digits);
+  let digits = phoneNumber.replace(/\D/g, '')
+  if (digits.length === 11 && digits.startsWith('1')) digits = digits.slice(1)
+  const valid = /^[2-9]\d{9}$/.test(digits)
   return valid
 }

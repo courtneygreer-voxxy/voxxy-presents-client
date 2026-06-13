@@ -33,7 +33,7 @@ const DEBUG = import.meta.env.DEV // Only log in development
 export function dedupeRequest<T>(
   key: string,
   fetcher: () => Promise<T>,
-  cacheDuration: number = CACHE_DURATION
+  cacheDuration: number = CACHE_DURATION,
 ): Promise<T> {
   const now = Date.now()
   const cached = cache.get(key)
@@ -81,13 +81,13 @@ export function dedupeRequest<T>(
       // Remove failed request from cache
       cache.delete(key)
       throw error
-    }
+    },
   )
 
   cache.set(key, {
     promise,
     timestamp: now,
-    isResolved: false
+    isResolved: false,
   })
 
   // Auto-cleanup after cache duration
@@ -165,16 +165,16 @@ export function getCacheStats() {
       key,
       age: Math.round((now - value.timestamp) / 1000),
       isResolved: value.isResolved,
-      hasResult: value.result !== undefined
-    }))
+      hasResult: value.result !== undefined,
+    })),
   }
 }
 
 // Expose cache stats globally in development
 if (DEBUG && typeof window !== 'undefined') {
-  (window as any).__requestCache = {
+  ;(window as any).__requestCache = {
     stats: getCacheStats,
     invalidate: invalidateCache,
-    clear: clearCache
+    clear: clearCache,
   }
 }

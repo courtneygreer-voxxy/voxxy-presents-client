@@ -12,8 +12,8 @@ export function generateCSVTemplate(): string {
     'notes',
     'eventbrite_email',
     'venmo_handle',
-    'paypal_email'
-  ];
+    'paypal_email',
+  ]
 
   const exampleRows = [
     {
@@ -29,7 +29,7 @@ export function generateCSVTemplate(): string {
       notes: 'Met at Spring Market 2024',
       eventbrite_email: 'sarah@ceramics.com',
       venmo_handle: '@sarahceramics',
-      paypal_email: ''
+      paypal_email: '',
     },
     {
       name: 'John Davidson',
@@ -44,64 +44,64 @@ export function generateCSVTemplate(): string {
       notes: 'Interested in summer events',
       eventbrite_email: '',
       venmo_handle: '',
-      paypal_email: 'john@paypal.com'
-    }
-  ];
+      paypal_email: 'john@paypal.com',
+    },
+  ]
 
   // Build CSV content
   const csvContent = [
     headers.join(','),
-    ...exampleRows.map(row =>
-      headers.map(header => {
-        const value = row[header as keyof typeof row] || '';
-        // Escape values with commas or quotes
-        if (value.includes(',') || value.includes('"')) {
-          return `"${value.replace(/"/g, '""')}"`;
-        }
-        return value;
-      }).join(',')
-    )
-  ].join('\n');
+    ...exampleRows.map((row) =>
+      headers
+        .map((header) => {
+          const value = row[header as keyof typeof row] || ''
+          // Escape values with commas or quotes
+          if (value.includes(',') || value.includes('"')) {
+            return `"${value.replace(/"/g, '""')}"`
+          }
+          return value
+        })
+        .join(','),
+    ),
+  ].join('\n')
 
-  return csvContent;
+  return csvContent
 }
 
 export function downloadCSVTemplate(): void {
-  const csv = generateCSVTemplate();
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
+  const csv = generateCSVTemplate()
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
 
-  link.setAttribute('href', url);
-  link.setAttribute('download', 'vendor_contacts_template.csv');
-  link.style.visibility = 'hidden';
+  link.setAttribute('href', url)
+  link.setAttribute('download', 'vendor_contacts_template.csv')
+  link.style.visibility = 'hidden'
 
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 export function downloadErrorReport(
   errors: Array<{ row: number; field: string; message: string }>,
-  fileName: string = 'import_errors.csv'
+  fileName: string = 'import_errors.csv',
 ): void {
-  const headers = ['Row Number', 'Field', 'Error Message'];
+  const headers = ['Row Number', 'Field', 'Error Message']
   const csvContent = [
     headers.join(','),
-    ...errors.map(err =>
-      `${err.row},"${err.field}","${err.message.replace(/"/g, '""')}"`
-    )
-  ].join('\n');
+    ...errors.map((err) => `${err.row},"${err.field}","${err.message.replace(/"/g, '""')}"`),
+  ].join('\n')
 
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
 
-  link.setAttribute('href', url);
-  link.setAttribute('download', fileName);
-  link.style.visibility = 'hidden';
+  link.setAttribute('href', url)
+  link.setAttribute('download', fileName)
+  link.style.visibility = 'hidden'
 
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }

@@ -1,7 +1,13 @@
 import React from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { X } from "lucide-react"
-import { cn } from "@/lib/utils"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { X } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface GlassModalProps {
   trigger: React.ReactNode
@@ -16,21 +22,21 @@ interface GlassModalProps {
 
 const sizeClasses = {
   sm: 'sm:max-w-sm',
-  md: 'sm:max-w-md', 
+  md: 'sm:max-w-md',
   lg: 'sm:max-w-lg',
-  xl: 'sm:max-w-2xl'
+  xl: 'sm:max-w-2xl',
 }
 
 /**
  * Standardized glass morphism modal component
- * 
+ *
  * Features:
  * - Glass morphism styling with enhanced backdrop blur
  * - Consistent white text on dark background
  * - Purple accent colors
  * - Responsive sizing options
  * - Smooth animations
- * 
+ *
  * Usage:
  * <GlassModal
  *   trigger={<Button>Open Modal</Button>}
@@ -41,31 +47,31 @@ const sizeClasses = {
  *   <p>Modal content here</p>
  * </GlassModal>
  */
-export function GlassModal({ 
-  trigger, 
-  title, 
-  icon, 
-  children, 
-  isOpen, 
+export function GlassModal({
+  trigger,
+  title,
+  icon,
+  children,
+  isOpen,
   onOpenChange,
   size = 'md',
-  className 
+  className,
 }: GlassModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        {trigger}
-      </DialogTrigger>
-      <DialogContent className={cn(
-        // Base glass morphism styles
-        "voxxy-auth-card text-foreground",
-        // Responsive sizing
-        sizeClasses[size],
-        // Scrolling for large content
-        "max-h-[90vh] overflow-y-auto",
-        // Custom classes
-        className
-      )}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent
+        className={cn(
+          // Base glass morphism styles
+          'voxxy-auth-card text-foreground',
+          // Responsive sizing
+          sizeClasses[size],
+          // Scrolling for large content
+          'max-h-[90vh] overflow-y-auto',
+          // Custom classes
+          className,
+        )}
+      >
         {title && (
           <DialogHeader className="space-y-3">
             <DialogTitle className="text-2xl font-bold text-center text-foreground flex items-center justify-center gap-2">
@@ -74,10 +80,8 @@ export function GlassModal({
             </DialogTitle>
           </DialogHeader>
         )}
-        
-        <div className={title ? "mt-6" : ""}>
-          {children}
-        </div>
+
+        <div className={title ? 'mt-6' : ''}>{children}</div>
       </DialogContent>
     </Dialog>
   )
@@ -86,12 +90,20 @@ export function GlassModal({
 /**
  * Glass morphism card component for use inside modals
  */
-export function GlassCard({ children, className }: { children: React.ReactNode, className?: string }) {
+export function GlassCard({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
   return (
-    <div className={cn(
-      "rounded-lg border border-border bg-card/80 p-4 backdrop-blur-sm dark:bg-background/5",
-      className
-    )}>
+    <div
+      className={cn(
+        'rounded-lg border border-border bg-card/80 p-4 backdrop-blur-sm dark:bg-background/5',
+        className,
+      )}
+    >
       {children}
     </div>
   )
@@ -100,13 +112,14 @@ export function GlassCard({ children, className }: { children: React.ReactNode, 
 /**
  * Glass morphism input styling classes
  */
-export const glassInputClasses = "voxxy-input-frost"
+export const glassInputClasses = 'voxxy-input-frost'
 
 /**
  * Glass morphism button styling classes
  */
 export const glassButtonClasses = {
-  primary: "voxxy-btn-solid",
-  secondary: "bg-background/10 border-border text-foreground hover:bg-background/20",
-  outline: "bg-background/10 backdrop-blur-sm border border-border text-foreground hover:bg-background/15 hover:border-border"
+  primary: 'voxxy-btn-solid',
+  secondary: 'bg-background/10 border-border text-foreground hover:bg-background/20',
+  outline:
+    'bg-background/10 backdrop-blur-sm border border-border text-foreground hover:bg-background/15 hover:border-border',
 }

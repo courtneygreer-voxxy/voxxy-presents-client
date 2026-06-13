@@ -10,15 +10,15 @@
 
 ## Current State (updated April 28, 2026)
 
-| Metric | Value |
-|--------|-------|
-| Source files (`src/**/*.ts(x)`) | ~269 |
-| Test files | 3 (smoke, auth, api error handling) |
-| Tests | 19 |
-| Suite runtime | <400ms |
-| CI runs tests | Yes (as of this PR) |
-| Coverage reporting | Not yet configured |
-| E2E tests | None |
+| Metric                          | Value                               |
+| ------------------------------- | ----------------------------------- |
+| Source files (`src/**/*.ts(x)`) | ~269                                |
+| Test files                      | 3 (smoke, auth, api error handling) |
+| Tests                           | 19                                  |
+| Suite runtime                   | <400ms                              |
+| CI runs tests                   | Yes (as of this PR)                 |
+| Coverage reporting              | Not yet configured                  |
+| E2E tests                       | None                                |
 
 ---
 
@@ -26,16 +26,16 @@
 
 Goal: Every PR runs tests. First real coverage on highest-risk code.
 
-| # | Task | Status | Notes |
-|---|------|--------|-------|
-| 1.1 | Restore vitest + jsdom + setup file | Done | `vitest.config.ts`, `src/test/setup.ts` |
-| 1.2 | Smoke test proving pipeline works | Done | `src/test/smoke.test.ts` |
-| 1.3 | Add `npm run test:run` to CI | Done | `.github/workflows/ci.yml` |
-| 1.4 | Auth token tests (save/get/clear lifecycle) | Done | `src/services/auth.test.ts` (8 tests) |
-| 1.5 | API error handling tests (fetchApi behavior) | Done | `src/services/api.test.ts` (9 tests) |
-| 1.6 | Add coverage reporting (`@vitest/coverage-v8`) | Todo | Install package, add `--coverage` to CI, set baseline threshold |
-| 1.7 | Fix hardcoded `localStorage.getItem('authToken')` in EventSettings.tsx | Todo | Lines 216, 268 use wrong key (`authToken` vs `railsAuthToken`) |
-| 1.8 | Add 401 interceptor to fetchApi | Todo | Auto-logout on expired token; prevents "zombie session" state |
+| #   | Task                                                                   | Status | Notes                                                           |
+| --- | ---------------------------------------------------------------------- | ------ | --------------------------------------------------------------- |
+| 1.1 | Restore vitest + jsdom + setup file                                    | Done   | `vitest.config.ts`, `src/test/setup.ts`                         |
+| 1.2 | Smoke test proving pipeline works                                      | Done   | `src/test/smoke.test.ts`                                        |
+| 1.3 | Add `npm run test:run` to CI                                           | Done   | `.github/workflows/ci.yml`                                      |
+| 1.4 | Auth token tests (save/get/clear lifecycle)                            | Done   | `src/services/auth.test.ts` (8 tests)                           |
+| 1.5 | API error handling tests (fetchApi behavior)                           | Done   | `src/services/api.test.ts` (9 tests)                            |
+| 1.6 | Add coverage reporting (`@vitest/coverage-v8`)                         | Todo   | Install package, add `--coverage` to CI, set baseline threshold |
+| 1.7 | Fix hardcoded `localStorage.getItem('authToken')` in EventSettings.tsx | Todo   | Lines 216, 268 use wrong key (`authToken` vs `railsAuthToken`)  |
+| 1.8 | Add 401 interceptor to fetchApi                                        | Todo   | Auto-logout on expired token; prevents "zombie session" state   |
 
 ---
 
@@ -43,15 +43,15 @@ Goal: Every PR runs tests. First real coverage on highest-risk code.
 
 Goal: Happy-path tests for every revenue and trust-adjacent flow.
 
-| # | Task | Status | Priority | Notes |
-|---|------|--------|----------|-------|
-| 2.1 | AuthContext tests (login, logout, role helpers, token expiry) | Todo | Critical | Currently untested; exercises protected route logic |
-| 2.2 | Event creation wizard validation (Steps 1-4) | Todo | Critical | Steps 3-4 are placeholder `return true` |
-| 2.3 | Vendor application form (submit, prefill, error handling) | Todo | High | Silent prefill failure at VendorApplicationForm.tsx:199 |
-| 2.4 | Payment success/cancel page behavior | Todo | High | No webhook verification on frontend |
-| 2.5 | Email variable resolution | Todo | High | Business-critical; old demo script was deleted |
-| 2.6 | CSV import validation flow | Todo | Medium | Two-phase validate-then-import |
-| 2.7 | Registration/RSVP submission | Todo | Medium | Single test existed before; needs rebuild |
+| #   | Task                                                          | Status | Priority | Notes                                                   |
+| --- | ------------------------------------------------------------- | ------ | -------- | ------------------------------------------------------- |
+| 2.1 | AuthContext tests (login, logout, role helpers, token expiry) | Todo   | Critical | Currently untested; exercises protected route logic     |
+| 2.2 | Event creation wizard validation (Steps 1-4)                  | Todo   | Critical | Steps 3-4 are placeholder `return true`                 |
+| 2.3 | Vendor application form (submit, prefill, error handling)     | Todo   | High     | Silent prefill failure at VendorApplicationForm.tsx:199 |
+| 2.4 | Payment success/cancel page behavior                          | Todo   | High     | No webhook verification on frontend                     |
+| 2.5 | Email variable resolution                                     | Todo   | High     | Business-critical; old demo script was deleted          |
+| 2.6 | CSV import validation flow                                    | Todo   | Medium   | Two-phase validate-then-import                          |
+| 2.7 | Registration/RSVP submission                                  | Todo   | Medium   | Single test existed before; needs rebuild               |
 
 ---
 
@@ -59,14 +59,14 @@ Goal: Happy-path tests for every revenue and trust-adjacent flow.
 
 Goal: Coverage is measured, security scanning runs, CI is fast and reliable.
 
-| # | Task | Status | Notes |
-|---|------|--------|-------|
-| 3.1 | Set coverage threshold (start at 10%, raise quarterly) | Todo | Fail CI if coverage drops below threshold |
-| 3.2 | Add `npm audit` to CI | Todo | Catch vulnerable dependencies before merge |
-| 3.3 | Add secret scanning to CI | Todo | Prevent accidental credential commits |
-| 3.4 | Add Dependabot for npm dependencies | Todo | `.github/dependabot.yml` |
-| 3.5 | PR template with testing checklist | Todo | "Tests added/updated," "test:run green locally" |
-| 3.6 | CODEOWNERS file for high-risk paths | Todo | `src/services/api.ts`, `src/contexts/AuthContext.tsx`, etc. |
+| #   | Task                                                   | Status | Notes                                                       |
+| --- | ------------------------------------------------------ | ------ | ----------------------------------------------------------- |
+| 3.1 | Set coverage threshold (start at 10%, raise quarterly) | Todo   | Fail CI if coverage drops below threshold                   |
+| 3.2 | Add `npm audit` to CI                                  | Todo   | Catch vulnerable dependencies before merge                  |
+| 3.3 | Add secret scanning to CI                              | Todo   | Prevent accidental credential commits                       |
+| 3.4 | Add Dependabot for npm dependencies                    | Todo   | `.github/dependabot.yml`                                    |
+| 3.5 | PR template with testing checklist                     | Todo   | "Tests added/updated," "test:run green locally"             |
+| 3.6 | CODEOWNERS file for high-risk paths                    | Todo   | `src/services/api.ts`, `src/contexts/AuthContext.tsx`, etc. |
 
 ---
 
@@ -74,15 +74,15 @@ Goal: Coverage is measured, security scanning runs, CI is fast and reliable.
 
 Goal: Real user flows are tested end-to-end. Production bugs get regression tests.
 
-| # | Task | Status | Notes |
-|---|------|--------|-------|
-| 4.1 | Choose E2E framework (Playwright recommended) | Todo | Evaluate against project needs |
-| 4.2 | E2E: Login and reach dashboard | Todo | First E2E test, validates auth + routing |
-| 4.3 | E2E: Create event happy path | Todo | Wizard steps 1-4, verify event appears |
-| 4.4 | E2E: Vendor application submit | Todo | Public form, verify confirmation |
-| 4.5 | E2E: Payment checkout redirect | Todo | Verify Stripe redirect works |
-| 4.6 | Regression test process documented | Todo | "Bug found in prod -> write test -> then fix" |
-| 4.7 | CI under 10 minutes with full suite | Todo | Monitor and optimize as suite grows |
+| #   | Task                                          | Status | Notes                                         |
+| --- | --------------------------------------------- | ------ | --------------------------------------------- |
+| 4.1 | Choose E2E framework (Playwright recommended) | Todo   | Evaluate against project needs                |
+| 4.2 | E2E: Login and reach dashboard                | Todo   | First E2E test, validates auth + routing      |
+| 4.3 | E2E: Create event happy path                  | Todo   | Wizard steps 1-4, verify event appears        |
+| 4.4 | E2E: Vendor application submit                | Todo   | Public form, verify confirmation              |
+| 4.5 | E2E: Payment checkout redirect                | Todo   | Verify Stripe redirect works                  |
+| 4.6 | Regression test process documented            | Todo   | "Bug found in prod -> write test -> then fix" |
+| 4.7 | CI under 10 minutes with full suite           | Todo   | Monitor and optimize as suite grows           |
 
 ---
 

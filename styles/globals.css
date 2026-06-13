@@ -87,7 +87,7 @@
   body {
     @apply bg-background text-foreground;
   }
-  
+
   /* Apply admin-dark theme to all pages by default */
   html {
     @apply admin-dark;
@@ -159,106 +159,106 @@
   .bg-purple-600 {
     @apply !bg-purple-600 !text-primary-foreground !important;
   }
-  
+
   /* All buttons default to glass styling */
-  button:not([class*="glass-"]):not([class*="bg-"]) {
+  button:not([class*='glass-']):not([class*='bg-']) {
     @apply glass-button-secondary;
   }
-  
+
   /* Primary action buttons */
-  button[class*="bg-purple"] {
+  button[class*='bg-purple'] {
     @apply glass-button-primary;
   }
-  
+
   /* Input fields */
-  input:not([class*="bg-"]), 
-  textarea:not([class*="bg-"]), 
-  select:not([class*="bg-"]) {
+  input:not([class*='bg-']),
+  textarea:not([class*='bg-']),
+  select:not([class*='bg-']) {
     @apply glass-input;
   }
-  
+
   /* Card components */
-  [class*="Card"]:not([class*="bg-"]) {
+  [class*='Card']:not([class*='bg-']) {
     @apply glass-card;
   }
-  
+
   /* Modal/Dialog components */
   [data-radix-dialog-content] {
     @apply glass-modal;
   }
-  
+
   /* Popover components */
   [data-radix-popover-content] {
     @apply glass-modal border-foreground/30;
   }
-  
+
   /* Dropdown components */
   [data-radix-dropdown-menu-content] {
     @apply glass-modal border-foreground/30;
   }
-  
+
   /* Badge component overrides */
-  [class*="Badge"] {
+  [class*='Badge'] {
     /* Status badges */
-    &[class*="bg-red"] {
+    &[class*='bg-red'] {
       @apply !bg-primary-foreground !text-primary !border-primary !border !important;
     }
-    
-    &[class*="bg-purple"] {
+
+    &[class*='bg-purple'] {
       @apply !bg-purple-600 !text-primary-foreground !important;
     }
-    
+
     /* Default badge styling */
-    &:not([class*="bg-"]) {
+    &:not([class*='bg-']) {
       @apply bg-background/10 text-foreground border-foreground/20 border;
     }
   }
-  
+
   /* Tab components */
   [data-radix-tabs-trigger] {
     @apply text-muted-foreground hover:text-foreground !bg-transparent;
     @apply data-[state=active]:!bg-background/20 data-[state=active]:!text-foreground;
   }
-  
+
   /* Table components */
   table {
     @apply text-foreground;
   }
-  
+
   th {
     @apply text-foreground border-foreground/20;
   }
-  
+
   td {
     @apply text-muted-foreground border-border;
   }
-  
+
   /* Alert components */
-  [class*="alert"]:not([class*="bg-"]) {
+  [class*='alert']:not([class*='bg-']) {
     @apply glass-card border-foreground/20;
   }
-  
+
   /* Select components */
   [data-radix-select-trigger] {
     @apply glass-input;
   }
-  
+
   [data-radix-select-content] {
     @apply glass-modal border-foreground/30;
   }
 }
 
 /* Force all Badge components to respect our theme globally */
-[class*="badge"] {
+[class*='badge'] {
   /* SOLD OUT badges */
-  &.bg-red-600, 
-  &[class*="bg-red"] {
+  &.bg-red-600,
+  &[class*='bg-red'] {
     @apply !bg-primary-foreground !text-primary !border-primary !border !important;
   }
-  
+
   /* PRESALE badges */
   &.bg-purple-600,
-  &[class*="bg-purple"] {
+  &[class*='bg-purple'] {
     @apply !bg-purple-600 !text-primary-foreground !important;
   }
 }

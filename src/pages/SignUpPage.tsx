@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Sparkles } from 'lucide-react'
 import { UnifiedSignUpForm } from '@/components/auth/UnifiedSignUpForm'
 import { usePageTracking } from '@/hooks/usePageTracking'
 import { useForceTheme } from '@/hooks/useForceTheme'
@@ -23,7 +23,9 @@ export default function SignUpPage() {
   const handleSignUpSuccess = (email: string) => {
     // After successful signup, redirect to pending/account setup page
     navigate('/pending', {
-      state: { message: 'Account created successfully! Please check your email for a verification code.' }
+      state: {
+        message: 'Account created successfully! Please check your email for a verification code.',
+      },
     })
   }
 
@@ -45,14 +47,11 @@ export default function SignUpPage() {
 
         <div className="relative z-10 flex flex-col justify-center items-center w-full px-12 text-foreground">
           <div className="text-center space-y-6">
-            <span className="font-nav-logo text-[3rem] font-black italic tracking-[0.08em] text-white uppercase leading-none block mb-6">
-              VOXXY
-            </span>
-            <h2 className="text-4xl font-bold text-white leading-tight">
-              The OS for recurring event producers.
-            </h2>
-            <p className="text-lg text-white/75 max-w-md">
-              Manage artist applications, automate communications, and grow your producer network — all from one place.
+            <Sparkles className="h-20 w-20 mx-auto mb-6" />
+            <h1 className="text-5xl font-bold mb-4">Join Voxxy</h1>
+            <p className="text-xl text-white/80 max-w-md">
+              Start managing your events, building your community, and growing your business with
+              Voxxy
             </p>
           </div>
         </div>
@@ -91,9 +90,7 @@ export default function SignUpPage() {
             <Card className="w-full bg-background/5 backdrop-blur-xl border border-primary/30 shadow-[0_0_50px_rgba(144,84,227,0.3)]">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-bold text-foreground">Join Voxxy</CardTitle>
-                <CardDescription>
-                  Choose your account type to get started
-                </CardDescription>
+                <CardDescription>Choose your account type to get started</CardDescription>
               </CardHeader>
               <CardContent>
                 <UnifiedSignUpForm
@@ -107,7 +104,10 @@ export default function SignUpPage() {
                   <Separator className="bg-background/20 mb-4" />
                   <p className="text-muted-foreground text-sm text-center">
                     Already have an account?{' '}
-                    <Link to="/login" className="text-primary hover:text-primary/70 font-medium transition-colors">
+                    <Link
+                      to="/login"
+                      className="text-primary hover:text-primary/70 font-medium transition-colors"
+                    >
                       Sign in here
                     </Link>
                   </p>

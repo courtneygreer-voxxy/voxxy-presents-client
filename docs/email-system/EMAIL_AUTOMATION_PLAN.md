@@ -89,6 +89,7 @@ An automated email system that sends scheduled, personalized emails to vendors t
 ```
 
 **Key Concepts:**
+
 - A **template** is a complete **email campaign** (collection of up to 40 emails), not a single email
 - **Editable emails** (16 in default) are stored in `email_template_items` and can be customized/paused/deleted
 - **System emails** (8 in default) are hard-coded and automatically sent on status/action changes
@@ -101,6 +102,7 @@ An automated email system that sends scheduled, personalized emails to vendors t
 The following decisions were made by the CEO and are incorporated throughout this plan:
 
 ### 1. Recipient Granularity
+
 **Decision:** Hybrid Filtering (Custom Segments + Internal Status)
 
 - **User-Defined Segments**: Support custom recipient lists based on vendor attributes (e.g., "Only vendors in Atlanta")
@@ -108,6 +110,7 @@ The following decisions were made by the CEO and are incorporated throughout thi
 - **Safety Logic**: Event detail change notifications default to "Accepted" vendors only (exclude waitlist/rejected)
 
 **Implementation**: JSONB `filter_criteria` field supporting:
+
 ```json
 {
   "status": ["approved"],
@@ -118,6 +121,7 @@ The following decisions were made by the CEO and are incorporated throughout thi
 ```
 
 ### 2. Email Editor
+
 **Decision:** Simplified WYSIWYG with Dynamic Placeholders
 
 - Rich-text interface for non-technical users
@@ -128,6 +132,7 @@ The following decisions were made by the CEO and are incorporated throughout thi
 **Implementation**: TipTap editor with custom toolbar extensions
 
 ### 3. Event Date Changes
+
 **Decision:** Manual Confirmation Workflow
 
 - No silent auto-recalculation of send dates
@@ -138,6 +143,7 @@ The following decisions were made by the CEO and are incorporated throughout thi
 **Implementation**: Preview endpoint + confirmation modal with affected emails table
 
 ### 4. Template System
+
 **Decision:** Template = Collection of Emails (up to 40 per template)
 
 - **Template Definition**: A template is a complete email campaign containing up to 40 individual emails
@@ -149,6 +155,7 @@ The following decisions were made by the CEO and are incorporated throughout thi
 **Implementation**: Two-table approach: `email_campaign_templates` (collections) + `email_template_items` (individual emails within collection)
 
 ### 5. Sent Email History
+
 **Decision:** Out of Scope (Phase 1)
 
 - Rely on recipient's email client for history
@@ -158,6 +165,7 @@ The following decisions were made by the CEO and are incorporated throughout thi
 **Implementation**: Deferred to future phase
 
 ### 6. Priority
+
 **Decision:** Phase 1 (Infrastructure)
 
 - Establish robust scheduling engine first
@@ -176,6 +184,7 @@ A template is a **complete email campaign** - a named collection of up to 40 ind
 Think of it like a "playbook" or "campaign blueprint" that contains all the emails for an event.
 
 **Example Templates:**
+
 - **Default Template** (System): "Standard Event Campaign" - 40 pre-written emails
 - **User Template 1**: "Summer Market Campaign" - 35 customized emails
 - **User Template 2**: "Atlanta Food Festival Campaign" - 28 emails tailored for food vendors in Atlanta
@@ -183,6 +192,7 @@ Think of it like a "playbook" or "campaign blueprint" that contains all the emai
 ### Three-Layer Architecture
 
 #### Layer 1: Email Campaign Templates (Collections)
+
 - **What**: Named collections of email configurations
 - **Types**:
   - System Default (1 template provided by platform)
@@ -191,6 +201,7 @@ Think of it like a "playbook" or "campaign blueprint" that contains all the emai
 - **Storage**: `email_campaign_templates` table
 
 #### Layer 2: Email Template Items (Individual Emails Within Templates)
+
 - **What**: Individual email configurations within a template
 - **Examples**: "Applications Now Open", "Deadline Approaching", "Thank You Email"
 - **Properties**: Subject, body, trigger logic, recipient filters
@@ -198,6 +209,7 @@ Think of it like a "playbook" or "campaign blueprint" that contains all the emai
 - **Storage**: `email_template_items` table (belongs to a campaign template)
 
 #### Layer 3: Scheduled Emails (Event-Specific Instances)
+
 - **What**: Actual emails that will be sent for a specific event
 - **Generated**: When event is created, system generates scheduled emails from chosen template
 - **Customizable**: Producer can edit, pause, delete any email for this event only
@@ -233,6 +245,7 @@ Think of it like a "playbook" or "campaign blueprint" that contains all the emai
 ## Database Schema
 
 ### Table 1: `email_campaign_templates`
+
 Master template collections (system default + user custom campaigns)
 
 ```ruby
@@ -258,6 +271,7 @@ add_index :email_campaign_templates, [:template_type, :is_default]
 ```
 
 **Validations:**
+
 - `name` must be present and unique per organization
 - `template_type` must be 'system' or 'user'
 - Only one system template can have `is_default = true`
@@ -265,6 +279,7 @@ add_index :email_campaign_templates, [:template_type, :is_default]
 - User templates: unlimited per organization
 
 **Example Records:**
+
 ```ruby
 # System default template
 {
@@ -292,6 +307,7 @@ add_index :email_campaign_templates, [:template_type, :is_default]
 ---
 
 ### Table 2: `email_template_items`
+
 Individual emails within a template collection
 
 ```ruby
@@ -330,12 +346,14 @@ add_index :email_template_items, :filter_criteria, using: :gin
 ```
 
 **Validations:**
+
 - Must belong to an `email_campaign_template`
 - `position` must be between 1 and 40
 - Maximum 40 email_template_items per campaign template
 - `name` must be unique within a template
 
 **Example Records:**
+
 ```ruby
 # Email #1 in Default Template
 {
@@ -370,6 +388,7 @@ add_index :email_template_items, :filter_criteria, using: :gin
 ---
 
 ### Table 3: `scheduled_emails`
+
 Event-specific email instances (actual scheduled emails)
 
 ```ruby
@@ -411,11 +430,13 @@ add_index :scheduled_emails, :filter_criteria, using: :gin
 ```
 
 **Validations:**
+
 - Must belong to an event
 - Status must be one of: scheduled, paused, sent, failed, cancelled
 - Cannot edit if status='sent' (immutable after sending)
 
 **Example Records:**
+
 ```ruby
 # Scheduled email for Event #123
 {
@@ -437,6 +458,7 @@ add_index :scheduled_emails, :filter_criteria, using: :gin
 ---
 
 ### Table 4: `email_deliveries`
+
 Email delivery tracking with SendGrid webhook integration (Phase 1)
 
 ```ruby
@@ -479,6 +501,7 @@ add_index :email_deliveries, :next_retry_at, where: "next_retry_at IS NOT NULL"
 ```
 
 **Validations:**
+
 - `sendgrid_message_id` must be unique (one delivery record per sent email)
 - `status` must be one of: queued, sent, delivered, bounced, dropped, unsubscribed
 - Soft bounces can be retried up to 3 times with exponential backoff
@@ -520,24 +543,30 @@ The system provides one default email campaign template with **24 pre-written em
 ### Two Types of Emails
 
 #### 1. Editable/Scheduled Emails (16 emails)
+
 These emails are stored in `email_template_items` table and can be:
+
 - ✅ Customized (subject, body, timing, recipients)
 - ✅ Paused or deleted per event
 - ✅ Scheduled based on triggers (days before deadline, days before event, etc.)
 
 **Categories:**
+
 - **Event Announcements**: 4 emails (promote event, drive applications)
 - **Application Updates**: 1 email (confirm receipt)
 - **Payment Reminders**: 4 emails (payment deadline countdown)
 - **Event Countdown**: 7 emails (pre-event reminders, day-of, post-event thank you)
 
 #### 2. System Emails (8 emails)
+
 These emails are hard-coded in application logic and:
+
 - ❌ CANNOT be edited, paused, or deleted by producers
 - ⚙️ Automatically sent when specific actions occur (status changes, event updates)
 - 🔒 Sent immediately via `RegistrationEmailService`, not through scheduling system
 
 **System Email Triggers:**
+
 - Application Accepted (status → approved)
 - Waitlist/Not Accepted (status → waitlist/rejected)
 - Moved to Waitlist - Non-Payment (payment deadline missed)
@@ -551,42 +580,44 @@ These emails are hard-coded in application logic and:
 
 **For full implementation details (subjects, body HTML, triggers, filters), see [EMAIL_TEMPLATES.md](./EMAIL_TEMPLATES.md)**
 
-| # | Email Name | Category | Trigger | Editable |
-|---|------------|----------|---------|----------|
-| 1 | Immediate Announcement | Event Announcements | On application open | ✅ Yes |
-| 2 | 10 Weeks Before Deadline | Event Announcements | 70 days before deadline | ✅ Yes |
-| 3 | 8 Weeks Before Deadline | Event Announcements | 56 days before deadline | ✅ Yes |
-| 4 | 12 Days Before Deadline | Event Announcements | 12 days before deadline | ✅ Yes |
-| 5 | Application Received | Application Updates | On submit | ✅ Yes |
-| 6 | Payment Details | Payment Reminders | On approval | ✅ Yes |
-| 7 | 1 Week Before Payment | Payment Reminders | 7 days before payment due | ✅ Yes |
-| 8 | 3 Days Before Payment | Payment Reminders | 3 days before payment due | ✅ Yes |
-| 9 | Payment Due Today | Payment Reminders | On payment deadline | ✅ Yes |
-| 10 | 33 Days Before Event | Event Countdown | 33 days before event | ✅ Yes |
-| 11 | 23 Days Before Event | Event Countdown | 23 days before event | ✅ Yes |
-| 12 | 10 Days Before Event | Event Countdown | 10 days before event | ✅ Yes |
-| 13 | 4 Days Before Event | Event Countdown | 4 days before event | ✅ Yes |
-| 14 | 2 Days Before Event | Event Countdown | 2 days before event | ✅ Yes |
-| 15 | Day of Event | Event Countdown | Event day at 7:00 AM | ✅ Yes |
-| 16 | Day After Event - Thank You | Event Countdown | 1 day after event | ✅ Yes |
-| 17 | Application Accepted | System Email | Status → approved | ❌ No |
-| 18 | Waitlist/Not Accepted | System Email | Status → waitlist/rejected | ❌ No |
-| 19 | Moved to Waitlist (Non-Payment) | System Email | Payment deadline missed | ❌ No |
-| 20 | Payment Confirmed | System Email | Payment received | ❌ No |
-| 21 | Category Changed | System Email | Category updated | ❌ No |
-| 22 | Event Details Changed | System Email | Event date/venue changed | ❌ No |
-| 23 | Event Canceled | System Email | Event cancelled | ❌ No |
-| 24 | Bulletin Board Update | System Email | Bulletin post created | ❌ No |
+| #   | Email Name                      | Category            | Trigger                    | Editable |
+| --- | ------------------------------- | ------------------- | -------------------------- | -------- |
+| 1   | Immediate Announcement          | Event Announcements | On application open        | ✅ Yes   |
+| 2   | 10 Weeks Before Deadline        | Event Announcements | 70 days before deadline    | ✅ Yes   |
+| 3   | 8 Weeks Before Deadline         | Event Announcements | 56 days before deadline    | ✅ Yes   |
+| 4   | 12 Days Before Deadline         | Event Announcements | 12 days before deadline    | ✅ Yes   |
+| 5   | Application Received            | Application Updates | On submit                  | ✅ Yes   |
+| 6   | Payment Details                 | Payment Reminders   | On approval                | ✅ Yes   |
+| 7   | 1 Week Before Payment           | Payment Reminders   | 7 days before payment due  | ✅ Yes   |
+| 8   | 3 Days Before Payment           | Payment Reminders   | 3 days before payment due  | ✅ Yes   |
+| 9   | Payment Due Today               | Payment Reminders   | On payment deadline        | ✅ Yes   |
+| 10  | 33 Days Before Event            | Event Countdown     | 33 days before event       | ✅ Yes   |
+| 11  | 23 Days Before Event            | Event Countdown     | 23 days before event       | ✅ Yes   |
+| 12  | 10 Days Before Event            | Event Countdown     | 10 days before event       | ✅ Yes   |
+| 13  | 4 Days Before Event             | Event Countdown     | 4 days before event        | ✅ Yes   |
+| 14  | 2 Days Before Event             | Event Countdown     | 2 days before event        | ✅ Yes   |
+| 15  | Day of Event                    | Event Countdown     | Event day at 7:00 AM       | ✅ Yes   |
+| 16  | Day After Event - Thank You     | Event Countdown     | 1 day after event          | ✅ Yes   |
+| 17  | Application Accepted            | System Email        | Status → approved          | ❌ No    |
+| 18  | Waitlist/Not Accepted           | System Email        | Status → waitlist/rejected | ❌ No    |
+| 19  | Moved to Waitlist (Non-Payment) | System Email        | Payment deadline missed    | ❌ No    |
+| 20  | Payment Confirmed               | System Email        | Payment received           | ❌ No    |
+| 21  | Category Changed                | System Email        | Category updated           | ❌ No    |
+| 22  | Event Details Changed           | System Email        | Event date/venue changed   | ❌ No    |
+| 23  | Event Canceled                  | System Email        | Event cancelled            | ❌ No    |
+| 24  | Bulletin Board Update           | System Email        | Bulletin post created      | ❌ No    |
 
 ### Implementation Notes
 
 **Editable Emails (1-16):**
+
 - Stored in `email_template_items` table
 - Generated as `scheduled_emails` when event is created
 - Can be customized, paused, or deleted by producer
 - Sent by background job (`EmailSenderWorker`)
 
 **System Emails (17-24):**
+
 - Hard-coded in `RegistrationEmailService`
 - NOT stored in `email_template_items` or `scheduled_emails`
 - Triggered automatically by model callbacks (`after_update`, etc.)
@@ -594,6 +625,7 @@ These emails are hard-coded in application logic and:
 - Sent immediately when trigger action occurs
 
 **Variable Mapping:**
+
 - Template uses `[firstName]`, `[eventName]`, etc.
 - Backend resolves to `{{vendor_name}}`, `{{event_title}}`, etc.
 - See EMAIL_TEMPLATES.md for complete variable reference
@@ -607,14 +639,16 @@ These emails are hard-coded in application logic and:
 The `filter_criteria` JSONB field supports the following filters:
 
 #### Status Filters
+
 ```json
 {
-  "status": ["approved", "confirmed"],           // Include these statuses
-  "exclude_status": ["waitlist", "rejected"]     // Exclude these statuses (safety logic)
+  "status": ["approved", "confirmed"], // Include these statuses
+  "exclude_status": ["waitlist", "rejected"] // Exclude these statuses (safety logic)
 }
 ```
 
 **Available statuses:**
+
 - `pending` - Application submitted, awaiting review
 - `approved` - Application accepted by producer
 - `confirmed` - Vendor confirmed participation (payment received)
@@ -623,16 +657,18 @@ The `filter_criteria` JSONB field supports the following filters:
 - `cancelled` - Vendor cancelled after approval
 
 #### Vendor Attribute Filters
+
 ```json
 {
-  "vendor_category": ["Food", "Art", "Music"],   // Filter by vendor type
-  "location_city": ["Atlanta", "Savannah"],      // Filter by vendor location
-  "location_state": ["GA", "FL"],                // Filter by state
+  "vendor_category": ["Food", "Art", "Music"], // Filter by vendor type
+  "location_city": ["Atlanta", "Savannah"], // Filter by vendor location
+  "location_state": ["GA", "FL"], // Filter by state
   "tags": ["premium_vendor", "returning_vendor"] // Custom tags
 }
 ```
 
 #### Payment Filters (Future)
+
 ```json
 {
   "payment_status": ["paid", "unpaid", "partial"]
@@ -642,6 +678,7 @@ The `filter_criteria` JSONB field supports the following filters:
 ### Filter Logic
 
 Filters are **cumulative (AND logic)**:
+
 ```json
 {
   "status": ["approved"],
@@ -649,17 +686,20 @@ Filters are **cumulative (AND logic)**:
   "location_city": ["Atlanta"]
 }
 ```
+
 Result: Approved vendors in Food category located in Atlanta
 
 ### Example Use Cases
 
 **Use Case 1: Event logistics email (CEO Decision #1 - Safety Logic)**
+
 ```json
 {
   "status": ["approved", "confirmed"],
   "exclude_status": ["waitlist", "rejected"]
 }
 ```
+
 ✅ Sends to approved/confirmed vendors only
 ❌ Prevents rejected/waitlist vendors from receiving setup instructions
 
@@ -674,6 +714,7 @@ Variables use double curly braces: `{{variable_name}}`
 ### Available Variables
 
 #### Event Variables
+
 ```
 {{event_title}}                    // "Summer Market 2025"
 {{event_date}}                     // "June 15, 2025" (formatted)
@@ -688,6 +729,7 @@ Variables use double curly braces: `{{variable_name}}`
 ```
 
 #### Organization Variables
+
 ```
 {{organization_name}}              // "Voxxy Presents"
 {{organization_email}}             // "events@voxxyai.com"
@@ -697,6 +739,7 @@ Variables use double curly braces: `{{variable_name}}`
 ```
 
 #### Vendor-Specific Variables (resolved per recipient)
+
 ```
 {{vendor_name}}                    // "John Doe"
 {{business_name}}                  // "John's Tacos"
@@ -707,6 +750,7 @@ Variables use double curly braces: `{{variable_name}}`
 ```
 
 #### Computed Variables (future enhancement)
+
 ```
 {{days_remaining}}                 // Days until event
 {{days_until_deadline}}            // Days until application deadline
@@ -722,6 +766,7 @@ Variables use double curly braces: `{{variable_name}}`
 **Phase 1 Scope:** Real-time email delivery tracking using SendGrid Event Webhooks. Track delivery status, bounces, drops, and unsubscribes with automatic retry logic for soft bounces.
 
 **Why Include in Phase 1:**
+
 - ✅ SendGrid webhook already configured
 - ✅ Essential for debugging during rollout
 - ✅ Producers expect delivery visibility
@@ -815,12 +860,14 @@ end
 **Webhook URL:** `https://www.voxxypresents.com/webhooks/sendgrid`
 
 **Events to Track:**
+
 - ✅ `delivered` - Email successfully delivered to recipient's inbox
 - ✅ `bounce` - Email bounced (hard or soft bounce)
 - ✅ `dropped` - SendGrid refused to send (e.g., previously unsubscribed)
 - ✅ `unsubscribe` - User clicked unsubscribe link
 
 **Webhook Payload Example:**
+
 ```json
 [
   {
@@ -902,6 +949,7 @@ end
 ### Webhook Controller
 
 **Route:**
+
 ```ruby
 # config/routes.rb
 namespace :webhooks do
@@ -910,6 +958,7 @@ end
 ```
 
 **Controller:**
+
 ```ruby
 # app/controllers/webhooks/sendgrid_controller.rb
 module Webhooks
@@ -938,6 +987,7 @@ end
 ### Background Processing
 
 **Sidekiq Worker:**
+
 ```ruby
 # app/workers/email_delivery_processor_job.rb
 class EmailDeliveryProcessorJob
@@ -1022,6 +1072,7 @@ end
 ```
 
 **Email Retry Worker:**
+
 ```ruby
 # app/workers/email_retry_job.rb
 class EmailRetryJob
@@ -1093,6 +1144,7 @@ const DeliveryStatusBadge = ({ status, delivery }: { status: string; delivery?: 
 ```
 
 **API Response Update:**
+
 ```ruby
 # app/controllers/api/v1/scheduled_emails_controller.rb
 def index
@@ -1116,6 +1168,7 @@ end
 ### Monitoring & Alerts
 
 **Daily Summary Job (Phase 2):**
+
 ```ruby
 # app/workers/email_delivery_summary_job.rb
 class EmailDeliverySummaryJob
@@ -1146,6 +1199,7 @@ end
 ### Testing the Webhook
 
 **Local Testing with ngrok:**
+
 ```bash
 # 1. Start ngrok tunnel
 ngrok http 3000
@@ -1158,6 +1212,7 @@ ngrok http 3000
 ```
 
 **RSpec Tests:**
+
 ```ruby
 # spec/controllers/webhooks/sendgrid_controller_spec.rb
 RSpec.describe Webhooks::SendgridController, type: :controller do
@@ -1181,6 +1236,7 @@ end
 ### Implementation Checklist
 
 **Phase 1 - Core Tracking:**
+
 - [ ] Create `email_deliveries` migration and model
 - [ ] Add associations to `ScheduledEmail` model
 - [ ] Update email sending service to include `custom_args` tracking IDs
@@ -1194,6 +1250,7 @@ end
 - [ ] Verify webhook in production SendGrid settings
 
 **Phase 2 Enhancements (Future):**
+
 - [ ] Add Action Cable real-time updates
 - [ ] Daily delivery health monitoring
 - [ ] Manual resend UI for failed emails
@@ -1210,6 +1267,7 @@ end
 **Purpose:** Calculate when an email should be sent based on trigger logic
 
 **Method:**
+
 ```ruby
 EmailScheduleCalculator.calculate(
   trigger_type: 'days_before_event',
@@ -1228,6 +1286,7 @@ EmailScheduleCalculator.calculate(
 **Purpose:** Filter event registrations based on filter_criteria JSONB
 
 **Method:**
+
 ```ruby
 RecipientFilterService.filter_recipients(
   event: @event,
@@ -1243,12 +1302,14 @@ RecipientFilterService.filter_recipients(
 **Purpose:** Auto-generate scheduled emails when event is created (from selected template)
 
 **Method:**
+
 ```ruby
 ScheduledEmailGenerator.generate_for_event(@event, @email_campaign_template)
 # Creates up to 40 scheduled_email records from template
 ```
 
 **Logic:**
+
 1. Fetch all `email_template_items` for the selected campaign template
 2. For each template item:
    - Create ScheduledEmail record
@@ -1265,6 +1326,7 @@ ScheduledEmailGenerator.generate_for_event(@event, @email_campaign_template)
 **Purpose:** Replace {{variables}} with actual data
 
 **Method:**
+
 ```ruby
 EmailVariableResolver.resolve(
   template: "Hi {{vendor_name}}, {{event_title}} is on {{event_date}}",
@@ -1281,6 +1343,7 @@ EmailVariableResolver.resolve(
 **Purpose:** Clone a template to create a new user template ("Save as New Template")
 
 **Method:**
+
 ```ruby
 EmailCampaignTemplateCloner.clone(
   source_template: @email_campaign_template,
@@ -1291,6 +1354,7 @@ EmailCampaignTemplateCloner.clone(
 ```
 
 **Logic:**
+
 1. Create new `EmailCampaignTemplate` record
    - template_type: 'user'
    - organization_id: current_organization
@@ -1307,6 +1371,7 @@ EmailCampaignTemplateCloner.clone(
 ### Email Campaign Templates (Collections)
 
 #### List all templates available to user
+
 ```
 GET /v1/presents/email_campaign_templates
 
@@ -1336,6 +1401,7 @@ Response:
 ```
 
 #### Get single template with all emails
+
 ```
 GET /v1/presents/email_campaign_templates/:id
 
@@ -1361,6 +1427,7 @@ Response:
 ```
 
 #### Create custom template (clone from existing)
+
 ```
 POST /v1/presents/email_campaign_templates
 
@@ -1375,6 +1442,7 @@ Response: Created template object
 ```
 
 #### Update user template
+
 ```
 PATCH /v1/presents/email_campaign_templates/:id
 
@@ -1388,6 +1456,7 @@ Response: Updated template object
 ```
 
 #### Delete user template
+
 ```
 DELETE /v1/presents/email_campaign_templates/:id
 
@@ -1399,6 +1468,7 @@ Response: 204 No Content
 ### Email Template Items (Individual Emails Within Template)
 
 #### Add email to user's custom template
+
 ```
 POST /v1/presents/email_campaign_templates/:template_id/emails
 
@@ -1417,6 +1487,7 @@ Response: Created email_template_item object
 ```
 
 #### Update email within user's template
+
 ```
 PATCH /v1/presents/email_template_items/:id
 
@@ -1430,6 +1501,7 @@ Response: Updated email_template_item object
 ```
 
 #### Delete email from user's template
+
 ```
 DELETE /v1/presents/email_template_items/:id
 
@@ -1441,6 +1513,7 @@ Response: 204 No Content
 ### Scheduled Emails (Event-Specific)
 
 #### List all scheduled emails for event
+
 ```
 GET /v1/presents/events/:event_slug/scheduled_emails
 
@@ -1448,6 +1521,7 @@ Response: Array of scheduled_email objects
 ```
 
 #### Update scheduled email (event-specific customization)
+
 ```
 PATCH /v1/presents/scheduled_emails/:id
 
@@ -1461,6 +1535,7 @@ Response: Updated scheduled_email object
 ```
 
 #### Pause/Resume/Delete
+
 ```
 PATCH /v1/presents/scheduled_emails/:id/pause
 PATCH /v1/presents/scheduled_emails/:id/resume
@@ -1468,6 +1543,7 @@ DELETE /v1/presents/scheduled_emails/:id
 ```
 
 #### Save event's emails as new template
+
 ```
 POST /v1/presents/events/:event_slug/save_as_template
 
@@ -1509,9 +1585,11 @@ src/components/producer/
 ### Updated Event Creation Flow
 
 **Step 1: Event Details**
+
 - User fills in basic event info (title, date, location, etc.)
 
 **Step 2: Select Email Template**
+
 ```
 ┌────────────────────────────────────────────────────────────┐
 │ Choose Email Campaign Template                             │
@@ -1537,6 +1615,7 @@ src/components/producer/
 **Step 3: Vendor Application Setup** (existing)
 
 **Step 4: Review & Create**
+
 - Shows selected template
 - "X emails will be scheduled"
 - Creates event + generates scheduled emails from template
@@ -1594,6 +1673,7 @@ src/components/producer/
 ```
 
 **"Save as Template" Button:**
+
 - Appears on Email Automation tab
 - Opens dialog: "Save these emails as a reusable template?"
 - User enters template name and description
@@ -1607,6 +1687,7 @@ src/components/producer/
 ### Backend Tasks
 
 #### ✅ Task 1.1: Database Migrations ✅ COMPLETE
+
 - [x] Create migration: `email_campaign_templates` table
   - [x] Columns: template_type, organization_id, name, description, is_default
   - [x] Columns: email_count (counter cache), events_count (counter cache)
@@ -1641,6 +1722,7 @@ src/components/producer/
 ---
 
 #### ✅ Task 1.2: Models ✅ COMPLETE
+
 - [x] Create `EmailCampaignTemplate` model
   - [x] Validations: name, template_type
   - [x] Validation: only one system template can be default
@@ -1682,6 +1764,7 @@ src/components/producer/
 ---
 
 #### ✅ Task 1.3: Seed Default Template (24 Emails)
+
 - [ ] Create seed file: `db/seeds/email_campaign_templates.rb`
 - [ ] Create EmailCampaignTemplate: "Default Event Campaign"
   - [ ] template_type: 'system'
@@ -1701,6 +1784,7 @@ src/components/producer/
 ---
 
 #### ✅ Task 1.4: Services
+
 - [ ] Create `EmailScheduleCalculator` (same as before)
 - [ ] Create `RecipientFilterService` (same as before)
 - [ ] Create `ScheduledEmailGenerator` (updated)
@@ -1719,6 +1803,7 @@ src/components/producer/
 ---
 
 #### ✅ Task 1.5: Controllers & Routes
+
 - [ ] Create `EmailCampaignTemplatesController`
   - [ ] `index` - List all templates (system + user)
   - [ ] `show` - Get template with all emails
@@ -1738,6 +1823,7 @@ src/components/producer/
 ---
 
 #### ✅ Task 1.6: Event Integration
+
 - [ ] Update Event model
   - [ ] Add `email_campaign_template_id` field
   - [ ] Callback to generate emails from selected template
@@ -1750,6 +1836,7 @@ src/components/producer/
 ---
 
 #### ✅ Task 1.7: Email Delivery Tracking (SendGrid Webhook Integration)
+
 - [ ] Create `EmailDelivery` model
   - [ ] Associations: `belongs_to :scheduled_email`, `belongs_to :event`, `belongs_to :vendor_registration`
   - [ ] Validations: sendgrid_message_id (unique), recipient_email, status
@@ -1798,6 +1885,7 @@ src/components/producer/
 ### Frontend Tasks
 
 #### ✅ Task 1.8: TypeScript Interfaces
+
 - [ ] Create `src/types/email.ts`
   - [ ] Interface: `EmailCampaignTemplate`
   - [ ] Interface: `EmailTemplateItem`
@@ -1810,6 +1898,7 @@ src/components/producer/
 ---
 
 #### ✅ Task 1.9: API Client Methods
+
 - [ ] Add `emailCampaignTemplatesApi` to `src/services/api.ts`
   - [ ] `getAll()`, `get(id)`, `create(data)`, `update(id, data)`, `delete(id)`
 - [ ] Add `emailTemplateItemsApi`
@@ -1823,6 +1912,7 @@ src/components/producer/
 ---
 
 #### ✅ Task 1.10: UI Components
+
 - [ ] Create `TemplateSelectorModal.tsx` (new)
   - [ ] Shows all available templates
   - [ ] Radio select for choosing template
@@ -1846,6 +1936,7 @@ src/components/producer/
 ---
 
 #### ✅ Task 1.11: Testing
+
 - [ ] Test event creation with template selection
 - [ ] Test "Save as Template" functionality
 - [ ] Test scheduled emails generated correctly from template
@@ -1863,6 +1954,7 @@ src/components/producer/
 ### Documentation
 
 #### ✅ Task 1.12: Update Documentation
+
 - [ ] Update CLAUDE_CONTEXT.md with template system
 - [ ] Document new models and relationships
 - [ ] Document SendGrid webhook integration
@@ -1877,6 +1969,7 @@ src/components/producer/
 ### Total Estimated Time: **63 hours** (~1.5-2 weeks)
 
 ### Phase 1 Deliverables:
+
 ✅ 5 database tables (campaign templates, template items, scheduled emails, deliveries, updated events/registrations)
 ✅ 5 models with validations (EmailCampaignTemplate, EmailTemplateItem, ScheduledEmail, EmailDelivery, updates to Event/VendorRegistration)
 ✅ 1 default template with 24 pre-written emails (16 editable + 8 system emails)
@@ -1896,6 +1989,7 @@ src/components/producer/
 ## Future Phases
 
 ### Phase 2: Advanced UI & Customization (2 weeks)
+
 - WYSIWYG email editor (TipTap) with "Insert Field" buttons
 - Filter builder UI with hybrid filtering
 - Template editor (add/remove/reorder emails in template)
@@ -1903,6 +1997,7 @@ src/components/producer/
 - Timeline/calendar view of scheduled emails
 
 ### Phase 3: Enhanced Email Analytics (1 week)
+
 - Track open rates (requires SendGrid 'open' event)
 - Track click rates (requires SendGrid 'click' event)
 - Email performance dashboard per event
@@ -1911,6 +2006,7 @@ src/components/producer/
 - Manual resend UI for failed emails
 
 ### Phase 4: Advanced Features (1 week)
+
 - A/B testing for email content
 - Bulk email operations
 - Email templates library/marketplace
@@ -1924,15 +2020,19 @@ src/components/producer/
 **Total Timeline:** 6 weeks
 
 ### Phase 1: Infrastructure (1-2 weeks)
+
 **Team:** 1 full-stack developer
 
 ### Phase 2: Advanced UI (2 weeks)
+
 **Team:** 1 frontend developer
 
 ### Phase 3: Email Sending (1 week)
+
 **Team:** 1 backend developer
 
 ### Phase 4: Analytics (1 week)
+
 **Team:** 1 full-stack developer
 
 ---
@@ -1946,6 +2046,7 @@ src/components/producer/
 ## Success Metrics
 
 ### Phase 1 Success Criteria
+
 - [ ] Event creation with template selection works
 - [ ] Default template with 40 emails seeds correctly
 - [ ] "Save as Template" creates reusable templates
@@ -1953,6 +2054,7 @@ src/components/producer/
 - [ ] Users can create unlimited custom templates
 
 ### Overall Success Metrics (6 months)
+
 - 80%+ of events use automated emails
 - Average 30+ emails sent per event (out of 40)
 - 50%+ of producers create at least 1 custom template
@@ -1965,6 +2067,7 @@ src/components/producer/
 **Version:** 2.0 (Updated with Template Collections)
 **Last Updated:** December 31, 2024
 **Changes:**
+
 - Clarified "template" = collection of up to 40 emails
 - Updated database schema (2 tables: campaign templates + template items)
 - Added template selection during event creation

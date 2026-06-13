@@ -9,9 +9,11 @@ All email preview implementations have been standardized into two consistent mod
 ## 🎨 Two Preview Types Implemented
 
 ### 1. **TemplatePreviewModal** (No Event Context)
+
 **Used for**: Mail page templates, system emails, admin previews
 
 **Features**:
+
 - Shows raw template with `[variables]` unresolved (e.g., `[firstName]`, `[eventName]`)
 - Info banner explaining variables will be replaced when sent
 - No status badges, no date/recipient info
@@ -19,6 +21,7 @@ All email preview implementations have been standardized into two consistent mod
 - Clean, simple design
 
 **Locations**:
+
 - ✅ Mail Page → Default Event Campaign → View button
 - ✅ Mail Page → System Emails → View button (NOW WORKING!)
 - ✅ Admin Panel → Template preview
@@ -26,9 +29,11 @@ All email preview implementations have been standardized into two consistent mod
 ---
 
 ### 2. **EventEmailPreviewModal** (With Event Context)
+
 **Used for**: Active event emails with real data
 
 **Features**:
+
 - Calls backend API to resolve `[variables]` → actual values
 - Shows metadata: status badge (Sent/Scheduled), date, recipient count
 - Category selector dropdown (appears when email has category-specific content)
@@ -37,6 +42,7 @@ All email preview implementations have been standardized into two consistent mod
 - "Test Email" button sends with real event data
 
 **Locations**:
+
 - ✅ Command Center → Mail tab → Preview button
 - ✅ Event Creation Wizard → Email preview step (with category support)
 
@@ -45,6 +51,7 @@ All email preview implementations have been standardized into two consistent mod
 ## 📁 Files Created
 
 ### New Shared Components:
+
 1. `src/components/shared/TemplatePreviewModal.tsx` - Template preview component
 2. `src/components/shared/EventEmailPreviewModal.tsx` - Event email preview with backend integration
 
@@ -53,11 +60,13 @@ All email preview implementations have been standardized into two consistent mod
 ## 📝 Files Modified
 
 ### Wrapper Components (updated to use new shared components):
+
 1. `src/components/producer/Email/EmailPreviewModal.tsx` - Command Center wrapper
 2. `src/components/producer/CreateEventWizard/EmailPreviewModal.tsx` - Wizard wrapper
 3. `src/components/admin/EmailPreviewModal.tsx` - Admin wrapper
 
 ### Pages:
+
 4. `src/pages/EmailTemplatesPage.tsx` - Mail page with system email View buttons now working
 
 ---
@@ -69,6 +78,7 @@ All email preview implementations have been standardized into two consistent mod
 **Navigate to**: `/producer/mail`
 
 **Test 1: Default Event Campaign Emails**
+
 1. Click "View" on any template (e.g., "Default Event Campaign")
 2. Click "View" (eye icon) on any email in the sequence
 3. ✅ **Verify**: Preview opens showing:
@@ -81,6 +91,7 @@ All email preview implementations have been standardized into two consistent mod
 4. ✅ **Verify**: No status badges, no date info, no category selector
 
 **Test 2: System Notifications**
+
 1. Scroll to "System Notifications" section
 2. Click eye icon on any system email (e.g., "Application Received")
 3. ✅ **Verify**: Preview opens (this was previously broken!)
@@ -95,6 +106,7 @@ All email preview implementations have been standardized into two consistent mod
 **Navigate to**: Create or open an event → Command Center → Mail tab
 
 **Test 3: Scheduled Email Preview**
+
 1. Click "Preview" button on any scheduled email
 2. ✅ **Verify**: Loading spinner appears briefly
 3. ✅ **Verify**: Preview shows:
@@ -109,6 +121,7 @@ All email preview implementations have been standardized into two consistent mod
    - "Test Email" and "Close" buttons
 
 **Test 4: Category-Specific Email Preview**
+
 1. Find an email that uses `[categoryPrice]` or `[installTime]`
 2. Click "Preview"
 3. ✅ **Verify**: Category selector dropdown appears (purple box)
@@ -117,6 +130,7 @@ All email preview implementations have been standardized into two consistent mod
 6. ✅ **Verify**: Loading spinner shows briefly when switching categories
 
 **Test 5: Error Handling**
+
 1. Preview an email for an event with no vendor applications yet
 2. ✅ **Verify**: Yellow warning message: "No vendor applications found for this event yet..."
 
@@ -127,6 +141,7 @@ All email preview implementations have been standardized into two consistent mod
 **Navigate to**: Create New Event → Step 4 (Auto Messages)
 
 **Test 6: Wizard Email Preview**
+
 1. Click "Preview" on any email in the sequence
 2. ✅ **Verify**: Same rich preview as Command Center (status, date, resolved variables)
 3. ✅ **Verify**: Category selector appears if email has category-specific content
@@ -139,6 +154,7 @@ All email preview implementations have been standardized into two consistent mod
 **Navigate to**: Admin Dashboard → Email Templates (if accessible)
 
 **Test 7: Admin Email Preview**
+
 1. Click preview on any email template
 2. ✅ **Verify**: Shows template with `[variables]` unresolved (like Mail page)
 3. ✅ **Verify**: Simple design, no event-specific metadata
@@ -147,14 +163,14 @@ All email preview implementations have been standardized into two consistent mod
 
 ## 🎯 Key Differences to Verify
 
-| Feature | Template Preview | Event Email Preview |
-|---------|------------------|---------------------|
-| Variables | `[firstName]` visible | `Sarah` resolved |
-| Status Badge | ❌ None | ✅ Sent/Scheduled |
-| Date/Recipients | ❌ None | ✅ Shows metadata |
-| Category Selector | ❌ None | ✅ If applicable |
-| Backend API Call | ❌ No | ✅ Yes (with spinner) |
-| Info Banner | ✅ Blue (variables info) | ✅ Blue (sample data note) |
+| Feature           | Template Preview         | Event Email Preview        |
+| ----------------- | ------------------------ | -------------------------- |
+| Variables         | `[firstName]` visible    | `Sarah` resolved           |
+| Status Badge      | ❌ None                  | ✅ Sent/Scheduled          |
+| Date/Recipients   | ❌ None                  | ✅ Shows metadata          |
+| Category Selector | ❌ None                  | ✅ If applicable           |
+| Backend API Call  | ❌ No                    | ✅ Yes (with spinner)      |
+| Info Banner       | ✅ Blue (variables info) | ✅ Blue (sample data note) |
 
 ---
 
@@ -179,6 +195,7 @@ All email preview implementations have been standardized into two consistent mod
 ## 📦 Ready for QA
 
 All changes are complete and ready for testing. Once QA passes, we can:
+
 1. Commit changes to current branch (`email-preview-standardization`)
 2. Push to GitHub
 3. Merge to `develop` (frontend)
@@ -190,6 +207,7 @@ All changes are complete and ready for testing. Once QA passes, we can:
 ## 🔗 Integration Points
 
 **Backend APIs Used**:
+
 - `scheduledEmailsApi.preview(eventSlug, emailId, context)` - Event email preview
 - `eventInvitationsApi.previewEmail(eventSlug)` - Invitation preview
 

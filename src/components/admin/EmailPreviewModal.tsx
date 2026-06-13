@@ -5,22 +5,17 @@
  * Shows the email content with glassmorphism styling.
  */
 
-import { X, Mail, Loader2 } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import EmailFooterCard from '@/components/shared/EmailFooterCard';
+import { X, Mail, Loader2 } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import EmailFooterCard from '@/components/shared/EmailFooterCard'
 
 interface EmailPreviewModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  emailName: string;
-  emailHtml: string;
-  loading: boolean;
+  isOpen: boolean
+  onClose: () => void
+  emailName: string
+  emailHtml: string
+  loading: boolean
 }
 
 export default function EmailPreviewModal({
@@ -32,10 +27,10 @@ export default function EmailPreviewModal({
 }: EmailPreviewModalProps) {
   // Strip HTML tags for clean display
   const stripHtml = (html: string) => {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
-  };
+    const tmp = document.createElement('div')
+    tmp.innerHTML = html
+    return tmp.textContent || tmp.innerText || ''
+  }
 
   // Remove footer text from body since we have hard-coded footer card
   const removeFooter = (text: string): string => {
@@ -48,18 +43,18 @@ export default function EmailPreviewModal({
       /If you have any questions,?\s*please contact us at\s*\[?organizationEmail\]?\.?/gi,
       /Please do not reply to this email\.?/gi,
       /Powered by Voxxy\.?/gi,
-    ];
+    ]
 
-    let cleanedText = text;
-    footerPatterns.forEach(pattern => {
-      cleanedText = cleanedText.replace(pattern, '');
-    });
+    let cleanedText = text
+    footerPatterns.forEach((pattern) => {
+      cleanedText = cleanedText.replace(pattern, '')
+    })
 
     // Trim excessive whitespace at the end
-    return cleanedText.trim();
-  };
+    return cleanedText.trim()
+  }
 
-  const displayText = removeFooter(stripHtml(emailHtml));
+  const displayText = removeFooter(stripHtml(emailHtml))
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -124,14 +119,11 @@ export default function EmailPreviewModal({
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-          <Button
-            onClick={onClose}
-            className="voxxy-btn-solid"
-          >
+          <Button onClick={onClose} className="voxxy-btn-solid">
             Close
           </Button>
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

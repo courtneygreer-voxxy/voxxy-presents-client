@@ -1,14 +1,19 @@
-import { useState } from 'react';
-import { X, Download, Loader2, Check } from 'lucide-react';
-import type { VendorContact } from '@/services/api';
-import { EXPORT_COLUMNS, getDefaultColumnKeys, contactsToCsv, triggerCsvDownload } from './contactsCsvExport';
+import { useState } from 'react'
+import { X, Download, Loader2, Check } from 'lucide-react'
+import type { VendorContact } from '@/services/api'
+import {
+  EXPORT_COLUMNS,
+  getDefaultColumnKeys,
+  contactsToCsv,
+  triggerCsvDownload,
+} from './contactsCsvExport'
 
 interface ContactExportModalProps {
-  open: boolean;
-  onClose: () => void;
-  contactCount: number;
-  organizationSlug: string;
-  fetchAllContacts: () => Promise<VendorContact[]>;
+  open: boolean
+  onClose: () => void
+  contactCount: number
+  organizationSlug: string
+  fetchAllContacts: () => Promise<VendorContact[]>
 }
 
 export default function ContactExportModal({
@@ -18,43 +23,45 @@ export default function ContactExportModal({
   organizationSlug,
   fetchAllContacts,
 }: ContactExportModalProps) {
-  const [selectedColumns, setSelectedColumns] = useState<Set<string>>(() => getDefaultColumnKeys());
-  const [isExporting, setIsExporting] = useState(false);
+  const [selectedColumns, setSelectedColumns] = useState<Set<string>>(() => getDefaultColumnKeys())
+  const [isExporting, setIsExporting] = useState(false)
 
   const toggleColumn = (key: string) => {
-    setSelectedColumns(prev => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  };
+    setSelectedColumns((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
 
-  const selectAll = () => setSelectedColumns(new Set(EXPORT_COLUMNS.map(c => c.key)));
-  const selectNone = () => setSelectedColumns(new Set());
+  const selectAll = () => setSelectedColumns(new Set(EXPORT_COLUMNS.map((c) => c.key)))
+  const selectNone = () => setSelectedColumns(new Set())
 
   const handleExport = async () => {
-    if (selectedColumns.size === 0) return;
-    setIsExporting(true);
+    if (selectedColumns.size === 0) return
+    setIsExporting(true)
     try {
-      const contacts = await fetchAllContacts();
-      const csv = contactsToCsv(contacts, selectedColumns);
-      const date = new Date().toISOString().slice(0, 10);
-      triggerCsvDownload(csv, `contacts-export-${organizationSlug}-${date}.csv`);
-      onClose();
+      const contacts = await fetchAllContacts()
+      const csv = contactsToCsv(contacts, selectedColumns)
+      const date = new Date().toISOString().slice(0, 10)
+      triggerCsvDownload(csv, `contacts-export-${organizationSlug}-${date}.csv`)
+      onClose()
     } catch (err: any) {
-      alert(err.message || 'Failed to export contacts');
+      alert(err.message || 'Failed to export contacts')
     } finally {
-      setIsExporting(false);
+      setIsExporting(false)
     }
-  };
+  }
 
-  if (!open) return null;
+  if (!open) return null
 
   return (
     <div
       className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4"
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
     >
       <div className="voxxy-modal-surface w-full max-w-lg rounded-xl overflow-hidden flex flex-col max-h-[80vh]">
         {/* Header */}
@@ -65,7 +72,11 @@ export default function ContactExportModal({
               {contactCount} contact{contactCount !== 1 ? 's' : ''} will be exported
             </p>
           </div>
-          <button onClick={onClose} className="text-foreground/60 hover:text-foreground transition-colors" aria-label="Close">
+          <button
+            onClick={onClose}
+            className="text-foreground/60 hover:text-foreground transition-colors"
+            aria-label="Close"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -77,19 +88,25 @@ export default function ContactExportModal({
               Select columns ({selectedColumns.size} of {EXPORT_COLUMNS.length})
             </p>
             <div className="flex items-center gap-2">
-              <button onClick={selectAll} className="text-[11px] text-primary hover:text-primary/80 transition-colors">
+              <button
+                onClick={selectAll}
+                className="text-[11px] text-primary hover:text-primary/80 transition-colors"
+              >
                 All
               </button>
               <span className="text-foreground/30">|</span>
-              <button onClick={selectNone} className="text-[11px] text-primary hover:text-primary/80 transition-colors">
+              <button
+                onClick={selectNone}
+                className="text-[11px] text-primary hover:text-primary/80 transition-colors"
+              >
                 None
               </button>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-1.5">
-            {EXPORT_COLUMNS.map(col => {
-              const isSelected = selectedColumns.has(col.key);
+            {EXPORT_COLUMNS.map((col) => {
+              const isSelected = selectedColumns.has(col.key)
               return (
                 <button
                   key={col.key}
@@ -106,11 +123,13 @@ export default function ContactExportModal({
                       isSelected ? 'bg-primary/50 border-primary' : 'border-border'
                     }`}
                   >
-                    {isSelected && <Check className="w-2.5 h-2.5 text-foreground" strokeWidth={3} />}
+                    {isSelected && (
+                      <Check className="w-2.5 h-2.5 text-foreground" strokeWidth={3} />
+                    )}
                   </div>
                   <span className="truncate">{col.label}</span>
                 </button>
-              );
+              )
             })}
           </div>
         </div>
@@ -143,5 +162,5 @@ export default function ContactExportModal({
         </div>
       </div>
     </div>
-  );
+  )
 }

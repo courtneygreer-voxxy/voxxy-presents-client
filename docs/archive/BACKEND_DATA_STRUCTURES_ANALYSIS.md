@@ -13,6 +13,7 @@ This analysis reviews the actual field definitions in both the Rails backend and
 **File:** `/Users/beaulazear/Desktop/voxxy-rails/app/models/vendor_contact.rb`
 
 #### Actual Database Fields (from migrations):
+
 ```ruby
 # Table: vendor_contacts (from 20251217120000_create_vendor_contacts.rb)
 - id (primary key)
@@ -42,12 +43,14 @@ This analysis reviews the actual field definitions in both the Rails backend and
 ```
 
 #### Key Findings:
+
 - **Single `name` field:** Stores full name (e.g., "John Doe")
 - **Single `business_name` field:** Stores company/business name
 - **NO separate first_name/last_name fields**
 - The serializer maps database `name` → JSON `contact_name` for frontend compatibility
 
 #### VendorContact Serializer Output:
+
 ```ruby
 # File: app/serializers/api/v1/presents/vendor_contact_serializer.rb
 contact_name: @vendor_contact.name,           # ← Maps `name` to `contact_name`
@@ -64,6 +67,7 @@ location: @vendor_contact.try(:location),
 **File:** `/Users/beaulazear/Desktop/voxxy-rails/app/models/registration.rb`
 
 #### Actual Database Fields (from migrations):
+
 ```ruby
 # Table: registrations (from 20251104140632_create_registrations.rb + additions)
 - id (primary key)
@@ -94,12 +98,14 @@ location: @vendor_contact.try(:location),
 ```
 
 #### Key Findings:
+
 - **Single `name` field:** Stores vendor/contact full name
 - **Single `business_name` field:** Stores vendor business name
 - **NO separate first_name/last_name fields**
 - Fields match VendorContact structure (for consistency)
 
 #### Registration Serializer Output:
+
 ```ruby
 # File: app/serializers/api/v1/presents/registration_serializer.rb
 name: @registration.name,              # ← Full name directly
@@ -115,10 +121,12 @@ vendor_category: @registration.vendor_category,
 **File:** `/Users/beaulazear/Desktop/voxxy-rails/app/models/event_invitation.rb`
 
 #### Actual Database Fields:
+
 - `belongs_to :vendor_contact` ← References VendorContact for all contact info
 - All contact name/email data comes FROM the associated VendorContact
 
 #### Key Findings:
+
 - Doesn't store name directly; uses related VendorContact
 - When resolving invitation variables, uses: `vendor_contact.name` and `vendor_contact.business_name`
 
@@ -131,13 +139,14 @@ vendor_category: @registration.vendor_category,
 **File:** `/Users/beaulazear/Desktop/voxxy-rails/app/services/email_variable_resolver.rb`
 
 #### How Names Are Parsed:
+
 ```ruby
 def resolve_registration_variables(template)
   # Parse full name into first/last by splitting on space
   name_parts = (registration.name || "").split(" ", 2)
   first_name = name_parts[0] || ""
   last_name = name_parts[1] || ""
-  
+
   # Greeting logic: business_name preferred, fallback to first_name
   greeting_name = if registration.business_name.present?
     registration.business_name
@@ -146,7 +155,7 @@ def resolve_registration_variables(template)
   else
     "there"
   end
-  
+
   # Variables replaced:
   template
     .gsub("[greetingName]", greeting_name)
@@ -159,6 +168,7 @@ end
 ```
 
 #### Supported Variables (Registration emails):
+
 - `[firstName]` - First word of `registration.name`
 - `[lastName]` - Second word (or rest) of `registration.name`
 - `[fullName]` - Complete `registration.name`
@@ -175,13 +185,14 @@ end
 **File:** `/Users/beaulazear/Desktop/voxxy-rails/app/services/invitation_variable_resolver.rb`
 
 #### How Names Are Parsed:
+
 ```ruby
 def resolve_vendor_contact_variables(template)
   # Same parsing logic as registration
   name_parts = (vendor_contact.name || "").split(" ", 2)
   first_name = name_parts[0] || ""
   last_name = name_parts[1] || ""
-  
+
   greeting_name = if vendor_contact.business_name.present?
     vendor_contact.business_name
   elsif first_name.present?
@@ -189,7 +200,7 @@ def resolve_vendor_contact_variables(template)
   else
     "there"
   end
-  
+
   template
     .gsub("[greetingName]", greeting_name)
     .gsub("[firstName]", first_name)
@@ -201,6 +212,7 @@ end
 ```
 
 #### Supported Variables (Invitation emails):
+
 - `[firstName]` - First word of `vendor_contact.name`
 - `[lastName]` - Second word (or rest) of `vendor_contact.name`
 - `[fullName]` - Complete `vendor_contact.name`
@@ -219,21 +231,23 @@ end
 **File:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/utils/emailVariables.ts`
 
 #### Documented Email Variables:
+
 The frontend maintains a comprehensive list of supported variables with field definitions:
 
 ```typescript
 export interface EmailVariable {
-  label: string;           // User-friendly name
-  frontendVar: string;     // [bracket] format
-  backendVar: string;      // {{mustache}} format (legacy)
-  category: 'event' | 'organization' | 'vendor' | 'computed';
-  description: string;
-  example: string;
-  worksInInvitations: boolean;
+  label: string // User-friendly name
+  frontendVar: string // [bracket] format
+  backendVar: string // {{mustache}} format (legacy)
+  category: 'event' | 'organization' | 'vendor' | 'computed'
+  description: string
+  example: string
+  worksInInvitations: boolean
 }
 ```
 
 #### Vendor Name Variables Defined:
+
 ```typescript
 {
   label: 'Greeting Name',
@@ -296,6 +310,7 @@ export interface EmailVariable {
 ## ACTUAL DATABASE FIELDS vs EXPECTED VARIABLES
 
 ### VendorContact Table Structure:
+
 ```
 name              (string)  ← Full name stored here
 business_name    (string)  ← Business/company name
@@ -309,6 +324,7 @@ location         (string)  ← Location/city
 ```
 
 ### Registration Table Structure:
+
 ```
 name              (string)  ← Full name stored here
 business_name    (string)  ← Business/company name
@@ -325,23 +341,27 @@ tiktok_handle    (string)  ← Social media handle
 ## KEY FINDINGS
 
 ### Name Field Storage:
+
 1. **NO separate `first_name` or `last_name` columns** in either table
 2. **Single `name` column** stores full name (e.g., "John Doe")
 3. **Single `business_name` column** stores company/business name
 4. Names are parsed by splitting on the first space
 
 ### Variable Resolution:
+
 1. **Backend EmailVariableResolver/InvitationVariableResolver** parse `name` by splitting
 2. **No database lookup** for separate first/last names
 3. **Splitting logic:** `name.split(" ", 2)` → ["John", "Doe"]
 4. **Fallback order for greeting:** business_name → first_name → "there"
 
 ### Serialization:
+
 1. **VendorContact Serializer** maps database `name` → JSON `contact_name`
 2. **Registration Serializer** outputs `name` directly
 3. Both match the expected backend field names
 
 ### Frontend Variables:
+
 1. **[contactName]** is documented but maps to database `name` (via serializer as `contact_name`)
 2. **[firstName]**, **[lastName]** are computed at runtime by string splitting
 3. **[fullName]** = complete `name` field
@@ -353,12 +373,15 @@ tiktok_handle    (string)  ← Social media handle
 ## RECOMMENDATIONS
 
 ### Current Implementation is Correct:
+
 The backend correctly uses:
+
 - `registration.name` for full name
 - `registration.business_name` for business name
 - String splitting at runtime for first/last names
 
 ### Email Variables Match Backend Reality:
+
 1. ✅ `[firstName]` - Works (computed from name split)
 2. ✅ `[lastName]` - Works (computed from name split)
 3. ✅ `[fullName]` - Works (direct from name field)
@@ -367,13 +390,16 @@ The backend correctly uses:
 6. ✅ `[contactName]` - Works (maps to name via serializer)
 
 ### For Maximum Compatibility:
+
 - Use **[firstName]** and **[lastName]** for personalization (these are split at runtime)
 - Use **[fullName]** for complete name
 - Use **[businessName]** for business/company name
 - Use **[greetingName]** for smart greeting that prefers business name
 
 ### If Separation of First/Last Names is Needed:
+
 Would require:
+
 1. Database schema change (add first_name, last_name columns)
 2. Update registration/vendor_contact forms to capture separately
 3. Update serializers
@@ -386,18 +412,21 @@ Would require:
 ## ACTUAL CODE PATHS
 
 ### EmailVariableResolver (Registration):
+
 - **Input:** `registration` object with `name` and `business_name`
 - **Process:** Splits `name` on space, uses `business_name` for greeting
 - **Output:** Variables like `[firstName]`, `[lastName]`, etc. substituted
 - **File:** `/Users/beaulazear/Desktop/voxxy-rails/app/services/email_variable_resolver.rb:126-177`
 
 ### InvitationVariableResolver (VendorContact):
-- **Input:** `vendor_contact` object with `name` and `business_name`  
+
+- **Input:** `vendor_contact` object with `name` and `business_name`
 - **Process:** Same splitting logic as EmailVariableResolver
 - **Output:** Variables substituted in invitation emails
 - **File:** `/Users/beaulazear/Desktop/voxxy-rails/app/services/invitation_variable_resolver.rb:87-113`
 
 ### Frontend Variable Definition:
+
 - **Source:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/utils/emailVariables.ts:41-391`
 - **Variables:** 50+ email variables defined with frontend/backend formats
 - **Frontend UI:** Uses `frontendVar` format `[bracket]`
@@ -414,4 +443,3 @@ The actual backend data structures support a **single name field** that stores t
 3. Supporting all documented variables correctly
 
 All documented email variables **actually work** with the current database schema. There is **no mismatch** between the documented variables and actual backend capabilities.
-

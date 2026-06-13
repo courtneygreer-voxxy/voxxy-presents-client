@@ -1,35 +1,30 @@
-import { useEffect, useState } from 'react';
-import { Mail, Building2, User, Loader2, Users, Info } from 'lucide-react';
-import { scheduledEmailsApi, eventInvitationsApi } from '@/services/api';
-import { logger } from '@/utils/logger';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
+import { useEffect, useState } from 'react'
+import { Mail, Building2, User, Loader2, Users, Info } from 'lucide-react'
+import { scheduledEmailsApi, eventInvitationsApi } from '@/services/api'
+import { logger } from '@/utils/logger'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
 
 interface Recipient {
-  email: string;
-  name: string;
-  organization: string;
+  email: string
+  name: string
+  organization: string
 }
 
 interface RecipientsData {
-  count: number;
-  category: string;
-  email_type: 'invitation_reminders' | 'registration_emails' | 'initial_invitations';
-  recipients: Recipient[];
+  count: number
+  category: string
+  email_type: 'invitation_reminders' | 'registration_emails' | 'initial_invitations'
+  recipients: Recipient[]
 }
 
 interface RecipientsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  eventSlug: string;
-  emailId: number;
-  emailName: string;
-  isInvitationAnnouncement?: boolean;
+  isOpen: boolean
+  onClose: () => void
+  eventSlug: string
+  emailId: number
+  emailName: string
+  isInvitationAnnouncement?: boolean
 }
 
 export default function RecipientsModal({
@@ -40,64 +35,64 @@ export default function RecipientsModal({
   emailName,
   isInvitationAnnouncement = false,
 }: RecipientsModalProps) {
-  const [recipientsData, setRecipientsData] = useState<RecipientsData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [recipientsData, setRecipientsData] = useState<RecipientsData | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (isOpen) {
-      fetchRecipients();
+      fetchRecipients()
     } else {
-      setRecipientsData(null);
-      setError(null);
+      setRecipientsData(null)
+      setError(null)
     }
-  }, [isOpen, emailId, isInvitationAnnouncement]);
+  }, [isOpen, emailId, isInvitationAnnouncement])
 
   const fetchRecipients = async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
 
     try {
       if (isInvitationAnnouncement) {
         // For initial invitation emails, fetch from event invitations
-        const invitationsResponse = await eventInvitationsApi.getByEvent(eventSlug);
+        const invitationsResponse = await eventInvitationsApi.getByEvent(eventSlug)
 
         const recipients = invitationsResponse.invitations
-          .filter(inv => inv.vendor_contact) // Only include invitations with contact data
-          .map(inv => ({
+          .filter((inv) => inv.vendor_contact) // Only include invitations with contact data
+          .map((inv) => ({
             email: inv.vendor_contact!.email,
             name: inv.vendor_contact!.name,
             organization: inv.vendor_contact!.business_name || inv.vendor_contact!.name,
-          }));
+          }))
 
         setRecipientsData({
           count: recipients.length,
           category: 'initial_invitations',
           email_type: 'initial_invitations',
           recipients,
-        });
+        })
       } else {
         // For scheduled emails, use the existing endpoint
-        const data = await scheduledEmailsApi.getRecipients(eventSlug, emailId);
-        setRecipientsData(data);
+        const data = await scheduledEmailsApi.getRecipients(eventSlug, emailId)
+        setRecipientsData(data)
       }
     } catch (err) {
-      logger.error('Failed to fetch recipients', { eventSlug, emailId, error: err });
-      setError(err instanceof Error ? err.message : 'Failed to load recipients');
+      logger.error('Failed to fetch recipients', { eventSlug, emailId, error: err })
+      setError(err instanceof Error ? err.message : 'Failed to load recipients')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const getEmailTypeLabel = (type: string) => {
     if (type === 'initial_invitations') {
-      return 'Initial invitation email sent to all invited vendor contacts';
+      return 'Initial invitation email sent to all invited vendor contacts'
     }
     if (type === 'invitation_reminders') {
-      return 'Targets invited contacts who haven\'t applied yet';
+      return "Targets invited contacts who haven't applied yet"
     }
-    return 'Targets vendors who have submitted applications';
-  };
+    return 'Targets vendors who have submitted applications'
+  }
 
   const getEmailTypeBadge = (type: string) => {
     if (type === 'initial_invitations') {
@@ -106,7 +101,7 @@ export default function RecipientsModal({
           <Users className="h-3 w-3" />
           Initial Invitations
         </Badge>
-      );
+      )
     }
     if (type === 'invitation_reminders') {
       return (
@@ -114,15 +109,15 @@ export default function RecipientsModal({
           <Users className="h-3 w-3" />
           Invitation Reminders
         </Badge>
-      );
+      )
     }
     return (
       <Badge variant="tintBlue" className="gap-1.5 px-2.5 py-1 text-xs font-medium">
         <Users className="h-3 w-3" />
         Application Emails
       </Badge>
-    );
-  };
+    )
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -139,9 +134,7 @@ export default function RecipientsModal({
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-foreground font-medium text-sm">{emailName}</h3>
             {recipientsData && (
-              <div className="text-foreground font-bold text-lg">
-                {recipientsData.count}
-              </div>
+              <div className="text-foreground font-bold text-lg">{recipientsData.count}</div>
             )}
           </div>
           {recipientsData && (
@@ -242,5 +235,5 @@ export default function RecipientsModal({
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

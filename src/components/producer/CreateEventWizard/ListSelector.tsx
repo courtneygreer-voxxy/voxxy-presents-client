@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { Filter, Users, ChevronDown, ChevronUp, Check } from 'lucide-react';
-import { contactListsApi, ContactList } from '@/services/api';
+import { useState, useEffect } from 'react'
+import { Filter, Users, ChevronDown, ChevronUp, Check } from 'lucide-react'
+import { contactListsApi, ContactList } from '@/services/api'
 
 interface ListSelectorProps {
-  organizationId: number;
-  selectedListIds: number[];
-  onListsChange: (listIds: number[]) => void;
+  organizationId: number
+  selectedListIds: number[]
+  onListsChange: (listIds: number[]) => void
 }
 
 export default function ListSelector({
@@ -13,49 +13,49 @@ export default function ListSelector({
   selectedListIds,
   onListsChange,
 }: ListSelectorProps) {
-  const [lists, setLists] = useState<ContactList[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState(true);
+  const [lists, setLists] = useState<ContactList[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState(true)
 
   useEffect(() => {
-    fetchLists();
-  }, [organizationId]);
+    fetchLists()
+  }, [organizationId])
 
   const fetchLists = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const response = await contactListsApi.getAll(organizationId);
-      setLists(response.contact_lists);
+      setLoading(true)
+      setError(null)
+      const response = await contactListsApi.getAll(organizationId)
+      setLists(response.contact_lists)
     } catch (err: any) {
-      setError(err.message || 'Failed to load lists');
+      setError(err.message || 'Failed to load lists')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleToggleList = (listId: number) => {
     const updated = selectedListIds.includes(listId)
       ? selectedListIds.filter((id) => id !== listId)
-      : [...selectedListIds, listId];
-    onListsChange(updated);
-  };
+      : [...selectedListIds, listId]
+    onListsChange(updated)
+  }
 
   const handleSelectAll = () => {
     if (selectedListIds.length === lists.length) {
-      onListsChange([]);
+      onListsChange([])
     } else {
-      onListsChange(lists.map((l) => l.id));
+      onListsChange(lists.map((l) => l.id))
     }
-  };
+  }
 
   // Calculate total unique contacts from selected lists
   const totalContactsFromLists = lists
     .filter((list) => selectedListIds.includes(list.id))
-    .reduce((sum, list) => sum + list.contacts_count, 0);
+    .reduce((sum, list) => sum + list.contacts_count, 0)
 
-  const selectedLists = lists.filter((list) => selectedListIds.includes(list.id));
+  const selectedLists = lists.filter((list) => selectedListIds.includes(list.id))
 
   if (loading) {
     return (
@@ -64,7 +64,7 @@ export default function ListSelector({
           <div className="w-6 h-6 border-2 border-border border-t-primary rounded-full animate-spin" />
         </div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -72,18 +72,18 @@ export default function ListSelector({
       <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
         <p className="text-sm text-red-400">{error}</p>
       </div>
-    );
+    )
   }
 
   if (lists.length === 0) {
     return (
       <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
         <p className="text-sm text-blue-200/80">
-          You don't have any saved lists yet. Use the filters on the Network
-          tab to create reusable lists for quickly selecting groups of contacts.
+          You don't have any saved lists yet. Use the filters on the Network tab to create reusable
+          lists for quickly selecting groups of contacts.
         </p>
       </div>
-    );
+    )
   }
 
   return (
@@ -105,11 +105,7 @@ export default function ListSelector({
           </div>
         </div>
         <button className="text-foreground/60 hover:text-foreground transition-colors">
-          {expanded ? (
-            <ChevronUp className="w-5 h-5" />
-          ) : (
-            <ChevronDown className="w-5 h-5" />
-          )}
+          {expanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
         </button>
       </div>
 
@@ -134,7 +130,7 @@ export default function ListSelector({
           {/* Lists Grid */}
           <div className="space-y-2">
             {lists.map((list) => {
-              const isSelected = selectedListIds.includes(list.id);
+              const isSelected = selectedListIds.includes(list.id)
               return (
                 <button
                   key={list.id}
@@ -152,9 +148,7 @@ export default function ListSelector({
                     {/* Checkbox */}
                     <div
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                        isSelected
-                          ? 'bg-primary/50 border-primary'
-                          : 'border-border'
+                        isSelected ? 'bg-primary/50 border-primary' : 'border-border'
                       }`}
                     >
                       {isSelected && (
@@ -216,7 +210,7 @@ export default function ListSelector({
                     </div>
                   </div>
                 </button>
-              );
+              )
             })}
           </div>
 
@@ -227,9 +221,9 @@ export default function ListSelector({
                 <div className="flex items-center gap-2 text-sm">
                   <Users className="w-4 h-4 text-primary" />
                   <span className="text-foreground/90">
-                    Approximately <strong className="text-foreground">{totalContactsFromLists}</strong>{' '}
-                    contacts from {selectedLists.length}{' '}
-                    {selectedLists.length === 1 ? 'list' : 'lists'}
+                    Approximately{' '}
+                    <strong className="text-foreground">{totalContactsFromLists}</strong> contacts
+                    from {selectedLists.length} {selectedLists.length === 1 ? 'list' : 'lists'}
                   </span>
                 </div>
                 <p className="text-xs text-foreground/50 mt-1">
@@ -241,5 +235,5 @@ export default function ListSelector({
         </div>
       )}
     </div>
-  );
+  )
 }

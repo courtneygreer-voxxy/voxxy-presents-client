@@ -2,9 +2,9 @@
 
 **Document purpose:** Engineering state-of-the-union on automated testing for the `voxxy-presents-client` repository.
 
-**Audit date:** 2026-04-26  
+**Audit date:** 2026-04-26
 
-**Baseline:** Analysis was performed on the local workspace checked out at branch **`staging`** (tracking `origin/staging`). Working tree was clean except an untracked `.env.local.backup`.  
+**Baseline:** Analysis was performed on the local workspace checked out at branch **`staging`** (tracking `origin/staging`). Working tree was clean except an untracked `.env.local.backup`.
 
 **Branch comparison:** The branch **`feature/brand-normalization`** does **not** appear in local or remote branch lists in this clone; no second pass was possible. **`origin/main`** was fetched and compared for test inventory only: the same three `*.test.ts` paths exist on `main` as on `staging`.
 
@@ -16,13 +16,13 @@
 
 ### Frameworks and libraries
 
-| Tool | Role | Version (from `package.json`) |
-|------|------|-------------------------------|
-| **Vitest** | Unit/integration test runner | `^3.2.4` |
-| **jsdom** | DOM environment for tests | `^26.1.0` |
-| **@testing-library/react** | Component testing | `^16.3.0` |
-| **@testing-library/jest-dom** | DOM matchers | `^6.6.4` |
-| **@testing-library/user-event** | User interaction simulation | `^14.6.1` |
+| Tool                            | Role                         | Version (from `package.json`) |
+| ------------------------------- | ---------------------------- | ----------------------------- |
+| **Vitest**                      | Unit/integration test runner | `^3.2.4`                      |
+| **jsdom**                       | DOM environment for tests    | `^26.1.0`                     |
+| **@testing-library/react**      | Component testing            | `^16.3.0`                     |
+| **@testing-library/jest-dom**   | DOM matchers                 | `^6.6.4`                      |
+| **@testing-library/user-event** | User interaction simulation  | `^14.6.1`                     |
 
 **Not present:** Jest, Cypress, Playwright, RSpec/Minitest, WebdriverIO.
 
@@ -55,22 +55,22 @@
 
 ### File counts (under `src/`)
 
-| Metric | Count |
-|--------|------:|
+| Metric                                          |   Count |
+| ----------------------------------------------- | ------: |
 | TypeScript / TSX source files (`*.ts`, `*.tsx`) | **269** |
-| Files matching `*.test.ts` / `*.spec.ts(x)` | **3** |
+| Files matching `*.test.ts` / `*.spec.ts(x)`     |   **3** |
 
 **Effective automated test modules:** **2** Vitest suites (`src/test/api.test.ts`, `src/test/eventPortalService.test.ts`). The third file is **not** a Vitest suite (see §3).
 
 ### Rough line volume
 
-| Category | Lines (approx.) |
-|----------|------------------|
-| Application code under `src/` (excluding `src/test/` and excluding `*.test.*`) | **~69,900** |
-| `src/test/setup.ts` | 6 |
-| `src/test/api.test.ts` | 196 |
-| `src/test/eventPortalService.test.ts` | 287 |
-| `src/utils/emailVariables.test.ts` | 155 (demo script, not assertions) |
+| Category                                                                       | Lines (approx.)                   |
+| ------------------------------------------------------------------------------ | --------------------------------- |
+| Application code under `src/` (excluding `src/test/` and excluding `*.test.*`) | **~69,900**                       |
+| `src/test/setup.ts`                                                            | 6                                 |
+| `src/test/api.test.ts`                                                         | 196                               |
+| `src/test/eventPortalService.test.ts`                                          | 287                               |
+| `src/utils/emailVariables.test.ts`                                             | 155 (demo script, not assertions) |
 
 **Ratio (test suite lines vs app lines):** on the order of **0.7%** if counting only the two real suites (~483 lines vs ~70k). That is **far below** what teams usually target for production-critical UIs.
 
@@ -98,14 +98,14 @@
 
 #### Frontend — by directory (application file counts)
 
-| Area | App `*.ts` / `*.tsx` files |
-|------|---------------------------:|
-| `src/components` | 179 |
-| `src/pages` | 35 |
-| `src/services` | 6 |
-| `src/contexts` | 2 |
-| `src/hooks` | 9 |
-| `src/utils` | 20 |
+| Area             | App `*.ts` / `*.tsx` files |
+| ---------------- | -------------------------: |
+| `src/components` |                        179 |
+| `src/pages`      |                         35 |
+| `src/services`   |                          6 |
+| `src/contexts`   |                          2 |
+| `src/hooks`      |                          9 |
+| `src/utils`      |                         20 |
 
 **Tests touching these:** Only `api.test.ts` (API client), `eventPortalService.test.ts` (portal session + fetch), and a non-test `emailVariables.test.ts`. **No** component tests, **no** page/route tests, **no** hook tests, **no** tests for most services (e.g. `googlePlacesService.ts`).
 
@@ -115,14 +115,14 @@
 
 #### Critical user flows (auth, payments, events, vendor, RSVP)
 
-| Flow | Coverage |
-|------|----------|
+| Flow                                 | Coverage                                                                                                                                             |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Auth (login, JWT, protected API)** | Exercised indirectly via `api.test.ts` (mocked `fetch`); **no** `AuthContext` or route-guard tests. API expectations are **out of date** (failures). |
-| **Payments / onboarding** | **No** dedicated tests (`PaymentOnboardingPage`, Stripe-related UI, etc.). |
-| **Event creation / producer** | **No** UI or workflow tests; `eventsApi` tests exist but **fail** against current implementation. |
-| **Vendor application** | **No** tests for `VendorApplicationForm` / related pages. |
-| **Submissions / portal** | **Strongest area:** `eventPortalService` has meaningful unit tests (session, verify, fetch, errors). |
-| **RSVP / registrations** | Single `registrationsApi.create` test **passes**; no end-to-end or form-level coverage. |
+| **Payments / onboarding**            | **No** dedicated tests (`PaymentOnboardingPage`, Stripe-related UI, etc.).                                                                           |
+| **Event creation / producer**        | **No** UI or workflow tests; `eventsApi` tests exist but **fail** against current implementation.                                                    |
+| **Vendor application**               | **No** tests for `VendorApplicationForm` / related pages.                                                                                            |
+| **Submissions / portal**             | **Strongest area:** `eventPortalService` has meaningful unit tests (session, verify, fetch, errors).                                                 |
+| **RSVP / registrations**             | Single `registrationsApi.create` test **passes**; no end-to-end or form-level coverage.                                                              |
 
 ---
 
@@ -162,10 +162,10 @@
 
 ### GitHub Actions
 
-| Workflow | Triggers | Jobs / steps |
-|----------|----------|----------------|
-| **`.github/workflows/ci.yml`** | `pull_request` → `main`, `develop`; `push` → `develop` | Checkout → Node 18 → `npm ci` → **`tsc --noEmit`** → **`npm run lint`** → **`npm run build`** → verify `dist/` exists. **No `npm run test:run`.** |
-| **`.github/workflows/deploy.yml`** | `push` → `main`; `workflow_dispatch` | Same pattern: `npm ci`, typecheck, lint, build, `dist/` check. **No tests.** Comment notes Render deploy follows. |
+| Workflow                           | Triggers                                               | Jobs / steps                                                                                                                                      |
+| ---------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`.github/workflows/ci.yml`**     | `pull_request` → `main`, `develop`; `push` → `develop` | Checkout → Node 18 → `npm ci` → **`tsc --noEmit`** → **`npm run lint`** → **`npm run build`** → verify `dist/` exists. **No `npm run test:run`.** |
+| **`.github/workflows/deploy.yml`** | `push` → `main`; `workflow_dispatch`                   | Same pattern: `npm ci`, typecheck, lint, build, `dist/` check. **No tests.** Comment notes Render deploy follows.                                 |
 
 ### Render (`render.yaml`)
 
@@ -182,13 +182,13 @@
 
 ### Security / static analysis in CI
 
-| Tool | In repo | In CI workflows |
-|------|---------|------------------|
-| **ESLint** | Yes (`.eslintrc.json`, `npm run lint`) | Yes |
-| **TypeScript** | Yes (`tsc --noEmit`) | Yes |
-| **`scripts/check-security.js`** (secret pattern scan) | Yes | **No** (not referenced in workflows reviewed) |
-| **Dependabot** | No config found | — |
-| **CodeQL / Snyk / npm audit** | Not in workflows | **No** |
+| Tool                                                  | In repo                                | In CI workflows                               |
+| ----------------------------------------------------- | -------------------------------------- | --------------------------------------------- |
+| **ESLint**                                            | Yes (`.eslintrc.json`, `npm run lint`) | Yes                                           |
+| **TypeScript**                                        | Yes (`tsc --noEmit`)                   | Yes                                           |
+| **`scripts/check-security.js`** (secret pattern scan) | Yes                                    | **No** (not referenced in workflows reviewed) |
+| **Dependabot**                                        | No config found                        | —                                             |
+| **CodeQL / Snyk / npm audit**                         | Not in workflows                       | **No**                                        |
 
 ---
 
@@ -196,54 +196,54 @@
 
 High-level: almost all user-visible and revenue-adjacent flows lack automated tests; the small API suite is **red** relative to current code.
 
-1. **`src/services/api.ts` (monolithic API client + auth headers)**  
-   - **What it does:** Central gateway to the backend; JWT attachment, error handling, and dozens of endpoints.  
-   - **Risk without tests:** Silent breakage of auth, wrong URLs/bodies, or incorrect error surfacing across the entire app.  
+1. **`src/services/api.ts` (monolithic API client + auth headers)**
+   - **What it does:** Central gateway to the backend; JWT attachment, error handling, and dozens of endpoints.
+   - **Risk without tests:** Silent breakage of auth, wrong URLs/bodies, or incorrect error surfacing across the entire app.
    - **Blast radius:** **Whole product** — any screen using the API.
 
-2. **Authentication and session (`AuthContext`, login/signup/password flows, token storage)**  
-   - **What it does:** User identity and access to producer features.  
-   - **Risk:** Regressions lock users out, leak unauthenticated calls, or mishandle tokens.  
+2. **Authentication and session (`AuthContext`, login/signup/password flows, token storage)**
+   - **What it does:** User identity and access to producer features.
+   - **Risk:** Regressions lock users out, leak unauthenticated calls, or mishandle tokens.
    - **Blast radius:** **All authenticated users**; support and trust impact.
 
-3. **Payment onboarding and money-adjacent UI (`PaymentOnboardingPage`, payment settings components)**  
-   - **What it does:** Connects producers to payment capabilities.  
-   - **Risk:** Broken flows → lost revenue, double charges, or confused users; hardest to debug without repro.  
+3. **Payment onboarding and money-adjacent UI (`PaymentOnboardingPage`, payment settings components)**
+   - **What it does:** Connects producers to payment capabilities.
+   - **Risk:** Broken flows → lost revenue, double charges, or confused users; hardest to debug without repro.
    - **Blast radius:** **Producers and attendees** downstream of payment configuration.
 
-4. **Event lifecycle (create/edit/publish, settings, go-live)**  
-   - **What it does:** Core value of the platform.  
-   - **Risk:** Bad saves, wrong validation, or broken publish paths.  
+4. **Event lifecycle (create/edit/publish, settings, go-live)**
+   - **What it does:** Core value of the platform.
+   - **Risk:** Bad saves, wrong validation, or broken publish paths.
    - **Blast radius:** **Every event**; operational fire drills.
 
-5. **Vendor application and CRM-heavy flows (`VendorApplicationForm`, invites, networking)**  
-   - **What it does:** Captures vendor data and producer workflows.  
-   - **Risk:** Data loss, duplicate submissions, wrong state transitions.  
+5. **Vendor application and CRM-heavy flows (`VendorApplicationForm`, invites, networking)**
+   - **What it does:** Captures vendor data and producer workflows.
+   - **Risk:** Data loss, duplicate submissions, wrong state transitions.
    - **Blast radius:** **Vendor pipeline** and producer operations.
 
-6. **Email system (templates, variables, sends, sequences)**  
-   - **What it does:** Large surface in `components/producer/Email/*`; `emailVariables` conversion is business-critical.  
-   - **Risk:** Wrong variable substitution or HTML/plain corruption → wrong emails at scale.  
+6. **Email system (templates, variables, sends, sequences)**
+   - **What it does:** Large surface in `components/producer/Email/*`; `emailVariables` conversion is business-critical.
+   - **Risk:** Wrong variable substitution or HTML/plain corruption → wrong emails at scale.
    - **Blast radius:** **All email recipients**; reputational and deliverability risk.
 
-7. **RSVP / registration flows**  
-   - **What it does:** Public-facing signup and `registrationsApi`.  
-   - **Risk:** Lost RSVPs, wrong counts, failed submissions.  
+7. **RSVP / registration flows**
+   - **What it does:** Public-facing signup and `registrationsApi`.
+   - **Risk:** Lost RSVPs, wrong counts, failed submissions.
    - **Blast radius:** **Event attendance data** and producer planning.
 
-8. **Location / Places integration (`googlePlacesService.ts`)**  
-   - **What it does:** Address search and normalization via backend proxy.  
-   - **Risk:** Broken venue capture, bad geodata, edge-case parsing.  
+8. **Location / Places integration (`googlePlacesService.ts`)**
+   - **What it does:** Address search and normalization via backend proxy.
+   - **Risk:** Broken venue capture, bad geodata, edge-case parsing.
    - **Blast radius:** **Event and venue accuracy**; downstream maps and comms.
 
-9. **Routing, lazy loading, and error boundaries (`App.tsx`, page-level error handling)**  
-   - **What it does:** Users reach the right screen with right guards.  
-   - **Risk:** Blank screens, open routes, or wrong redirects.  
+9. **Routing, lazy loading, and error boundaries (`App.tsx`, page-level error handling)**
+   - **What it does:** Users reach the right screen with right guards.
+   - **Risk:** Blank screens, open routes, or wrong redirects.
    - **Blast radius:** **All users** on navigation edge cases.
 
-10. **Vendor event portal page (`VendorEventPortalPage` + service)**  
-    - **What it does:** Vendors consume producer updates and booth data.  
-    - **Risk:** Service is tested; **UI integration** is not — mismatches between session and UI states.  
+10. **Vendor event portal page (`VendorEventPortalPage` + service)**
+    - **What it does:** Vendors consume producer updates and booth data.
+    - **Risk:** Service is tested; **UI integration** is not — mismatches between session and UI states.
     - **Blast radius:** **All vendors** using the portal.
 
 ---
@@ -279,8 +279,8 @@ High-level: almost all user-visible and revenue-adjacent flows lack automated te
 
 ## 7. Honest Assessment
 
-This client repo is **not** in a production-grade testing posture today. You have a **thin** automated layer: two intentional Vitest suites totaling on the order of **twenty** test cases, while the application surface is **tens of thousands of lines** across **hundreds** of modules. **Continuous integration does not run those tests**, so the merge pipeline behaves as if automated tests barely exist. When tests *are* run locally, the run **fails**: one file is misclassified as a test suite, and the API suite is **out of sync** with the real client, which is a classic sign that tests were not treated as part of the delivery contract. The **vendor portal service** tests are a bright spot — they show the team can write focused, behavior-driven unit tests — but they cover a **narrow slice** of the business. **End-to-end coverage is absent.** Overall, this is closer to **“minimal safety net with holes”** than to **“no safety net,”** because some logic is tested and TypeScript plus ESLint catch a different class of errors — but for **regressions in auth, payments, events, email, and forms**, the team is still relying primarily on **manual verification and production pain**. That is the reality to set expectations against for 2026 planning.
+This client repo is **not** in a production-grade testing posture today. You have a **thin** automated layer: two intentional Vitest suites totaling on the order of **twenty** test cases, while the application surface is **tens of thousands of lines** across **hundreds** of modules. **Continuous integration does not run those tests**, so the merge pipeline behaves as if automated tests barely exist. When tests _are_ run locally, the run **fails**: one file is misclassified as a test suite, and the API suite is **out of sync** with the real client, which is a classic sign that tests were not treated as part of the delivery contract. The **vendor portal service** tests are a bright spot — they show the team can write focused, behavior-driven unit tests — but they cover a **narrow slice** of the business. **End-to-end coverage is absent.** Overall, this is closer to **“minimal safety net with holes”** than to **“no safety net,”** because some logic is tested and TypeScript plus ESLint catch a different class of errors — but for **regressions in auth, payments, events, email, and forms**, the team is still relying primarily on **manual verification and production pain**. That is the reality to set expectations against for 2026 planning.
 
 ---
 
-*End of report.*
+_End of report._

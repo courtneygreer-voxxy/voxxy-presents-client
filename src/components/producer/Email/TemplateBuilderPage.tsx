@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import {
   Mail,
   ArrowLeft,
@@ -13,206 +13,229 @@ import {
   CheckCircle2,
   XCircle,
   Send,
-  HelpCircle
-} from 'lucide-react';
-import * as Tooltip from '@radix-ui/react-tooltip';
-import { Button } from '@/components/ui/button';
-import { emailCampaignTemplatesApi, emailTemplateItemsApi } from '@/services/api';
-import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory, TriggerType } from '@/types/email';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
-import { EmailTemplateEditorPage } from './EmailTemplateEditorPage';
-import { STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
-import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
-import { logger } from '@/utils/logger';
+  HelpCircle,
+} from 'lucide-react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { Button } from '@/components/ui/button'
+import { emailCampaignTemplatesApi, emailTemplateItemsApi } from '@/services/api'
+import type {
+  EmailCampaignTemplate,
+  EmailTemplateItem,
+  EmailCategory,
+  TriggerType,
+} from '@/types/email'
+import { useAuth } from '@/contexts/AuthContext'
+import { toast } from 'sonner'
+import { EmailTemplateEditorPage } from './EmailTemplateEditorPage'
+import { STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter'
+import { getEmailTypeInfo } from '@/utils/emailTypeHelper'
+import { logger } from '@/utils/logger'
 
 interface TemplateBuilderPageProps {
-  templateId?: number;
-  createFromDefault?: boolean;
-  onBack?: () => void;
+  templateId?: number
+  createFromDefault?: boolean
+  onBack?: () => void
 }
 
-export default function TemplateBuilderPage({ templateId, createFromDefault, onBack }: TemplateBuilderPageProps) {
-  const { userProfile } = useAuth();
-  const isAdmin = userProfile?.role === 'admin';
+export default function TemplateBuilderPage({
+  templateId,
+  createFromDefault,
+  onBack,
+}: TemplateBuilderPageProps) {
+  const { userProfile } = useAuth()
+  const isAdmin = userProfile?.role === 'admin'
 
-  const [template, setTemplate] = useState<EmailCampaignTemplate | null>(null);
-  const [emailItems, setEmailItems] = useState<EmailTemplateItem[]>([]);
-  const [isLoading, setIsLoading] = useState(!!templateId || !!createFromDefault);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [template, setTemplate] = useState<EmailCampaignTemplate | null>(null)
+  const [emailItems, setEmailItems] = useState<EmailTemplateItem[]>([])
+  const [isLoading, setIsLoading] = useState(!!templateId || !!createFromDefault)
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   // Form state
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
 
   // Change tracking
-  const [hasChanges, setHasChanges] = useState(false);
-  const [initialName, setInitialName] = useState('');
-  const [initialDescription, setInitialDescription] = useState('');
+  const [hasChanges, setHasChanges] = useState(false)
+  const [initialName, setInitialName] = useState('')
+  const [initialDescription, setInitialDescription] = useState('')
 
   // Email editor state
-  const [editingItem, setEditingItem] = useState<EmailTemplateItem | null>(null);
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [isCreateMode, setIsCreateMode] = useState(false);
+  const [editingItem, setEditingItem] = useState<EmailTemplateItem | null>(null)
+  const [isEditorOpen, setIsEditorOpen] = useState(false)
+  const [isCreateMode, setIsCreateMode] = useState(false)
 
   // Selected email for preview
-  const [selectedEmail, setSelectedEmail] = useState<EmailTemplateItem | null>(null);
+  const [selectedEmail, setSelectedEmail] = useState<EmailTemplateItem | null>(null)
 
   // Delete confirmation modal state (for individual emails)
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [emailToDelete, setEmailToDelete] = useState<EmailTemplateItem | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [emailToDelete, setEmailToDelete] = useState<EmailTemplateItem | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // Delete template confirmation modal state
-  const [deleteTemplateModalOpen, setDeleteTemplateModalOpen] = useState(false);
-  const [isDeletingTemplate, setIsDeletingTemplate] = useState(false);
+  const [deleteTemplateModalOpen, setDeleteTemplateModalOpen] = useState(false)
+  const [isDeletingTemplate, setIsDeletingTemplate] = useState(false)
 
   // Track locally modified emails (before template is saved)
-  const [modifiedEmails, setModifiedEmails] = useState<Map<number, EmailTemplateItem>>(new Map());
+  const [modifiedEmails, setModifiedEmails] = useState<Map<number, EmailTemplateItem>>(new Map())
 
   // Test email dialog state
-  const [showTestEmailDialog, setShowTestEmailDialog] = useState(false);
-  const [testEmailAddress, setTestEmailAddress] = useState('');
-  const [isSendingTest, setIsSendingTest] = useState(false);
-  const navItemClass = 'w-full rounded-lg border border-transparent px-3 py-2 text-left transition-all hover:border-primary/25 hover:bg-primary/10 focus-visible:border-primary/45 focus-visible:bg-primary/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 dark:hover:border-primary/20 dark:hover:bg-primary/12 dark:focus-visible:border-primary/35 dark:focus-visible:bg-primary/18 dark:focus-visible:ring-primary/25';
-  const activeNavItemClass = 'border border-primary/45 bg-primary/18 shadow-sm dark:border-primary/28 dark:bg-primary/20 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]';
-  const modalInputClass = 'voxxy-input-frost w-full rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/40';
+  const [showTestEmailDialog, setShowTestEmailDialog] = useState(false)
+  const [testEmailAddress, setTestEmailAddress] = useState('')
+  const [isSendingTest, setIsSendingTest] = useState(false)
+  const navItemClass =
+    'w-full rounded-lg border border-transparent px-3 py-2 text-left transition-all hover:border-primary/25 hover:bg-primary/10 focus-visible:border-primary/45 focus-visible:bg-primary/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 dark:hover:border-primary/20 dark:hover:bg-primary/12 dark:focus-visible:border-primary/35 dark:focus-visible:bg-primary/18 dark:focus-visible:ring-primary/25'
+  const activeNavItemClass =
+    'border border-primary/45 bg-primary/18 shadow-sm dark:border-primary/28 dark:bg-primary/20 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]'
+  const modalInputClass =
+    'voxxy-input-frost w-full rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/40'
 
   useEffect(() => {
     if (templateId) {
-      loadTemplate();
+      loadTemplate()
     } else if (createFromDefault) {
-      loadDefaultSequence();
+      loadDefaultSequence()
     }
-  }, [templateId, createFromDefault]);
+  }, [templateId, createFromDefault])
 
   // Track changes to name and description
   useEffect(() => {
     if (createFromDefault) {
-      const nameChanged = name !== initialName;
-      const descriptionChanged = description !== initialDescription;
-      setHasChanges(nameChanged || descriptionChanged);
+      const nameChanged = name !== initialName
+      const descriptionChanged = description !== initialDescription
+      setHasChanges(nameChanged || descriptionChanged)
     }
-  }, [name, description, initialName, initialDescription, createFromDefault]);
+  }, [name, description, initialName, initialDescription, createFromDefault])
 
   const loadTemplate = async () => {
-    if (!templateId) return;
+    if (!templateId) return
 
-    setIsLoading(true);
-    setError(null);
+    setIsLoading(true)
+    setError(null)
     try {
       const [templateData, items] = await Promise.all([
         emailCampaignTemplatesApi.getById(templateId),
-        emailTemplateItemsApi.getByTemplate(templateId)
-      ]);
+        emailTemplateItemsApi.getByTemplate(templateId),
+      ])
 
-      setTemplate(templateData);
-      setName(templateData.name);
-      setDescription(templateData.description || '');
-      setInitialName(templateData.name);
-      setInitialDescription(templateData.description || '');
-      const sortedItems = items.sort((a, b) => a.position - b.position);
-      setEmailItems(sortedItems);
+      setTemplate(templateData)
+      setName(templateData.name)
+      setDescription(templateData.description || '')
+      setInitialName(templateData.name)
+      setInitialDescription(templateData.description || '')
+      const sortedItems = items.sort((a, b) => a.position - b.position)
+      setEmailItems(sortedItems)
 
       // Auto-select first email for preview
       if (sortedItems.length > 0 && !selectedEmail) {
-        setSelectedEmail(sortedItems[0]);
+        setSelectedEmail(sortedItems[0])
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load template');
+      setError(err.message || 'Failed to load template')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const loadDefaultSequence = async () => {
-    setIsLoading(true);
-    setError(null);
+    setIsLoading(true)
+    setError(null)
     try {
       // Fetch all templates and find the default GENERIC template
       // (We have two defaults now: generic and category)
-      const allTemplates = await emailCampaignTemplatesApi.getAll();
-      const defaultTemplate = allTemplates.find(t => t.is_default && t.template_type === 'generic');
+      const allTemplates = await emailCampaignTemplatesApi.getAll()
+      const defaultTemplate = allTemplates.find(
+        (t) => t.is_default && t.template_type === 'generic',
+      )
 
       if (!defaultTemplate) {
-        setError('No default event sequence found');
-        setIsLoading(false);
-        return;
+        setError('No default event sequence found')
+        setIsLoading(false)
+        return
       }
 
       // Load the default template's emails (should only be event-wide triggers)
-      const items = await emailTemplateItemsApi.getByTemplate(defaultTemplate.id);
+      const items = await emailTemplateItemsApi.getByTemplate(defaultTemplate.id)
 
       // Generate a unique default name by checking existing templates of the same type
-      const generateUniqueName = (baseName: string, existingTemplates: EmailCampaignTemplate[], templateType: string): string => {
+      const generateUniqueName = (
+        baseName: string,
+        existingTemplates: EmailCampaignTemplate[],
+        templateType: string,
+      ): string => {
         // Filter to only templates of the same type
-        const sameTypeTemplates = existingTemplates.filter(t => t.template_type === templateType);
+        const sameTypeTemplates = existingTemplates.filter((t) => t.template_type === templateType)
 
-        let counter = 1;
-        let proposedName = baseName;
+        let counter = 1
+        let proposedName = baseName
 
-        while (sameTypeTemplates.some(t => t.name === proposedName)) {
-          counter++;
-          proposedName = `${baseName} ${counter}`;
+        while (sameTypeTemplates.some((t) => t.name === proposedName)) {
+          counter++
+          proposedName = `${baseName} ${counter}`
         }
 
-        return proposedName;
-      };
+        return proposedName
+      }
 
-      const uniqueName = generateUniqueName('My Event Sequence', allTemplates, 'generic');
+      const uniqueName = generateUniqueName('My Event Sequence', allTemplates, 'generic')
 
       // Set up for creating new sequence based on default
-      setName(uniqueName);
-      setDescription('Based on default event sequence');
-      setInitialName(uniqueName);
-      setInitialDescription('Based on default event sequence');
-      setEmailItems(items.sort((a, b) => a.position - b.position));
-      setHasChanges(false); // Start with no changes
+      setName(uniqueName)
+      setDescription('Based on default event sequence')
+      setInitialName(uniqueName)
+      setInitialDescription('Based on default event sequence')
+      setEmailItems(items.sort((a, b) => a.position - b.position))
+      setHasChanges(false) // Start with no changes
     } catch (err: any) {
-      setError(err.message || 'Failed to load default sequence');
+      setError(err.message || 'Failed to load default sequence')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleSave = async () => {
     // For non-category templates, validate name
     if (!isCategoryTemplate) {
       if (!name.trim()) {
-        setError('Sequence name is required');
-        return;
+        setError('Sequence name is required')
+        return
       }
 
       // Check for duplicate name within the same template type
       // (Event sequences and Category sequences can have the same name)
-      const allTemplates = await emailCampaignTemplatesApi.getAll();
+      const allTemplates = await emailCampaignTemplatesApi.getAll()
 
       // Determine what template type we're working with
-      const currentTemplateType = createFromDefault ? 'generic' : (template?.template_type || 'generic');
+      const currentTemplateType = createFromDefault
+        ? 'generic'
+        : template?.template_type || 'generic'
 
-      const duplicateName = allTemplates.some(t =>
-        t.name.toLowerCase() === name.trim().toLowerCase() &&
-        t.template_type === currentTemplateType && // Only check within same type
-        t.id !== template?.id
-      );
+      const duplicateName = allTemplates.some(
+        (t) =>
+          t.name.toLowerCase() === name.trim().toLowerCase() &&
+          t.template_type === currentTemplateType && // Only check within same type
+          t.id !== template?.id,
+      )
 
       if (duplicateName) {
-        const typeLabel = currentTemplateType === 'generic' ? 'event' : 'category';
-        setError(`A ${typeLabel} sequence named "${name.trim()}" already exists. Please choose a different name.`);
-        return;
+        const typeLabel = currentTemplateType === 'generic' ? 'event' : 'category'
+        setError(
+          `A ${typeLabel} sequence named "${name.trim()}" already exists. Please choose a different name.`,
+        )
+        return
       }
     }
 
     if (createFromDefault && !hasChanges) {
-      setError('Please make at least one change before saving');
-      return;
+      setError('Please make at least one change before saving')
+      return
     }
 
-    setIsSaving(true);
-    setError(null);
-    setSuccessMessage(null);
+    setIsSaving(true)
+    setError(null)
+    setSuccessMessage(null)
 
     try {
       if (template) {
@@ -221,52 +244,56 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
         if (isCategoryTemplate) {
           // Category templates: name and description are read-only
           // Nothing to update at template level (only emails are editable)
-          setSuccessMessage('Sequence saved successfully');
+          setSuccessMessage('Sequence saved successfully')
         } else {
           // Generic/event and universal templates: can update name and description
           await emailCampaignTemplatesApi.update(template.id, {
             name: name.trim(),
-            description: description.trim() || undefined
-          });
-          setSuccessMessage('Sequence updated successfully');
+            description: description.trim() || undefined,
+          })
+          setSuccessMessage('Sequence updated successfully')
         }
       } else if (createFromDefault) {
         // Create new sequence by cloning default GENERIC template
-        const allTemplates = await emailCampaignTemplatesApi.getAll();
-        const defaultTemplate = allTemplates.find(t => t.is_default && t.template_type === 'generic');
+        const allTemplates = await emailCampaignTemplatesApi.getAll()
+        const defaultTemplate = allTemplates.find(
+          (t) => t.is_default && t.template_type === 'generic',
+        )
 
         if (!defaultTemplate) {
-          setError('Default event sequence not found');
-          setIsSaving(false);
-          return;
+          setError('Default event sequence not found')
+          setIsSaving(false)
+          return
         }
 
         // Clone the default template with custom name and description
         const newTemplate = await emailCampaignTemplatesApi.clone(
           defaultTemplate.id,
           name.trim(),
-          description.trim() || undefined
-        );
+          description.trim() || undefined,
+        )
 
         // Get the cloned template's emails
-        const clonedItems = await emailTemplateItemsApi.getByTemplate(newTemplate.id);
-        const sortedClonedItems = clonedItems.sort((a, b) => a.position - b.position);
+        const clonedItems = await emailTemplateItemsApi.getByTemplate(newTemplate.id)
+        const sortedClonedItems = clonedItems.sort((a, b) => a.position - b.position)
 
         // If there are locally modified emails, apply those changes to the cloned items
         if (modifiedEmails.size > 0) {
-          logger.info('Persisting locally modified emails to cloned template', { count: modifiedEmails.size });
+          logger.info('Persisting locally modified emails to cloned template', {
+            count: modifiedEmails.size,
+          })
 
           // Create a map of position -> modified email for quick lookup
-          const modifiedByPosition = new Map<number, EmailTemplateItem>();
+          const modifiedByPosition = new Map<number, EmailTemplateItem>()
           emailItems.forEach((item, index) => {
             if (modifiedEmails.has(item.id)) {
-              modifiedByPosition.set(item.position, modifiedEmails.get(item.id)!);
+              modifiedByPosition.set(item.position, modifiedEmails.get(item.id)!)
             }
-          });
+          })
 
           // Update each cloned email that has local modifications
           for (const clonedItem of sortedClonedItems) {
-            const modifiedVersion = modifiedByPosition.get(clonedItem.position);
+            const modifiedVersion = modifiedByPosition.get(clonedItem.position)
             if (modifiedVersion) {
               await emailTemplateItemsApi.update(newTemplate.id, clonedItem.id, {
                 name: modifiedVersion.name,
@@ -278,46 +305,46 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                 trigger_time: modifiedVersion.trigger_time ?? undefined,
                 enabled_by_default: modifiedVersion.enabled_by_default,
                 filter_criteria: modifiedVersion.filter_criteria,
-              });
+              })
             }
           }
         }
 
-        setTemplate(newTemplate);
-        setHasChanges(false);
-        setModifiedEmails(new Map()); // Clear modified emails tracking
-        setSuccessMessage('Sequence created successfully with your edits!');
+        setTemplate(newTemplate)
+        setHasChanges(false)
+        setModifiedEmails(new Map()) // Clear modified emails tracking
+        setSuccessMessage('Sequence created successfully with your edits!')
 
         // Reload the final state
-        const finalItems = await emailTemplateItemsApi.getByTemplate(newTemplate.id);
-        setEmailItems(finalItems.sort((a, b) => a.position - b.position));
+        const finalItems = await emailTemplateItemsApi.getByTemplate(newTemplate.id)
+        setEmailItems(finalItems.sort((a, b) => a.position - b.position))
       } else {
         // Create new empty template
         const newTemplate = await emailCampaignTemplatesApi.create({
           name: name.trim(),
-          description: description.trim() || undefined
-        });
-        setTemplate(newTemplate);
-        setSuccessMessage('Sequence created successfully');
+          description: description.trim() || undefined,
+        })
+        setTemplate(newTemplate)
+        setSuccessMessage('Sequence created successfully')
       }
     } catch (err: any) {
       // Check if error has validation errors array (from ApiError)
       if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
-        setError(err.errors.join(', '));
+        setError(err.errors.join(', '))
       } else {
-        setError(err.message || 'Failed to save sequence');
+        setError(err.message || 'Failed to save sequence')
       }
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   // Handle creating email from editor
   const handleCreateEmailFromEditor = async (data: any) => {
     if (!template) {
       // If template doesn't exist yet, show error
-      setError('Please save the template first before adding emails');
-      throw new Error('Template must be saved first');
+      setError('Please save the template first before adding emails')
+      throw new Error('Template must be saved first')
     }
 
     try {
@@ -332,117 +359,121 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
         trigger_time: data.trigger_time,
         filter_criteria: data.filter_criteria,
         enabled_by_default: data.enabled_by_default,
-      });
-      setEmailItems([...emailItems, newItem]);
-      setSuccessMessage('Email added to template successfully!');
-      setIsCreateMode(false);
-      setIsEditorOpen(false);
+      })
+      setEmailItems([...emailItems, newItem])
+      setSuccessMessage('Email added to template successfully!')
+      setIsCreateMode(false)
+      setIsEditorOpen(false)
     } catch (err: any) {
-      setError(err.message || 'Failed to add email');
-      throw err; // Re-throw so editor can handle it
+      setError(err.message || 'Failed to add email')
+      throw err // Re-throw so editor can handle it
     }
-  };
+  }
 
   const handleOpenCreateEditor = (category?: string) => {
     if (!template) {
-      setError('Please save the template first before adding emails');
-      return;
+      setError('Please save the template first before adding emails')
+      return
     }
-    setIsCreateMode(true);
-    setEditingItem(null);
-    setIsEditorOpen(true);
-  };
+    setIsCreateMode(true)
+    setEditingItem(null)
+    setIsEditorOpen(true)
+  }
 
   const handleDeleteEmail = (item: EmailTemplateItem) => {
-    setEmailToDelete(item);
-    setDeleteModalOpen(true);
-  };
+    setEmailToDelete(item)
+    setDeleteModalOpen(true)
+  }
 
   const handleDeleteConfirm = async () => {
-    if (!template || !emailToDelete) return;
+    if (!template || !emailToDelete) return
 
-    setIsDeleting(true);
+    setIsDeleting(true)
 
     try {
-      await emailTemplateItemsApi.delete(template.id, emailToDelete.id);
-      setEmailItems(emailItems.filter(item => item.id !== emailToDelete.id));
+      await emailTemplateItemsApi.delete(template.id, emailToDelete.id)
+      setEmailItems(emailItems.filter((item) => item.id !== emailToDelete.id))
 
       // Clear selected email if it's the one being deleted
       if (selectedEmail?.id === emailToDelete.id) {
-        setSelectedEmail(null);
+        setSelectedEmail(null)
       }
 
-      setDeleteModalOpen(false);
-      setEmailToDelete(null);
+      setDeleteModalOpen(false)
+      setEmailToDelete(null)
     } catch (err: any) {
-      setError(err.message || 'Failed to delete email');
+      setError(err.message || 'Failed to delete email')
     } finally {
-      setIsDeleting(false);
+      setIsDeleting(false)
     }
-  };
+  }
 
   const handleDeleteTemplate = async () => {
-    if (!template) return;
+    if (!template) return
 
-    setIsDeletingTemplate(true);
+    setIsDeletingTemplate(true)
 
     try {
-      await emailCampaignTemplatesApi.delete(template.id);
-      setDeleteTemplateModalOpen(false);
+      await emailCampaignTemplatesApi.delete(template.id)
+      setDeleteTemplateModalOpen(false)
       toast.success('Sequence deleted', {
         description: `"${template.name}" has been removed`,
-      });
+      })
       setTimeout(() => {
-        if (onBack) onBack();
-      }, 500);
+        if (onBack) onBack()
+      }, 500)
     } catch (err: any) {
       toast.error('Failed to delete sequence', {
         description: err.message || 'An error occurred while deleting',
-      });
-      setDeleteTemplateModalOpen(false);
+      })
+      setDeleteTemplateModalOpen(false)
     } finally {
-      setIsDeletingTemplate(false);
+      setIsDeletingTemplate(false)
     }
-  };
+  }
 
   const handleEditEmail = (item: EmailTemplateItem) => {
-    setEditingItem(item);
-    setIsEditorOpen(true);
-  };
+    setEditingItem(item)
+    setIsEditorOpen(true)
+  }
 
   const handleSendTest = async () => {
-    if (!template || !selectedEmail || !testEmailAddress) return;
+    if (!template || !selectedEmail || !testEmailAddress) return
 
-    setIsSendingTest(true);
+    setIsSendingTest(true)
 
     try {
-      const result = await emailTemplateItemsApi.sendTest(template.id, selectedEmail.id, testEmailAddress);
+      const result = await emailTemplateItemsApi.sendTest(
+        template.id,
+        selectedEmail.id,
+        testEmailAddress,
+      )
 
-      setSuccessMessage(`Test email sent to ${result.recipient}`);
-      setTimeout(() => setSuccessMessage(null), 5000);
+      setSuccessMessage(`Test email sent to ${result.recipient}`)
+      setTimeout(() => setSuccessMessage(null), 5000)
 
-      setShowTestEmailDialog(false);
-      setTestEmailAddress('');
+      setShowTestEmailDialog(false)
+      setTestEmailAddress('')
     } catch (error: any) {
-      logger.error('Failed to send test email', { templateId: template?.id, error });
-      setError(error?.message || 'Failed to send test email');
-      setTimeout(() => setError(null), 5000);
+      logger.error('Failed to send test email', { templateId: template?.id, error })
+      setError(error?.message || 'Failed to send test email')
+      setTimeout(() => setError(null), 5000)
     } finally {
-      setIsSendingTest(false);
+      setIsSendingTest(false)
     }
-  };
+  }
 
   const handleSaveEmail = async (updatedItem: EmailTemplateItem) => {
     if (!template) {
       // If no template yet (creating new from default), update local state and track modification
-      setEmailItems(emailItems.map(item => item.id === updatedItem.id ? updatedItem : item));
-      setModifiedEmails(prev => new Map(prev).set(updatedItem.id, updatedItem));
-      setIsEditorOpen(false);
-      setEditingItem(null);
-      setHasChanges(true); // Mark that changes have been made
-      setSuccessMessage('Email updated (will be saved when you save the sequence)');
-      setTimeout(() => setSuccessMessage(null), 3000);
-      return;
+      setEmailItems(emailItems.map((item) => (item.id === updatedItem.id ? updatedItem : item)))
+      setModifiedEmails((prev) => new Map(prev).set(updatedItem.id, updatedItem))
+      setIsEditorOpen(false)
+      setEditingItem(null)
+      setHasChanges(true) // Mark that changes have been made
+      setSuccessMessage('Email updated (will be saved when you save the sequence)')
+      setTimeout(() => setSuccessMessage(null), 3000)
+      return
     }
 
     try {
@@ -456,31 +487,31 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
         trigger_time: updatedItem.trigger_time ?? undefined,
         enabled_by_default: updatedItem.enabled_by_default,
         filter_criteria: updatedItem.filter_criteria,
-      });
+      })
 
       // Update in local state
-      setEmailItems(emailItems.map(item => item.id === saved.id ? saved : item));
-      setIsEditorOpen(false);
-      setEditingItem(null);
-      setSuccessMessage('Email updated successfully');
-      setTimeout(() => setSuccessMessage(null), 3000);
+      setEmailItems(emailItems.map((item) => (item.id === saved.id ? saved : item)))
+      setIsEditorOpen(false)
+      setEditingItem(null)
+      setSuccessMessage('Email updated successfully')
+      setTimeout(() => setSuccessMessage(null), 3000)
     } catch (err: any) {
-      setError(err.message || 'Failed to update email');
+      setError(err.message || 'Failed to update email')
     }
-  };
+  }
 
   const handleCloseEditor = () => {
-    setIsEditorOpen(false);
-    setEditingItem(null);
-    setIsCreateMode(false);
-  };
+    setIsEditorOpen(false)
+    setEditingItem(null)
+    setIsCreateMode(false)
+  }
 
-
-  const isSystemDefault = template?.organization_id === null && template?.is_default;
-  const isCategoryTemplate = template?.template_type === 'category' && !template?.is_universal;
-  const canEdit = !isSystemDefault;
-  const canEditNameAndDescription = canEdit && !isCategoryTemplate;
-  const canDelete = template && !template.is_default && (template.organization_id !== null || isAdmin);
+  const isSystemDefault = template?.organization_id === null && template?.is_default
+  const isCategoryTemplate = template?.template_type === 'category' && !template?.is_universal
+  const canEdit = !isSystemDefault
+  const canEditNameAndDescription = canEdit && !isCategoryTemplate
+  const canDelete =
+    template && !template.is_default && (template.organization_id !== null || isAdmin)
 
   // Helper to check if email is a reminder (value-based trigger)
   // These are time-based reminders (not event-triggered) that can be edited/deleted
@@ -489,28 +520,31 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
       'days_before_deadline',
       'days_after_deadline',
       'days_before_payment_deadline',
-      'on_payment_deadline',  // Time-based, not event-triggered
+      'on_payment_deadline', // Time-based, not event-triggered
       'days_after_payment_deadline',
       'days_before_event',
-      'on_event_date',  // Time-based, not event-triggered
-      'days_after_event'
-    ];
-    return customReminderTriggers.includes(triggerType);
-  };
+      'on_event_date', // Time-based, not event-triggered
+      'days_after_event',
+    ]
+    return customReminderTriggers.includes(triggerType)
+  }
 
   // Group emails by system vs reminders for sidebar
-  const groupedEmails = emailItems.reduce((groups, item) => {
-    const groupKey = isCustomReminder(item.trigger_type) ? 'reminders' : 'system';
-    if (!groups[groupKey]) groups[groupKey] = [];
-    groups[groupKey].push(item);
-    return groups;
-  }, {} as Record<'system' | 'reminders', EmailTemplateItem[]>);
+  const groupedEmails = emailItems.reduce(
+    (groups, item) => {
+      const groupKey = isCustomReminder(item.trigger_type) ? 'reminders' : 'system'
+      if (!groups[groupKey]) groups[groupKey] = []
+      groups[groupKey].push(item)
+      return groups
+    },
+    {} as Record<'system' | 'reminders', EmailTemplateItem[]>,
+  )
 
   // Group labels
   const groupLabels: Record<'system' | 'reminders', string> = {
     system: 'System',
     reminders: 'Reminders',
-  };
+  }
 
   // If editor is open (create or edit mode), show full-screen editor
   if (isEditorOpen) {
@@ -525,7 +559,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
         onSave={isCreateMode ? undefined : handleSaveEmail}
         onCreate={isCreateMode ? handleCreateEmailFromEditor : undefined}
       />
-    );
+    )
   }
 
   return (
@@ -550,14 +584,18 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                 <Mail className="h-5 w-5 shrink-0 text-primary dark:text-primary" />
                 <div>
                   <h1 className="text-base font-semibold text-foreground">
-                    {template ? (isSystemDefault ? 'View Sequence' : 'Edit Sequence') : 'New Sequence'}
+                    {template
+                      ? isSystemDefault
+                        ? 'View Sequence'
+                        : 'Edit Sequence'
+                      : 'New Sequence'}
                   </h1>
                   <p className="text-xs text-muted-foreground">
                     {isSystemDefault
                       ? 'System sequences are read-only. Clone to customize.'
                       : isCategoryTemplate
-                      ? 'Customize email content for this vendor category'
-                      : 'Create a reusable email sequence'}
+                        ? 'Customize email content for this vendor category'
+                        : 'Create a reusable email sequence'}
                   </p>
                 </div>
               </div>
@@ -591,7 +629,11 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                 <Button
                   size="sm"
                   onClick={handleSave}
-                  disabled={isSaving || (!isCategoryTemplate && !name.trim()) || (createFromDefault && !hasChanges)}
+                  disabled={
+                    isSaving ||
+                    (!isCategoryTemplate && !name.trim()) ||
+                    (createFromDefault && !hasChanges)
+                  }
                   className="voxxy-btn-cta gap-2"
                   title={createFromDefault && !hasChanges ? 'Make at least one change to save' : ''}
                 >
@@ -622,9 +664,13 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
             <div>
               <p className="text-blue-400 text-sm font-medium">Creating New Sequence</p>
               <p className="text-blue-400/80 text-xs mt-0.5">
-                You can edit emails now and your changes will be automatically saved when you save the sequence.
+                You can edit emails now and your changes will be automatically saved when you save
+                the sequence.
                 {modifiedEmails.size > 0 && (
-                  <span className="font-medium"> ({modifiedEmails.size} email{modifiedEmails.size !== 1 ? 's' : ''} modified)</span>
+                  <span className="font-medium">
+                    {' '}
+                    ({modifiedEmails.size} email{modifiedEmails.size !== 1 ? 's' : ''} modified)
+                  </span>
                 )}
               </p>
             </div>
@@ -657,9 +703,16 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
         {!isLoading && (
           <div className="space-y-4">
             {/* Sequence Details - Compact */}
-            <div className={`p-3 rounded-lg border ${isCategoryTemplate || isSystemDefault ? 'border-blue-500/20 bg-blue-500/5' : 'border-border bg-background/[0.02]'}`} role={isSystemDefault ? 'region' : undefined} aria-label={isSystemDefault ? 'Sequence details' : undefined}>
+            <div
+              className={`p-3 rounded-lg border ${isCategoryTemplate || isSystemDefault ? 'border-blue-500/20 bg-blue-500/5' : 'border-border bg-background/[0.02]'}`}
+              role={isSystemDefault ? 'region' : undefined}
+              aria-label={isSystemDefault ? 'Sequence details' : undefined}
+            >
               {isSystemDefault && (
-                <div className="flex items-start gap-2 pb-2 mb-2 border-b border-blue-500/20" role="note">
+                <div
+                  className="flex items-start gap-2 pb-2 mb-2 border-b border-blue-500/20"
+                  role="note"
+                >
                   <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" aria-hidden />
                   <p className="text-blue-400 text-xs leading-snug">
                     <span className="font-semibold text-blue-300">Read-only system sequence.</span>{' '}
@@ -671,12 +724,16 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                 // Information card for category templates
                 <div className="space-y-1.5">
                   <div>
-                    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Category</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      Category
+                    </span>
                     <p className="text-base font-semibold text-foreground">{name}</p>
                   </div>
                   {description && (
                     <div>
-                      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">About</span>
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        About
+                      </span>
                       <p className="text-sm text-foreground/70">{description}</p>
                     </div>
                   )}
@@ -685,12 +742,16 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                 // Information card for system default templates
                 <div className="space-y-1.5">
                   <div>
-                    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Sequence Name</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      Sequence Name
+                    </span>
                     <p className="text-base font-semibold text-foreground">{name}</p>
                   </div>
                   {description && (
                     <div>
-                      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Description</span>
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Description
+                      </span>
                       <p className="text-sm text-foreground/70">{description}</p>
                     </div>
                   )}
@@ -700,7 +761,10 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                 <div className="grid grid-cols-2 gap-3">
                   {/* Name */}
                   <div>
-                    <label htmlFor="template-name" className="block text-[10px] font-medium text-foreground/50 uppercase tracking-wide mb-1">
+                    <label
+                      htmlFor="template-name"
+                      className="block text-[10px] font-medium text-foreground/50 uppercase tracking-wide mb-1"
+                    >
                       Sequence Name *
                     </label>
                     <input
@@ -717,8 +781,12 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
                   {/* Description */}
                   <div>
-                    <label htmlFor="template-description" className="block text-[10px] font-medium text-foreground/50 uppercase tracking-wide mb-1">
-                      Description <span className="font-normal text-muted-foreground">(Optional)</span>
+                    <label
+                      htmlFor="template-description"
+                      className="block text-[10px] font-medium text-foreground/50 uppercase tracking-wide mb-1"
+                    >
+                      Description{' '}
+                      <span className="font-normal text-muted-foreground">(Optional)</span>
                     </label>
                     <input
                       id="template-description"
@@ -737,7 +805,6 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
             {/* Email Sequence - Main View */}
             <div>
-
               {emailItems.length === 0 ? (
                 <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
                   <Mail className="mx-auto mb-3 h-12 w-12 text-muted-foreground" />
@@ -777,8 +844,8 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                     {/* Grouped Email List - System then Reminders */}
                     <div className="p-2 space-y-3">
                       {(['system', 'reminders'] as const).map((groupKey) => {
-                        const items = groupedEmails[groupKey];
-                        if (!items || items.length === 0) return null;
+                        const items = groupedEmails[groupKey]
+                        if (!items || items.length === 0) return null
 
                         return (
                           <div key={groupKey}>
@@ -801,7 +868,9 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                                       </div>
                                     </div>
                                     <div className="flex items-center gap-1.5">
-                                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${getEmailTypeInfo(item.trigger_type).color}`}>
+                                      <span
+                                        className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${getEmailTypeInfo(item.trigger_type).color}`}
+                                      >
                                         {getEmailTypeInfo(item.trigger_type).label}
                                       </span>
                                       {item.trigger_value !== null && item.trigger_value > 0 && (
@@ -811,11 +880,11 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                                       )}
                                     </div>
                                   </button>
-                                );
+                                )
                               })}
                             </div>
                           </div>
-                        );
+                        )
                       })}
                     </div>
                   </div>
@@ -834,7 +903,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                                   {selectedEmail.name}
                                 </h3>
                                 {(() => {
-                                  const isReminder = isCustomReminder(selectedEmail.trigger_type);
+                                  const isReminder = isCustomReminder(selectedEmail.trigger_type)
                                   return isReminder ? (
                                     <div className="flex items-center gap-1">
                                       <span className="flex-shrink-0 rounded border border-primary/40 bg-primary/30 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-violet-950 dark:text-primary">
@@ -852,7 +921,8 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                                               className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-primary/30 shadow-xl max-w-xs z-50"
                                               sideOffset={5}
                                             >
-                                              This is a time-based reminder that was added to this event's sequence.
+                                              This is a time-based reminder that was added to this
+                                              event's sequence.
                                               <Tooltip.Arrow className="fill-gray-900" />
                                             </Tooltip.Content>
                                           </Tooltip.Portal>
@@ -876,62 +946,67 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                                               className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-emerald-400/30 shadow-xl max-w-xs z-50"
                                               sideOffset={5}
                                             >
-                                              This is a core system email that's automatically triggered by vendor actions or event milestones.
+                                              This is a core system email that's automatically
+                                              triggered by vendor actions or event milestones.
                                               <Tooltip.Arrow className="fill-gray-900" />
                                             </Tooltip.Content>
                                           </Tooltip.Portal>
                                         </Tooltip.Root>
                                       </Tooltip.Provider>
                                     </div>
-                                  );
+                                  )
                                 })()}
                               </div>
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getEmailTypeInfo(selectedEmail.trigger_type).color}`}>
+                                <span
+                                  className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getEmailTypeInfo(selectedEmail.trigger_type).color}`}
+                                >
                                   {getEmailTypeInfo(selectedEmail.trigger_type).label}
                                 </span>
                                 <span className="text-xs text-foreground/60">
                                   {selectedEmail.trigger_type.replace(/_/g, ' ')}
                                 </span>
-                                {selectedEmail.trigger_value !== null && selectedEmail.trigger_value > 0 && (
-                                  <span className="text-xs text-foreground/60">
-                                    ({selectedEmail.trigger_value} days)
-                                  </span>
-                                )}
+                                {selectedEmail.trigger_value !== null &&
+                                  selectedEmail.trigger_value > 0 && (
+                                    <span className="text-xs text-foreground/60">
+                                      ({selectedEmail.trigger_value} days)
+                                    </span>
+                                  )}
                               </div>
                             </div>
-                            {canEdit && (() => {
-                              const isReminderEmail = isCustomReminder(selectedEmail.trigger_type);
+                            {canEdit &&
+                              (() => {
+                                const isReminderEmail = isCustomReminder(selectedEmail.trigger_type)
 
-                              return (
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={() => setShowTestEmailDialog(true)}
-                                    className="px-3 py-1.5 rounded-lg border border-green-500/40 bg-green-500/20 text-emerald-900 dark:text-green-300 hover:bg-green-500/30 transition-all text-sm flex items-center gap-1.5"
-                                    title="Send test email"
-                                  >
-                                    <Send className="w-3.5 h-3.5" />
-                                    Send Test
-                                  </button>
-                                  <button
-                                    onClick={() => handleEditEmail(selectedEmail)}
-                                    className="px-3 py-1.5 rounded-lg border border-primary/40 bg-primary/20 text-violet-950 dark:text-primary hover:bg-primary/30 transition-all text-sm flex items-center gap-1.5"
-                                  >
-                                    <Edit className="w-3.5 h-3.5" />
-                                    Edit
-                                  </button>
-                                  {isReminderEmail && (
+                                return (
+                                  <div className="flex items-center gap-2">
                                     <button
-                                      onClick={() => handleDeleteEmail(selectedEmail)}
-                                      className="p-1.5 rounded text-foreground/50 hover:text-red-400 hover:bg-background/10 transition-all"
-                                      title="Delete email"
+                                      onClick={() => setShowTestEmailDialog(true)}
+                                      className="px-3 py-1.5 rounded-lg border border-green-500/40 bg-green-500/20 text-emerald-900 dark:text-green-300 hover:bg-green-500/30 transition-all text-sm flex items-center gap-1.5"
+                                      title="Send test email"
                                     >
-                                      <Trash2 className="w-4 h-4" />
+                                      <Send className="w-3.5 h-3.5" />
+                                      Send Test
                                     </button>
-                                  )}
-                                </div>
-                              );
-                            })()}
+                                    <button
+                                      onClick={() => handleEditEmail(selectedEmail)}
+                                      className="px-3 py-1.5 rounded-lg border border-primary/40 bg-primary/20 text-violet-950 dark:text-primary hover:bg-primary/30 transition-all text-sm flex items-center gap-1.5"
+                                    >
+                                      <Edit className="w-3.5 h-3.5" />
+                                      Edit
+                                    </button>
+                                    {isReminderEmail && (
+                                      <button
+                                        onClick={() => handleDeleteEmail(selectedEmail)}
+                                        className="p-1.5 rounded text-foreground/50 hover:text-red-400 hover:bg-background/10 transition-all"
+                                        title="Delete email"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    )}
+                                  </div>
+                                )
+                              })()}
                           </div>
                         </div>
 
@@ -957,7 +1032,11 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                             <div className="voxxy-surface-subtle rounded-lg p-4">
                               <div
                                 className="prose prose-sm max-w-none dark:prose-invert"
-                                dangerouslySetInnerHTML={{ __html: selectedEmail.body_template || '<p class="text-muted-foreground">(No content)</p>' }}
+                                dangerouslySetInnerHTML={{
+                                  __html:
+                                    selectedEmail.body_template ||
+                                    '<p class="text-muted-foreground">(No content)</p>',
+                                }}
                               />
                             </div>
                           </div>
@@ -969,18 +1048,29 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                             </label>
                             <div className="grid grid-cols-2 gap-3">
                               <div className="voxxy-surface-subtle rounded-lg p-3">
-                                <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Type</div>
-                                <div className="text-sm text-foreground">{selectedEmail.trigger_type.replace(/_/g, ' ')}</div>
-                              </div>
-                              {selectedEmail.trigger_value !== null && selectedEmail.trigger_value > 0 && (
-                                <div className="voxxy-surface-subtle rounded-lg p-3">
-                                  <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Days</div>
-                                  <div className="text-sm text-foreground">{selectedEmail.trigger_value}</div>
+                                <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                                  Type
                                 </div>
-                              )}
+                                <div className="text-sm text-foreground">
+                                  {selectedEmail.trigger_type.replace(/_/g, ' ')}
+                                </div>
+                              </div>
+                              {selectedEmail.trigger_value !== null &&
+                                selectedEmail.trigger_value > 0 && (
+                                  <div className="voxxy-surface-subtle rounded-lg p-3">
+                                    <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                                      Days
+                                    </div>
+                                    <div className="text-sm text-foreground">
+                                      {selectedEmail.trigger_value}
+                                    </div>
+                                  </div>
+                                )}
                               {selectedEmail.trigger_time && (
                                 <div className="voxxy-surface-subtle rounded-lg p-3">
-                                  <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Time</div>
+                                  <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                                    Time
+                                  </div>
                                   <div className="text-sm text-foreground">
                                     {selectedEmail.trigger_time.substring(11, 16)}
                                   </div>
@@ -994,7 +1084,9 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                       <div className="h-full flex items-center justify-center p-8">
                         <div className="text-center">
                           <Mail className="w-12 h-12 text-foreground/20 mx-auto mb-3" />
-                          <p className="text-sm text-muted-foreground">Select an email to preview</p>
+                          <p className="text-sm text-muted-foreground">
+                            Select an email to preview
+                          </p>
                         </div>
                       </div>
                     )}
@@ -1007,7 +1099,8 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
             {!template && (
               <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <p className="text-xs text-blue-400">
-                  <strong>Tip:</strong> Save the sequence first, then add emails to build your email campaign.
+                  <strong>Tip:</strong> Save the sequence first, then add emails to build your email
+                  campaign.
                 </p>
               </div>
             )}
@@ -1026,20 +1119,14 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-foreground">Delete Email?</h3>
-                <p className="text-sm text-foreground/60 mt-0.5">
-                  This action cannot be undone
-                </p>
+                <p className="text-sm text-foreground/60 mt-0.5">This action cannot be undone</p>
               </div>
             </div>
 
             {/* Body */}
-              <div className="voxxy-surface-subtle mb-6 rounded-lg p-4">
-              <p className="text-sm text-foreground/80">
-                You are about to delete:
-              </p>
-              <p className="text-base font-semibold text-foreground mt-2">
-                "{emailToDelete.name}"
-              </p>
+            <div className="voxxy-surface-subtle mb-6 rounded-lg p-4">
+              <p className="text-sm text-foreground/80">You are about to delete:</p>
+              <p className="text-base font-semibold text-foreground mt-2">"{emailToDelete.name}"</p>
               <div className="mt-3 pt-3 border-t border-border">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-foreground/50">Type:</span>
@@ -1060,8 +1147,8 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
             <div className="flex items-center gap-3">
               <button
                 onClick={() => {
-                  setDeleteModalOpen(false);
-                  setEmailToDelete(null);
+                  setDeleteModalOpen(false)
+                  setEmailToDelete(null)
                 }}
                 disabled={isDeleting}
                 className="flex-1 rounded-lg border border-border px-4 py-2.5 text-foreground transition-all hover:bg-accent/60 disabled:cursor-not-allowed disabled:opacity-50 dark:border-violet-400/12 dark:hover:bg-background/10"
@@ -1101,20 +1188,16 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-foreground">Delete Sequence?</h3>
-                <p className="text-sm text-foreground/60 mt-0.5">
-                  This action cannot be undone
-                </p>
+                <p className="text-sm text-foreground/60 mt-0.5">This action cannot be undone</p>
               </div>
             </div>
 
             {/* Body */}
-              <div className="voxxy-surface-subtle mb-6 rounded-lg p-4">
+            <div className="voxxy-surface-subtle mb-6 rounded-lg p-4">
               <p className="text-sm text-foreground/80">
                 You are about to delete this email sequence:
               </p>
-              <p className="text-base font-semibold text-foreground mt-2">
-                "{template.name}"
-              </p>
+              <p className="text-base font-semibold text-foreground mt-2">"{template.name}"</p>
               <div className="mt-3 pt-3 border-t border-border">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-foreground/50">Type:</span>
@@ -1204,8 +1287,8 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
             <div className="flex items-center gap-3">
               <button
                 onClick={() => {
-                  setShowTestEmailDialog(false);
-                  setTestEmailAddress('');
+                  setShowTestEmailDialog(false)
+                  setTestEmailAddress('')
                 }}
                 disabled={isSendingTest}
                 className="flex-1 rounded-lg border border-border px-4 py-2.5 text-foreground transition-all hover:bg-accent/60 disabled:cursor-not-allowed disabled:opacity-50 dark:border-violet-400/12 dark:hover:bg-background/10"
@@ -1234,5 +1317,5 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
         </div>
       )}
     </div>
-  );
+  )
 }

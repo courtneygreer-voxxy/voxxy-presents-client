@@ -10,11 +10,11 @@
 
 ### Active Branches
 
-| Branch | Environment | URL | Auto-deploy |
-|--------|-------------|-----|-------------|
-| `main` | Production | https://voxxypresents.com | Yes -- on merge via Render |
-| `staging` | Pre-production | Render staging service | Yes -- on merge via Render |
-| `dev` | Integration testing | Render dev service | Yes -- on merge via Render |
+| Branch    | Environment         | URL                       | Auto-deploy                |
+| --------- | ------------------- | ------------------------- | -------------------------- |
+| `main`    | Production          | https://voxxypresents.com | Yes -- on merge via Render |
+| `staging` | Pre-production      | Render staging service    | Yes -- on merge via Render |
+| `dev`     | Integration testing | Render dev service        | Yes -- on merge via Render |
 
 ---
 
@@ -50,13 +50,13 @@ Every change follows this path. **No direct pushes to `dev`, `staging`, or `main
 
 Always branch off `dev`. Use one of these prefixes:
 
-| Prefix | When to use | Example |
-|--------|-------------|---------|
-| `feature/` | New functionality | `feature/email-unsubscribe-flow` |
-| `fix/` | Bug fix (non-urgent) | `fix/contact-upload-validation` |
-| `hotfix/` | Urgent production fix | `hotfix/broken-go-live-button` |
-| `chore/` | Maintenance, refactors, tooling | `chore/remove-legacy-tests` |
-| `release/` | Release preparation | `release/v2.1.0` |
+| Prefix     | When to use                     | Example                          |
+| ---------- | ------------------------------- | -------------------------------- |
+| `feature/` | New functionality               | `feature/email-unsubscribe-flow` |
+| `fix/`     | Bug fix (non-urgent)            | `fix/contact-upload-validation`  |
+| `hotfix/`  | Urgent production fix           | `hotfix/broken-go-live-button`   |
+| `chore/`   | Maintenance, refactors, tooling | `chore/remove-legacy-tests`      |
+| `release/` | Release preparation             | `release/v2.1.0`                 |
 
 ### PR Rules (enforced by branch protection)
 
@@ -71,6 +71,7 @@ Always branch off `dev`. Use one of these prefixes:
 ## Tech Stack
 
 ### Frontend
+
 - **Framework:** React 18 + TypeScript
 - **Build Tool:** Vite 6
 - **Styling:** Tailwind CSS 3
@@ -83,6 +84,7 @@ Always branch off `dev`. Use one of these prefixes:
 - **Analytics:** Mixpanel (production only)
 
 ### Backend (separate repo)
+
 - **API:** Rails 7.2 + Ruby 3.3
 - **Database:** PostgreSQL
 - **Email:** SendGrid with automated campaigns
@@ -90,6 +92,7 @@ Always branch off `dev`. Use one of these prefixes:
 - **Hosting:** Render.com
 
 ### Testing
+
 - **Runner:** Vitest 3 + jsdom
 - **Component Testing:** @testing-library/react
 - **CI:** GitHub Actions (typecheck + lint + **test** + build on every PR)
@@ -100,10 +103,12 @@ Always branch off `dev`. Use one of these prefixes:
 ## Development
 
 ### Prerequisites
+
 - Node.js 18+
 - npm
 
 ### Setup
+
 ```bash
 npm install
 npm run dev
@@ -112,6 +117,7 @@ npm run dev
 The frontend connects to the Rails API backend. For local development, the backend must be running on port 3001. See the [backend repo](https://github.com/Voxxy-AI/voxxy-rails-react) README for setup instructions. API base URLs are configured in `src/config/environments.ts`.
 
 ### Commands
+
 ```bash
 npm run dev           # Start dev server (http://localhost:5173)
 npm run build         # Build for production

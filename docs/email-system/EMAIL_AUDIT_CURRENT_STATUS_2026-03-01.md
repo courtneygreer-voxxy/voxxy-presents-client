@@ -29,17 +29,20 @@ The Email Audit Log is a **centralized, full-screen dashboard** that displays al
 ### Key Milestones Achieved
 
 ✅ **Invitation System Unification** (Feb 27-28)
+
 - Position 1 ("Initial Invitation") is now a real ScheduledEmail from database
 - No more virtual emails or special cases
 - Full audit trail for invitation deliveries
 
 ✅ **Email Audit Log Implementation** (Feb 28)
+
 - 9-column sortable table
 - Advanced filtering (email name, category, status, search)
 - Deep linking from email row counts
 - Contact Support integration (Discord)
 
 ✅ **Backend Integration** (Feb 28 - March 1)
+
 - Registration data in email deliveries (recipient_name)
 - Category field now uses email template category (not vendor category)
 - Invitation deliveries properly linked via `scheduled_email_id`
@@ -52,6 +55,7 @@ The Email Audit Log is a **centralized, full-screen dashboard** that displays al
 ### ✅ Frontend Features
 
 **Email Audit Log Overlay** (`EmailAuditLogOverlay.tsx`)
+
 - Full-screen modal with 9-column table
 - Columns: Sent At, Name, Email, Email Name, Subject, Type, Category, Status, Actions
 - Pagination: 100 items per page
@@ -59,17 +63,20 @@ The Email Audit Log is a **centralized, full-screen dashboard** that displays al
 - Responsive design: Works on mobile and desktop
 
 **Filtering System** (`EmailAuditFilters.tsx`)
+
 - **Email Name**: Dropdown of all email names (deep link from row counts)
 - **Category**: Shows email template categories (event_announcements, registration_emails, etc.)
 - **Status**: delivered, bounced, dropped, unsubscribed, scheduled, undelivered (bounced+dropped)
 - **Search**: Free text search across recipient name and email
 
 **Deep Linking** (`EmailRow.tsx`)
+
 - Click recipient count → Opens audit filtered by email_name
 - Click undelivered count → Opens audit filtered by email_name + status:undelivered
 - Click unsubscribed count → Opens audit filtered by email_name + status:unsubscribed
 
 **Contact Support** (`ContactSupportDialog.tsx`)
+
 - Discord webhook integration
 - Pre-fills delivery details for support requests
 - Only shown for undelivered emails (bounced/dropped)
@@ -77,12 +84,14 @@ The Email Audit Log is a **centralized, full-screen dashboard** that displays al
 ### ✅ Backend Features
 
 **API Endpoints Working**
+
 - `GET /events/:slug/scheduled_emails` - Returns all 17 email types including Position 1
 - `GET /events/:slug/scheduled_emails/:id/email_deliveries` - Returns delivery records with recipient data
 - `GET /events/:slug/scheduled_emails/:id/recipients` - Returns planned recipients for scheduled emails
 - `POST /events/:id/go_live` - Sends invitations and links them to Position 1
 
 **Data Flow**
+
 1. User clicks "View Audit Log" → Fetches all scheduled emails
 2. For sent emails → Fetches email_deliveries (with registration/invitation data)
 3. For scheduled emails → Fetches upcoming recipients from filters/invitation_draft
@@ -99,6 +108,7 @@ The Email Audit Log is a **centralized, full-screen dashboard** that displays al
 **Root Cause**: Backend `email_deliveries` endpoint tried to access `vendor_category` on VendorContact (which doesn't have that field)
 
 **Solution Applied**:
+
 ```ruby
 # scheduled_emails_controller.rb:474-490
 deliveries_json = deliveries.map do |delivery|
@@ -130,6 +140,7 @@ end
 **Root Cause**: `/recipients` endpoint only queried EventInvitation table (which is empty until go_live)
 
 **Solution Applied**:
+
 ```ruby
 # scheduled_emails_controller.rb:345-389
 if @scheduled_email.trigger_type == "on_application_open" &&
@@ -154,6 +165,7 @@ end
 **Root Cause**: Fallback path in go_live didn't set `scheduled_email_id`
 
 **Solution Applied**:
+
 ```ruby
 # events_controller.rb:171-207
 # Ensure Position 1 scheduled email exists for audit trail
@@ -173,6 +185,7 @@ end
 ```
 
 Also updated fallback EmailDelivery creation:
+
 ```ruby
 # events_controller.rb:272
 scheduled_email_id: invitation_template&.id  # Now guaranteed to exist
@@ -188,6 +201,7 @@ scheduled_email_id: invitation_template&.id  # Now guaranteed to exist
 **Root Cause**: Frontend tried to access `email.category` which doesn't exist
 
 **Solution Applied**:
+
 ```typescript
 // EmailAuditLogOverlay.tsx:95, 126
 category: email.email_template_item?.category || 'Unknown'
@@ -196,6 +210,7 @@ category: email.email_template_item?.category || 'Unknown'
 **Status**: ✅ Deployed, tested, working
 
 **Categories Now Displayed**:
+
 - `event_announcements` - Invitations, deadline reminders
 - `registration_emails` - Application received, approved, rejected, etc.
 - `vendor_management` - Payment confirmed, category changed
@@ -209,6 +224,7 @@ category: email.email_template_item?.category || 'Unknown'
 **Root Cause**: CommandCenter rendered before organization loaded
 
 **Solution Applied**:
+
 ```typescript
 // ProducerDashboard.tsx:470-482
 if (eventsView === 'command-center') {
@@ -242,6 +258,7 @@ if (eventsView === 'command-center') {
 **Impact**: Mail Tab might show "3 undelivered" while Audit Log shows "3 delivered"
 
 **Solution Needed**:
+
 ```ruby
 # Add to ScheduledEmail model
 def recalculate_delivery_counts!
@@ -270,6 +287,7 @@ delivery.scheduled_email.recalculate_delivery_counts!
 ```
 
 **Testing**:
+
 ```ruby
 test "delivery_counts matches email_deliveries status counts" do
   email = scheduled_emails(:confirmation)
@@ -281,6 +299,7 @@ end
 ```
 
 **Files to Modify**:
+
 - `/Users/beaulazear/Desktop/voxxy-rails/app/models/scheduled_email.rb`
 - `/Users/beaulazear/Desktop/voxxy-rails/app/jobs/email_delivery_processor_job.rb` (or webhook handler)
 
@@ -295,6 +314,7 @@ end
 #### 2. Comprehensive End-to-End Testing
 
 **Need to Test**:
+
 1. Unsent Position 1 → Click recipient count → See draft invitation contacts
 2. Go Live → Send invitations → Verify deliveries appear in audit
 3. Click undelivered count → Filters to only undelivered emails
@@ -318,6 +338,7 @@ end
 **Current Behavior**: Header and body have separate scroll containers
 
 **Fix Needed**:
+
 ```tsx
 // EmailAuditTable.tsx
 // BEFORE (broken)
@@ -350,6 +371,7 @@ end
 **Current**: Frontend makes N+1 API calls (1 for emails + N for deliveries)
 
 **Option A: Bulk Deliveries Endpoint**
+
 ```ruby
 # GET /events/:slug/email_deliveries?scheduled_email_ids[]=1&scheduled_email_ids[]=2
 def bulk_index
@@ -362,6 +384,7 @@ end
 ```
 
 **Option B: Include Deliveries in Scheduled Emails Response**
+
 ```ruby
 # GET /events/:slug/scheduled_emails?include_deliveries=true
 def index
@@ -381,6 +404,7 @@ end
 **Request**: Allow users to export audit log to CSV for external analysis
 
 **Implementation**:
+
 ```typescript
 // Add export button to EmailAuditLogOverlay
 <button onClick={handleExportCSV}>
@@ -416,6 +440,7 @@ const handleExportCSV = () => {
 **Goal**: Ensure data consistency between Mail Tab and Audit Log
 
 **Tasks**:
+
 1. ✅ Implement `recalculate_delivery_counts!` method in ScheduledEmail model
 2. ✅ Update webhook handler to call it after status changes
 3. ✅ Add database tests for count consistency
@@ -431,6 +456,7 @@ const handleExportCSV = () => {
 **Goal**: Validate all user flows work end-to-end
 
 **Tasks**:
+
 1. ⏳ Test all 7 scenarios in [Testing Checklist](#testing-checklist)
 2. ⏳ Fix any UI bugs discovered during testing
 3. ⏳ Test on multiple browsers (Chrome, Safari, Firefox)
@@ -447,6 +473,7 @@ const handleExportCSV = () => {
 **Goal**: Production-ready feature with complete documentation
 
 **Tasks**:
+
 1. ⏳ Fix table header scroll issue
 2. ⏳ Update all documentation files to reflect current state
 3. ⏳ Create user-facing documentation (help docs)
@@ -463,6 +490,7 @@ const handleExportCSV = () => {
 **Goal**: Performance optimization and advanced features
 
 **Tasks**:
+
 1. ⏸️ Implement bulk deliveries endpoint (if performance issues arise)
 2. ⏸️ Add CSV export functionality
 3. ⏸️ Add email preview in audit log (modal with email HTML)
@@ -478,12 +506,14 @@ const handleExportCSV = () => {
 ### Scenario 1: Unsent Position 1 Recipients
 
 **Steps**:
+
 1. Create new event
 2. Add contacts to invitation list (don't go live yet)
 3. Navigate to Email tab
 4. Click recipient count for "Initial Invitation"
 
 **Expected**:
+
 - ✅ Email audit opens
 - ✅ Shows all draft invitation contacts (from invitation_draft)
 - ✅ Status shows "scheduled" (not "delivered")
@@ -497,12 +527,14 @@ const handleExportCSV = () => {
 ### Scenario 2: Sent Position 1 Deliveries
 
 **Steps**:
+
 1. From same event, click "Go Live"
 2. Wait for invitations to send
 3. Navigate to Email tab
 4. Click recipient count for "Initial Invitation"
 
 **Expected**:
+
 - ✅ Email audit opens
 - ✅ Shows all sent invitation deliveries (from email_deliveries)
 - ✅ Status shows "delivered", "bounced", "dropped", etc.
@@ -517,12 +549,14 @@ const handleExportCSV = () => {
 ### Scenario 3: Registration Email Deliveries
 
 **Steps**:
+
 1. From live event, submit vendor application
 2. Approve application
 3. Navigate to Email tab
 4. Click recipient count for "Application Approved"
 
 **Expected**:
+
 - ✅ Email audit opens
 - ✅ Shows delivery for approved vendor
 - ✅ Status shows "delivered" (or current status)
@@ -536,10 +570,12 @@ const handleExportCSV = () => {
 ### Scenario 4: Undelivered Deep Link
 
 **Steps**:
+
 1. From Email tab with sent emails
 2. Click undelivered count (e.g., "3 undelivered")
 
 **Expected**:
+
 - ✅ Email audit opens
 - ✅ Filtered to only that email name
 - ✅ Filtered to only "undelivered" status (bounced + dropped)
@@ -553,10 +589,12 @@ const handleExportCSV = () => {
 ### Scenario 5: Search Functionality
 
 **Steps**:
+
 1. Open email audit log
 2. Type recipient email in search box
 
 **Expected**:
+
 - ✅ Table filters to matching entries
 - ✅ Search is case-insensitive
 - ✅ Matches partial email addresses
@@ -569,10 +607,12 @@ const handleExportCSV = () => {
 ### Scenario 6: Sorting
 
 **Steps**:
+
 1. Open email audit log with mixed entries
 2. Click each column header
 
 **Expected**:
+
 - ✅ Sent At: Sorts by datetime (oldest/newest first)
 - ✅ Name: Alphabetical sort
 - ✅ Email: Alphabetical sort
@@ -588,6 +628,7 @@ const handleExportCSV = () => {
 ### Scenario 7: Contact Support
 
 **Steps**:
+
 1. Open email audit log
 2. Find bounced/dropped delivery
 3. Click three-dot menu → "Contact Support"
@@ -595,6 +636,7 @@ const handleExportCSV = () => {
 5. Submit
 
 **Expected**:
+
 - ✅ Discord webhook fires
 - ✅ Message includes event details
 - ✅ Message includes delivery details
@@ -658,6 +700,7 @@ const handleExportCSV = () => {
 ## Success Criteria
 
 ### Must-Have (Production Ready)
+
 - ✅ All invitation deliveries visible in audit log
 - ✅ Unsent emails show planned recipients
 - ✅ Category shows correct email template category
@@ -667,6 +710,7 @@ const handleExportCSV = () => {
 - ⏳ Search and filtering work correctly
 
 ### Nice-to-Have (Future)
+
 - ⏸️ CSV export functionality
 - ⏸️ Bulk actions (retry multiple)
 - ⏸️ Real-time updates via WebSocket
@@ -678,11 +722,13 @@ const handleExportCSV = () => {
 ## File Change Log (March 1, 2026)
 
 ### Frontend Files Modified
+
 1. `/src/pages/ProducerDashboard.tsx` - Added organization loading guard
 2. `/src/components/producer/Email/EmailAuditLogOverlay.tsx` - Changed category to use `email.email_template_item?.category`
 3. `/src/types/email.ts` - No changes needed (category field already exists)
 
 ### Backend Files Modified
+
 1. `/app/controllers/api/v1/presents/scheduled_emails_controller.rb`
    - Lines 345-389: Added invitation_draft resolution for unsent Position 1
    - Lines 474-490: Fixed vendor_category handling for invitation vs registration deliveries
@@ -692,6 +738,7 @@ const handleExportCSV = () => {
    - Line 272: Added `scheduled_email_id` to fallback EmailDelivery creation
 
 ### Documentation Files to Update
+
 - [ ] `EMAIL_AUDIT_LOG_TECHNICAL_SPEC.md` - Remove virtual email references, update with March 1 changes
 - [ ] `EMAIL_AUDIT_LOG_BACKEND_CHECKLIST.md` - Update task statuses
 - [ ] `EMAIL_AUDIT_LOG_QUICK_REFERENCE.md` - Update with current API responses
@@ -702,6 +749,7 @@ const handleExportCSV = () => {
 ## Next Steps
 
 ### Immediate (This Week)
+
 1. ✅ Backend team reviews this document
 2. ✅ Backend team implements `recalculate_delivery_counts!` method
 3. ✅ Deploy to staging
@@ -709,6 +757,7 @@ const handleExportCSV = () => {
 5. ⏳ Fix any bugs discovered
 
 ### Short-Term (Next 2 Weeks)
+
 1. ⏳ Fix table header scroll issue
 2. ⏳ Complete comprehensive testing
 3. ⏳ Update all documentation
@@ -716,6 +765,7 @@ const handleExportCSV = () => {
 5. ⏳ Monitor for 48 hours
 
 ### Long-Term (Next Month+)
+
 1. ⏸️ Evaluate need for performance optimization
 2. ⏸️ Consider CSV export based on user feedback
 3. ⏸️ Explore real-time updates if requested
@@ -726,6 +776,7 @@ const handleExportCSV = () => {
 
 **Contact**: Frontend Team (Courtney + Claude Code)
 **Related Docs**:
+
 - [EMAIL_AUDIT_LOG_TECHNICAL_SPEC.md](./EMAIL_AUDIT_LOG_TECHNICAL_SPEC.md)
 - [EMAIL_AUDIT_LOG_BACKEND_CHECKLIST.md](./EMAIL_AUDIT_LOG_BACKEND_CHECKLIST.md)
 - [INVITATION_UNIFICATION_FRONTEND_UPDATE.md](./INVITATION_UNIFICATION_FRONTEND_UPDATE.md)

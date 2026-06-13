@@ -1,8 +1,8 @@
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle } from 'lucide-react'
 
 interface HelpIconProps {
-  onClick: () => void;
-  label?: string;
+  onClick: () => void
+  label?: string
 }
 
 export function HelpIcon({ onClick, label = 'Start guide' }: HelpIconProps) {
@@ -15,5 +15,5 @@ export function HelpIcon({ onClick, label = 'Start guide' }: HelpIconProps) {
       <HelpCircle className="w-4 h-4" />
       <span className="hidden sm:inline">Guide</span>
     </button>
-  );
+  )
 }

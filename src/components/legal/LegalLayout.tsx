@@ -22,7 +22,10 @@ export default function LegalLayout({ children }: LegalLayoutProps) {
 
   return (
     // Force light-mode appearance regardless of user's system/app theme
-    <div className="min-h-screen" style={{ background: 'linear-gradient(160deg, #f5f3ff 0%, #ede9fe 40%, #f0f4ff 100%)' }}>
+    <div
+      className="min-h-screen"
+      style={{ background: 'linear-gradient(160deg, #f5f3ff 0%, #ede9fe 40%, #f0f4ff 100%)' }}
+    >
       {/* Sticky nav bar */}
       <nav className="border-b border-violet-100 bg-white/90 backdrop-blur-sm sticky top-0 z-40">
         {/* Brand header */}
@@ -55,9 +58,7 @@ export default function LegalLayout({ children }: LegalLayoutProps) {
       </nav>
 
       {/* Content */}
-      <div className="container mx-auto max-w-4xl px-4 py-12">
-        {children}
-      </div>
+      <div className="container mx-auto max-w-4xl px-4 py-12">{children}</div>
     </div>
   )
 }

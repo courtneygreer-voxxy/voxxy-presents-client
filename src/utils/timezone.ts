@@ -11,10 +11,10 @@
  */
 export function getUserTimezone(): string {
   try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return Intl.DateTimeFormat().resolvedOptions().timeZone
   } catch (error) {
-    console.warn('Failed to detect timezone, defaulting to America/New_York');
-    return 'America/New_York'; // Default fallback
+    console.warn('Failed to detect timezone, defaulting to America/New_York')
+    return 'America/New_York' // Default fallback
   }
 }
 
@@ -23,21 +23,21 @@ export function getUserTimezone(): string {
  */
 export function getTimezoneAbbreviation(): string {
   try {
-    const timezone = getUserTimezone();
-    const now = new Date();
+    const timezone = getUserTimezone()
+    const now = new Date()
 
     // Get the short timezone string
     const formatter = new Intl.DateTimeFormat('en-US', {
       timeZone: timezone,
-      timeZoneName: 'short'
-    });
+      timeZoneName: 'short',
+    })
 
-    const parts = formatter.formatToParts(now);
-    const tzPart = parts.find(part => part.type === 'timeZoneName');
+    const parts = formatter.formatToParts(now)
+    const tzPart = parts.find((part) => part.type === 'timeZoneName')
 
-    return tzPart?.value || 'Local Time';
+    return tzPart?.value || 'Local Time'
   } catch (error) {
-    return 'Local Time';
+    return 'Local Time'
   }
 }
 
@@ -46,7 +46,7 @@ export function getTimezoneAbbreviation(): string {
  * Positive for west of UTC, negative for east of UTC
  */
 export function getTimezoneOffset(): number {
-  return new Date().getTimezoneOffset();
+  return new Date().getTimezoneOffset()
 }
 
 /**
@@ -59,22 +59,22 @@ export function getTimezoneOffset(): number {
  */
 export function getEightAmLocalAsUTC(): string {
   // Create a date object for today at 8:00 AM local time
-  const now = new Date();
+  const now = new Date()
   const localEightAm = new Date(
     now.getFullYear(),
     now.getMonth(),
     now.getDate(),
     8, // 8:00 AM
     0, // 0 minutes
-    0  // 0 seconds
-  );
+    0, // 0 seconds
+  )
 
   // Get UTC hours and minutes
-  const utcHours = localEightAm.getUTCHours();
-  const utcMinutes = localEightAm.getUTCMinutes();
+  const utcHours = localEightAm.getUTCHours()
+  const utcMinutes = localEightAm.getUTCMinutes()
 
   // Format as HH:MM
-  return `${utcHours.toString().padStart(2, '0')}:${utcMinutes.toString().padStart(2, '0')}`;
+  return `${utcHours.toString().padStart(2, '0')}:${utcMinutes.toString().padStart(2, '0')}`
 }
 
 /**
@@ -85,29 +85,29 @@ export function getEightAmLocalAsUTC(): string {
  */
 export function utcToLocalTimeDisplay(utcTimeString: string): string {
   if (!utcTimeString || !utcTimeString.includes(':')) {
-    return '8:00 AM (your time)';
+    return '8:00 AM (your time)'
   }
 
   try {
-    const [hours, minutes] = utcTimeString.split(':').map(Number);
+    const [hours, minutes] = utcTimeString.split(':').map(Number)
 
     // Create a UTC date
-    const utcDate = new Date();
-    utcDate.setUTCHours(hours, minutes, 0, 0);
+    const utcDate = new Date()
+    utcDate.setUTCHours(hours, minutes, 0, 0)
 
     // Format in local timezone
     const localTime = utcDate.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
-      timeZone: getUserTimezone()
-    });
+      timeZone: getUserTimezone(),
+    })
 
-    const tzAbbr = getTimezoneAbbreviation();
+    const tzAbbr = getTimezoneAbbreviation()
 
-    return `${localTime} ${tzAbbr}`;
+    return `${localTime} ${tzAbbr}`
   } catch (error) {
-    return '8:00 AM (your time)';
+    return '8:00 AM (your time)'
   }
 }
 
@@ -116,20 +116,20 @@ export function utcToLocalTimeDisplay(utcTimeString: string): string {
  * Useful for validation
  */
 export function isEightAmLocal(utcTimeString: string): boolean {
-  const expectedUtc = getEightAmLocalAsUTC();
-  return utcTimeString === expectedUtc;
+  const expectedUtc = getEightAmLocalAsUTC()
+  return utcTimeString === expectedUtc
 }
 
 /**
  * Get timezone info for display
  */
 export function getTimezoneInfo() {
-  const timezone = getUserTimezone();
-  const abbreviation = getTimezoneAbbreviation();
-  const offsetMinutes = getTimezoneOffset();
-  const offsetHours = Math.abs(Math.floor(offsetMinutes / 60));
-  const offsetMins = Math.abs(offsetMinutes % 60);
-  const offsetSign = offsetMinutes <= 0 ? '+' : '-'; // Note: JS offset is inverted
+  const timezone = getUserTimezone()
+  const abbreviation = getTimezoneAbbreviation()
+  const offsetMinutes = getTimezoneOffset()
+  const offsetHours = Math.abs(Math.floor(offsetMinutes / 60))
+  const offsetMins = Math.abs(offsetMinutes % 60)
+  const offsetSign = offsetMinutes <= 0 ? '+' : '-' // Note: JS offset is inverted
 
   return {
     timezone,
@@ -137,15 +137,15 @@ export function getTimezoneInfo() {
     offsetMinutes,
     offsetString: `UTC${offsetSign}${offsetHours}${offsetMins > 0 ? `:${offsetMins.toString().padStart(2, '0')}` : ''}`,
     eightAmUtc: getEightAmLocalAsUTC(),
-    eightAmLocal: `8:00 AM ${abbreviation}`
-  };
+    eightAmLocal: `8:00 AM ${abbreviation}`,
+  }
 }
 
 /**
  * Format a date with timezone
  */
 export function formatDateWithTimezone(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
+  const d = typeof date === 'string' ? new Date(date) : date
 
   return d.toLocaleString('en-US', {
     timeZone: getUserTimezone(),
@@ -154,17 +154,17 @@ export function formatDateWithTimezone(date: Date | string): string {
     year: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true
-  });
+    hour12: true,
+  })
 }
 
 // Example usage and testing (can be removed in production)
 if (typeof window !== 'undefined') {
-  console.log('🌍 Timezone Detection:');
-  console.log('  User Timezone:', getUserTimezone());
-  console.log('  Abbreviation:', getTimezoneAbbreviation());
-  console.log('  Offset:', getTimezoneOffset(), 'minutes');
-  console.log('  8:00 AM Local as UTC:', getEightAmLocalAsUTC());
-  console.log('  Display:', utcToLocalTimeDisplay(getEightAmLocalAsUTC()));
-  console.log('  Full Info:', getTimezoneInfo());
+  console.log('🌍 Timezone Detection:')
+  console.log('  User Timezone:', getUserTimezone())
+  console.log('  Abbreviation:', getTimezoneAbbreviation())
+  console.log('  Offset:', getTimezoneOffset(), 'minutes')
+  console.log('  8:00 AM Local as UTC:', getEightAmLocalAsUTC())
+  console.log('  Display:', utcToLocalTimeDisplay(getEightAmLocalAsUTC()))
+  console.log('  Full Info:', getTimezoneInfo())
 }

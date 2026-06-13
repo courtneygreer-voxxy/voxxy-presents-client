@@ -33,7 +33,7 @@ describe('vendorContactsApi.create - 422 error handling', () => {
         message: 'Validation failed',
         errors: ['Email has already been taken'],
       },
-      422
+      422,
     )
 
     try {
@@ -55,13 +55,9 @@ describe('vendorContactsApi.create - 422 error handling', () => {
     globalThis.fetch = mockFetchResponse(
       {
         message: 'Validation failed',
-        errors: [
-          'Email has already been taken',
-          'Instagram handle is invalid',
-          'Phone is invalid',
-        ],
+        errors: ['Email has already been taken', 'Instagram handle is invalid', 'Phone is invalid'],
       },
-      422
+      422,
     )
 
     try {

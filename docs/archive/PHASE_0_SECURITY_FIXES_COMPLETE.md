@@ -8,16 +8,19 @@
 ## ✅ COMPLETED SECURITY FIXES
 
 ### 1. Fixed CORS Configuration (API)
+
 **File**: `voxxy-presents-api/src/app.ts`
 **Issue**: `origin: true` allowed ALL origins with credentials enabled
 **Fix**: Whitelist specific domains only, block unauthorized origins
 
 **Before**:
+
 ```typescript
-origin: true  // DANGEROUS - allows ANY origin
+origin: true // DANGEROUS - allows ANY origin
 ```
 
 **After**:
+
 ```typescript
 origin: (origin, callback) => {
   if (!origin) return callback(null, true)
@@ -31,6 +34,7 @@ origin: (origin, callback) => {
 ```
 
 **Allowed Origins**:
+
 - `http://localhost:5173` (local dev)
 - `http://localhost:3000` (local dev alt)
 - `https://voxxypresents.com` (production)
@@ -38,16 +42,19 @@ origin: (origin, callback) => {
 - `https://staging-voxxy-presents.onrender.com` (staging)
 
 ### 2. Removed Hardcoded Admin Key Fallback (Client)
+
 **File**: `voxxy-presents-client/src/services/api.ts`
 **Issue**: Fallback to `'voxxy-admin-2024'` if env var missing
 **Fix**: Throw error if `VITE_ADMIN_API_KEY` is missing
 
 **Before**:
+
 ```typescript
-headers['x-admin-key'] = import.meta.env.VITE_ADMIN_API_KEY || 'voxxy-admin-2024'  // DANGEROUS
+headers['x-admin-key'] = import.meta.env.VITE_ADMIN_API_KEY || 'voxxy-admin-2024' // DANGEROUS
 ```
 
 **After**:
+
 ```typescript
 const adminKey = import.meta.env.VITE_ADMIN_API_KEY
 if (!adminKey) {
@@ -57,21 +64,26 @@ headers['x-admin-key'] = adminKey
 ```
 
 ### 3. Added Environment Variable Validation
+
 **Files Created**:
+
 - `voxxy-presents-client/src/utils/validateEnv.ts`
 - `voxxy-presents-api/src/utils/validateEnv.ts`
 
 **Files Modified**:
+
 - `voxxy-presents-client/src/main.tsx` (calls `validateEnv()` on startup)
 - `voxxy-presents-api/src/index.ts` (calls `validateEnv()` before server starts)
 
 **What It Does**:
+
 - Validates all required environment variables on startup
 - Throws errors in development if critical vars are missing
 - Logs warnings for recommended vars
 - Validates format of CORS origins and Firebase keys
 
 **Required Client Env Vars**:
+
 - `VITE_FIREBASE_API_KEY`
 - `VITE_FIREBASE_AUTH_DOMAIN`
 - `VITE_FIREBASE_PROJECT_ID`
@@ -81,6 +93,7 @@ headers['x-admin-key'] = adminKey
 - `VITE_API_BASE_URL`
 
 **Required API Env Vars**:
+
 - `FIREBASE_PROJECT_ID`
 - `FIREBASE_PRIVATE_KEY`
 - `FIREBASE_CLIENT_EMAIL`
@@ -89,11 +102,13 @@ headers['x-admin-key'] = adminKey
 - `SENDGRID_FROM_EMAIL`
 
 ### 4. Locked Dependency Versions
+
 **File**: `voxxy-presents-client/package.json`
 **Issue**: 33 packages set to `"latest"` causing non-deterministic builds
 **Fix**: Locked all packages to specific versions with caret ranges (^)
 
 **Changed**:
+
 - All `@radix-ui/*` packages: `"latest"` → `"^1.x.0"` or `"^2.x.0"`
 - `cmdk`: `"latest"` → `"^1.1.1"`
 - `geist`: `"latest"` → `"^1.4.2"`
@@ -115,6 +130,7 @@ headers['x-admin-key'] = adminKey
 ### Step 1: Test Client Locally
 
 **Terminal 1 - Client**:
+
 ```bash
 cd /Users/courtneygreer/Development/voxxy-presents-client
 
@@ -126,10 +142,13 @@ npm run dev
 ```
 
 **Expected Output**:
+
 ```
 ✅ All environment variables validated successfully
 ```
+
 OR
+
 ```
 ⚠️ MISSING RECOMMENDED ENVIRONMENT VARIABLES:
   - VITE_ADMIN_API_KEY
@@ -137,12 +156,14 @@ OR
 ```
 
 **What to Test**:
+
 1. ✅ App starts without errors
 2. ✅ Console shows env validation output
 3. ✅ Firebase initializes correctly
 4. ✅ No "latest" package warnings
 
 **If you see missing env vars**:
+
 1. Check `.env.development` exists
 2. Compare with `.env.development.example`
 3. Add any missing required vars
@@ -150,6 +171,7 @@ OR
 ### Step 2: Test API Locally
 
 **Terminal 2 - API**:
+
 ```bash
 cd /Users/courtneygreer/Development/voxxy-presents-api
 
@@ -164,6 +186,7 @@ npm run dev
 ```
 
 **Expected Output**:
+
 ```
 ✅ All environment variables validated successfully
 🔧 CORS Configuration: {
@@ -182,12 +205,14 @@ npm run dev
 ```
 
 **What to Test**:
+
 1. ✅ Server starts without errors
 2. ✅ Console shows env validation output
 3. ✅ CORS configuration shows whitelisted origins (NOT `true`)
 4. ✅ Firebase initializes correctly
 
 **If you see missing env vars**:
+
 1. Check `.env` exists in API directory
 2. Compare with `.env.example`
 3. Add any missing required vars
@@ -197,16 +222,19 @@ npm run dev
 With both client and API running, test CORS:
 
 **In Browser (http://localhost:5173)**:
+
 1. Open DevTools Console
 2. Navigate to any page
 3. Check Network tab - API requests should succeed
 
 **Expected**:
+
 - ✅ API requests from `localhost:5173` work
 - ✅ No CORS errors in console
 - ✅ API logs show: `🔧 CORS Configuration` with whitelisted origins
 
 **Test Unauthorized Origin (Optional)**:
+
 ```bash
 # From terminal, try curl from unauthorized origin
 curl -H "Origin: http://evil.com" \
@@ -217,21 +245,25 @@ curl -H "Origin: http://evil.com" \
 ```
 
 **Expected**:
+
 - ❌ Should fail or return CORS error
 - ✅ API logs: `⚠️ CORS blocked request from origin: http://evil.com`
 
 ### Step 4: Test Admin Key Security
 
 **In Browser**:
+
 1. Check if `VITE_ADMIN_API_KEY` is set in `.env.development`
 2. Navigate to Admin Dashboard (if you have access)
 
 **Expected Behavior**:
 
 **If `VITE_ADMIN_API_KEY` is set**:
+
 - ✅ Admin endpoints work normally
 
 **If `VITE_ADMIN_API_KEY` is NOT set**:
+
 - ❌ Console error: `VITE_ADMIN_API_KEY is not configured`
 - ❌ Admin endpoints fail with clear error message
 - ✅ NO fallback to hardcoded key
@@ -239,6 +271,7 @@ curl -H "Origin: http://evil.com" \
 ### Step 5: Test Production Build
 
 **Client Build Test**:
+
 ```bash
 cd /Users/courtneygreer/Development/voxxy-presents-client
 
@@ -250,12 +283,14 @@ npm run preview
 ```
 
 **Expected**:
+
 - ✅ Build succeeds without errors
 - ✅ No "latest" package warnings
 - ✅ Env validation runs (may show warnings for missing prod vars - that's OK in local preview)
 - ✅ Preview server starts
 
 **API Build Test**:
+
 ```bash
 cd /Users/courtneygreer/Development/voxxy-presents-api
 
@@ -267,6 +302,7 @@ npm start
 ```
 
 **Expected**:
+
 - ✅ Build succeeds without TypeScript errors
 - ✅ Server starts with prod env vars
 - ✅ CORS configuration loads from `ALLOWED_ORIGINS` env var
@@ -278,10 +314,12 @@ npm start
 ### Issue: "Missing required environment variables"
 
 **Solution**:
+
 1. Check if `.env` files exist:
    - Client: `.env.development` or `.env.local`
    - API: `.env`
 2. Copy from examples:
+
    ```bash
    # Client
    cp .env.development.example .env.development
@@ -289,11 +327,13 @@ npm start
    # API
    cp .env.example .env
    ```
+
 3. Fill in actual values (Firebase keys, API keys, etc.)
 
 ### Issue: "Not allowed by CORS"
 
 **Solution**:
+
 1. Check API is running on correct port (3001)
 2. Check client is running on whitelisted port (5173 or 3000)
 3. Check API console shows correct `allowedOrigins`
@@ -305,6 +345,7 @@ npm start
 ### Issue: npm install fails or shows "latest" warnings
 
 **Solution**:
+
 1. Delete `node_modules` and `package-lock.json`:
    ```bash
    rm -rf node_modules package-lock.json
@@ -318,6 +359,7 @@ npm start
 ### Issue: TypeScript errors in validateEnv.ts
 
 **Solution**:
+
 1. Check `src/utils/validateEnv.ts` exists in both projects
 2. Rebuild:
    ```bash
@@ -373,6 +415,7 @@ Before deploying to staging/production:
 ## 📝 CHANGES SUMMARY FOR GIT COMMIT
 
 **API Changes**:
+
 - Fixed CORS security (whitelist only)
 - Added environment variable validation
 - Created `src/utils/validateEnv.ts`
@@ -380,6 +423,7 @@ Before deploying to staging/production:
 - Updated `src/index.ts` (env validation on startup)
 
 **Client Changes**:
+
 - Removed hardcoded admin key fallback
 - Added environment variable validation
 - Locked all dependency versions (removed 33 "latest" entries)
@@ -399,6 +443,7 @@ Before deploying to staging/production:
 Once Phase 0 tests pass:
 
 1. **Commit changes** (both repos):
+
    ```bash
    git add .
    git commit -m "fix: Phase 0 security improvements
@@ -413,12 +458,14 @@ Once Phase 0 tests pass:
    ```
 
 2. **Push to API repo** (requires production deployment):
+
    ```bash
    cd /Users/courtneygreer/Development/voxxy-presents-api
    git push origin main
    ```
 
 3. **Push to Client repo**:
+
    ```bash
    cd /Users/courtneygreer/Development/voxxy-presents-client
    git push origin main

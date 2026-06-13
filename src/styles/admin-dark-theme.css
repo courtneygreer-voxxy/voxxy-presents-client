@@ -9,11 +9,11 @@
 
 /* Card Title Styling */
 .admin-dark h1,
-.admin-dark h2, 
+.admin-dark h2,
 .admin-dark h3,
 .admin-dark h4,
-.admin-dark [data-slot="title"],
-.admin-dark [data-radix-collection-item][data-state="active"] {
+.admin-dark [data-slot='title'],
+.admin-dark [data-radix-collection-item][data-state='active'] {
   @apply text-foreground;
 }
 
@@ -26,7 +26,7 @@
 /* Card Description and Body Text */
 .admin-dark p,
 .admin-dark span:not(.lucide),
-.admin-dark [data-slot="description"] {
+.admin-dark [data-slot='description'] {
   @apply text-muted-foreground;
 }
 
@@ -44,7 +44,7 @@
 }
 
 /* Button Overrides for Dark Theme */
-.admin-dark button[data-variant="outline"] {
+.admin-dark button[data-variant='outline'] {
   @apply bg-background/10 border-foreground/20 text-foreground hover:bg-background/20;
 }
 

@@ -12,42 +12,56 @@
  * 8. Action (vertical ellipsis dropdown, only for failed deliveries)
  */
 
-import { ChevronUp, ChevronDown, ChevronsUpDown, MoreVertical, MessageCircleQuestion } from 'lucide-react';
-import { format } from 'date-fns';
-import type { AuditEntry } from '@/types/email';
-import { DELIVERY_STATUS_CONFIGS } from '@/types/email';
+import {
+  ChevronUp,
+  ChevronDown,
+  ChevronsUpDown,
+  MoreVertical,
+  MessageCircleQuestion,
+} from 'lucide-react'
+import { format } from 'date-fns'
+import type { AuditEntry } from '@/types/email'
+import { DELIVERY_STATUS_CONFIGS } from '@/types/email'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '@/components/ui/dropdown-menu';
-import { Badge, type BadgeVariant } from '@/components/ui/badge';
+} from '@/components/ui/dropdown-menu'
+import { Badge, type BadgeVariant } from '@/components/ui/badge'
 
-export type SortColumn = 'sent_at' | 'recipient_name' | 'recipient_email' | 'email_name' | 'category' | 'status';
-type SortDirection = 'asc' | 'desc';
+export type SortColumn =
+  | 'sent_at'
+  | 'recipient_name'
+  | 'recipient_email'
+  | 'email_name'
+  | 'category'
+  | 'status'
+type SortDirection = 'asc' | 'desc'
 
 interface EmailAuditTableProps {
-  entries: AuditEntry[];
-  sortColumn?: SortColumn | null;
-  sortDirection?: SortDirection;
-  onSort?: (column: SortColumn) => void;
-  onContactSupport?: (entry: AuditEntry) => void;
+  entries: AuditEntry[]
+  sortColumn?: SortColumn | null
+  sortDirection?: SortDirection
+  onSort?: (column: SortColumn) => void
+  onContactSupport?: (entry: AuditEntry) => void
 }
 
 function SortIcon({
   column,
   sortColumn,
-  sortDirection
+  sortDirection,
 }: {
-  column: SortColumn;
-  sortColumn?: SortColumn | null;
-  sortDirection?: SortDirection;
+  column: SortColumn
+  sortColumn?: SortColumn | null
+  sortDirection?: SortDirection
 }) {
-  if (sortColumn !== column) return <ChevronsUpDown className="w-3 h-3 opacity-40" />;
-  return sortDirection === 'asc'
-    ? <ChevronUp className="w-3 h-3 text-primary" />
-    : <ChevronDown className="w-3 h-3 text-primary" />;
+  if (sortColumn !== column) return <ChevronsUpDown className="w-3 h-3 opacity-40" />
+  return sortDirection === 'asc' ? (
+    <ChevronUp className="w-3 h-3 text-primary" />
+  ) : (
+    <ChevronDown className="w-3 h-3 text-primary" />
+  )
 }
 
 const STATUS_COLOR_VARIANT: Record<
@@ -59,11 +73,11 @@ const STATUS_COLOR_VARIANT: Record<
   green: 'tintGreen',
   red: 'tintRed',
   yellow: 'tintYellow',
-};
+}
 
 function StatusBadge({ status }: { status: AuditEntry['status'] }) {
-  const config = DELIVERY_STATUS_CONFIGS[status] || DELIVERY_STATUS_CONFIGS['pending'];
-  const variant = STATUS_COLOR_VARIANT[config.color];
+  const config = DELIVERY_STATUS_CONFIGS[status] || DELIVERY_STATUS_CONFIGS['pending']
+  const variant = STATUS_COLOR_VARIANT[config.color]
 
   return (
     <Badge
@@ -74,7 +88,7 @@ function StatusBadge({ status }: { status: AuditEntry['status'] }) {
       <span className="shrink-0">{config.icon}</span>
       <span className="truncate">{config.label}</span>
     </Badge>
-  );
+  )
 }
 
 const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
@@ -85,7 +99,7 @@ const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
   event_day: 'tintOrange',
   post_event: 'tintCyan',
   system: 'tintYellow',
-};
+}
 
 const CATEGORY_CONFIG_LABEL: Record<string, string> = {
   pre_application: 'Announcements',
@@ -95,11 +109,11 @@ const CATEGORY_CONFIG_LABEL: Record<string, string> = {
   event_day: 'Event Day',
   post_event: 'Post-Event',
   system: 'System',
-};
+}
 
 function CategoryBadge({ category }: { category: string }) {
-  const variant = CATEGORY_VARIANT[category] ?? 'tintMuted';
-  const label = CATEGORY_CONFIG_LABEL[category] || category;
+  const variant = CATEGORY_VARIANT[category] ?? 'tintMuted'
+  const label = CATEGORY_CONFIG_LABEL[category] || category
   return (
     <Badge
       variant={variant}
@@ -108,12 +122,12 @@ function CategoryBadge({ category }: { category: string }) {
     >
       {label}
     </Badge>
-  );
+  )
 }
 
 /** Returns true for statuses that indicate a delivery problem */
 function hasDeliveryIssue(status: AuditEntry['status']): boolean {
-  return status === 'bounced' || status === 'dropped';
+  return status === 'bounced' || status === 'dropped'
 }
 
 export function EmailAuditTable({
@@ -128,7 +142,7 @@ export function EmailAuditTable({
       <div className="bg-background/5 rounded-lg border border-border p-12 text-center">
         <p className="text-foreground/60">No audit entries found</p>
       </div>
-    );
+    )
   }
 
   const col = (column: SortColumn, label: string) => (
@@ -139,16 +153,19 @@ export function EmailAuditTable({
       {label}
       <SortIcon column={column} sortColumn={sortColumn} sortDirection={sortDirection} />
     </button>
-  );
+  )
 
   // 8 columns: Date | Recipient | Email | Email Name | Category | Status | Details | Action
-  const gridCols = 'grid-cols-[100px_minmax(60px,0.8fr)_minmax(80px,1fr)_minmax(80px,1fr)_minmax(50px,0.7fr)_100px_minmax(80px,1.2fr)_36px]';
+  const gridCols =
+    'grid-cols-[100px_minmax(60px,0.8fr)_minmax(80px,1fr)_minmax(80px,1fr)_minmax(50px,0.7fr)_100px_minmax(80px,1.2fr)_36px]'
 
   return (
     <div className="voxxy-table-shell overflow-x-auto">
       {/* Table Header */}
       <div className="voxxy-table-header">
-        <div className={`voxxy-table-header-row grid ${gridCols} min-w-[800px] items-center gap-2 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide`}>
+        <div
+          className={`voxxy-table-header-row grid ${gridCols} min-w-[800px] items-center gap-2 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide`}
+        >
           {col('sent_at', 'Date Sent')}
           {col('recipient_name', 'Recipient')}
           {col('recipient_email', 'Email')}
@@ -169,21 +186,30 @@ export function EmailAuditTable({
           >
             {/* Date Sent */}
             <div className="text-[11px] text-foreground/80">
-              {entry.sent_at
-                ? format(new Date(entry.sent_at), 'MMM d, h:mm a')
-                : entry.scheduled_for
-                  ? <span className="text-blue-700 dark:text-blue-300">{format(new Date(entry.scheduled_for), 'MMM d, h:mm a')}</span>
-                  : <span className="text-muted-foreground">--</span>
-              }
+              {entry.sent_at ? (
+                format(new Date(entry.sent_at), 'MMM d, h:mm a')
+              ) : entry.scheduled_for ? (
+                <span className="text-blue-700 dark:text-blue-300">
+                  {format(new Date(entry.scheduled_for), 'MMM d, h:mm a')}
+                </span>
+              ) : (
+                <span className="text-muted-foreground">--</span>
+              )}
             </div>
 
             {/* Recipient Name */}
-            <div className="text-[11px] text-foreground/80 truncate" title={entry.recipient_name || 'Unknown'}>
+            <div
+              className="text-[11px] text-foreground/80 truncate"
+              title={entry.recipient_name || 'Unknown'}
+            >
               {entry.recipient_name || <span className="text-muted-foreground">Unknown</span>}
             </div>
 
             {/* Email Address */}
-            <div className="text-[11px] text-foreground/60 font-mono truncate" title={entry.recipient_email}>
+            <div
+              className="text-[11px] text-foreground/60 font-mono truncate"
+              title={entry.recipient_email}
+            >
               {entry.recipient_email}
             </div>
 
@@ -204,7 +230,7 @@ export function EmailAuditTable({
 
             {/* Details - truncated text with hover tooltip */}
             <div className="min-w-0">
-              {(entry.bounce_reason || entry.drop_reason) ? (
+              {entry.bounce_reason || entry.drop_reason ? (
                 <span
                   className="block cursor-help truncate text-[11px] text-red-700 dark:text-red-400/80"
                   title={entry.bounce_reason || entry.drop_reason || ''}
@@ -246,5 +272,5 @@ export function EmailAuditTable({
         ))}
       </div>
     </div>
-  );
+  )
 }

@@ -8,8 +8,8 @@
  * - Pre-filled context: recipient email, email name, status, error details
  */
 
-import { useState } from 'react';
-import { AlertCircle, Send, Loader2 } from 'lucide-react';
+import { useState } from 'react'
+import { AlertCircle, Send, Loader2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -17,21 +17,21 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { logger } from '@/utils/logger';
-import type { AuditEntry } from '@/types/email';
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
+import { logger } from '@/utils/logger'
+import type { AuditEntry } from '@/types/email'
 
 interface ContactSupportDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  entry: AuditEntry | null;
-  eventTitle: string;
-  userEmail?: string;
-  userName?: string;
+  isOpen: boolean
+  onClose: () => void
+  entry: AuditEntry | null
+  eventTitle: string
+  userEmail?: string
+  userName?: string
 }
 
 export function ContactSupportDialog({
@@ -42,39 +42,39 @@ export function ContactSupportDialog({
   userEmail = '',
   userName = '',
 }: ContactSupportDialogProps) {
-  const [name, setName] = useState(userName);
-  const [message, setMessage] = useState('');
-  const [wantCallback, setWantCallback] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [name, setName] = useState(userName)
+  const [message, setMessage] = useState('')
+  const [wantCallback, setWantCallback] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Reset form when dialog opens/closes
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      onClose();
+      onClose()
       // Reset after close animation
       setTimeout(() => {
-        setName(userName);
-        setMessage('');
-        setWantCallback(false);
-        setSubmitSuccess(false);
-        setSubmitError(null);
-      }, 300);
+        setName(userName)
+        setMessage('')
+        setWantCallback(false)
+        setSubmitSuccess(false)
+        setSubmitError(null)
+      }, 300)
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    if (!entry) return;
+    if (!entry) return
     if (!message.trim()) {
-      setSubmitError('Please enter a message');
-      return;
+      setSubmitError('Please enter a message')
+      return
     }
 
-    setIsSubmitting(true);
-    setSubmitError(null);
+    setIsSubmitting(true)
+    setSubmitError(null)
 
     try {
       // Build context information
@@ -88,55 +88,59 @@ export function ContactSupportDialog({
         bounce_reason: entry.bounce_reason || null,
         drop_reason: entry.drop_reason || null,
         sent_at: entry.sent_at || null,
-      };
+      }
 
       // Build Discord message
       const discordMessage = {
-        embeds: [{
-          title: '🆘 Email Audit Log Support Request',
-          color: 0xFF6B6B, // Red color
-          fields: [
-            {
-              name: '👤 From',
-              value: `${name || 'Anonymous'} (${userEmail || 'No email provided'})`,
-              inline: false,
+        embeds: [
+          {
+            title: '🆘 Email Audit Log Support Request',
+            color: 0xff6b6b, // Red color
+            fields: [
+              {
+                name: '👤 From',
+                value: `${name || 'Anonymous'} (${userEmail || 'No email provided'})`,
+                inline: false,
+              },
+              {
+                name: '💬 Message',
+                value: message,
+                inline: false,
+              },
+              {
+                name: '📞 Wants Callback',
+                value: wantCallback ? '✅ Yes' : '❌ No',
+                inline: true,
+              },
+              {
+                name: '📧 Email Context',
+                value: [
+                  `**Event:** ${context.event}`,
+                  `**Email:** ${context.email_name}`,
+                  `**Subject:** ${context.email_subject}`,
+                  `**Recipient:** ${context.recipient_name} (${context.recipient_email})`,
+                  `**Status:** ${context.status}`,
+                  context.bounce_reason ? `**Bounce Reason:** ${context.bounce_reason}` : '',
+                  context.drop_reason ? `**Drop Reason:** ${context.drop_reason}` : '',
+                ]
+                  .filter(Boolean)
+                  .join('\n'),
+                inline: false,
+              },
+            ],
+            timestamp: new Date().toISOString(),
+            footer: {
+              text: 'Email Audit Log • Voxxy',
             },
-            {
-              name: '💬 Message',
-              value: message,
-              inline: false,
-            },
-            {
-              name: '📞 Wants Callback',
-              value: wantCallback ? '✅ Yes' : '❌ No',
-              inline: true,
-            },
-            {
-              name: '📧 Email Context',
-              value: [
-                `**Event:** ${context.event}`,
-                `**Email:** ${context.email_name}`,
-                `**Subject:** ${context.email_subject}`,
-                `**Recipient:** ${context.recipient_name} (${context.recipient_email})`,
-                `**Status:** ${context.status}`,
-                context.bounce_reason ? `**Bounce Reason:** ${context.bounce_reason}` : '',
-                context.drop_reason ? `**Drop Reason:** ${context.drop_reason}` : '',
-              ].filter(Boolean).join('\n'),
-              inline: false,
-            },
-          ],
-          timestamp: new Date().toISOString(),
-          footer: {
-            text: 'Email Audit Log • Voxxy',
           },
-        }],
-      };
+        ],
+      }
 
       // Get Discord webhook URL from environment
-      const webhookUrl = import.meta.env.VITE_DISCORD_WEBHOOK_URL;
+      const webhookUrl = import.meta.env.VITE_DISCORD_WEBHOOK_URL
 
       if (!webhookUrl) {
-        throw new Error('Discord webhook URL not configured');
+        throw new Error('Discord webhook URL not configured')
       }
 
       // Send to Discord
@@ -146,26 +150,26 @@ export function ContactSupportDialog({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(discordMessage),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error(`Discord API error: ${response.status}`);
+        throw new Error(`Discord API error: ${response.status}`)
       }
 
       // Success!
-      setSubmitSuccess(true);
+      setSubmitSuccess(true)
 
       // Auto-close after 2 seconds
       setTimeout(() => {
-        handleOpenChange(false);
-      }, 2000);
+        handleOpenChange(false)
+      }, 2000)
     } catch (err: any) {
-      logger.error('Failed to submit support request', { error: err });
-      setSubmitError(err.message || 'Failed to submit request. Please try again.');
+      logger.error('Failed to submit support request', { error: err })
+      setSubmitError(err.message || 'Failed to submit request. Please try again.')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -173,7 +177,8 @@ export function ContactSupportDialog({
         <DialogHeader>
           <DialogTitle>Contact Voxxy Support</DialogTitle>
           <DialogDescription>
-            Need help with this email delivery? Our team will review your request and get back to you.
+            Need help with this email delivery? Our team will review your request and get back to
+            you.
           </DialogDescription>
         </DialogHeader>
 
@@ -182,9 +187,7 @@ export function ContactSupportDialog({
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
               <Send className="w-8 h-8 text-green-400" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              Request Sent!
-            </h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Request Sent!</h3>
             <p className="text-sm text-foreground/60">
               We've received your support request and will respond shortly.
             </p>
@@ -194,7 +197,10 @@ export function ContactSupportDialog({
             <div className="space-y-4 py-4">
               {/* Name */}
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-foreground/80 mb-1.5">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-foreground/80 mb-1.5"
+                >
                   Your Name
                 </label>
                 <Input
@@ -208,7 +214,10 @@ export function ContactSupportDialog({
 
               {/* Message */}
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-foreground/80 mb-1.5">
+                <label
+                  htmlFor="message"
+                  className="block text-sm font-medium text-foreground/80 mb-1.5"
+                >
                   Message <span className="text-red-400">*</span>
                 </label>
                 <Textarea
@@ -237,7 +246,8 @@ export function ContactSupportDialog({
                     I want Voxxy to reach out to me
                   </label>
                   <p className="text-xs text-foreground/60 mt-0.5">
-                    We'll contact you at {userEmail || 'your registered email'} to help resolve this issue.
+                    We'll contact you at {userEmail || 'your registered email'} to help resolve this
+                    issue.
                   </p>
                 </div>
               </div>
@@ -257,11 +267,19 @@ export function ContactSupportDialog({
                     Context that will be included:
                   </p>
                   <div className="text-xs text-foreground/50 space-y-1">
-                    <div><span className="font-medium">Email:</span> {entry.email_name}</div>
-                    <div><span className="font-medium">Recipient:</span> {entry.recipient_email}</div>
-                    <div><span className="font-medium">Status:</span> {entry.status}</div>
+                    <div>
+                      <span className="font-medium">Email:</span> {entry.email_name}
+                    </div>
+                    <div>
+                      <span className="font-medium">Recipient:</span> {entry.recipient_email}
+                    </div>
+                    <div>
+                      <span className="font-medium">Status:</span> {entry.status}
+                    </div>
                     {entry.bounce_reason && (
-                      <div><span className="font-medium">Error:</span> {entry.bounce_reason}</div>
+                      <div>
+                        <span className="font-medium">Error:</span> {entry.bounce_reason}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -277,11 +295,7 @@ export function ContactSupportDialog({
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting || !message.trim()}
-                className="gap-2"
-              >
+              <Button type="submit" disabled={isSubmitting || !message.trim()} className="gap-2">
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -299,5 +313,5 @@ export function ContactSupportDialog({
         )}
       </DialogContent>
     </Dialog>
-  );
+  )
 }

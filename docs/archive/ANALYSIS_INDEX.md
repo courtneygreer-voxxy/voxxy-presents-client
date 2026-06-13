@@ -5,9 +5,11 @@ This folder contains a comprehensive analysis of the backend data structures and
 ## Documents
 
 ### 1. BACKEND_DATA_STRUCTURES_ANALYSIS.md
+
 **Comprehensive technical analysis** of all data structures involved in email variable resolution.
 
 **Contains:**
+
 - Complete VendorContact model field definitions
 - Complete Registration model field definitions
 - EventInvitation model structure
@@ -24,9 +26,11 @@ This folder contains a comprehensive analysis of the backend data structures and
 ---
 
 ### 2. BACKEND_FIELDS_QUICK_REFERENCE.md
+
 **Quick lookup table** of all available fields and how to use them.
 
 **Contains:**
+
 - VendorContact fields table
 - Registration fields table
 - Email variables supported (organized by context)
@@ -40,9 +44,11 @@ This folder contains a comprehensive analysis of the backend data structures and
 ---
 
 ### 3. BACKEND_CODE_SNIPPETS.md
+
 **Actual code examples** from the codebase showing implementation details.
 
 **Contains:**
+
 - Database schema (migrations)
 - EmailVariableResolver code (resolve_registration_variables method)
 - InvitationVariableResolver code (resolve_vendor_contact_variables method)
@@ -57,24 +63,25 @@ This folder contains a comprehensive analysis of the backend data structures and
 
 ## Key Facts At A Glance
 
-| Aspect | Details |
-|--------|---------|
-| Name Fields | Single `name` field (no first_name/last_name columns) |
-| Business Field | Single `business_name` field |
-| First/Last Parsing | Runtime via `name.split(" ", 2)` |
-| Greeting Logic | business_name > first_name > "there" |
-| Variable Format | `[bracket]` (not {{mustache}}) |
-| VendorContact Variables | All documented variables work |
-| Registration Variables | All documented variables work |
-| Serializer Mapping | VendorContact: name → contact_name |
+| Aspect                  | Details                                               |
+| ----------------------- | ----------------------------------------------------- |
+| Name Fields             | Single `name` field (no first_name/last_name columns) |
+| Business Field          | Single `business_name` field                          |
+| First/Last Parsing      | Runtime via `name.split(" ", 2)`                      |
+| Greeting Logic          | business_name > first_name > "there"                  |
+| Variable Format         | `[bracket]` (not {{mustache}})                        |
+| VendorContact Variables | All documented variables work                         |
+| Registration Variables  | All documented variables work                         |
+| Serializer Mapping      | VendorContact: name → contact_name                    |
 
 ---
 
 ## Email Variables Reference
 
 ### Available for Both VendorContact and Registration:
+
 - `[firstName]` - First word of name
-- `[lastName]` - Last word(s) of name  
+- `[lastName]` - Last word(s) of name
 - `[fullName]` - Complete name
 - `[businessName]` - Business/company name
 - `[greetingName]` - Smart greeting (business > first > "there")
@@ -84,6 +91,7 @@ This folder contains a comprehensive analysis of the backend data structures and
 - `[website]` - Website URL
 
 ### Registration-Only Variables:
+
 - `[vendorCategory]` - Only available after registration
 - `[boothNumber]` - Only available after booth assignment
 - `[applicationDate]` - Date vendor applied
@@ -93,23 +101,28 @@ This folder contains a comprehensive analysis of the backend data structures and
 ## File Locations
 
 ### Database Models
+
 - **VendorContact:** `/Users/beaulazear/Desktop/voxxy-rails/app/models/vendor_contact.rb`
 - **Registration:** `/Users/beaulazear/Desktop/voxxy-rails/app/models/registration.rb`
 - **EventInvitation:** `/Users/beaulazear/Desktop/voxxy-rails/app/models/event_invitation.rb`
 
 ### Email Variable Resolvers
+
 - **EmailVariableResolver:** `/Users/beaulazear/Desktop/voxxy-rails/app/services/email_variable_resolver.rb`
 - **InvitationVariableResolver:** `/Users/beaulazear/Desktop/voxxy-rails/app/services/invitation_variable_resolver.rb`
 
 ### Serializers
+
 - **VendorContact:** `/Users/beaulazear/Desktop/voxxy-rails/app/serializers/api/v1/presents/vendor_contact_serializer.rb`
 - **Registration:** `/Users/beaulazear/Desktop/voxxy-rails/app/serializers/api/v1/presents/registration_serializer.rb`
 
 ### Frontend
+
 - **Email Variables:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/utils/emailVariables.ts`
 - **Email Types:** `/Users/beaulazear/Desktop/voxxy-presents-client/src/types/email.ts`
 
 ### Database Migrations
+
 - **VendorContact Creation:** `/Users/beaulazear/Desktop/voxxy-rails/db/migrate/20251217120000_create_vendor_contacts.rb`
 - **Registration Creation:** `/Users/beaulazear/Desktop/voxxy-rails/db/migrate/20251104140632_create_registrations.rb`
 - **Registration Vendor Fields:** `/Users/beaulazear/Desktop/voxxy-rails/db/migrate/20251115162751_add_vendor_fields_to_registrations.rb`
@@ -142,4 +155,3 @@ This analysis was conducted by:
 5. Cross-referencing between backend implementations and frontend documentation
 
 All findings are based on actual code, not assumptions or inferred behavior.
-

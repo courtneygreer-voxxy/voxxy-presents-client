@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { MailX, Calendar, Building2, Globe, Search, Filter, ChevronDown, ChevronUp, Mail } from "lucide-react"
-import { useAuth } from "@/contexts/AuthContext"
-import { adminApi } from "@/services/api"
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import {
+  MailX,
+  Calendar,
+  Building2,
+  Globe,
+  Search,
+  Filter,
+  ChevronDown,
+  ChevronUp,
+  Mail,
+} from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { adminApi } from '@/services/api'
 
 interface UnsubscribeRecord {
   id: number
@@ -72,7 +82,7 @@ export default function AdminUnsubscribesPage() {
         per_page: 25,
         scope: scopeFilter || undefined,
         source: sourceFilter || undefined,
-        search: searchEmail || undefined
+        search: searchEmail || undefined,
       })
       setData(result)
     } catch (err) {
@@ -121,7 +131,7 @@ export default function AdminUnsubscribesPage() {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     })
   }
 
@@ -143,7 +153,6 @@ export default function AdminUnsubscribesPage() {
     <div className="min-h-screen voxxy-gradient-page-alt relative overflow-hidden">
       <div className="relative z-10 min-h-screen px-4 py-12 md:py-16">
         <div className="w-full max-w-7xl mx-auto space-y-8 my-8 md:my-12">
-
           {/* Header Card */}
           <Card className="bg-background/10 backdrop-blur-sm border border-border shadow-2xl">
             <CardHeader className="border-b border-border">
@@ -163,20 +172,34 @@ export default function AdminUnsubscribesPage() {
               {data && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-background/10 backdrop-blur-sm border border-border rounded-lg p-4">
-                    <p className="text-muted-foreground text-xs uppercase tracking-wide">Total Unsubscribes</p>
+                    <p className="text-muted-foreground text-xs uppercase tracking-wide">
+                      Total Unsubscribes
+                    </p>
                     <p className="text-foreground text-3xl font-bold mt-2">{data.summary.total}</p>
                   </div>
                   <div className="bg-background/10 backdrop-blur-sm border border-border rounded-lg p-4">
-                    <p className="text-muted-foreground text-xs uppercase tracking-wide">Last 24 Hours</p>
-                    <p className="text-foreground text-3xl font-bold mt-2">{data.summary.last_24_hours}</p>
+                    <p className="text-muted-foreground text-xs uppercase tracking-wide">
+                      Last 24 Hours
+                    </p>
+                    <p className="text-foreground text-3xl font-bold mt-2">
+                      {data.summary.last_24_hours}
+                    </p>
                   </div>
                   <div className="bg-background/10 backdrop-blur-sm border border-border rounded-lg p-4">
-                    <p className="text-muted-foreground text-xs uppercase tracking-wide">Last 7 Days</p>
-                    <p className="text-foreground text-3xl font-bold mt-2">{data.summary.last_7_days}</p>
+                    <p className="text-muted-foreground text-xs uppercase tracking-wide">
+                      Last 7 Days
+                    </p>
+                    <p className="text-foreground text-3xl font-bold mt-2">
+                      {data.summary.last_7_days}
+                    </p>
                   </div>
                   <div className="bg-background/10 backdrop-blur-sm border border-border rounded-lg p-4">
-                    <p className="text-muted-foreground text-xs uppercase tracking-wide">Last 30 Days</p>
-                    <p className="text-foreground text-3xl font-bold mt-2">{data.summary.last_30_days}</p>
+                    <p className="text-muted-foreground text-xs uppercase tracking-wide">
+                      Last 30 Days
+                    </p>
+                    <p className="text-foreground text-3xl font-bold mt-2">
+                      {data.summary.last_30_days}
+                    </p>
                   </div>
                 </div>
               )}
@@ -217,7 +240,10 @@ export default function AdminUnsubscribesPage() {
 
                   <select
                     value={scopeFilter}
-                    onChange={(e) => {setScopeFilter(e.target.value); setCurrentPage(1)}}
+                    onChange={(e) => {
+                      setScopeFilter(e.target.value)
+                      setCurrentPage(1)
+                    }}
                     className="px-3 py-2 rounded-lg bg-background/10 border border-border text-foreground text-sm"
                   >
                     <option value="">All Scopes</option>
@@ -228,7 +254,10 @@ export default function AdminUnsubscribesPage() {
 
                   <select
                     value={sourceFilter}
-                    onChange={(e) => {setSourceFilter(e.target.value); setCurrentPage(1)}}
+                    onChange={(e) => {
+                      setSourceFilter(e.target.value)
+                      setCurrentPage(1)
+                    }}
                     className="px-3 py-2 rounded-lg bg-background/10 border border-border text-foreground text-sm"
                   >
                     <option value="">All Sources</option>
@@ -287,7 +316,9 @@ export default function AdminUnsubscribesPage() {
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <Badge className={`${getScopeBadgeColor(unsub.scope)} text-xs capitalize`}>
+                            <Badge
+                              className={`${getScopeBadgeColor(unsub.scope)} text-xs capitalize`}
+                            >
                               {unsub.scope}
                             </Badge>
                             {isExpanded ? (
@@ -313,11 +344,15 @@ export default function AdminUnsubscribesPage() {
                               </div>
                               <div>
                                 <p className="text-muted-foreground">Unsubscribed At</p>
-                                <p className="text-foreground">{formatDate(unsub.unsubscribed_at)}</p>
+                                <p className="text-foreground">
+                                  {formatDate(unsub.unsubscribed_at)}
+                                </p>
                               </div>
                               <div>
                                 <p className="text-muted-foreground">Source</p>
-                                <p className="text-foreground">{unsub.unsubscribe_source || 'N/A'}</p>
+                                <p className="text-foreground">
+                                  {unsub.unsubscribe_source || 'N/A'}
+                                </p>
                               </div>
                             </div>
 
@@ -347,7 +382,9 @@ export default function AdminUnsubscribesPage() {
                                 </h5>
                                 <div className="space-y-1 text-sm">
                                   <p className="text-foreground">{unsub.organization.name}</p>
-                                  <p className="text-muted-foreground">Slug: {unsub.organization.slug}</p>
+                                  <p className="text-muted-foreground">
+                                    Slug: {unsub.organization.slug}
+                                  </p>
                                 </div>
                               </div>
                             )}
@@ -373,12 +410,12 @@ export default function AdminUnsubscribesPage() {
               {data && data.pagination.total_pages > 1 && (
                 <div className="flex justify-between items-center pt-4 border-t border-border">
                   <p className="text-muted-foreground text-sm">
-                    Page {data.pagination.current_page} of {data.pagination.total_pages}
-                    {' '}({data.pagination.total_unsubscribes} total)
+                    Page {data.pagination.current_page} of {data.pagination.total_pages} (
+                    {data.pagination.total_unsubscribes} total)
                   </p>
                   <div className="flex gap-2">
                     <Button
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
                       variant="outline"
                       size="sm"
@@ -387,7 +424,9 @@ export default function AdminUnsubscribesPage() {
                       Previous
                     </Button>
                     <Button
-                      onClick={() => setCurrentPage(p => Math.min(data.pagination.total_pages, p + 1))}
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(data.pagination.total_pages, p + 1))
+                      }
                       disabled={currentPage === data.pagination.total_pages}
                       variant="outline"
                       size="sm"

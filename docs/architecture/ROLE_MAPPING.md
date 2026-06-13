@@ -8,41 +8,47 @@ The frontend uses user-friendly labels while the backend uses technical role nam
 
 ## Role Mappings
 
-| Backend Role (Database) | Frontend Display | Helper Flag | Routing |
-|------------------------|------------------|-------------|---------|
-| `venue_owner` | **Producer** | `isProducer` | `/producer/pending` |
-| `vendor` | **Vendor** | `isVendor` | `/vendor/pending` |
-| `consumer` | **Consumer** | `isGuest` | `/pending` |
-| `guest` | **Guest** | `isGuest` | `/pending` |
-| `admin` | **Admin** | `isAdmin` | `/producer/pending` |
+| Backend Role (Database) | Frontend Display | Helper Flag  | Routing             |
+| ----------------------- | ---------------- | ------------ | ------------------- |
+| `venue_owner`           | **Producer**     | `isProducer` | `/producer/pending` |
+| `vendor`                | **Vendor**       | `isVendor`   | `/vendor/pending`   |
+| `consumer`              | **Consumer**     | `isGuest`    | `/pending`          |
+| `guest`                 | **Guest**        | `isGuest`    | `/pending`          |
+| `admin`                 | **Admin**        | `isAdmin`    | `/producer/pending` |
 
 ### Legacy Mappings (Deprecated)
-| Backend Role | Frontend Display | Helper Flag |
-|--------------|------------------|-------------|
-| `organizer` | **Producer (Legacy)** | `isOrganizer` |
+
+| Backend Role | Frontend Display      | Helper Flag   |
+| ------------ | --------------------- | ------------- |
+| `organizer`  | **Producer (Legacy)** | `isOrganizer` |
 
 ---
 
 ## Implementation
 
 ### 1. Debug Panel Role Switcher
+
 **File:** `src/components/debug/DebugPanel.tsx`
 
 ```typescript
 // When user clicks "Producer" button:
-handleRoleSwitch('venue_owner')  // ← Sends venue_owner to backend
+handleRoleSwitch('venue_owner') // ← Sends venue_owner to backend
 
 // Display logic:
 const getDisplayRole = (role?: string) => {
   switch (role) {
-    case 'venue_owner': return 'PRODUCER'  // ← Shows Producer to user
-    case 'organizer': return 'PRODUCER (Legacy)'
-    default: return role?.toUpperCase()
+    case 'venue_owner':
+      return 'PRODUCER' // ← Shows Producer to user
+    case 'organizer':
+      return 'PRODUCER (Legacy)'
+    default:
+      return role?.toUpperCase()
   }
 }
 ```
 
 ### 2. Auth Context Role Helpers
+
 **File:** `src/contexts/AuthContext.tsx`
 
 ```typescript
@@ -54,6 +60,7 @@ const isVendor = userProfile?.role === 'vendor'
 ```
 
 ### 3. Routing Logic
+
 **File:** `src/App.tsx`
 
 ```typescript
@@ -73,6 +80,7 @@ if (role === 'vendor') {
 ## Why This Approach?
 
 ### ✅ Benefits
+
 1. **No backend changes required** - Rails already uses `venue_owner`
 2. **User-friendly labels** - "Producer" is clearer than "Venue Owner" for event organizers
 3. **Backward compatible** - Existing `venue_owner` records work without migration
@@ -80,6 +88,7 @@ if (role === 'vendor') {
 5. **Clean separation** - Backend can keep technical names, frontend shows friendly names
 
 ### 🎯 Use Cases
+
 - **Event Organizers** → See "Producer" everywhere in UI
 - **Service Providers** → See "Vendor" (catering, photography, etc.)
 - **Backend/Database** → Stores as `venue_owner` (technical clarity)
@@ -109,6 +118,7 @@ if (role === 'vendor') {
 If you ever want to rename `venue_owner` → `producer` in the database:
 
 1. **Rails migration:**
+
    ```ruby
    class RenameVenueOwnerToProducer < ActiveRecord::Migration[7.0]
      def change
@@ -121,11 +131,12 @@ If you ever want to rename `venue_owner` → `producer` in the database:
    ```
 
 2. **Frontend cleanup:**
+
    ```typescript
    // Remove mapping logic, use 'producer' directly
    const isProducer = userProfile?.role === 'producer'
 
-   handleRoleSwitch('producer')  // Send producer instead of venue_owner
+   handleRoleSwitch('producer') // Send producer instead of venue_owner
    ```
 
 ---

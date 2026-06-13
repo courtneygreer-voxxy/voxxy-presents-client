@@ -33,7 +33,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
-    rememberMe: false
+    rememberMe: false,
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [showPassword, setShowPassword] = useState(false)
@@ -58,13 +58,13 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
 
   // Handle input changes with validation
   const handleInputChange = (field: keyof FormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    
+    setFormData((prev) => ({ ...prev, [field]: value }))
+
     // Clear previous errors for this field
     if (errors[field as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }))
+      setErrors((prev) => ({ ...prev, [field]: undefined }))
     }
-    
+
     // Clear general auth error when user starts typing
     if (error) {
       clearError()
@@ -74,7 +74,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
   // Validate entire form
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
-    
+
     const emailError = validateField('email', formData.email)
     if (emailError) newErrors.email = emailError
 
@@ -88,27 +88,30 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
-    
+
     setIsSubmitting(true)
-    setErrors(prev => ({ ...prev, submit: undefined }))
-    
+    setErrors((prev) => ({ ...prev, submit: undefined }))
+
     try {
       await signIn({
         email: formData.email.trim(),
-        password: formData.password
+        password: formData.password,
       })
-      
+
       // Store remember me preference if needed
       if (formData.rememberMe) {
         localStorage.setItem('voxxy-remember-me', 'true')
       }
-      
+
       onSuccess?.()
     } catch {
       // Error is handled by the AuthContext
-      setErrors(prev => ({ ...prev, submit: 'Failed to sign in. Please check your credentials and try again.' }))
+      setErrors((prev) => ({
+        ...prev,
+        submit: 'Failed to sign in. Please check your credentials and try again.',
+      }))
     } finally {
       setIsSubmitting(false)
     }
@@ -129,7 +132,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-        
+
         {/* Display form submission errors */}
         {errors.submit && (
           <Alert variant="destructive">
@@ -152,16 +155,14 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 onBlur={() => {
                   const error = validateField('email', formData.email)
-                  if (error) setErrors(prev => ({ ...prev, email: error }))
+                  if (error) setErrors((prev) => ({ ...prev, email: error }))
                 }}
                 aria-invalid={!!errors.email}
                 disabled={isSubmitting || loading}
                 autoComplete="email"
               />
             </div>
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email}</p>
-            )}
+            {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
           </div>
 
           {/* Password Field */}
@@ -188,7 +189,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
                 onChange={(e) => handleInputChange('password', e.target.value)}
                 onBlur={() => {
                   const error = validateField('password', formData.password)
-                  if (error) setErrors(prev => ({ ...prev, password: error }))
+                  if (error) setErrors((prev) => ({ ...prev, password: error }))
                 }}
                 aria-invalid={!!errors.password}
                 disabled={isSubmitting || loading}
@@ -203,9 +204,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-sm text-destructive">{errors.password}</p>
-            )}
+            {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
           </div>
 
           {/* Remember Me */}
