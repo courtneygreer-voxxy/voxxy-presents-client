@@ -626,19 +626,36 @@ export default function VendorApplicationForm() {
 
                 <div>
                   <label className="block text-xs font-medium text-foreground mb-1.5">
-                    Business/Brand Name{' '}
-                    <span className="text-muted-foreground text-[10px] ml-1 font-normal">
-                      (optional)
-                    </span>
+                    Last Name <span className="text-red-600 dark:text-red-400">*</span>
                   </label>
                   <input
                     type="text"
-                    value={formData.business_name}
-                    onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
-                    placeholder="Your business or brand name"
+                    value={formData.last_name}
+                    onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                    placeholder="Your last name"
                     className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
+                    required
                   />
                 </div>
+              </div>
+
+              <div className="mt-3">
+                <label className="block text-xs font-medium text-foreground mb-1.5">
+                  Business/Brand Name{' '}
+                  <span className="text-muted-foreground text-[10px] ml-1 font-normal">
+                    (optional)
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.business_name}
+                  onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
+                  placeholder="Your business or brand name"
+                  className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
 
                 {/* Email */}
                 <div>
