@@ -1,6 +1,7 @@
 import React, { Component, ReactNode } from 'react'
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
 import ReportBug from './ReportBug'
+import { getMessage } from '@/errors/catalog'
 
 interface Props {
   children: ReactNode
@@ -87,13 +88,12 @@ class ErrorBoundary extends Component<Props, State> {
 
               {/* Title */}
               <h1 className="text-2xl font-bold text-foreground text-center mb-2">
-                Oops! Something went wrong
+                {getMessage('global.boundaryTitle')}
               </h1>
 
               {/* Description */}
               <p className="text-foreground/70 text-center mb-6">
-                We encountered an unexpected error. Don't worry, your data is safe. Try refreshing
-                the page or returning to the home page.
+                {getMessage('global.boundaryDescription')}
               </p>
 
               {/* Error Details (Collapsible in dev mode) */}

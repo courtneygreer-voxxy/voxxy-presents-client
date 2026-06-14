@@ -9,6 +9,9 @@ import { Separator } from '@/components/ui/separator'
 import { ArrowLeft, Sparkles, Eye, EyeOff, Loader2, Mail, Lock, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail } from '@/utils/validation'
+import { ApiError } from '@/services/api'
+import { getApiErrorMessage } from '@/errors/getApiErrorMessage'
+import { getMessage } from '@/errors/catalog'
 import { usePageTracking } from '@/hooks/usePageTracking'
 import { useForceTheme } from '@/hooks/useForceTheme'
 
@@ -26,7 +29,7 @@ interface FormErrors {
 export default function LoginPage() {
   useForceTheme('dark')
   const navigate = useNavigate()
-  const { signIn, loading, error, clearError } = useAuth()
+  const { signIn, refreshUserProfile, loading, error, clearError } = useAuth()
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
@@ -100,10 +103,10 @@ export default function LoginPage() {
     } catch (err) {
       console.error('Login error:', err)
 
-      let errorMessage = 'Invalid email or password. Please try again.'
-      if (err instanceof Error) {
-        errorMessage = err.message
-      }
+      const errorMessage =
+        err instanceof ApiError
+          ? getApiErrorMessage(err, 'auth')
+          : getMessage('auth.signInFailed')
 
       setErrors((prev) => ({ ...prev, submit: errorMessage }))
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -119,17 +122,12 @@ export default function LoginPage() {
 
     try {
       const { authApi } = await import('@/services/api')
-      // devLogin() calls POST /dev_login which returns a token and saves it
-      const data = await authApi.devLogin()
-
-      // Token is already saved by devLogin(). Now use the regular login
-      // with the seed password to go through the normal auth flow.
-      await signIn({ email: data.email, password: 'password123' })
+      // devLogin() returns a JWT and saves it; load profile without re-posting login
+      await authApi.devLogin()
+      await refreshUserProfile()
     } catch (err) {
       console.error('Dev login error:', err)
-      setErrors({
-        submit: 'Dev login failed. Is the Rails server running on port 3001 with seed data?',
-      })
+      setErrors({ submit: getMessage('auth.devLoginFailed') })
     } finally {
       setIsSubmitting(false)
     }

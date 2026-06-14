@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { authApi, getAuthToken, clearAuthToken, ApiError } from '@/services/api'
+import { getApiErrorMessage } from '@/errors/getApiErrorMessage'
+import { getMessage } from '@/errors/catalog'
 import { analytics } from '@/lib/analytics'
 import { getCachedUserProfile, cacheUserProfile, removeCachedUserProfile } from '@/utils/cache'
 import { resetThemePreference, restoreDashboardThemePreference } from '@/contexts/ThemeContext'
@@ -224,13 +226,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         analytics.trackUserSignIn(user.email, String(user.id), user.role)
       }
     } catch (err) {
-      if (err instanceof ApiError) {
-        // Use the main error message (which is user-friendly)
-        // Don't use err.errors as it contains raw backend validation errors
-        setError(err.message)
-      } else {
-        setError('An unexpected error occurred during sign up')
-      }
+      setError(
+        err instanceof ApiError
+          ? getApiErrorMessage(err, 'auth')
+          : getMessage('auth.signUpFailed')
+      )
       throw err
     }
     // Note: No finally block - don't change loading state for signup
@@ -268,12 +268,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         confirmed: !!user.confirmed_at,
       })
     } catch (err) {
-      if (err instanceof ApiError) {
-        // Use the main error message (which is user-friendly)
-        setError(err.message)
-      } else {
-        setError('An unexpected error occurred during sign in')
-      }
+      setError(
+        err instanceof ApiError
+          ? getApiErrorMessage(err, 'auth')
+          : getMessage('auth.signInFailed')
+      )
       throw err
     }
     // Note: No finally block - don't change loading state for login
@@ -299,11 +298,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setCurrentUser(null)
       setUserProfile(null)
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message)
-      } else {
-        setError('An unexpected error occurred during sign out')
-      }
+      setError(
+        err instanceof ApiError
+          ? getApiErrorMessage(err)
+          : getMessage('auth.signOutFailed')
+      )
       throw err
     } finally {
       setLoading(false)
@@ -316,11 +315,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setError(null)
       await authApi.requestPasswordReset(email)
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message)
-      } else {
-        setError('An unexpected error occurred while resetting password')
-      }
+      setError(
+        err instanceof ApiError
+          ? getApiErrorMessage(err, 'auth')
+          : getMessage('auth.resetPasswordFailed')
+      )
       throw err
     }
   }

@@ -224,8 +224,8 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
-        {/* Toast Notifications - Auto-dismiss after 4 seconds */}
-        <Toaster position="top-right" duration={4000} closeButton richColors theme="system" />
+        {/* Toast Notifications - Auto-dismiss after 3 seconds */}
+        <Toaster position="top-right" duration={3000} closeButton richColors theme="system" />
 
         {/* Debug Panel - Shows on all pages in development */}
         <DebugPanel />
