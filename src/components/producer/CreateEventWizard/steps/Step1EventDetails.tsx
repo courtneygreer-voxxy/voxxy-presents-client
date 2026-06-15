@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { Lock, X, Zap } from 'lucide-react';
-import { WizardStepProps } from '../types';
-import VenueAutocomplete from '../VenueAutocomplete';
-import LocationAutocomplete from '../LocationAutocomplete';
-import googlePlacesService, { LocationData } from '@/services/googlePlacesService';
-import { isDevOrStaging } from '@/config/environments';
-import { useAuth } from '@/contexts/AuthContext';
-import { DebugPanel } from '../../DebugPanel';
+import { useState } from 'react'
+import { Lock, X, Zap } from 'lucide-react'
+import { WizardStepProps } from '../types'
+import VenueAutocomplete from '../VenueAutocomplete'
+import LocationAutocomplete from '../LocationAutocomplete'
+import googlePlacesService, { LocationData } from '@/services/googlePlacesService'
+import { isDevOrStaging } from '@/config/environments'
+import { useAuth } from '@/contexts/AuthContext'
+import { DebugPanel } from '../../DebugPanel'
 
 /**
  * Step1EventDetails - Event information and deadlines configuration
@@ -45,11 +45,11 @@ export default function Step1EventDetails({
   setErrors,
   isAdmin,
 }: WizardStepProps) {
-  const { eventDetails } = wizardState;
-  const { userProfile } = useAuth();
+  const { eventDetails } = wizardState
+  const { userProfile } = useAuth()
 
   // Track if venue was selected from autocomplete (for locking location)
-  const [isVenueSelected, setIsVenueSelected] = useState(false);
+  const [isVenueSelected, setIsVenueSelected] = useState(false)
 
   const handleChange = (field: keyof typeof eventDetails, value: string) => {
     updateWizardState({
@@ -57,20 +57,20 @@ export default function Step1EventDetails({
         ...eventDetails,
         [field]: value,
       },
-    });
+    })
 
     // Clear error when user starts typing
     if (errors[field]) {
-      const newErrors = { ...errors };
-      delete newErrors[field];
-      setErrors(newErrors);
+      const newErrors = { ...errors }
+      delete newErrors[field]
+      setErrors(newErrors)
     }
-  };
+  }
 
   // Handle venue selection from autocomplete
   const handleVenueSelect = (locationData: LocationData, venueName: string) => {
     // Auto-fill location with city
-    const cityDisplay = googlePlacesService.getCityDisplay(locationData);
+    const cityDisplay = googlePlacesService.getCityDisplay(locationData)
     if (cityDisplay) {
       // Update both venue and location atomically to avoid race condition
       updateWizardState({
@@ -79,18 +79,18 @@ export default function Step1EventDetails({
           venue: venueName,
           location: cityDisplay,
         },
-      });
+      })
 
       // Mark venue as selected (locks location)
-      setIsVenueSelected(true);
+      setIsVenueSelected(true)
 
       // Clear errors if they were set
-      const newErrors = { ...errors };
-      delete newErrors.venue;
-      delete newErrors.location;
-      setErrors(newErrors);
+      const newErrors = { ...errors }
+      delete newErrors.venue
+      delete newErrors.location
+      setErrors(newErrors)
     }
-  };
+  }
 
   // Handle clearing venue (also clears location)
   const handleClearVenue = () => {
@@ -100,36 +100,37 @@ export default function Step1EventDetails({
         venue: '',
         location: '',
       },
-    });
+    })
 
     // Unlock location
-    setIsVenueSelected(false);
+    setIsVenueSelected(false)
 
     // Clear errors
-    const newErrors = { ...errors };
-    delete newErrors.venue;
-    delete newErrors.location;
-    setErrors(newErrors);
-  };
+    const newErrors = { ...errors }
+    delete newErrors.venue
+    delete newErrors.location
+    setErrors(newErrors)
+  }
 
   // DEV ONLY: Prefill form with test data
   const handlePrefill = () => {
     // Calculate dates relative to today
-    const today = new Date();
-    const eventDate = new Date(today);
-    eventDate.setDate(today.getDate() + 30); // Event in 30 days
+    const today = new Date()
+    const eventDate = new Date(today)
+    eventDate.setDate(today.getDate() + 30) // Event in 30 days
 
-    const eventEndDate = new Date(eventDate);
-    eventEndDate.setDate(eventDate.getDate() + 2); // 3-day event
+    const eventEndDate = new Date(eventDate)
+    eventEndDate.setDate(eventDate.getDate() + 2) // 3-day event
 
-    const applicationDeadline = new Date(eventDate);
-    applicationDeadline.setDate(eventDate.getDate() - 14); // 2 weeks before event
+    const applicationDeadline = new Date(eventDate)
+    applicationDeadline.setDate(eventDate.getDate() - 14) // 2 weeks before event
 
     updateWizardState({
       eventDetails: {
         ...eventDetails,
         title: `Test Event #${generateRandomCode()}`,
-        description: 'Join us for a three-day celebration of local artists, makers, and food vendors in beautiful Prospect Park. This family-friendly event features live music, food trucks, artisan booths, and interactive workshops.',
+        description:
+          'Join us for a three-day celebration of local artists, makers, and food vendors in beautiful Prospect Park. This family-friendly event features live music, food trucks, artisan booths, and interactive workshops.',
         venue: 'Prospect Park Bandshell',
         location: 'Brooklyn, NY',
         event_date: eventDate.toISOString().split('T')[0],
@@ -140,17 +141,17 @@ export default function Step1EventDetails({
         ticket_link: 'https://www.example.com/tickets/brooklyn-market',
         application_deadline: applicationDeadline.toISOString().split('T')[0],
       },
-    });
+    })
 
     // Mark venue as selected (since we're setting it programmatically)
-    setIsVenueSelected(true);
+    setIsVenueSelected(true)
 
     // Clear any errors
-    setErrors({});
-  };
+    setErrors({})
+  }
 
   // Generate random event code for unique titles
-  const generateRandomCode = () => Math.floor(100000 + Math.random() * 900000);
+  const generateRandomCode = () => Math.floor(100000 + Math.random() * 900000)
 
   return (
     <div className="space-y-4">
@@ -278,7 +279,10 @@ export default function Step1EventDetails({
         {/* Event Date */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label htmlFor="event_date" className="block text-xs text-foreground/80 font-medium mb-1.5">
+            <label
+              htmlFor="event_date"
+              className="block text-xs text-foreground/80 font-medium mb-1.5"
+            >
               Event Date *
             </label>
             <p className="text-foreground/50 text-xs mb-1.5">Start date for multi-day events</p>
@@ -291,13 +295,14 @@ export default function Step1EventDetails({
                 errors.event_date ? 'border-red-500' : 'border-border'
               } text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
             />
-            {errors.event_date && (
-              <p className="mt-1 text-xs text-red-500">{errors.event_date}</p>
-            )}
+            {errors.event_date && <p className="mt-1 text-xs text-red-500">{errors.event_date}</p>}
           </div>
 
           <div>
-            <label htmlFor="event_end_date" className="block text-xs text-foreground/80 font-medium mb-1.5">
+            <label
+              htmlFor="event_end_date"
+              className="block text-xs text-foreground/80 font-medium mb-1.5"
+            >
               Event End Date
             </label>
             <p className="text-foreground/50 text-xs mb-1.5">Optional for multi-day events</p>
@@ -319,7 +324,10 @@ export default function Step1EventDetails({
         {/* Event Times */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label htmlFor="start_time" className="block text-xs text-foreground/80 font-medium mb-1.5">
+            <label
+              htmlFor="start_time"
+              className="block text-xs text-foreground/80 font-medium mb-1.5"
+            >
               Start Time
             </label>
             <input
@@ -331,13 +339,14 @@ export default function Step1EventDetails({
                 errors.start_time ? 'border-red-500' : 'border-border'
               } text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
             />
-            {errors.start_time && (
-              <p className="mt-1 text-xs text-red-500">{errors.start_time}</p>
-            )}
+            {errors.start_time && <p className="mt-1 text-xs text-red-500">{errors.start_time}</p>}
           </div>
 
           <div>
-            <label htmlFor="end_time" className="block text-xs text-foreground/80 font-medium mb-1.5">
+            <label
+              htmlFor="end_time"
+              className="block text-xs text-foreground/80 font-medium mb-1.5"
+            >
               End Time
             </label>
             <input
@@ -349,15 +358,16 @@ export default function Step1EventDetails({
                 errors.end_time ? 'border-red-500' : 'border-border'
               } text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
             />
-            {errors.end_time && (
-              <p className="mt-1 text-xs text-red-500">{errors.end_time}</p>
-            )}
+            {errors.end_time && <p className="mt-1 text-xs text-red-500">{errors.end_time}</p>}
           </div>
         </div>
 
         {/* Age Restriction */}
         <div>
-          <label htmlFor="age_restriction" className="block text-xs text-foreground/80 font-medium mb-1.5">
+          <label
+            htmlFor="age_restriction"
+            className="block text-xs text-foreground/80 font-medium mb-1.5"
+          >
             Age Restriction
           </label>
           <p className="text-foreground/50 text-xs mb-1.5">
@@ -380,7 +390,10 @@ export default function Step1EventDetails({
 
         {/* Ticket Link */}
         <div>
-          <label htmlFor="ticket_link" className="block text-xs text-foreground/80 font-medium mb-1.5">
+          <label
+            htmlFor="ticket_link"
+            className="block text-xs text-foreground/80 font-medium mb-1.5"
+          >
             Ticket Link
           </label>
           <p className="text-foreground/50 text-xs mb-1.5">
@@ -396,14 +409,15 @@ export default function Step1EventDetails({
               errors.ticket_link ? 'border-red-500' : 'border-border'
             } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
           />
-          {errors.ticket_link && (
-            <p className="mt-1 text-xs text-red-500">{errors.ticket_link}</p>
-          )}
+          {errors.ticket_link && <p className="mt-1 text-xs text-red-500">{errors.ticket_link}</p>}
         </div>
 
         {/* Application Deadline */}
         <div>
-          <label htmlFor="application_deadline" className="block text-xs text-foreground/80 font-medium mb-1.5">
+          <label
+            htmlFor="application_deadline"
+            className="block text-xs text-foreground/80 font-medium mb-1.5"
+          >
             Application Deadline *
           </label>
           <p className="text-foreground/50 text-xs mb-1.5">
@@ -425,7 +439,10 @@ export default function Step1EventDetails({
 
         {/* Event Details (Description) - Moved to bottom and made optional */}
         <div>
-          <label htmlFor="description" className="block text-xs text-foreground/80 font-medium mb-1.5">
+          <label
+            htmlFor="description"
+            className="block text-xs text-foreground/80 font-medium mb-1.5"
+          >
             Event Details
           </label>
           <p className="text-foreground/50 text-xs mb-1.5">
@@ -441,9 +458,7 @@ export default function Step1EventDetails({
               errors.description ? 'border-red-500' : 'border-border'
             } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all resize-none`}
           />
-          {errors.description && (
-            <p className="mt-1 text-xs text-red-500">{errors.description}</p>
-          )}
+          {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
         </div>
       </div>
 
@@ -458,5 +473,5 @@ export default function Step1EventDetails({
         isAdmin={isAdmin}
       />
     </div>
-  );
+  )
 }

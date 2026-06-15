@@ -9,7 +9,7 @@
  *   logger.info('Email sent', { count: 5 })              // Dev only
  */
 
-const isDev = import.meta.env.DEV;
+const isDev = import.meta.env.DEV
 
 export const logger = {
   /**
@@ -18,9 +18,9 @@ export const logger = {
    */
   error: (message: string, data?: Record<string, any>) => {
     if (data) {
-      console.error(`[ERROR] ${message}`, data);
+      console.error(`[ERROR] ${message}`, data)
     } else {
-      console.error(`[ERROR] ${message}`);
+      console.error(`[ERROR] ${message}`)
     }
   },
 
@@ -31,9 +31,9 @@ export const logger = {
   info: (message: string, data?: Record<string, any>) => {
     if (isDev) {
       if (data) {
-        console.log(`[INFO] ${message}`, data);
+        console.log(`[INFO] ${message}`, data)
       } else {
-        console.log(`[INFO] ${message}`);
+        console.log(`[INFO] ${message}`)
       }
     }
   },
@@ -45,10 +45,10 @@ export const logger = {
   debug: (message: string, data?: Record<string, any>) => {
     if (isDev) {
       if (data) {
-        console.log(`[DEBUG] ${message}`, data);
+        console.log(`[DEBUG] ${message}`, data)
       } else {
-        console.log(`[DEBUG] ${message}`);
+        console.log(`[DEBUG] ${message}`)
       }
     }
-  }
-};
+  },
+}

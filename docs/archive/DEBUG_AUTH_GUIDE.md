@@ -9,6 +9,7 @@ I've added comprehensive debug logging throughout the authentication flow to hel
 ### 1. Make sure you're on the feature branch
 
 **Frontend:**
+
 ```bash
 cd /Users/courtneygreer/Development/voxxy-presents-client
 git checkout feature/performance-and-crm-updates
@@ -16,6 +17,7 @@ git pull
 ```
 
 **Backend:**
+
 ```bash
 cd /Users/courtneygreer/Development/voxxy-rails-react
 git checkout feature/performance-and-crm-updates
@@ -25,12 +27,14 @@ git pull
 ### 2. Start the servers
 
 **Backend (Terminal 1):**
+
 ```bash
 cd /Users/courtneygreer/Development/voxxy-rails-react
 rails server
 ```
 
 **Frontend (Terminal 2):**
+
 ```bash
 cd /Users/courtneygreer/Development/voxxy-presents-client
 npm run dev
@@ -53,6 +57,7 @@ npm run dev
 You should see detailed logs like this:
 
 **Frontend Console (Browser DevTools):**
+
 ```
 🔐 [AUTH DEBUG] Token saved to localStorage: {key: "railsAuthToken", tokenLength: 156, tokenPreview: "eyJhbGciOiJIUzI1NiJ9..."}
 🔍 [AUTH DEBUG] Token retrieved from localStorage: {hasToken: true, tokenLength: 156, ...}
@@ -62,6 +67,7 @@ You should see detailed logs like this:
 ```
 
 **Backend Logs (Rails Terminal):**
+
 ```
 🔐 [AUTH DEBUG] Login attempt - email: test-producer@voxxypresents.com
 ✅ [AUTH DEBUG] Authentication successful for user: test-producer@voxxypresents.com (id: 123)
@@ -108,32 +114,40 @@ The debug logs will tell us:
 ## Common Issues to Look For
 
 ### Issue 1: Token not saved to localStorage
+
 **Symptom:** Login succeeds but subsequent requests fail immediately
 **Debug logs will show:**
+
 - ✅ Backend: Token generated
 - ❌ Frontend: No "Token saved" message
 
 **Likely cause:** Login response doesn't include token field
 
 ### Issue 2: Token saved but not retrieved
+
 **Symptom:** Login works once, but after refresh it fails
 **Debug logs will show:**
+
 - ✅ Token saved
 - ⚠️ Token retrieved shows `hasToken: false`
 
 **Likely cause:** localStorage being cleared or different storage key
 
 ### Issue 3: Token retrieved but not sent
+
 **Symptom:** Token exists but requests fail with 401
 **Debug logs will show:**
+
 - ✅ Token retrieved: `hasToken: true`
 - ⚠️ Making API request: `isPublicAuthEndpoint: true` (should be false for /me)
 
 **Likely cause:** Endpoint detection logic incorrectly marking /me as public
 
 ### Issue 4: Token sent but backend doesn't receive it
+
 **Symptom:** Frontend adds header but backend doesn't see it
 **Debug logs will show:**
+
 - ✅ Frontend: Authorization header added
 - ❌ Backend: No Authorization header present
 

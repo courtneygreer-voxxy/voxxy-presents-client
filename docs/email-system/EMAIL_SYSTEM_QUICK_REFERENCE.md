@@ -3,24 +3,29 @@
 ## File Locations (All in src/)
 
 ### Core Components
+
 - `components/producer/Email/EmailAutomationTab.tsx` - Main email management UI
 - `components/producer/Email/EmailEditorPage.tsx` - Full-screen email editor
 - `components/producer/Email/EmailTable.tsx` & `EmailRow.tsx` - Email list display
 - `components/shared/EventEmailPreviewModal.tsx` - Email preview modal
 
 ### Supporting Components
+
 - `components/producer/Email/SaveAsTemplateDialog.tsx` - Save as template
 - `components/producer/Email/RecipientsModal.tsx` - View email recipients
 - `components/producer/Email/DeliveryStatusBadge.tsx` - Status badge display
 
 ### Utilities
+
 - `utils/emailVariables.ts` - Variables, validation, conversion (80+ functions)
 - `types/email.ts` - All TypeScript interfaces
 
 ### API Service
+
 - `services/api.ts` - Email API endpoints (25+ methods)
 
 ### Pages
+
 - `pages/EmailTemplatesPage.tsx` - Template library
 - `pages/EmailTestingPage.tsx` - Admin testing
 
@@ -29,6 +34,7 @@
 ## Critical Functions
 
 ### Email Content Conversion
+
 ```typescript
 // Load from backend for editing
 backendToFrontend(html: string) → plain text with [variables]
@@ -38,6 +44,7 @@ frontendToBackend(text: string) → HTML with [variables]
 ```
 
 ### Variable Validation
+
 ```typescript
 validateEmailContent(subject: string, body: string)
   → { unknownVariables, unclosedBrackets, errors }
@@ -47,6 +54,7 @@ insertVariableAtCursor(element: HTMLTextAreaElement, variable: string)
 ```
 
 ### Timezone Handling
+
 ```typescript
 getEightAmLocalAsUTC() → UTC time for 8 AM in user timezone
 getTimezoneInfo() → { timezone, eightAmLocal }
@@ -57,6 +65,7 @@ getTimezoneInfo() → { timezone, eightAmLocal }
 ## API Endpoints Quick Lookup
 
 ### Scheduled Emails
+
 ```
 GET  /events/{slug}/scheduled_emails           → All emails for event
 GET  /events/{slug}/scheduled_emails/{id}      → Single email
@@ -73,6 +82,7 @@ DELETE /events/{slug}/scheduled_emails/{id}    → Delete email
 ```
 
 ### Email Templates
+
 ```
 GET  /email_campaign_templates              → All templates
 GET  /email_campaign_templates/{id}         → Template details
@@ -83,6 +93,7 @@ DELETE /email_campaign_templates/{id}       → Delete template
 ```
 
 ### Email Deliveries
+
 ```
 GET  /scheduled_emails/{id}/email_deliveries        → All deliveries
 GET  /events/{slug}/email_deliveries/stats          → Event stats
@@ -97,23 +108,28 @@ GET  /events/{slug}/invitations/{id}/email_history  → Invitation history
 ## Variable Types (30+)
 
 ### Event Variables
-[eventName] [eventDate] [eventTime] [eventLocation] [eventVenue] 
+
+[eventName] [eventDate] [eventTime] [eventLocation] [eventVenue]
 [eventDescription] [applicationDeadline] [paymentDueDate] [boothPrice] [ageRestriction]
 
 ### Organization Variables
+
 [organizationName] [organizationEmail]
 
 ### Vendor Variables
+
 [greetingName] [firstName] [lastName] [fullName] [businessName] [email]
 [vendorCategory] [categoryList] [boothNumber] [applicationDate]
 [installDate] [installTime] [installStartTime] [installEndTime]
 
 ### Link Variables
+
 [paymentLink] [eventLink] [invitationLink] [bulletinLink] [dashboardLink] [unsubscribeLink]
 
 ---
 
 ## Email Statuses
+
 - `scheduled` - Waiting to send
 - `paused` - Manually paused
 - `sent` - Sent to SendGrid (may not be delivered yet)
@@ -121,6 +137,7 @@ GET  /events/{slug}/invitations/{id}/email_history  → Invitation history
 - `cancelled` - Deleted by user
 
 ## Delivery Statuses
+
 - `pending` - Not sent yet
 - `queued` - In SendGrid queue
 - `sent` - Sent by SendGrid
@@ -132,6 +149,7 @@ GET  /events/{slug}/invitations/{id}/email_history  → Invitation history
 ---
 
 ## Trigger Types (10)
+
 ```
 days_before_event              → X days before event
 days_after_event               → X days after event
@@ -150,6 +168,7 @@ on_payment_deadline            → On payment deadline
 ## Data Models
 
 ### ScheduledEmail (Event Instance)
+
 ```
 id, event_id, name, subject_template, body_template
 trigger_type, trigger_value, trigger_time
@@ -160,6 +179,7 @@ error_message, created_at, updated_at
 ```
 
 ### EmailDelivery (Tracking Record)
+
 ```
 id, scheduled_email_id, event_id, registration_id
 sendgrid_message_id, recipient_email
@@ -169,6 +189,7 @@ retry_count, next_retry_at, max_retries
 ```
 
 ### FilterCriteria (Recipient Targeting)
+
 ```
 status: RegistrationStatus[]        // pending, approved, confirmed, etc.
 exclude_status: RegistrationStatus[]
@@ -184,6 +205,7 @@ payment_status: PaymentStatus[]     // future
 ## Common Workflows
 
 ### Edit Email
+
 1. Click "Edit" in email table
 2. EmailEditorPage opens (full screen)
 3. Loads email: `backendToFrontend()` converts HTML → plain text
@@ -194,6 +216,7 @@ payment_status: PaymentStatus[]     // future
 8. Table reloads with updated email
 
 ### Preview Email
+
 1. Click "Preview" in email table
 2. EventEmailPreviewModal opens
 3. If registrations exist:
@@ -205,6 +228,7 @@ payment_status: PaymentStatus[]     // future
    - Message: "No vendor applications found yet"
 
 ### Send Email
+
 1. Click "Send Now" on scheduled email
 2. Confirmation dialog appears
 3. Call `scheduledEmailsApi.sendNow()`
@@ -217,22 +241,26 @@ payment_status: PaymentStatus[]     // future
 ## Key Implementation Details
 
 ### HTML/Text Conversion
+
 - Backend stores as: HTML `<p>[eventName]</p>`
 - Frontend edits as: Plain text `[eventName]`
 - Load: Strip HTML, convert {{old}} → [new] (backwards compat)
 - Save: Add HTML, keep [bracket] format (backend expects it)
 
 ### Variable Format
+
 - Current: `[bracket]` format (frontend UI, storage, backend)
 - Legacy: `{{mustache}}` format (old emails, auto-converted)
 - Backwards compatible: Old emails auto-convert on load
 
 ### Timezone Handling
+
 - All emails send at 8:00 AM in user's timezone
 - Converted to UTC for storage in `trigger_time`
 - Preview date calculated using date-fns with timezone awareness
 
 ### Invitation Email
+
 - Virtual email created by EmailAutomationTab (ID = -1)
 - Not a real backend object, reconstructed from invitationsApi
 - Special handling for preview (calls eventInvitationsApi.previewEmail)
@@ -263,16 +291,16 @@ payment_status: PaymentStatus[]     // future
 
 ## Files to Modify for Changes
 
-| Feature | File |
-|---------|------|
-| Add email variable | `utils/emailVariables.ts` + `types/email.ts` |
-| Change trigger type | `types/email.ts` TRIGGER_TYPES |
-| Modify preview modal | `components/shared/EventEmailPreviewModal.tsx` |
-| Update email editor | `components/producer/Email/EmailEditorPage.tsx` |
-| Change table display | `components/producer/Email/EmailRow.tsx` |
-| Add API endpoint | `services/api.ts` |
-| Add status type | `types/email.ts` ScheduledEmailStatus |
-| Change validation | `utils/emailVariables.ts` validateEmailContent() |
+| Feature              | File                                             |
+| -------------------- | ------------------------------------------------ |
+| Add email variable   | `utils/emailVariables.ts` + `types/email.ts`     |
+| Change trigger type  | `types/email.ts` TRIGGER_TYPES                   |
+| Modify preview modal | `components/shared/EventEmailPreviewModal.tsx`   |
+| Update email editor  | `components/producer/Email/EmailEditorPage.tsx`  |
+| Change table display | `components/producer/Email/EmailRow.tsx`         |
+| Add API endpoint     | `services/api.ts`                                |
+| Add status type      | `types/email.ts` ScheduledEmailStatus            |
+| Change validation    | `utils/emailVariables.ts` validateEmailContent() |
 
 ---
 

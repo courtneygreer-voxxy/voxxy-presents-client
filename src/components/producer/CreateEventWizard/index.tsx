@@ -1,2 +1,2 @@
-export { default as CreateEventWizard } from './CreateEventWizard';
-export * from './types';
+export { default as CreateEventWizard } from './CreateEventWizard'
+export * from './types'

@@ -12,10 +12,10 @@ function eventSlug(ev: Record<string, unknown>): string | null {
  */
 export async function enrichContactsWithEventHistory(
   contacts: VendorContact[],
-  events: Record<string, unknown>[]
+  events: Record<string, unknown>[],
 ): Promise<VendorContact[]> {
   const needsEnrichment = contacts.some(
-    c => (c.events_participated ?? 0) > 0 && !(c.event_history?.length)
+    (c) => (c.events_participated ?? 0) > 0 && !c.event_history?.length,
   )
   if (!needsEnrichment || events.length === 0 || contacts.length === 0) {
     return contacts
@@ -23,11 +23,11 @@ export async function enrichContactsWithEventHistory(
 
   const emailToHistory = new Map<string, EventHistoryItem[]>()
   const contactEmails = new Set(
-    contacts.map(c => c.email?.trim().toLowerCase()).filter(Boolean) as string[]
+    contacts.map((c) => c.email?.trim().toLowerCase()).filter(Boolean) as string[],
   )
 
   await Promise.all(
-    events.map(async ev => {
+    events.map(async (ev) => {
       const slug = eventSlug(ev)
       const eventId = Number(ev.id)
       if (!slug || !eventId) return
@@ -38,7 +38,9 @@ export async function enrichContactsWithEventHistory(
         const eventDate = String(ev.event_date || data.event?.event_date || '')
 
         for (const submission of data.submissions || []) {
-          const email = String(submission.email || '').trim().toLowerCase()
+          const email = String(submission.email || '')
+            .trim()
+            .toLowerCase()
           if (!email || !contactEmails.has(email)) continue
 
           const item: EventHistoryItem = {
@@ -48,11 +50,13 @@ export async function enrichContactsWithEventHistory(
             category: String(submission.vendor_category || submission.category || ''),
             status: String(submission.status || ''),
             applied_at: String(submission.created_at || ''),
-            application_id: Number(submission.vendor_application_id || submission.vendor_application?.id || 0),
+            application_id: Number(
+              submission.vendor_application_id || submission.vendor_application?.id || 0,
+            ),
           }
 
           const list = emailToHistory.get(email) || []
-          if (!list.some(h => h.event_id === eventId)) {
+          if (!list.some((h) => h.event_id === eventId)) {
             list.push(item)
             emailToHistory.set(email, list)
           }
@@ -60,12 +64,12 @@ export async function enrichContactsWithEventHistory(
       } catch (err) {
         console.warn(`[export] Could not load submissions for event ${slug}:`, err)
       }
-    })
+    }),
   )
 
   if (emailToHistory.size === 0) return contacts
 
-  return contacts.map(c => {
+  return contacts.map((c) => {
     const email = c.email?.trim().toLowerCase()
     const built = email ? emailToHistory.get(email) : undefined
     if (!built?.length) return c
@@ -76,7 +80,7 @@ export async function enrichContactsWithEventHistory(
 export function getShowLocationsForContact(
   contact: VendorContact,
   eventLocationMap: Map<number, string>,
-  events: Record<string, unknown>[]
+  events: Record<string, unknown>[],
 ): string {
   const locs = new Set<string>()
 
@@ -87,7 +91,7 @@ export function getShowLocationsForContact(
       locs.add(fromMap)
       continue
     }
-    const ev = events.find(e => Number(e.id) === id)
+    const ev = events.find((e) => Number(e.id) === id)
     if (ev) {
       const loc = resolveEventLocation(ev)
       if (loc) locs.add(loc)

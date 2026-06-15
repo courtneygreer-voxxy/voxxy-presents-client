@@ -1,21 +1,21 @@
-import { VendorContact } from '@/services/api';
-import ContactRow from './ContactRow';
-import Pagination from './Pagination';
+import { VendorContact } from '@/services/api'
+import ContactRow from './ContactRow'
+import Pagination from './Pagination'
 
 interface ContactsTableProps {
-  contacts: VendorContact[];
-  selectedContacts: number[];
-  onSelectContact: (contactId: number) => void;
-  onSelectAll: () => void;
-  onDeleteContact: (contactId: number) => void;
-  onEditContact: (contact: VendorContact) => void;
+  contacts: VendorContact[]
+  selectedContacts: number[]
+  onSelectContact: (contactId: number) => void
+  onSelectAll: () => void
+  onDeleteContact: (contactId: number) => void
+  onEditContact: (contact: VendorContact) => void
   paginationMeta: {
-    current_page: number;
-    per_page: number;
-    total_count: number;
-    total_pages: number;
-  };
-  onPageChange: (page: number) => void;
+    current_page: number
+    per_page: number
+    total_count: number
+    total_pages: number
+  }
+  onPageChange: (page: number) => void
 }
 
 export default function ContactsTable({
@@ -28,7 +28,7 @@ export default function ContactsTable({
   paginationMeta,
   onPageChange,
 }: ContactsTableProps) {
-  const allSelected = contacts.length > 0 && selectedContacts.length === contacts.length;
+  const allSelected = contacts.length > 0 && selectedContacts.length === contacts.length
 
   return (
     <div className="voxxy-table-shell">
@@ -85,5 +85,5 @@ export default function ContactsTable({
         onPageChange={onPageChange}
       />
     </div>
-  );
+  )
 }

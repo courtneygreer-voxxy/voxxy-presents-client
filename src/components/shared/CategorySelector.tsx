@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Plus, X } from 'lucide-react';
-import { Category, CreateCategoryData } from '@/types/category';
-import { CategoryBadge } from './CategoryBadge';
+import { useState, useEffect } from 'react'
+import { Plus, X } from 'lucide-react'
+import { Category, CreateCategoryData } from '@/types/category'
+import { CategoryBadge } from './CategoryBadge'
 
 interface CategorySelectorProps {
-  organizationId: number;
-  selectedIds: number[];
-  onChange: (ids: number[]) => void;
-  mode?: 'single' | 'multi';
-  allowCreate?: boolean;
-  placeholder?: string;
-  categories: Category[];
-  onCreateCategory?: (data: CreateCategoryData) => Promise<Category>;
-  disabled?: boolean;
+  organizationId: number
+  selectedIds: number[]
+  onChange: (ids: number[]) => void
+  mode?: 'single' | 'multi'
+  allowCreate?: boolean
+  placeholder?: string
+  categories: Category[]
+  onCreateCategory?: (data: CreateCategoryData) => Promise<Category>
+  disabled?: boolean
 }
 
 export function CategorySelector({
@@ -26,74 +26,72 @@ export function CategorySelector({
   onCreateCategory,
   disabled = false,
 }: CategorySelectorProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isCreating, setIsCreating] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [createError, setCreateError] = useState('');
+  const [isOpen, setIsOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isCreating, setIsCreating] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [createError, setCreateError] = useState('')
 
   // Filter categories based on search
   const filteredCategories = categories.filter((cat) =>
-    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    cat.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  )
 
   // Get selected categories
-  const selectedCategories = categories.filter((cat) =>
-    selectedIds.includes(cat.id)
-  );
+  const selectedCategories = categories.filter((cat) => selectedIds.includes(cat.id))
 
   // Handle category selection
   const handleSelect = (categoryId: number) => {
     if (mode === 'single') {
-      onChange([categoryId]);
-      setIsOpen(false);
+      onChange([categoryId])
+      setIsOpen(false)
     } else {
       if (selectedIds.includes(categoryId)) {
-        onChange(selectedIds.filter((id) => id !== categoryId));
+        onChange(selectedIds.filter((id) => id !== categoryId))
       } else {
-        onChange([...selectedIds, categoryId]);
+        onChange([...selectedIds, categoryId])
       }
     }
-    setSearchQuery('');
-  };
+    setSearchQuery('')
+  }
 
   // Handle category removal
   const handleRemove = (categoryId: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    onChange(selectedIds.filter((id) => id !== categoryId));
-  };
+    e.stopPropagation()
+    onChange(selectedIds.filter((id) => id !== categoryId))
+  }
 
   // Handle create new category
   const handleCreate = async () => {
-    if (!newCategoryName.trim() || !onCreateCategory) return;
+    if (!newCategoryName.trim() || !onCreateCategory) return
 
-    setCreateError('');
-    setIsCreating(true);
+    setCreateError('')
+    setIsCreating(true)
 
     try {
       const newCategory = await onCreateCategory({
         name: newCategoryName.trim(),
-      });
+      })
 
       // Add to selection
-      onChange([...selectedIds, newCategory.id]);
-      setNewCategoryName('');
-      setSearchQuery('');
+      onChange([...selectedIds, newCategory.id])
+      setNewCategoryName('')
+      setSearchQuery('')
     } catch (error: any) {
-      setCreateError(error.message || 'Failed to create category');
+      setCreateError(error.message || 'Failed to create category')
     } finally {
-      setIsCreating(false);
+      setIsCreating(false)
     }
-  };
+  }
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = () => setIsOpen(false);
+    const handleClickOutside = () => setIsOpen(false)
     if (isOpen) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
+      document.addEventListener('click', handleClickOutside)
+      return () => document.removeEventListener('click', handleClickOutside)
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   return (
     <div className="relative" onClick={(e) => e.stopPropagation()}>
@@ -109,12 +107,7 @@ export function CategorySelector({
         {selectedCategories.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {selectedCategories.map((category) => (
-              <CategoryBadge
-                key={category.id}
-                category={category}
-                size="sm"
-                className="group"
-              >
+              <CategoryBadge key={category.id} category={category} size="sm" className="group">
                 <button
                   onClick={(e) => handleRemove(category.id, e)}
                   className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -150,7 +143,7 @@ export function CategorySelector({
             {filteredCategories.length > 0 ? (
               <div className="p-2">
                 {filteredCategories.map((category) => {
-                  const isSelected = selectedIds.includes(category.id);
+                  const isSelected = selectedIds.includes(category.id)
                   return (
                     <button
                       key={category.id}
@@ -172,13 +165,11 @@ export function CategorySelector({
                         <span className="text-violet-700 dark:text-primary text-xs">✓</span>
                       )}
                     </button>
-                  );
+                  )
                 })}
               </div>
             ) : (
-              <div className="p-6 text-center text-sm text-foreground/40">
-                No categories found
-              </div>
+              <div className="p-6 text-center text-sm text-foreground/40">No categories found</div>
             )}
           </div>
 
@@ -194,8 +185,8 @@ export function CategorySelector({
                   className="flex-1 px-3 py-2 voxxy-input-well rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleCreate();
+                      e.preventDefault()
+                      handleCreate()
                     }
                   }}
                 />
@@ -208,9 +199,7 @@ export function CategorySelector({
                   Create
                 </button>
               </div>
-              {createError && (
-                <p className="text-xs text-red-400 mt-2">{createError}</p>
-              )}
+              {createError && <p className="text-xs text-red-400 mt-2">{createError}</p>}
             </div>
           )}
 
@@ -223,5 +212,5 @@ export function CategorySelector({
         </div>
       )}
     </div>
-  );
+  )
 }

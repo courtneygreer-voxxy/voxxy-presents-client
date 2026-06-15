@@ -7,11 +7,13 @@ Currently, the vendor application flow assumes **one application per event**. Ho
 ## Current Implementation
 
 ### Current URL Structure
+
 ```
 /events/{slug}/apply
 ```
 
 ### Current Flow
+
 1. User clicks "Apply as Vendor" button on event/invitation page
 2. Navigates to `/events/{slug}/apply`
 3. `VendorApplicationForm` fetches the event
@@ -25,8 +27,8 @@ Currently, the vendor application flow assumes **one application per event**. Ho
 ```typescript
 // Line 58 - Assumes single vendor_application
 if (!data.vendor_application) {
-  setError('This event is not accepting vendor applications.');
-  return;
+  setError('This event is not accepting vendor applications.')
+  return
 }
 ```
 
@@ -34,34 +36,34 @@ if (!data.vendor_application) {
 
 ```tsx
 // Apply button doesn't specify which application
-<a href={`/events/${event.slug}/apply`}>
-  Apply as Vendor
-</a>
+<a href={`/events/${event.slug}/apply`}>Apply as Vendor</a>
 ```
 
 ### Current Data Structure
 
 **Event with Multiple Applications (array):**
+
 ```typescript
 event: {
   vendor_applications: [
     {
       id: 1,
-      name: "Standard Booth",
-      booth_price: 100.00,
-      categories: ["Food", "Crafts"]
+      name: 'Standard Booth',
+      booth_price: 100.0,
+      categories: ['Food', 'Crafts'],
     },
     {
       id: 2,
-      name: "Premium Booth",
-      booth_price: 200.00,
-      categories: ["Food", "Crafts"]
-    }
+      name: 'Premium Booth',
+      booth_price: 200.0,
+      categories: ['Food', 'Crafts'],
+    },
   ]
 }
 ```
 
 **But form expects singular:**
+
 ```typescript
 event: {
   vendor_application: {
@@ -77,11 +79,13 @@ event: {
 ### 1. Update URL Structure
 
 **New URL:**
+
 ```
 /events/{slug}/apply/{application_id}
 ```
 
 OR (alternative):
+
 ```
 /applications/{application_id}/apply
 ```
@@ -91,11 +95,13 @@ OR (alternative):
 **File:** `src/App.tsx`
 
 **Current:**
+
 ```tsx
 <Route path="/events/:slug/apply" element={<VendorApplicationForm />} />
 ```
 
 **New:**
+
 ```tsx
 <Route path="/events/:slug/apply/:applicationId" element={<VendorApplicationForm />} />
 ```
@@ -103,21 +109,20 @@ OR (alternative):
 ### 3. Update Apply Button Links
 
 **Files to Update:**
+
 - `src/pages/InvitationViewPage.tsx` (line ~200)
 - `src/pages/PublicEventDetailPage.tsx` (line ~217)
 
 **Current:**
+
 ```tsx
-<a
-  href={`/events/${invitation.event!.slug}/apply`}
-  target="_blank"
-  rel="noopener noreferrer"
->
+<a href={`/events/${invitation.event!.slug}/apply`} target="_blank" rel="noopener noreferrer">
   Apply as Vendor
 </a>
 ```
 
 **New:**
+
 ```tsx
 <a
   href={`/events/${invitation.event!.slug}/apply/${application.id}`}
@@ -135,54 +140,56 @@ OR (alternative):
 **Changes Needed:**
 
 #### A. Update URL params
+
 ```typescript
 // Current
-const { slug } = useParams<{ slug: string }>();
+const { slug } = useParams<{ slug: string }>()
 
 // New
-const { slug, applicationId } = useParams<{ slug: string; applicationId: string }>();
+const { slug, applicationId } = useParams<{ slug: string; applicationId: string }>()
 ```
 
 #### B. Update fetch logic
+
 ```typescript
 // Current - fetches event and expects single vendor_application
 const fetchEvent = async (eventSlug: string) => {
-  const data = await eventsApi.getById(eventSlug);
+  const data = await eventsApi.getById(eventSlug)
 
   if (!data.vendor_application) {
-    setError('This event is not accepting vendor applications.');
-    return;
+    setError('This event is not accepting vendor applications.')
+    return
   }
 
-  setEvent(data);
-};
+  setEvent(data)
+}
 
 // New - fetches event and finds specific application
 const fetchEvent = async (eventSlug: string, appId: string) => {
-  const data = await eventsApi.getById(eventSlug);
+  const data = await eventsApi.getById(eventSlug)
 
   // Find the specific application by ID
-  const application = data.vendor_applications?.find(
-    app => app.id === parseInt(appId)
-  );
+  const application = data.vendor_applications?.find((app) => app.id === parseInt(appId))
 
   if (!application) {
-    setError('This vendor application is not available.');
-    return;
+    setError('This vendor application is not available.')
+    return
   }
 
   // Store both event and specific application
-  setEvent(data);
-  setApplication(application);
-};
+  setEvent(data)
+  setApplication(application)
+}
 ```
 
 #### C. Add application state
+
 ```typescript
-const [application, setApplication] = useState<VendorApplication | null>(null);
+const [application, setApplication] = useState<VendorApplication | null>(null)
 ```
 
 #### D. Update form to use specific application
+
 ```typescript
 // Use application state instead of event.vendor_application
 <h2 className="text-2xl font-bold text-white mb-4">
@@ -197,6 +204,7 @@ const [application, setApplication] = useState<VendorApplication | null>(null);
 ```
 
 #### E. Update submit to use application ID
+
 ```typescript
 const response = await registrationsApi.submitVendorApplication(event.slug, {
   name: formData.name,
@@ -206,7 +214,7 @@ const response = await registrationsApi.submitVendorApplication(event.slug, {
   vendor_category: formData.vendor_category,
   vendor_application_id: parseInt(applicationId!), // Use from URL param
   subscribed: formData.subscribed,
-});
+})
 ```
 
 ### 5. Update TypeScript Interfaces
@@ -216,18 +224,18 @@ const response = await registrationsApi.submitVendorApplication(event.slug, {
 ```typescript
 // Add specific VendorApplication type
 interface VendorApplication {
-  id: number;
-  name: string;
-  description?: string;
-  categories: string[];
-  booth_price?: number;
-  submissions_count?: number;
+  id: number
+  name: string
+  description?: string
+  categories: string[]
+  booth_price?: number
+  submissions_count?: number
 }
 
 // Update Event interface to use array
 interface Event {
   // ... other fields
-  vendor_applications?: VendorApplication[]; // Changed from singular to plural
+  vendor_applications?: VendorApplication[] // Changed from singular to plural
 }
 ```
 
@@ -242,7 +250,7 @@ After implementing the fix, test the following scenarios:
 - [ ] Invalid application ID in URL shows proper error message
 - [ ] Invitation page with multiple applications - all buttons work
 - [ ] Public event page with multiple applications - all buttons work
-- [ ] Application form opened in new tab (target="_blank") works correctly
+- [ ] Application form opened in new tab (target="\_blank") works correctly
 
 ## Files to Modify
 
@@ -265,14 +273,14 @@ Ensure the backend API returns `vendor_applications` as an **array** for events 
       {
         "id": 1,
         "name": "Standard Booth",
-        "booth_price": 100.00,
+        "booth_price": 100.0,
         "categories": ["Food", "Crafts"],
         "description": "10x10 booth space"
       },
       {
         "id": 2,
         "name": "Premium Booth",
-        "booth_price": 200.00,
+        "booth_price": 200.0,
         "categories": ["Food", "Crafts"],
         "description": "20x20 booth space with electricity"
       }

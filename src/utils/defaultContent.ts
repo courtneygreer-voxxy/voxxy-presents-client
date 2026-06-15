@@ -6,12 +6,7 @@ Join us for our upcoming events and become part of our growing community!`
 }
 
 export const getDefaultOfferings = (): string[] => {
-  return [
-    'Community building',
-    'Regular meetups',
-    'Fun activities',
-    'Networking opportunities'
-  ]
+  return ['Community building', 'Regular meetups', 'Fun activities', 'Networking opportunities']
 }
 
 // Check if content is "empty" (just default or whitespace)
@@ -30,8 +25,8 @@ export const getDisplayAboutStory = (customStory: string | undefined, clubName: 
 }
 
 export const getDisplayOfferings = (customOfferings: string[] | undefined): string[] => {
-  if (customOfferings && customOfferings.some(offering => offering.trim())) {
-    return customOfferings.filter(offering => offering.trim())
+  if (customOfferings && customOfferings.some((offering) => offering.trim())) {
+    return customOfferings.filter((offering) => offering.trim())
   }
   return getDefaultOfferings()
 }

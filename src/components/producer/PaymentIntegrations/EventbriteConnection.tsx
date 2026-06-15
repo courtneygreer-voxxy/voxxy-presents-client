@@ -1,99 +1,103 @@
-import { useState, useEffect } from 'react';
-import { Link2, Unlink, Check, AlertCircle, RefreshCw } from 'lucide-react';
-import { organizationIntegrationsApi } from '@/services/paymentApi';
-import type { EventbriteStatusResponse } from '@/types/payment';
+import { useState, useEffect } from 'react'
+import { Link2, Unlink, Check, AlertCircle, RefreshCw } from 'lucide-react'
+import { organizationIntegrationsApi } from '@/services/paymentApi'
+import type { EventbriteStatusResponse } from '@/types/payment'
 
 interface EventbriteConnectionProps {
-  organizationId: number;
-  onConnectionChange?: (connected: boolean) => void;
+  organizationId: number
+  onConnectionChange?: (connected: boolean) => void
 }
 
 export default function EventbriteConnection({
   organizationId,
   onConnectionChange,
 }: EventbriteConnectionProps) {
-  const [isConnected, setIsConnected] = useState(false);
-  const [connectedAt, setConnectedAt] = useState<string | null>(null);
-  const [apiToken, setApiToken] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [isConnected, setIsConnected] = useState(false)
+  const [connectedAt, setConnectedAt] = useState<string | null>(null)
+  const [apiToken, setApiToken] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [isFetching, setIsFetching] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchStatus();
-  }, [organizationId]);
+    fetchStatus()
+  }, [organizationId])
 
   const fetchStatus = async () => {
     try {
-      setIsFetching(true);
-      setError(null);
-      const status = await organizationIntegrationsApi.getEventbriteStatus(organizationId);
-      setIsConnected(status.connected);
-      setConnectedAt(status.connected_at || null);
+      setIsFetching(true)
+      setError(null)
+      const status = await organizationIntegrationsApi.getEventbriteStatus(organizationId)
+      setIsConnected(status.connected)
+      setConnectedAt(status.connected_at || null)
     } catch (err: any) {
-      console.error('Failed to fetch Eventbrite status:', err);
-      const errorMessage = err.data?.error || err.message || 'Failed to check connection status';
-      console.error('Backend error details:', err.data);
-      setError(`Failed to check status: ${errorMessage}`);
+      console.error('Failed to fetch Eventbrite status:', err)
+      const errorMessage = err.data?.error || err.message || 'Failed to check connection status'
+      console.error('Backend error details:', err.data)
+      setError(`Failed to check status: ${errorMessage}`)
     } finally {
-      setIsFetching(false);
+      setIsFetching(false)
     }
-  };
+  }
 
   const handleConnect = async () => {
     if (!apiToken.trim()) {
-      setError('Please enter an API token');
-      return;
+      setError('Please enter an API token')
+      return
     }
 
     try {
-      setIsLoading(true);
-      setError(null);
-      setSuccess(null);
+      setIsLoading(true)
+      setError(null)
+      setSuccess(null)
 
       const response = await organizationIntegrationsApi.connectEventbrite(organizationId, {
         api_token: apiToken.trim(),
-      });
+      })
 
-      setIsConnected(true);
-      setConnectedAt(response.connected_at || new Date().toISOString());
-      setSuccess('Eventbrite connected successfully!');
-      setApiToken('');
-      onConnectionChange?.(true);
+      setIsConnected(true)
+      setConnectedAt(response.connected_at || new Date().toISOString())
+      setSuccess('Eventbrite connected successfully!')
+      setApiToken('')
+      onConnectionChange?.(true)
     } catch (err: any) {
-      console.error('Failed to connect Eventbrite:', err);
-      const errorMessage = err.data?.error || err.message || 'Failed to connect to Eventbrite';
-      console.error('Backend error details:', err.data);
-      setError(`Connection failed: ${errorMessage}`);
+      console.error('Failed to connect Eventbrite:', err)
+      const errorMessage = err.data?.error || err.message || 'Failed to connect to Eventbrite'
+      console.error('Backend error details:', err.data)
+      setError(`Connection failed: ${errorMessage}`)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleDisconnect = async () => {
-    if (!confirm('Are you sure you want to disconnect Eventbrite? This will disable payment syncing for all events.')) {
-      return;
+    if (
+      !confirm(
+        'Are you sure you want to disconnect Eventbrite? This will disable payment syncing for all events.',
+      )
+    ) {
+      return
     }
 
     try {
-      setIsLoading(true);
-      setError(null);
-      setSuccess(null);
+      setIsLoading(true)
+      setError(null)
+      setSuccess(null)
 
-      await organizationIntegrationsApi.disconnectEventbrite(organizationId);
+      await organizationIntegrationsApi.disconnectEventbrite(organizationId)
 
-      setIsConnected(false);
-      setConnectedAt(null);
-      setSuccess('Eventbrite disconnected successfully');
-      onConnectionChange?.(false);
+      setIsConnected(false)
+      setConnectedAt(null)
+      setSuccess('Eventbrite disconnected successfully')
+      onConnectionChange?.(false)
     } catch (err: any) {
-      console.error('Failed to disconnect Eventbrite:', err);
-      setError(err.message || 'Failed to disconnect Eventbrite');
+      console.error('Failed to disconnect Eventbrite:', err)
+      setError(err.message || 'Failed to disconnect Eventbrite')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="bg-background/5 backdrop-blur-sm rounded-2xl border border-border p-6 space-y-4">
@@ -142,7 +146,10 @@ export default function EventbriteConnection({
       {!isConnected ? (
         <div className="space-y-4">
           <div>
-            <label htmlFor="eventbrite-token" className="block text-sm font-medium text-foreground dark:text-foreground/70 mb-2">
+            <label
+              htmlFor="eventbrite-token"
+              className="block text-sm font-medium text-foreground dark:text-foreground/70 mb-2"
+            >
               Eventbrite Private Token
             </label>
             <input
@@ -183,7 +190,8 @@ export default function EventbriteConnection({
               <h4 className="font-medium text-green-300">Connection Active</h4>
             </div>
             <p className="text-sm text-green-200/80">
-              Your Eventbrite account is connected. You can now enable payment syncing for individual events.
+              Your Eventbrite account is connected. You can now enable payment syncing for
+              individual events.
             </p>
           </div>
 
@@ -198,5 +206,5 @@ export default function EventbriteConnection({
         </div>
       )}
     </div>
-  );
+  )
 }

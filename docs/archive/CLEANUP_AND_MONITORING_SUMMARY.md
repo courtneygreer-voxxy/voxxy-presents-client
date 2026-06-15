@@ -16,6 +16,7 @@ This document summarizes the cleanup work completed and error monitoring system 
 ### 1.1 Sensitive Files Removed
 
 **Deleted from `/files/` directory:**
+
 - ✅ `cincinnati-show - c43f6f5f-d1c9-4866-9ec7-7833c853c8ad.csv` (175 KB)
 - ✅ `minneapolis-38a8ceae-65d5-4f11-b2dc-71fe2a0bc309 (1).csv` (1.2 MB)
 - ✅ `SF- Emails 5d38481c-81ab-4a72-a6c6-5569ae8f1a7a.csv` (8.3 MB)
@@ -31,6 +32,7 @@ This document summarizes the cleanup work completed and error monitoring system 
 ### 1.2 .gitignore Updated
 
 Added protections to prevent future sensitive file commits:
+
 ```gitignore
 # Sensitive data files (customer data, scripts)
 files/*.csv
@@ -41,12 +43,14 @@ data/
 ### 1.3 Git History Cleanup
 
 **Files found in git history:**
+
 - Commit `dcd38fe`: CSV files added
 - Commit `2710902`: Demo data seeding
 
 **Recommendation:** Since this is a private repo and data has been restored, git history cleanup is **optional but recommended** for best practices.
 
 **To clean history (run after backing up):**
+
 ```bash
 # Option 1: Using git filter-repo (recommended)
 pip install git-filter-repo
@@ -69,36 +73,40 @@ git push origin --force --all
 
 ### 2.1 Social Media Link Requirement Validation
 
-**Issue:** Form displayed "Social & Portfolio * (One Link Required)" but allowed submission with NO links provided.
+**Issue:** Form displayed "Social & Portfolio \* (One Link Required)" but allowed submission with NO links provided.
 
 **Root Cause:** Validation at [VendorApplicationForm.tsx:246-250](../src/pages/VendorApplicationForm.tsx#L246-L250) only checked:
+
 - Name, email, business_name, vendor_category
 - Terms agreement
 
 **Missing:** Validation that at least one of these fields had content:
+
 - `website`
 - `instagram_handle`
 - `tiktok_handle`
 - `facebook_handle`
 
 **Fix Applied:**
+
 ```typescript
 // Validate at least one social/portfolio link is provided
 const hasAtLeastOneLink =
   (formData.website && formData.website.trim()) ||
   (formData.instagram_handle && formData.instagram_handle.trim()) ||
   (formData.tiktok_handle && formData.tiktok_handle.trim()) ||
-  (formData.facebook_handle && formData.facebook_handle.trim());
+  (formData.facebook_handle && formData.facebook_handle.trim())
 
 if (!hasAtLeastOneLink) {
-  setError('Please provide at least one link to your work (website or social media)');
-  return;
+  setError('Please provide at least one link to your work (website or social media)')
+  return
 }
 ```
 
 **Status:** ✅ Fixed in [VendorApplicationForm.tsx:252-262](../src/pages/VendorApplicationForm.tsx#L252-L262)
 
 **Testing Required:**
+
 1. Try submitting with no links → Should show error
 2. Add only website → Should succeed
 3. Add only Instagram → Should succeed
@@ -121,6 +129,7 @@ Event (e.g., "SF Art Walk 2026")
 ```
 
 **Critical Insight:**
+
 - `VendorApplication.name` **IS** the category (e.g., "Artist Booth")
 - `VendorApplication.categories[]` is **NOT USED** (unreliably populated, legacy field)
 - Each event can have 1-N applications (typically 1-8)
@@ -128,6 +137,7 @@ Event (e.g., "SF Art Walk 2026")
 - All applications share the same form fields (name, email, business, social links, note)
 
 **Why This Matters for Error Monitoring:**
+
 - Errors must be tracked per application, not just per event
 - Different applications within the same event could have different failure patterns
 - Email notifications are tied to specific applications
@@ -148,6 +158,7 @@ User fills form → Validation → Submit with retry (3 attempts) → Backend AP
 ```
 
 **Current Error Handling:**
+
 - ✅ Retry logic with exponential backoff (2s → 4s → 8s)
 - ✅ Form persistence with auto-save every 30 seconds
 - ✅ Bug report system after 3 consecutive failures
@@ -158,12 +169,14 @@ User fills form → Validation → Submit with retry (3 attempts) → Backend AP
 ### 3.3 Email Sending Points
 
 **Registration Confirmation Email:**
+
 - Triggered by: Successful vendor application submission
 - Endpoint: Backend `/api/v1/presents/events/:event_slug/registrations` (POST)
 - Provider: SendGrid
 - **Risk:** Previously had issues where vendor emails didn't fire while artist category worked
 
 **Other Email Types:**
+
 - Payment confirmation (high priority)
 - Event updates
 - Cancellation notices
@@ -179,11 +192,13 @@ User fills form → Validation → Submit with retry (3 attempts) → Backend AP
 ### 4.1 Architecture Overview
 
 **Components Created:**
+
 1. **Centralized Error Monitoring Utility** - `/src/utils/errorMonitoring.ts`
 2. **Setup Guide** - `/docs/SENTRY_DISCORD_SETUP.md`
 3. **Implementation Examples** - `/docs/ERROR_MONITORING_IMPLEMENTATION.md`
 
 **Technology Stack:**
+
 - **Sentry** for error tracking (free tier: 10k events/month)
 - **Discord webhooks** for real-time alerts (free)
 - **Optional:** Zapier for prettier Discord formatting (free tier: 100 tasks/month)
@@ -191,6 +206,7 @@ User fills form → Validation → Submit with retry (3 attempts) → Backend AP
 ### 4.2 Error Tracking Capabilities
 
 **Form Errors:**
+
 ```typescript
 trackFormError(error, {
   formType: FormType.VENDOR_APPLICATION,
@@ -205,10 +221,11 @@ trackFormError(error, {
   attemptNumber: 3,
   totalAttempts: 3,
   validationErrors: [],
-});
+})
 ```
 
 **Email Errors:**
+
 ```typescript
 trackEmailError(error, {
   emailType: 'registration_confirmation',
@@ -219,18 +236,18 @@ trackEmailError(error, {
   status: EmailDeliveryStatus.FAILED,
   provider: 'sendgrid',
   failureReason: 'Bounce: Invalid email address',
-});
+})
 ```
 
 ### 4.3 Severity Levels
 
-| Severity | Examples | Alert Timing |
-|----------|----------|--------------|
-| **CRITICAL** | Payment forms, email failures for payment confirmations | Immediate to Discord |
-| **HIGH** | Application form failures, registration confirmation failures | Immediate to Discord |
-| **MEDIUM** | Contact form issues, event update emails | Batched (hourly) |
-| **LOW** | Validation errors, analytics failures | Batched (daily) |
-| **INFO** | Successful submissions (for success rate tracking) | Log only |
+| Severity     | Examples                                                      | Alert Timing         |
+| ------------ | ------------------------------------------------------------- | -------------------- |
+| **CRITICAL** | Payment forms, email failures for payment confirmations       | Immediate to Discord |
+| **HIGH**     | Application form failures, registration confirmation failures | Immediate to Discord |
+| **MEDIUM**   | Contact form issues, event update emails                      | Batched (hourly)     |
+| **LOW**      | Validation errors, analytics failures                         | Batched (daily)      |
+| **INFO**     | Successful submissions (for success rate tracking)            | Log only             |
 
 ### 4.4 Discord Alert Format (with optional Zapier)
 
@@ -258,6 +275,7 @@ Endpoint: /v1/presents/events/sf-art-walk-2026/registrations
 ### Phase 1: Install & Configure (Week 1)
 
 **Frontend:**
+
 - [ ] Install Sentry: `npm install @sentry/react`
 - [ ] Add environment variables to Render:
   - `VITE_SENTRY_DSN=<your-dsn>`
@@ -267,6 +285,7 @@ Endpoint: /v1/presents/events/sf-art-walk-2026/registrations
 - [ ] Test in development
 
 **Discord:**
+
 - [ ] Create `#voxxy-alerts` channel
 - [ ] Set up webhook
 - [ ] Configure Sentry integration
@@ -383,6 +402,7 @@ Endpoint: /v1/presents/events/sf-art-walk-2026/registrations
    - Audit public API endpoints
 
 **Next Steps:**
+
 1. Courtney can provide readonly access or specific file exports
 2. Document findings in `docs/BACKEND_ANALYSIS.md`
 3. Create action items for backend improvements
@@ -394,29 +414,30 @@ Endpoint: /v1/presents/events/sf-art-walk-2026/registrations
 
 ### Services
 
-| Service | Tier | Cost | Usage Limit |
-|---------|------|------|-------------|
-| Sentry | Free | $0/mo | 10k events/month |
-| Discord | Free | $0/mo | Unlimited |
-| Zapier (optional) | Free | $0/mo | 100 tasks/month |
+| Service           | Tier | Cost  | Usage Limit      |
+| ----------------- | ---- | ----- | ---------------- |
+| Sentry            | Free | $0/mo | 10k events/month |
+| Discord           | Free | $0/mo | Unlimited        |
+| Zapier (optional) | Free | $0/mo | 100 tasks/month  |
 
 **Total Cost:** $0/month for MVP
 
 **Upgrade Path (if needed):**
+
 - Sentry Team: $26/month (50k events)
 - Sentry Business: $80/month (100k events)
 
-*Note: If hitting 10k errors/month, that indicates a bigger problem that needs fixing first.*
+_Note: If hitting 10k errors/month, that indicates a bigger problem that needs fixing first._
 
 ### Time Investment
 
-| Phase | Frontend | Backend | Total |
-|-------|----------|---------|-------|
-| Setup & Config | 3h | 2h | 5h |
-| Implementation | 6h | 6h | 12h |
-| Testing | 2h | 2h | 4h |
-| Monitoring (first week) | 2h | 2h | 4h |
-| **Total** | **13h** | **12h** | **25h** |
+| Phase                   | Frontend | Backend | Total   |
+| ----------------------- | -------- | ------- | ------- |
+| Setup & Config          | 3h       | 2h      | 5h      |
+| Implementation          | 6h       | 6h      | 12h     |
+| Testing                 | 2h       | 2h      | 4h      |
+| Monitoring (first week) | 2h       | 2h      | 4h      |
+| **Total**               | **13h**  | **12h** | **25h** |
 
 Spread across 3-4 weeks = ~6 hours/week
 
@@ -425,18 +446,21 @@ Spread across 3-4 weeks = ~6 hours/week
 ## Part 9: Success Metrics
 
 ### Week 1 (After Frontend Deploy)
+
 - ✅ 0 unhandled errors reaching users
 - ✅ All form errors tracked in Sentry
 - ✅ Discord alerts firing correctly
 - ✅ <2 minutes from error to Discord alert
 
 ### Week 4 (After Backend Deploy)
+
 - ✅ Email delivery tracking operational
 - ✅ 0 missed registration confirmation emails
 - ✅ >95% email delivery success rate
 - ✅ <15 minutes from email failure to alert
 
 ### Month 3 (Steady State)
+
 - ✅ Form submission success rate >98%
 - ✅ Average error resolution time <24 hours
 - ✅ 0 critical errors unresolved >1 hour
@@ -565,4 +589,3 @@ The system is designed to scale with Voxxy's growth and catch issues before user
 - **Sentry Docs:** https://docs.sentry.io/platforms/javascript/guides/react/
 - **Discord Webhooks:** https://discord.com/developers/docs/resources/webhook
 - **Internal:** `#engineering` Discord channel for questions
-

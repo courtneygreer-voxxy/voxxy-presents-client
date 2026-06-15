@@ -1,20 +1,20 @@
-import { useState } from 'react';
-import { AlertCircle, Loader2, Mail, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react'
+import { AlertCircle, Loader2, Mail, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui/dialog'
 
 interface CancellationEmailDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => Promise<void>;
-  recipientCount: number;
-  eventTitle: string;
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: () => Promise<void>
+  recipientCount: number
+  eventTitle: string
 }
 
 export function CancellationEmailDialog({
@@ -24,19 +24,19 @@ export function CancellationEmailDialog({
   recipientCount,
   eventTitle,
 }: CancellationEmailDialogProps) {
-  const [isSending, setIsSending] = useState(false);
+  const [isSending, setIsSending] = useState(false)
 
   const handleConfirm = async () => {
     try {
-      setIsSending(true);
-      await onConfirm();
-      onClose();
+      setIsSending(true)
+      await onConfirm()
+      onClose()
     } catch (error) {
-      console.error('Failed to send cancellation emails:', error);
+      console.error('Failed to send cancellation emails:', error)
     } finally {
-      setIsSending(false);
+      setIsSending(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -89,7 +89,10 @@ export function CancellationEmailDialog({
             </p>
             <ul className="text-sm text-yellow-200/90 mt-2 space-y-1 list-disc list-inside">
               <li>Event status will be set to "Cancelled"</li>
-              <li>All {recipientCount} registered {recipientCount === 1 ? 'vendor' : 'vendors'} will be notified via email</li>
+              <li>
+                All {recipientCount} registered {recipientCount === 1 ? 'vendor' : 'vendors'} will
+                be notified via email
+              </li>
               <li>Emails will include refund information if applicable</li>
               <li>No new applications will be accepted</li>
             </ul>
@@ -126,5 +129,5 @@ export function CancellationEmailDialog({
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

@@ -9,6 +9,7 @@
 ## Where To Start
 
 ### If You're a Producer/Content Creator
+
 1. **Frontend:** `/docs/email-system/EMAIL_EDITOR_GUIDE.md`
    - How to create and edit emails in the UI
 2. **Frontend:** `/docs/email-system/EMAIL_VARIABLES_REFERENCE.md`
@@ -17,6 +18,7 @@
    - Special rules for invitation emails
 
 ### If You're a Frontend Developer
+
 1. **Frontend:** `/docs/email-system/EMAIL_SYSTEM_GUIDE.md`
    - System architecture and components
 2. **Frontend:** `/docs/email-system/EMAIL_VARIABLES_REFERENCE.md`
@@ -25,6 +27,7 @@
    - Complete end-to-end system documentation
 
 ### If You're a Backend Developer
+
 1. **Backend:** `/docs/email/VOXXY_PRESENTS_EMAIL_MASTER_REFERENCE.md`
    - Complete email system overview
 2. **Backend:** `/docs/email/EMAIL_AUTOMATION_SYSTEM_GUIDE.md`
@@ -33,6 +36,7 @@
    - Architecture and API reference
 
 ### If You Need To Debug Email Issues
+
 1. **Backend:** `/docs/email/EMAIL_SYSTEMS_GUIDE.md` (Common Issues section)
 2. **Backend:** `/docs/email/EMAIL_TECH_DEBT_CLEANUP_PLAN_APRIL_2026.md`
 3. **Frontend:** `/docs/email-system/EMAIL_DEBUG_SUMMARY.md`
@@ -42,6 +46,7 @@
 ## Email System Overview (30-second version)
 
 ### What is the Email System?
+
 Voxxy has automated email sending for event management. There are two contexts:
 
 1. **Position 1 (Invitations):** Sent immediately when vendors are invited
@@ -58,12 +63,14 @@ Voxxy has automated email sending for event management. There are two contexts:
 ### Key Components
 
 **Backend (Rails):**
+
 - SendGrid for email delivery
 - Webhook system for delivery tracking
 - Variable resolution via two resolvers
 - Scheduled jobs via Sidekiq
 
 **Frontend (React):**
+
 - Email editor with RichText support
 - Variable insertion buttons
 - Email preview system
@@ -136,6 +143,7 @@ Root:
 ## Most Important Files (Read These!)
 
 ### Backend - Essential Reading
+
 **File Path:** `/Users/beaulazear/Desktop/voxxy-rails/docs/email/`
 
 1. **VOXXY_PRESENTS_EMAIL_MASTER_REFERENCE.md** (40 KB)
@@ -154,6 +162,7 @@ Root:
    - Read time: 30 minutes
 
 ### Frontend - Essential Reading
+
 **File Path:** `/Users/beaulazear/Desktop/voxxy-presents-client/docs/email-system/`
 
 1. **EMAIL_DOCUMENTATION_INDEX.md** ⭐
@@ -181,26 +190,31 @@ Root:
 ## Common Scenarios
 
 ### "I need to add a new email variable"
+
 1. Backend: Update both resolvers in `/app/services/`
 2. Frontend: Add to `src/utils/emailVariables.ts`
 3. Update: Both EMAIL_VARIABLES_REFERENCE docs
 
 ### "Email isn't being sent"
+
 1. Check: `EMAIL_TECH_DEBT_CLEANUP_PLAN_APRIL_2026.md`
 2. Debug: `EMAIL_AUTOMATION_SYSTEM_GUIDE.md` (Debugging section)
 3. Verify: SendGrid webhook setup in `SENDGRID_WEBHOOK_SETUP_APRIL_2026.md`
 
 ### "Variable is showing blank in email"
+
 1. Check: `EMAIL_VARIABLES_REFERENCE.md` (variable availability)
 2. Frontend: `EMAIL_EDITOR_GUIDE.md` (Troubleshooting section)
 3. Backend: `EMAIL_SYSTEM_FIXES_JANUARY_17_2026.md`
 
 ### "Need to understand variable resolution"
+
 1. Frontend: `EMAIL_SYSTEM_GUIDE.md` (Variable Resolution System)
 2. Backend: `EMAIL_AUTOMATION_SYSTEM_GUIDE.md` (Services section)
 3. Code: Look at `/app/services/email_variable_resolver.rb`
 
 ### "Delivery tracking isn't working"
+
 1. Backend: `WEBHOOK_CUSTOM_ARGS_FIX_APRIL_2026.md`
 2. Backend: `WEBHOOK_FALLBACK_TIER_225_FIX_APRIL_2026.md`
 3. Verify: `WEBHOOK_VERIFICATION_CHECKLIST.md`
@@ -210,22 +224,26 @@ Root:
 ## Key Statistics
 
 ### Email System Size
+
 - Backend: 66 email-specific docs (800+ KB)
 - Frontend: 32 email-specific docs (600+ KB)
 - Total: 150+ documentation files
 
 ### Variables
+
 - Total variables: 48
 - Work in invitations: 34
 - Post-application only: 14
 - Organized in 4 categories (Event, Vendor, Organization, Links)
 
 ### Email Types
+
 - Position 1: Invitations (sent immediately)
 - Positions 2-17: Registration emails (scheduled)
 - System notifications (future)
 
 ### Architecture
+
 - SendGrid for delivery
 - Webhook system (5-tier fallback)
 - 2 variable resolvers (Invitation, Full)
@@ -237,6 +255,7 @@ Root:
 ## Quick Command Reference
 
 ### Frontend - Find email code
+
 ```bash
 # Components
 find src/components -name "*mail*" -o -name "*email*" -o -name "*Email*"
@@ -252,6 +271,7 @@ grep -r "Email\|ScheduledEmail" src/types/
 ```
 
 ### Backend - Find email code
+
 ```bash
 # Services
 find app/services -name "*email*" -o -name "*mail*"
@@ -271,6 +291,7 @@ find app/jobs -name "*email*" -o -name "*mail*"
 ## Documentation Status (May 2026)
 
 ### Completed
+
 - Complete variable reference (48 variables)
 - Webhook system (5-tier fallback)
 - Audit logging
@@ -279,12 +300,14 @@ find app/jobs -name "*email*" -o -name "*mail*"
 - UI components
 
 ### Recent Fixes (April 2026)
+
 - SendGrid custom_args field mapping
 - Tier 2.25 fallback for registration emails
 - Audit log showing transactional emails
 - Active email status tracking
 
 ### Known Areas to Update
+
 - System notifications (not yet implemented)
 - Advanced filtering features
 - Performance optimizations
@@ -294,12 +317,14 @@ find app/jobs -name "*email*" -o -name "*mail*"
 ## Getting Help
 
 ### For Specific Questions
+
 1. **"How do I...?"** → EMAIL_EDITOR_GUIDE.md (frontend)
 2. **"Why isn't this working?"** → EMAIL_DEBUG_SUMMARY.md + EMAIL_SYSTEMS_GUIDE.md
 3. **"What variable should I use?"** → EMAIL_VARIABLES_REFERENCE.md
 4. **"How does the system work?"** → EMAIL_AUTOMATION_SYSTEM_GUIDE.md
 
 ### For Code References
+
 - Backend variables: `/app/services/email_variable_resolver.rb`
 - Frontend variables: `/src/utils/emailVariables.ts`
 - Email editor: `/src/components/producer/Email/EmailEditorPage.tsx`
@@ -318,6 +343,7 @@ find app/jobs -name "*email*" -o -name "*mail*"
 ---
 
 **Documentation Catalog Location:**
+
 - Backend: `/Users/beaulazear/Desktop/voxxy-rails/docs/email/DOCUMENTATION_CATALOG.md`
 - Frontend: `/Users/beaulazear/Desktop/voxxy-presents-client/docs/email-system/DOCUMENTATION_CATALOG.md`
 

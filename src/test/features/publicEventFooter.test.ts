@@ -4,7 +4,7 @@ import path from 'path'
 
 const source = readFileSync(
   path.resolve(__dirname, '../../pages/PublicEventDetailPage.tsx'),
-  'utf-8'
+  'utf-8',
 )
 
 describe('PublicEventDetailPage — powered-by footer', () => {

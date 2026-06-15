@@ -1,14 +1,17 @@
-import { useState } from 'react';
-import { Database, Download } from 'lucide-react';
-import FullDataExportModal from './FullDataExportModal';
+import { useState } from 'react'
+import { Database, Download } from 'lucide-react'
+import FullDataExportModal from './FullDataExportModal'
 
 interface FullDataExportSectionProps {
-  organizationId: number;
-  organizationSlug: string;
+  organizationId: number
+  organizationSlug: string
 }
 
-export default function FullDataExportSection({ organizationId, organizationSlug }: FullDataExportSectionProps) {
-  const [showModal, setShowModal] = useState(false);
+export default function FullDataExportSection({
+  organizationId,
+  organizationSlug,
+}: FullDataExportSectionProps) {
+  const [showModal, setShowModal] = useState(false)
 
   return (
     <>
@@ -18,7 +21,8 @@ export default function FullDataExportSection({ organizationId, organizationSlug
           <div className="flex-1">
             <h3 className="text-sm text-foreground font-semibold mb-0.5">Data Export</h3>
             <p className="text-xs text-muted-foreground">
-              Review and download all your events, contacts, and vendor registrations. Use this for full backups, compliance, or switching providers.
+              Review and download all your events, contacts, and vendor registrations. Use this for
+              full backups, compliance, or switching providers.
             </p>
           </div>
         </div>
@@ -39,5 +43,5 @@ export default function FullDataExportSection({ organizationId, organizationSlug
         organizationSlug={organizationSlug}
       />
     </>
-  );
+  )
 }

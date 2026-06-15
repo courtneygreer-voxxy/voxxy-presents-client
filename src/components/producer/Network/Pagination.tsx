@@ -1,11 +1,11 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  perPage: number;
-  onPageChange: (page: number) => void;
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  perPage: number
+  onPageChange: (page: number) => void
 }
 
 export default function Pagination({
@@ -16,47 +16,47 @@ export default function Pagination({
   onPageChange,
 }: PaginationProps) {
   // Calculate the range of items being displayed
-  const startItem = totalCount === 0 ? 0 : (currentPage - 1) * perPage + 1;
-  const endItem = Math.min(currentPage * perPage, totalCount);
+  const startItem = totalCount === 0 ? 0 : (currentPage - 1) * perPage + 1
+  const endItem = Math.min(currentPage * perPage, totalCount)
 
   // Generate page numbers to display
   const getPageNumbers = () => {
-    const pages: (number | string)[] = [];
-    const maxPagesToShow = 7; // Show max 7 page buttons
+    const pages: (number | string)[] = []
+    const maxPagesToShow = 7 // Show max 7 page buttons
 
     if (totalPages <= maxPagesToShow) {
       // Show all pages if total is small
       for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
+        pages.push(i)
       }
     } else {
       // Always show first page
-      pages.push(1);
+      pages.push(1)
 
       if (currentPage > 3) {
-        pages.push('...');
+        pages.push('...')
       }
 
       // Show pages around current page
-      const startPage = Math.max(2, currentPage - 1);
-      const endPage = Math.min(totalPages - 1, currentPage + 1);
+      const startPage = Math.max(2, currentPage - 1)
+      const endPage = Math.min(totalPages - 1, currentPage + 1)
 
       for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
+        pages.push(i)
       }
 
       if (currentPage < totalPages - 2) {
-        pages.push('...');
+        pages.push('...')
       }
 
       // Always show last page
-      pages.push(totalPages);
+      pages.push(totalPages)
     }
 
-    return pages;
-  };
+    return pages
+  }
 
-  const pageNumbers = getPageNumbers();
+  const pageNumbers = getPageNumbers()
 
   return (
     <div className="bg-background/5 border-t border-border px-4 py-3">
@@ -93,17 +93,14 @@ export default function Pagination({
               {pageNumbers.map((page, index) => {
                 if (page === '...') {
                   return (
-                    <span
-                      key={`ellipsis-${index}`}
-                      className="px-2 py-1 text-foreground/40"
-                    >
+                    <span key={`ellipsis-${index}`} className="px-2 py-1 text-foreground/40">
                       ...
                     </span>
-                  );
+                  )
                 }
 
-                const pageNum = page as number;
-                const isActive = pageNum === currentPage;
+                const pageNum = page as number
+                const isActive = pageNum === currentPage
 
                 return (
                   <button
@@ -120,7 +117,7 @@ export default function Pagination({
                   >
                     {pageNum}
                   </button>
-                );
+                )
               })}
             </div>
 
@@ -144,5 +141,5 @@ export default function Pagination({
         )}
       </div>
     </div>
-  );
+  )
 }

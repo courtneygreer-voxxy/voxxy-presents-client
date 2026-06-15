@@ -26,12 +26,14 @@
 The Voxxy Presents Email System provides automated, customizable email communications throughout the vendor application and event lifecycle. The system supports two distinct email contexts:
 
 ### **Invitation Emails (Position 1)**
+
 - Sent to **VendorContacts** BEFORE they apply
 - Uses `InvitationVariableResolver`
 - Has access to: Event data + Contact data
 - NO access to: Registration data, Category-specific data
 
 ### **Registration Emails (Positions 2-17)**
+
 - Sent to **Registrations** AFTER they apply
 - Uses `EmailVariableResolver`
 - Has access to: Event data + Contact data + Registration data + Category data
@@ -86,17 +88,20 @@ The Voxxy Presents Email System provides automated, customizable email communica
 ### Technology Stack
 
 **Frontend:**
+
 - React 18.3.1 + TypeScript
 - TipTap (Rich Text Editor)
 - React Hook Form + Zod validation
 - Radix UI components
 
 **Backend:**
+
 - Rails 7.2.2 + PostgreSQL
 - SendGrid (email delivery)
 - Sidekiq (background jobs)
 
 **Key Services:**
+
 - `InvitationVariableResolver` - Resolves variables for Position 1
 - `EmailVariableResolver` - Resolves variables for Positions 2-17
 - `EmailSenderService` - Sends emails via SendGrid
@@ -113,6 +118,7 @@ The Voxxy Presents Email System provides automated, customizable email communica
 **Data Context:** Event + Vendor Contact only
 
 **Available Variables (34 total):**
+
 - ✅ Event info (name, date, location, etc.)
 - ✅ Organization info (name, email)
 - ✅ Contact info (name, email, phone, website)
@@ -121,6 +127,7 @@ The Voxxy Presents Email System provides automated, customizable email communica
 - ❌ NO registration data (applicationDate, boothNumber, etc.)
 
 **Example Use Case:**
+
 ```
 Subject: [greetingName], you're invited to [eventName]!
 
@@ -146,12 +153,14 @@ To unsubscribe: [unsubscribeLink]
 **Data Context:** Event + Contact + Registration + Category
 
 **Available Variables (48 total):**
+
 - ✅ Everything from Invitation Emails
 - ✅ Category-specific (boothPrice, installDate, installTime)
 - ✅ Registration-specific (applicationDate, vendorCategory, boothNumber)
 - ✅ Payment links (categoryPaymentLink, paymentLink)
 
 **Example Use Case:**
+
 ```
 Subject: Application Approved - [eventName]
 
@@ -179,6 +188,7 @@ Unsubscribe: [unsubscribeLink]
 ### 3. System Emails (Future)
 
 Currently handled separately, planned for unification:
+
 - Application submission confirmation
 - Approval notifications
 - Rejection notifications
@@ -191,11 +201,13 @@ Currently handled separately, planned for unification:
 ### Format: `[bracket]` Notation
 
 **All variables use `[bracket]` format:**
+
 - Frontend UI: `[eventName]`, `[firstName]`
 - Backend Database: `[eventName]`, `[firstName]` (same!)
 - Backend Resolvers: Recognize `[bracket]` format
 
 **Legacy Support:**
+
 - Old emails may have `{{mustache}}` format
 - `backendToFrontend()` converts `{{}}` → `[]` when loading
 - New emails always use `[bracket]` format
@@ -203,21 +215,25 @@ Currently handled separately, planned for unification:
 ### Two Resolvers
 
 #### InvitationVariableResolver
+
 **File:** `/app/services/invitation_variable_resolver.rb`
 
 **Purpose:** Resolve variables for invitation emails (Position 1)
 
 **Has Access To:**
+
 - `event` - Full event record
 - `vendor_contact` - Contact being invited
 - `event.vendor_applications` - Public application info
 
 **Resolves 34 Variables:**
+
 - Event: eventName, eventDate, eventTime, eventLocation, eventVenue, etc.
 - Contact: greetingName, firstName, lastName, businessName, email, phone, website
 - Links: eventLink, dashboardLink, artistApplicationLink, vendorApplicationLink, unsubscribeLink
 
 **Example:**
+
 ```ruby
 # Invitation context
 resolver = InvitationVariableResolver.new(event, vendor_contact)
@@ -226,21 +242,25 @@ subject = resolver.resolve("[greetingName], join us at [eventName]!")
 ```
 
 #### EmailVariableResolver
+
 **File:** `/app/services/email_variable_resolver.rb`
 
 **Purpose:** Resolve variables for registration emails (Positions 2-17)
 
 **Has Access To:**
+
 - `event` - Full event record
 - `registration` - Vendor registration
 - `registration.vendor_application` - Category-specific data
 
 **Resolves All 48 Variables:**
+
 - Everything from InvitationVariableResolver
 - Category-specific: boothPrice, installDate, installTime, categoryPaymentLink
 - Registration-specific: vendorCategory, applicationDate, boothNumber, applicationCode
 
 **Example:**
+
 ```ruby
 # Registration context
 resolver = EmailVariableResolver.new(event, registration)
@@ -266,11 +286,14 @@ See [EMAIL_VARIABLES_REFERENCE.md](./EMAIL_VARIABLES_REFERENCE.md) for the compl
 ### Editor Types
 
 #### 1. Rich Text Editor (HTML Emails)
+
 **Used in:**
+
 - EmailTemplateEditorPage (Template Builder)
 - EmailEditorPage (Plain editor page)
 
 **Features:**
+
 - TipTap WYSIWYG editor
 - Variable insertion buttons
 - Image upload support
@@ -280,10 +303,13 @@ See [EMAIL_VARIABLES_REFERENCE.md](./EMAIL_VARIABLES_REFERENCE.md) for the compl
 **Location:** `/src/components/shared/RichTextEditor.tsx`
 
 #### 2. Plain Text Editor (Modal)
+
 **Used in:**
+
 - EditScheduledEmailModal (Quick edits from Mail tab)
 
 **Features:**
+
 - Simple textarea for subject + body
 - Variable insertion buttons
 - Plain text only (no HTML)
@@ -294,18 +320,21 @@ See [EMAIL_VARIABLES_REFERENCE.md](./EMAIL_VARIABLES_REFERENCE.md) for the compl
 ### Variable Insertion
 
 **How it Works:**
+
 1. Click on subject or body field
 2. Variable buttons appear grouped by category
 3. Click variable button to insert at cursor
 4. Variables show as `[variableName]` in the editor
 
 **Variable Button Categories:**
+
 - **Event Info** (purple) - Event details
 - **Vendor Info** (pink) - Recipient details
 - **Organization** (blue) - Your organization
 - **Links** (green) - Generated URLs
 
 **Tooltip on Hover:**
+
 - Shows variable description
 - Shows example value
 - Indicates if it works in invitations
@@ -315,12 +344,14 @@ See [EMAIL_VARIABLES_REFERENCE.md](./EMAIL_VARIABLES_REFERENCE.md) for the compl
 **Purpose:** Ensure unsubscribe link is always present (legal requirement)
 
 **Implementation:**
+
 - Footer is locked when email is loaded
 - Cannot be edited or deleted
 - Contains: Organization info + Unsubscribe link
 - Automatically appended if missing
 
 **Files:**
+
 - `/src/utils/emailFooter.ts` - Standard footer template
 - Lock logic in: RichTextEditor, EmailTemplateEditorPage, EmailEditorPage
 
@@ -332,18 +363,19 @@ See [EMAIL_VARIABLES_REFERENCE.md](./EMAIL_VARIABLES_REFERENCE.md) for the compl
 
 Emails are organized into 17 positions:
 
-| Position | Name | Trigger | Resolver |
-|----------|------|---------|----------|
-| 1 | Initial Invitation | on_invitation_send | Invitation |
-| 2 | Application Confirmation | on_application_submit | Registration |
-| 3 | Approval Notification | on_approval | Registration |
-| 4-17 | Various reminders, follow-ups | Scheduled triggers | Registration |
+| Position | Name                          | Trigger               | Resolver     |
+| -------- | ----------------------------- | --------------------- | ------------ |
+| 1        | Initial Invitation            | on_invitation_send    | Invitation   |
+| 2        | Application Confirmation      | on_application_submit | Registration |
+| 3        | Approval Notification         | on_approval           | Registration |
+| 4-17     | Various reminders, follow-ups | Scheduled triggers    | Registration |
 
 ### Template Builder
 
 **Location:** `/src/pages/producer/TemplateBuilderPage.tsx`
 
 **Features:**
+
 - View all 17 email positions
 - Edit each email's content, timing, and recipients
 - Add new emails to sequence (with "Add Email" button)
@@ -351,6 +383,7 @@ Emails are organized into 17 positions:
 - Drag-and-drop reordering (future)
 
 **Workflow:**
+
 1. Producer opens Mail tab in Command Center
 2. Clicks "Generate Emails from Template" (first time)
 3. System creates all 17 emails from default template
@@ -360,11 +393,13 @@ Emails are organized into 17 positions:
 ### Email Templates vs Scheduled Emails
 
 **EmailCampaignTemplate:**
+
 - System-provided or user-created
 - Reusable across events
 - Contains EmailTemplateItems (17 positions)
 
 **ScheduledEmail:**
+
 - Per-event instance
 - Generated from template
 - Fully editable
@@ -379,6 +414,7 @@ Emails are organized into 17 positions:
 **Purpose:** Track individual email sends with SendGrid
 
 **Key Fields:**
+
 ```typescript
 {
   scheduled_email_id: number,       // Links to ScheduledEmail
@@ -394,6 +430,7 @@ Emails are organized into 17 positions:
 ```
 
 **Statuses:**
+
 - `pending` - Not sent yet
 - `queued` - Queued in SendGrid
 - `sent` - Sent to recipient's server
@@ -405,6 +442,7 @@ Emails are organized into 17 positions:
 ### Webhook Integration
 
 **Flow:**
+
 ```
 1. EmailSenderService sends email
    ↓
@@ -426,6 +464,7 @@ The webhook processor uses a sophisticated 5-tier fallback system to match webho
 **CRITICAL:** Tier order matters! More specific lookups run first.
 
 **Correct Execution Order (April 9, 2026):**
+
 1. **Tier 1:** Message ID lookup (exact match, works after first webhook)
 2. **Tier 2.25:** Scheduled email lookup (email + scheduled_email_id from `custom_args`) ⭐ **MORE SPECIFIC**
 3. **Tier 2:** Invitation fallback (email + invitation exists) **LESS SPECIFIC**
@@ -435,6 +474,7 @@ The webhook processor uses a sophisticated 5-tier fallback system to match webho
 **Recent Fixes:**
 
 **April 9, 2026 - CRITICAL Deliverability Fix:**
+
 - ✅ **Fixed custom_args extraction:** Webhook processor now checks `custom_args` BEFORE `unique_args`
   - SendGrid Web API sends `custom_args`, not `unique_args`
   - Updated all 6 locations in webhook processor
@@ -444,6 +484,7 @@ The webhook processor uses a sophisticated 5-tier fallback system to match webho
 - 🎯 **Result:** 100% deliverability tracking achieved for ALL email types
 
 **April 9, 2026 - Audit Log Fix:**
+
 - ✅ **Fixed frontend audit log:** Now shows transactional emails (`status: 'active'`)
   - Frontend was only fetching `status === 'sent'` emails
   - Excluded all transactional emails (Application Received, Approved, etc.)
@@ -451,9 +492,11 @@ The webhook processor uses a sophisticated 5-tier fallback system to match webho
   - See: `docs/email-system/AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md`
 
 **April 8, 2026:**
+
 - ✅ Added Tier 2.25 lenient fallback for registration emails
 
 **For Complete Technical Details:**
+
 - Backend webhook fix: `voxxy-rails/docs/email/WEBHOOK_CUSTOM_ARGS_FIX_APRIL_2026.md`
 - Frontend audit fix: `docs/email-system/AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md`
 - Tier 2.25 context: `voxxy-rails/docs/email/WEBHOOK_FALLBACK_TIER_225_FIX_APRIL_2026.md`
@@ -463,6 +506,7 @@ The webhook processor uses a sophisticated 5-tier fallback system to match webho
 **Location:** Mail Tab → Audit Log Section
 
 **Features:**
+
 - Shows all email deliveries for the event
 - Filters by email name (invitations + transactional emails)
 - Shows delivery status with color coding (sent, delivered, bounced, dropped)
@@ -470,6 +514,7 @@ The webhook processor uses a sophisticated 5-tier fallback system to match webho
 - Supports both one-time (`status: 'sent'`) and recurring (`status: 'active'`) emails
 
 **Email Status Types:**
+
 - **`status: 'sent'`** - One-time scheduled emails (e.g., "Invitation to Apply")
   - Status changes: scheduled → sent
   - Sent once per schedule
@@ -506,9 +551,11 @@ CommandCenter.tsx
 ### Key Components
 
 #### EmailAutomationTab.tsx
+
 **Location:** `/src/components/producer/Email/EmailAutomationTab.tsx`
 
 **Responsibilities:**
+
 - Load scheduled emails for event
 - Display statistics (scheduled, sent, failed)
 - Manage email CRUD operations
@@ -516,6 +563,7 @@ CommandCenter.tsx
 - Handle invitations
 
 **Actions:**
+
 - Edit Email - Opens EditScheduledEmailModal
 - Preview Email - Shows resolved variables
 - Send Now - Immediately sends email
@@ -523,9 +571,11 @@ CommandCenter.tsx
 - Delete Email - Removes from sequence
 
 #### RichTextEditor.tsx
+
 **Location:** `/src/components/shared/RichTextEditor.tsx`
 
 **Features:**
+
 - TipTap-based WYSIWYG editor
 - Variable insertion buttons
 - Footer locking system
@@ -533,9 +583,11 @@ CommandCenter.tsx
 - Link editing
 
 #### EmailPreviewModal.tsx
+
 **Location:** `/src/components/shared/EventEmailPreviewModal.tsx`
 
 **Features:**
+
 - Shows resolved email HTML
 - Optional registration selection (for category-specific preview)
 - Shows recipient name and email
@@ -546,11 +598,13 @@ CommandCenter.tsx
 ## Backend Services
 
 ### EmailSenderService
+
 **File:** `/app/services/email_sender_service.rb`
 
 **Purpose:** Send emails via SendGrid API
 
 **Key Methods:**
+
 ```ruby
 def send_to_recipients
   # Gets filtered recipients
@@ -567,11 +621,13 @@ end
 ```
 
 ### ScheduledEmailGenerator
+
 **File:** `/app/services/scheduled_email_generator.rb`
 
 **Purpose:** Generate ScheduledEmail instances from templates
 
 **Key Methods:**
+
 ```ruby
 def generate
   # Loads default system template
@@ -586,11 +642,13 @@ end
 ```
 
 ### EmailScheduleCalculator
+
 **File:** `/app/services/email_schedule_calculator.rb`
 
 **Purpose:** Calculate when emails should be sent
 
 **Trigger Logic:**
+
 - `days_before_event` - X days before event_date
 - `days_after_event` - X days after event_date
 - `on_event_date` - Same day as event
@@ -598,6 +656,7 @@ end
 - `on_payment_deadline` - Same day as payment_deadline
 
 **Example:**
+
 ```ruby
 calculator = EmailScheduleCalculator.new(event)
 scheduled_for = calculator.calculate(
@@ -615,6 +674,7 @@ scheduled_for = calculator.calculate(
 ## API Reference
 
 ### Base URL
+
 ```
 /api/v1/presents/events/:event_slug/scheduled_emails
 ```
@@ -622,12 +682,14 @@ scheduled_for = calculator.calculate(
 ### Key Endpoints
 
 #### List Emails
+
 ```http
 GET /scheduled_emails
 Response: ScheduledEmail[]
 ```
 
 #### Generate Emails
+
 ```http
 POST /scheduled_emails/generate
 Body: { regenerate?: boolean }
@@ -635,6 +697,7 @@ Response: { scheduled_emails: ScheduledEmail[], generated_count: number }
 ```
 
 #### Update Email
+
 ```http
 PATCH /scheduled_emails/:id
 Body: {
@@ -652,6 +715,7 @@ Note: Automatically recalculates scheduled_for if trigger fields change
 ```
 
 #### Preview Email
+
 ```http
 POST /scheduled_emails/:id/preview
 Body: { registration_id?: number, category?: string }
@@ -664,6 +728,7 @@ Response: {
 ```
 
 #### Send Now
+
 ```http
 POST /scheduled_emails/:id/send_now
 Response: {
@@ -674,6 +739,7 @@ Response: {
 ```
 
 #### Pause/Resume
+
 ```http
 PATCH /scheduled_emails/:id/pause
 PATCH /scheduled_emails/:id/resume
@@ -681,6 +747,7 @@ Response: { message: string, email: ScheduledEmail }
 ```
 
 #### Delete
+
 ```http
 DELETE /scheduled_emails/:id
 Response: 204 No Content
@@ -692,23 +759,27 @@ Note: Cannot delete sent emails
 ## Recent Changes (March 2026)
 
 ### Variable System Overhaul
+
 - ✅ Changed from `{{mustache}}` to `[bracket]` format
 - ✅ Added 8 new variables (eventEndDate, phone, website, etc.)
 - ✅ Fixed `worksInInvitations` flags for 6 variables
 - ✅ Added 5 backend variables to frontend UI
 
 ### Invitation Links Fix
+
 - ✅ Added dashboardLink to invitations (was redirecting to eventLink)
 - ✅ Added artistApplicationLink and vendorApplicationLink to invitations
 - ✅ Added applicationLink and categoryApplicationLink to invitations
 - ✅ All public links now work in Position 1
 
 ### Footer Lock System
+
 - ✅ Implemented locked footer in all HTML editors
 - ✅ Ensures unsubscribe link always present
 - ✅ Cannot be edited or deleted by producers
 
 ### Bug Fixes
+
 - ✅ Fixed public application page routing (slug parsing)
 - ✅ Fixed "Add Email" 422 validation error
 - ✅ Fixed [categoryList] variable name mismatch

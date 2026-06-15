@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
   },
   build: {
@@ -15,8 +15,8 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,     // Remove all console.* calls in production
-        drop_debugger: true,    // Remove debugger statements
+        drop_console: true, // Remove all console.* calls in production
+        drop_debugger: true, // Remove debugger statements
         pure_funcs: ['console.log', 'console.info', 'console.debug'], // Extra safety
       },
     },
@@ -57,7 +57,7 @@ export default defineConfig({
       'voxxy-presents-client-staging.onrender.com',
       'staging-voxxy-presents.onrender.com',
       'dev-voxxy-presents.onrender.com',
-      'localhost'
-    ]
-  }
+      'localhost',
+    ],
+  },
 })

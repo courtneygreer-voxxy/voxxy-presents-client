@@ -14,6 +14,7 @@ All documentation related to the V3.0 database refactoring and migration.
 ## Migration Overview
 
 ### Key Changes
+
 - Role refactoring: `organizer`→`producer`, `venue_owner`→`vendor`
 - Profile renaming: `organizationProfile`→`producerProfile`, `venueOwnerProfile`→`vendorProfile`
 - Beta approval removed
@@ -21,6 +22,7 @@ All documentation related to the V3.0 database refactoring and migration.
 - New V3.0 terminology throughout
 
 ### Status
+
 - ✅ Phase 0: Security fixes complete
 - ✅ Day 1: Database refactoring complete
 - 🔄 Day 2: Vendor discovery in progress

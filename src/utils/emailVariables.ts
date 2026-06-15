@@ -13,29 +13,29 @@
 
 export interface EmailVariable {
   // User-friendly display name (shown in buttons)
-  label: string;
+  label: string
 
   // Variable format: [eventName]
   // Both frontend and backend use this same format
-  frontendVar: string;
+  frontendVar: string
 
   // Deprecated: kept for backwards compatibility
   // Backend actually uses same [bracket] format as frontendVar
-  backendVar: string;
+  backendVar: string
 
   // Category for grouping
-  category: 'event' | 'organization' | 'vendor' | 'computed' | 'links';
+  category: 'event' | 'organization' | 'vendor' | 'computed' | 'links'
 
   // Help text
-  description: string;
+  description: string
 
   // Example value
-  example: string;
+  example: string
 
   // Whether this variable works in invitation emails (Position 1)
   // Invitation emails only have access to event + vendor_contact data
   // Category-specific and registration-level variables don't work in invitations
-  worksInInvitations: boolean;
+  worksInInvitations: boolean
 }
 
 export const EMAIL_VARIABLES: EmailVariable[] = [
@@ -47,7 +47,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Name of the event',
     example: 'Summer Market 2025',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Event Date',
@@ -56,7 +56,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Date of the event',
     example: 'June 15, 2025',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Event End Date',
@@ -65,7 +65,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'End date of the event (for multi-day events)',
     example: 'June 17, 2025',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Date Range',
@@ -74,7 +74,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Formatted date range for multi-day events (e.g., "June 15-17, 2025")',
     example: 'June 15-17, 2025',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Event Time',
@@ -83,7 +83,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Time of the event',
     example: '10:00 AM - 6:00 PM',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Event Location',
@@ -92,7 +92,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'City and state of the event',
     example: 'Atlanta, GA',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Event City',
@@ -101,7 +101,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'City of the event',
     example: 'Atlanta',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Event State',
@@ -110,7 +110,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'State/region of the event',
     example: 'GA',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Event Address',
@@ -119,7 +119,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Street address of the event',
     example: '123 Johnson Street',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Event Venue',
@@ -128,7 +128,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Venue name/title of the event location',
     example: 'Piedmont Park',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Event Description',
@@ -137,7 +137,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Event description text',
     example: 'A family-friendly outdoor market...',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Application Deadline',
@@ -146,7 +146,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Last day to apply',
     example: 'May 30, 2025',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Category Price',
@@ -155,16 +155,17 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Cost per booth (category-specific - only works after vendor applies)',
     example: '$150.00',
-    worksInInvitations: false
+    worksInInvitations: false,
   },
   {
     label: 'Early Bird Price',
     frontendVar: '[earlyBirdPrice]',
     backendVar: '{{early_bird_price}}',
     category: 'event',
-    description: 'Early bird discounted price (category-specific - only works after vendor applies)',
+    description:
+      'Early bird discounted price (category-specific - only works after vendor applies)',
     example: '$125.00',
-    worksInInvitations: false
+    worksInInvitations: false,
   },
   {
     label: 'Early Bird Deadline',
@@ -173,7 +174,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Deadline for early bird pricing',
     example: 'May 15, 2025',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Jury Fee',
@@ -182,16 +183,17 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Non-refundable jury/application fee (category-specific)',
     example: '$25.00',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Commission Rate',
     frontendVar: '[commissionRate]',
     backendVar: '{{commission_rate}}',
     category: 'event',
-    description: 'Commission percentage on sales (category-specific - only works after vendor applies)',
+    description:
+      'Commission percentage on sales (category-specific - only works after vendor applies)',
     example: '10%',
-    worksInInvitations: false
+    worksInInvitations: false,
   },
   {
     label: 'Payment Due Date',
@@ -200,7 +202,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Payment deadline',
     example: 'June 1, 2025',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Age Restriction',
@@ -209,7 +211,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'event',
     description: 'Age policy for the event',
     example: '21+',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
 
   // Organization Variables
@@ -220,7 +222,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'organization',
     description: 'Your organization name',
     example: 'Voxxy',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Organization Email',
@@ -229,7 +231,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'organization',
     description: 'Your contact email',
     example: 'hello@heyvoxxy.com',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
 
   // Vendor Variables
@@ -240,7 +242,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's first name",
     example: 'John',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Last Name',
@@ -249,7 +251,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's last name",
     example: 'Doe',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Full Name',
@@ -258,7 +260,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's full name",
     example: 'John Doe',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Business Name',
@@ -267,7 +269,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's business name",
     example: "John's Tacos",
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Email',
@@ -276,7 +278,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's email address",
     example: 'john@example.com',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Phone',
@@ -285,7 +287,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's phone number",
     example: '(555) 123-4567',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Website',
@@ -294,7 +296,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's website URL",
     example: 'https://johnstacos.com',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Category',
@@ -303,7 +305,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: 'Application type vendor applied for (only works after they apply)',
     example: 'Food',
-    worksInInvitations: false
+    worksInInvitations: false,
   },
   {
     label: 'Category Description',
@@ -312,7 +314,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: 'Description of the vendor category they applied for',
     example: 'Local restaurants and food service vendors',
-    worksInInvitations: false
+    worksInInvitations: false,
   },
   {
     label: 'Install Date',
@@ -321,7 +323,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: 'Vendor setup date (category-specific - only works after they apply)',
     example: 'June 14, 2025',
-    worksInInvitations: false
+    worksInInvitations: false,
   },
   {
     label: 'Install Time',
@@ -330,7 +332,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: 'Vendor setup time range (category-specific - only works after they apply)',
     example: '8:00 AM - 10:00 AM',
-    worksInInvitations: false
+    worksInInvitations: false,
   },
   {
     label: 'Install Start Time',
@@ -339,7 +341,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: 'Setup start time (category-specific - only works after they apply)',
     example: '8:00 AM',
-    worksInInvitations: false
+    worksInInvitations: false,
   },
   {
     label: 'Install End Time',
@@ -348,7 +350,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: 'Setup end time (category-specific - only works after they apply)',
     example: '10:00 AM',
-    worksInInvitations: false
+    worksInInvitations: false,
   },
   {
     label: 'Category Payment Link',
@@ -357,7 +359,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'links',
     description: 'Payment link for the specific vendor category (only works after they apply)',
     example: 'https://pay.stripe.com/...',
-    worksInInvitations: false
+    worksInInvitations: false,
   },
 
   // Link Variables
@@ -368,7 +370,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'links',
     description: 'Public application page URL - where vendors apply to your event',
     example: 'https://voxxy.io/events/org-slug/event-slug-123',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Event Dashboard',
@@ -377,7 +379,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'links',
     description: 'Vendor portal/dashboard link (requires email to access)',
     example: 'https://voxxy.io/portal/org-slug/event-slug-123',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Unsubscribe Link',
@@ -386,7 +388,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'links',
     description: 'Unsubscribe URL (required for all emails)',
     example: 'https://voxxy.io/unsubscribe/abc123token',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Application Code',
@@ -395,7 +397,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: 'Unique application reference code (only available after application)',
     example: 'APP-2024-12345',
-    worksInInvitations: false
+    worksInInvitations: false,
   },
 
   // Vendor Payment Info (TODO: backend migration needed)
@@ -406,7 +408,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's Eventbrite email for payment matching",
     example: 'john@example.com',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'Venmo Handle',
@@ -415,7 +417,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's Venmo handle for payment",
     example: '@john-doe',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
   {
     label: 'PayPal Email',
@@ -424,9 +426,9 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: "Vendor's PayPal email for payment",
     example: 'john@paypal.com',
-    worksInInvitations: true
+    worksInInvitations: true,
   },
-];
+]
 
 /**
  * @deprecated Use RichTextEditor component instead
@@ -435,36 +437,36 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
  * Kept for backwards compatibility with legacy code
  */
 export function htmlToPlainText(html: string): string {
-  if (!html) return '';
+  if (!html) return ''
 
-  let text = html;
+  let text = html
 
   // Convert common HTML elements to plain text equivalents
-  text = text.replace(/<br\s*\/?>/gi, '\n');           // <br> → newline
-  text = text.replace(/<\/p>\s*<p>/gi, '\n\n');        // </p><p> → double newline
-  text = text.replace(/<p[^>]*>/gi, '');                // Remove opening <p>
-  text = text.replace(/<\/p>/gi, '\n');                 // </p> → newline
-  text = text.replace(/<div[^>]*>/gi, '');              // Remove opening <div>
-  text = text.replace(/<\/div>/gi, '\n');               // </div> → newline
-  text = text.replace(/<h[1-6][^>]*>/gi, '');           // Remove headings
-  text = text.replace(/<\/h[1-6]>/gi, '\n\n');          // Heading end → double newline
-  text = text.replace(/<li[^>]*>/gi, '• ');             // <li> → bullet
-  text = text.replace(/<\/li>/gi, '\n');                // </li> → newline
-  text = text.replace(/<[^>]+>/g, '');                  // Remove all other tags
+  text = text.replace(/<br\s*\/?>/gi, '\n') // <br> → newline
+  text = text.replace(/<\/p>\s*<p>/gi, '\n\n') // </p><p> → double newline
+  text = text.replace(/<p[^>]*>/gi, '') // Remove opening <p>
+  text = text.replace(/<\/p>/gi, '\n') // </p> → newline
+  text = text.replace(/<div[^>]*>/gi, '') // Remove opening <div>
+  text = text.replace(/<\/div>/gi, '\n') // </div> → newline
+  text = text.replace(/<h[1-6][^>]*>/gi, '') // Remove headings
+  text = text.replace(/<\/h[1-6]>/gi, '\n\n') // Heading end → double newline
+  text = text.replace(/<li[^>]*>/gi, '• ') // <li> → bullet
+  text = text.replace(/<\/li>/gi, '\n') // </li> → newline
+  text = text.replace(/<[^>]+>/g, '') // Remove all other tags
 
   // Decode HTML entities
-  text = text.replace(/&nbsp;/g, ' ');
-  text = text.replace(/&amp;/g, '&');
-  text = text.replace(/&lt;/g, '<');
-  text = text.replace(/&gt;/g, '>');
-  text = text.replace(/&quot;/g, '"');
-  text = text.replace(/&#39;/g, "'");
+  text = text.replace(/&nbsp;/g, ' ')
+  text = text.replace(/&amp;/g, '&')
+  text = text.replace(/&lt;/g, '<')
+  text = text.replace(/&gt;/g, '>')
+  text = text.replace(/&quot;/g, '"')
+  text = text.replace(/&#39;/g, "'")
 
   // Clean up multiple newlines (more than 2) and trim
-  text = text.replace(/\n{3,}/g, '\n\n');
-  text = text.trim();
+  text = text.replace(/\n{3,}/g, '\n\n')
+  text = text.trim()
 
-  return text;
+  return text
 }
 
 /**
@@ -474,24 +476,21 @@ export function htmlToPlainText(html: string): string {
  * Kept for backwards compatibility with legacy code
  */
 export function plainTextToHtml(text: string): string {
-  if (!text) return '';
+  if (!text) return ''
 
   // Escape HTML special characters
-  let html = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
   // Split by double newlines to identify paragraphs
-  const paragraphs = html.split(/\n\n+/);
+  const paragraphs = html.split(/\n\n+/)
 
   // Wrap each paragraph in <p> tags and convert single newlines to <br>
-  const htmlParagraphs = paragraphs.map(para => {
-    const withBreaks = para.replace(/\n/g, '<br>');
-    return `<p>${withBreaks}</p>`;
-  });
+  const htmlParagraphs = paragraphs.map((para) => {
+    const withBreaks = para.replace(/\n/g, '<br>')
+    return `<p>${withBreaks}</p>`
+  })
 
-  return htmlParagraphs.join('\n');
+  return htmlParagraphs.join('\n')
 }
 
 /**
@@ -501,20 +500,20 @@ export function plainTextToHtml(text: string): string {
  *    (old emails may still have {{mustache}} format in database)
  */
 export function backendToFrontend(text: string): string {
-  if (!text) return text;
+  if (!text) return text
 
-  let result = text;
+  let result = text
 
   // Convert old {{mustache}} format to [bracket] format
   // This handles emails that were saved with the old format
-  EMAIL_VARIABLES.forEach(variable => {
+  EMAIL_VARIABLES.forEach((variable) => {
     // Escape special regex characters in backend var
-    const escapedBackend = variable.backendVar.replace(/[{}]/g, '\\$&');
-    const regex = new RegExp(escapedBackend, 'g');
-    result = result.replace(regex, variable.frontendVar);
-  });
+    const escapedBackend = variable.backendVar.replace(/[{}]/g, '\\$&')
+    const regex = new RegExp(escapedBackend, 'g')
+    result = result.replace(regex, variable.frontendVar)
+  })
 
-  return result;
+  return result
 }
 
 /**
@@ -523,12 +522,12 @@ export function backendToFrontend(text: string): string {
  * 2. Preserve HTML from rich text editor (NO LONGER converts plain text to HTML)
  */
 export function frontendToBackend(text: string): string {
-  if (!text) return text;
+  if (!text) return text
 
   // Variables stay in [bracket] format - backend expects [eventName], not {{event_title}}
   // Backend EmailVariableResolver only knows how to resolve [bracket] format
   // HTML is already formatted by TipTap rich text editor - return as-is
-  return text;
+  return text
 }
 
 /**
@@ -536,11 +535,11 @@ export function frontendToBackend(text: string): string {
  */
 export function getVariablesByCategory() {
   return {
-    event: EMAIL_VARIABLES.filter(v => v.category === 'event'),
-    organization: EMAIL_VARIABLES.filter(v => v.category === 'organization'),
-    vendor: EMAIL_VARIABLES.filter(v => v.category === 'vendor'),
-    computed: EMAIL_VARIABLES.filter(v => v.category === 'computed'),
-  };
+    event: EMAIL_VARIABLES.filter((v) => v.category === 'event'),
+    organization: EMAIL_VARIABLES.filter((v) => v.category === 'organization'),
+    vendor: EMAIL_VARIABLES.filter((v) => v.category === 'vendor'),
+    computed: EMAIL_VARIABLES.filter((v) => v.category === 'computed'),
+  }
 }
 
 /**
@@ -548,41 +547,34 @@ export function getVariablesByCategory() {
  * Three groups: Vendor Details, Organization Details, Event Details
  */
 export interface VariableGroup {
-  label: string;
-  variables: EmailVariable[];
+  label: string
+  variables: EmailVariable[]
 }
 
 export function getGroupedVariablesForUI(): VariableGroup[] {
   // Helper to sort alphabetically by label
-  const sortByLabel = (a: EmailVariable, b: EmailVariable) =>
-    a.label.localeCompare(b.label);
+  const sortByLabel = (a: EmailVariable, b: EmailVariable) => a.label.localeCompare(b.label)
 
   return [
     {
       label: 'Vendor Details',
-      variables: EMAIL_VARIABLES
-        .filter(v => v.category === 'vendor')
-        .sort(sortByLabel)
+      variables: EMAIL_VARIABLES.filter((v) => v.category === 'vendor').sort(sortByLabel),
     },
     {
       label: 'Organization Details',
-      variables: EMAIL_VARIABLES
-        .filter(v => v.category === 'organization')
-        .sort(sortByLabel)
+      variables: EMAIL_VARIABLES.filter((v) => v.category === 'organization').sort(sortByLabel),
     },
     {
       label: 'Event Details',
-      variables: EMAIL_VARIABLES
-        .filter(v => v.category === 'event')
-        .sort(sortByLabel)
+      variables: EMAIL_VARIABLES.filter((v) => v.category === 'event').sort(sortByLabel),
     },
     {
       label: 'Links',
-      variables: EMAIL_VARIABLES
-        .filter(v => v.category === 'links' || v.category === 'computed')
-        .sort(sortByLabel)
-    }
-  ];
+      variables: EMAIL_VARIABLES.filter(
+        (v) => v.category === 'links' || v.category === 'computed',
+      ).sort(sortByLabel),
+    },
+  ]
 }
 
 /**
@@ -590,36 +582,36 @@ export function getGroupedVariablesForUI(): VariableGroup[] {
  */
 export function insertVariableAtCursor(
   textareaElement: HTMLTextAreaElement | HTMLInputElement,
-  variableToInsert: string
+  variableToInsert: string,
 ): string {
   // Handle null selectionStart/selectionEnd (can happen with some input types)
-  const start = textareaElement.selectionStart ?? 0;
-  const end = textareaElement.selectionEnd ?? textareaElement.value.length;
-  const text = textareaElement.value;
+  const start = textareaElement.selectionStart ?? 0
+  const end = textareaElement.selectionEnd ?? textareaElement.value.length
+  const text = textareaElement.value
 
   // Insert variable at cursor position
-  const newText = text.substring(0, start) + variableToInsert + text.substring(end);
+  const newText = text.substring(0, start) + variableToInsert + text.substring(end)
 
   // Set cursor position after inserted variable
-  const newCursorPos = start + variableToInsert.length;
+  const newCursorPos = start + variableToInsert.length
 
   // Update textarea (caller should do this)
   setTimeout(() => {
-    textareaElement.focus();
-    textareaElement.setSelectionRange(newCursorPos, newCursorPos);
-  }, 0);
+    textareaElement.focus()
+    textareaElement.setSelectionRange(newCursorPos, newCursorPos)
+  }, 0)
 
-  return newText;
+  return newText
 }
 
 /**
  * Validation result interface
  */
 export interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-  unknownVariables: string[];
-  unclosedBrackets: string[];
+  isValid: boolean
+  errors: string[]
+  unknownVariables: string[]
+  unclosedBrackets: string[]
 }
 
 /**
@@ -629,45 +621,45 @@ export interface ValidationResult {
  * - Unclosed brackets
  */
 export function validateEmailContent(subject: string, body: string): ValidationResult {
-  const errors: string[] = [];
-  const unknownVariables: string[] = [];
-  const unclosedBrackets: string[] = [];
+  const errors: string[] = []
+  const unknownVariables: string[] = []
+  const unclosedBrackets: string[] = []
 
   const texts = [
     { text: subject, label: 'subject' },
-    { text: body, label: 'body' }
-  ];
+    { text: body, label: 'body' },
+  ]
 
-  const frontendVars = EMAIL_VARIABLES.map(v => v.frontendVar);
+  const frontendVars = EMAIL_VARIABLES.map((v) => v.frontendVar)
 
   for (const { text, label } of texts) {
-    if (!text) continue;
+    if (!text) continue
 
     // Find all complete variables [variable]
-    const completeVars = text.match(/\[[\w]+\]/g) || [];
+    const completeVars = text.match(/\[[\w]+\]/g) || []
 
     // Check for unknown variables
-    const unknownInText = completeVars.filter(match => !frontendVars.includes(match));
-    unknownVariables.push(...unknownInText);
+    const unknownInText = completeVars.filter((match) => !frontendVars.includes(match))
+    unknownVariables.push(...unknownInText)
 
     // Check for unclosed brackets
     // Pattern: [ followed by word characters but NOT followed by ]
-    const unclosedPattern = /\[[\w]+(?!\])/g;
-    const unclosed = text.match(unclosedPattern) || [];
+    const unclosedPattern = /\[[\w]+(?!\])/g
+    const unclosed = text.match(unclosedPattern) || []
 
     // Additional check: find opening [ without matching ]
-    let openBrackets = 0;
+    let openBrackets = 0
     for (let i = 0; i < text.length; i++) {
       if (text[i] === '[') {
-        openBrackets++;
+        openBrackets++
         // Look ahead to see if this bracket is closed
-        const remainingText = text.substring(i);
-        const nextClose = remainingText.indexOf(']');
+        const remainingText = text.substring(i)
+        const nextClose = remainingText.indexOf(']')
         if (nextClose === -1) {
           // No closing bracket found after this opening
-          const unclosedVar = remainingText.match(/\[[\w]*/)?.[0] || '[';
+          const unclosedVar = remainingText.match(/\[[\w]*/)?.[0] || '['
           if (!unclosedBrackets.includes(unclosedVar)) {
-            unclosedBrackets.push(unclosedVar);
+            unclosedBrackets.push(unclosedVar)
           }
         }
       }
@@ -676,21 +668,25 @@ export function validateEmailContent(subject: string, body: string): ValidationR
 
   // Generate error messages
   if (unknownVariables.length > 0) {
-    const uniqueUnknown = [...new Set(unknownVariables)];
-    errors.push(`Unknown variable${uniqueUnknown.length > 1 ? 's' : ''}: ${uniqueUnknown.join(', ')}`);
+    const uniqueUnknown = [...new Set(unknownVariables)]
+    errors.push(
+      `Unknown variable${uniqueUnknown.length > 1 ? 's' : ''}: ${uniqueUnknown.join(', ')}`,
+    )
   }
 
   if (unclosedBrackets.length > 0) {
-    const uniqueUnclosed = [...new Set(unclosedBrackets)];
-    errors.push(`Unclosed bracket${uniqueUnclosed.length > 1 ? 's' : ''}: ${uniqueUnclosed.join(', ')}`);
+    const uniqueUnclosed = [...new Set(unclosedBrackets)]
+    errors.push(
+      `Unclosed bracket${uniqueUnclosed.length > 1 ? 's' : ''}: ${uniqueUnclosed.join(', ')}`,
+    )
   }
 
   return {
     isValid: errors.length === 0,
     errors,
     unknownVariables: [...new Set(unknownVariables)],
-    unclosedBrackets: [...new Set(unclosedBrackets)]
-  };
+    unclosedBrackets: [...new Set(unclosedBrackets)],
+  }
 }
 
 /**
@@ -698,20 +694,20 @@ export function validateEmailContent(subject: string, body: string): ValidationR
  * Returns array of unrecognized variables
  */
 export function validateVariables(text: string): string[] {
-  if (!text) return [];
+  if (!text) return []
 
-  const frontendVars = EMAIL_VARIABLES.map(v => v.frontendVar);
-  const backendVars = EMAIL_VARIABLES.map(v => v.backendVar);
-  const allValidVars = [...frontendVars, ...backendVars];
+  const frontendVars = EMAIL_VARIABLES.map((v) => v.frontendVar)
+  const backendVars = EMAIL_VARIABLES.map((v) => v.backendVar)
+  const allValidVars = [...frontendVars, ...backendVars]
 
   // Find all variables in text (both formats)
-  const frontendMatches = text.match(/\[[\w]+\]/g) || [];
-  const backendMatches = text.match(/\{\{[\w_]+\}\}/g) || [];
-  const allMatches = [...frontendMatches, ...backendMatches];
+  const frontendMatches = text.match(/\[[\w]+\]/g) || []
+  const backendMatches = text.match(/\{\{[\w_]+\}\}/g) || []
+  const allMatches = [...frontendMatches, ...backendMatches]
 
   // Find unrecognized variables
-  const unrecognized = allMatches.filter(match => !allValidVars.includes(match));
+  const unrecognized = allMatches.filter((match) => !allValidVars.includes(match))
 
   // Return unique unrecognized variables
-  return [...new Set(unrecognized)];
+  return [...new Set(unrecognized)]
 }

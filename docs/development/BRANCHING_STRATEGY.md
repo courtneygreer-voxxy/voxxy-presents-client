@@ -7,6 +7,7 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
 ### Main Branches
 
 #### `main`
+
 - **Purpose**: Production-ready code
 - **Protection**: Protected branch with required reviews
 - **Deployments**: Automatically deploys to production
@@ -14,6 +15,7 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
 - **Direct commits**: Prohibited
 
 #### `develop`
+
 - **Purpose**: Integration branch for ongoing development
 - **Protection**: Protected with required reviews
 - **Deployments**: Automatically deploys to development environment
@@ -21,6 +23,7 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
 - **Direct commits**: Limited to hotfixes only
 
 #### `staging`
+
 - **Purpose**: Pre-production testing and quality assurance
 - **Protection**: Protected branch
 - **Deployments**: Automatically deploys to staging environment
@@ -30,6 +33,7 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
 ### Supporting Branches
 
 #### Feature Branches (`feature/*`)
+
 - **Naming**: `feature/feature-name` or `feature/ticket-number-description`
 - **Purpose**: Develop new features or enhancements
 - **Base**: Created from `develop`
@@ -37,6 +41,7 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
 - **Lifecycle**: Deleted after successful merge
 
 #### Bugfix Branches (`bugfix/*`)
+
 - **Naming**: `bugfix/bug-description` or `bugfix/ticket-number-description`
 - **Purpose**: Fix non-critical bugs found in development
 - **Base**: Created from `develop`
@@ -44,6 +49,7 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
 - **Lifecycle**: Deleted after successful merge
 
 #### Hotfix Branches (`hotfix/*`)
+
 - **Naming**: `hotfix/critical-fix-description`
 - **Purpose**: Fix critical issues in production
 - **Base**: Created from `main`
@@ -51,6 +57,7 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
 - **Lifecycle**: Deleted after successful merge
 
 #### Release Branches (`release/*`) - **BATCH RELEASE STRATEGY**
+
 - **Naming**: `release/version-number` (e.g., `release/1.2.0`)
 - **Purpose**: **Batch multiple completed features** for coordinated releases
 - **Base**: Created from `develop`
@@ -61,7 +68,9 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
 ## Workflow
 
 ### Feature Development
+
 1. Create feature branch from `develop`
+
    ```bash
    git checkout develop
    git pull origin develop
@@ -69,12 +78,14 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
    ```
 
 2. Develop and commit changes
+
    ```bash
    git add .
    git commit -m "feat: implement new feature"
    ```
 
 3. Push and create pull request to `develop`
+
    ```bash
    git push origin feature/new-feature-name
    ```
@@ -87,6 +98,7 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
 **🎯 Coordinated Multi-Feature Releases**
 
 1. **Create release branch from `develop`**
+
    ```bash
    git checkout develop
    git pull origin develop
@@ -94,6 +106,7 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
    ```
 
 2. **Batch merge completed features**
+
    ```bash
    # Merge multiple ready features into release branch
    git merge feature/email-system
@@ -102,6 +115,7 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
    ```
 
 3. **Deploy batch to staging for comprehensive testing**
+
    ```bash
    git checkout staging
    git merge release/1.2.0
@@ -114,6 +128,7 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
    - Verify no breaking changes between features
 
 5. **After comprehensive QA approval, batch release to production**
+
    ```bash
    git checkout main
    git merge release/1.2.0
@@ -121,24 +136,28 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
    ```
 
 6. **Tag the coordinated release**
+
    ```bash
    git tag -a v1.2.0 -m "Release v1.2.0: Email System + Platform Integration + Admin Updates"
    git push origin v1.2.0
    ```
 
 7. **Clean up feature and release branches**
+
    ```bash
    # Delete merged feature branches
    git branch -d feature/email-system
    git branch -d feature/platform-integration
    git branch -d feature/admin-dashboard-updates
-   
+
    # Delete release branch
    git branch -d release/1.2.0
    ```
 
 ### Hotfix Process
+
 1. Create hotfix branch from `main`
+
    ```bash
    git checkout main
    git pull origin main
@@ -152,6 +171,7 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
 ## Branch Protection Rules
 
 ### `main` Branch
+
 - Require pull request reviews (minimum 1 reviewer)
 - Require status checks to pass before merging
 - Require branches to be up to date before merging
@@ -159,11 +179,13 @@ This document outlines the Git branching strategy for the Voxxy Presents Client 
 - Delete head branches automatically after merge
 
 ### `develop` Branch
+
 - Require pull request reviews (minimum 1 reviewer)
 - Require status checks to pass before merging
 - Allow administrators to bypass requirements for hotfixes
 
 ### `staging` Branch
+
 - Require pull request reviews
 - Require status checks to pass before merging
 - Restrict to merges from `develop` and `release/*` branches
@@ -181,6 +203,7 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/) specific
 - `chore:` Maintenance tasks
 
 Example:
+
 ```
 feat: add user authentication system
 
@@ -191,15 +214,16 @@ feat: add user authentication system
 
 ## Environment Deployments
 
-| Branch    | Environment | URL | Auto-Deploy |
-|-----------|-------------|-----|-------------|
-| `main`    | Production  | https://voxxy-presents.com | ✅ |
-| `staging` | Staging     | https://staging.voxxy-presents.com | ✅ |
-| `develop` | Development | https://dev.voxxy-presents.com | ✅ |
+| Branch    | Environment | URL                                | Auto-Deploy |
+| --------- | ----------- | ---------------------------------- | ----------- |
+| `main`    | Production  | https://voxxy-presents.com         | ✅          |
+| `staging` | Staging     | https://staging.voxxy-presents.com | ✅          |
+| `develop` | Development | https://dev.voxxy-presents.com     | ✅          |
 
 ## Best Practices
 
 ### Batch Release Strategy
+
 1. **Feature Planning** - Target features for specific release versions
 2. **Release Cadence** - Weekly or bi-weekly coordinated releases
 3. **Feature Isolation** - Features stay in branches until release batch
@@ -207,6 +231,7 @@ feat: add user authentication system
 5. **Release Documentation** - Document all features in version releases
 
 ### General Development
+
 1. **Keep branches small and focused** - One feature per branch
 2. **Regular updates** - Sync with base branch frequently
 3. **Descriptive names** - Use clear, descriptive branch names
@@ -219,14 +244,18 @@ feat: add user authentication system
 ## Emergency Procedures
 
 ### Production Rollback
+
 If a critical issue is discovered in production:
+
 1. Immediately rollback the deployment
 2. Create hotfix branch from the last known good commit
 3. Fix the issue and follow hotfix process
 4. Deploy the fix as soon as possible
 
 ### Branch Recovery
+
 If a branch is accidentally deleted:
+
 1. Check GitHub's branch restore options
 2. Use `git reflog` to find the commit hash
 3. Recreate the branch: `git checkout -b branch-name commit-hash`

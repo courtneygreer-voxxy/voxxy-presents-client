@@ -6,10 +6,12 @@
  */
 
 interface EmailFooterCardProps {
-  organizationEmail?: string;
+  organizationEmail?: string
 }
 
-export default function EmailFooterCard({ organizationEmail = '[organizationEmail]' }: EmailFooterCardProps) {
+export default function EmailFooterCard({
+  organizationEmail = '[organizationEmail]',
+}: EmailFooterCardProps) {
   return (
     <div>
       <label className="block text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide mb-2">
@@ -27,11 +29,9 @@ export default function EmailFooterCard({ organizationEmail = '[organizationEmai
               Unsubscribe from these emails
             </a>
           </span>
-          <span className="block text-foreground/60 text-[10px] mt-3">
-            Powered by Voxxy
-          </span>
+          <span className="block text-foreground/60 text-[10px] mt-3">Powered by Voxxy</span>
         </p>
       </div>
     </div>
-  );
+  )
 }

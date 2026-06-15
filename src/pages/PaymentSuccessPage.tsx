@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Loader2, Sparkles, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useAuth } from "@/contexts/AuthContext"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { CheckCircle, Loader2, Sparkles, ArrowRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { useAuth } from '@/contexts/AuthContext'
 import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function PaymentSuccessPage() {
@@ -71,7 +71,6 @@ export default function PaymentSuccessPage() {
 
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-2xl space-y-8">
-
           {/* Success Card */}
           <Card className="bg-background/10 backdrop-blur-md border-2 border-green-400/30 shadow-2xl">
             <CardHeader className="text-center pb-6 space-y-4">
@@ -82,7 +81,10 @@ export default function PaymentSuccessPage() {
                 </div>
               </div>
 
-              <Badge variant="tintGreen" className="mx-auto w-fit gap-2 px-4 py-2 text-sm font-medium">
+              <Badge
+                variant="tintGreen"
+                className="mx-auto w-fit gap-2 px-4 py-2 text-sm font-medium"
+              >
                 <Sparkles className="h-4 w-4" />
                 Payment Successful
               </Badge>
@@ -99,11 +101,10 @@ export default function PaymentSuccessPage() {
             <CardContent className="space-y-6">
               {/* Confirmation Message */}
               <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-6 text-center space-y-2">
-                <p className="text-foreground font-semibold text-lg">
-                  🎉 Payment Confirmed!
-                </p>
+                <p className="text-foreground font-semibold text-lg">🎉 Payment Confirmed!</p>
                 <p className="text-foreground/85 dark:text-muted-foreground">
-                  You now have full access to all producer features. Time to create something amazing!
+                  You now have full access to all producer features. Time to create something
+                  amazing!
                 </p>
                 {sessionId && (
                   <p className="text-xs text-foreground/75 dark:text-muted-foreground pt-2 font-mono">
@@ -114,9 +115,7 @@ export default function PaymentSuccessPage() {
 
               {/* What's Next */}
               <div className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-6 space-y-4">
-                <h3 className="font-semibold text-foreground text-lg mb-3">
-                  What's Next?
-                </h3>
+                <h3 className="font-semibold text-foreground text-lg mb-3">What's Next?</h3>
                 <ul className="space-y-3 text-sm text-foreground/85 dark:text-muted-foreground">
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
@@ -151,11 +150,7 @@ export default function PaymentSuccessPage() {
                     <p className="text-foreground/80 dark:text-muted-foreground text-sm">
                       Redirecting to your dashboard in {countdown} seconds...
                     </p>
-                    <Button
-                      onClick={handleGoToDashboard}
-                      className="voxxy-btn-cta-pink"
-                      size="lg"
-                    >
+                    <Button onClick={handleGoToDashboard} className="voxxy-btn-cta-pink" size="lg">
                       Go to Dashboard Now
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>

@@ -29,7 +29,7 @@ export default function LoginPage() {
   const { signIn, loading, error, clearError } = useAuth()
   const [formData, setFormData] = useState<FormData>({
     email: '',
-    password: ''
+    password: '',
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [showPassword, setShowPassword] = useState(false)
@@ -45,16 +45,16 @@ export default function LoginPage() {
 
   // Handle input changes
   const handleInputChange = (field: keyof FormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
 
     // Clear field-specific errors
     if (errors[field as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }))
+      setErrors((prev) => ({ ...prev, [field]: undefined }))
     }
 
     // Clear submit error
     if (errors.submit) {
-      setErrors(prev => ({ ...prev, submit: undefined }))
+      setErrors((prev) => ({ ...prev, submit: undefined }))
     }
 
     // Clear AuthContext error
@@ -88,12 +88,12 @@ export default function LoginPage() {
     if (!validateForm()) return
 
     setIsSubmitting(true)
-    setErrors(prev => ({ ...prev, submit: undefined }))
+    setErrors((prev) => ({ ...prev, submit: undefined }))
 
     try {
       await signIn({
         email: formData.email.trim(),
-        password: formData.password
+        password: formData.password,
       })
 
       // RedirectIfAuthenticated component will handle routing based on user role
@@ -105,7 +105,7 @@ export default function LoginPage() {
         errorMessage = err.message
       }
 
-      setErrors(prev => ({ ...prev, submit: errorMessage }))
+      setErrors((prev) => ({ ...prev, submit: errorMessage }))
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } finally {
       setIsSubmitting(false)
@@ -127,7 +127,9 @@ export default function LoginPage() {
       await signIn({ email: data.email, password: 'password123' })
     } catch (err) {
       console.error('Dev login error:', err)
-      setErrors({ submit: 'Dev login failed. Is the Rails server running on port 3001 with seed data?' })
+      setErrors({
+        submit: 'Dev login failed. Is the Rails server running on port 3001 with seed data?',
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -188,9 +190,7 @@ export default function LoginPage() {
             <Card className="w-full bg-background/5 backdrop-blur-xl border border-primary/30 shadow-[0_0_50px_rgba(144,84,227,0.3)]">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-bold text-foreground">Sign In</CardTitle>
-                <CardDescription>
-                  Enter your credentials to access your account
-                </CardDescription>
+                <CardDescription>Enter your credentials to access your account</CardDescription>
               </CardHeader>
               <CardContent>
                 {/* Error Display */}
@@ -198,9 +198,7 @@ export default function LoginPage() {
                   <Alert className="bg-red-500/20 border-red-500 border-2 mb-6 shadow-lg">
                     <AlertDescription className="flex items-start gap-3">
                       <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
-                      <div className="text-foreground font-medium">
-                        {error || errors.submit}
-                      </div>
+                      <div className="text-foreground font-medium">{error || errors.submit}</div>
                     </AlertDescription>
                   </Alert>
                 )}
@@ -208,7 +206,9 @@ export default function LoginPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Email Field */}
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-foreground">Email</Label>
+                    <Label htmlFor="email" className="text-foreground">
+                      Email
+                    </Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -221,15 +221,15 @@ export default function LoginPage() {
                         disabled={isSubmitting}
                       />
                     </div>
-                    {errors.email && (
-                      <p className="text-red-400 text-sm">{errors.email}</p>
-                    )}
+                    {errors.email && <p className="text-red-400 text-sm">{errors.email}</p>}
                   </div>
 
                   {/* Password Field */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="password" className="text-foreground">Password</Label>
+                      <Label htmlFor="password" className="text-foreground">
+                        Password
+                      </Label>
                       <button
                         type="button"
                         onClick={() => navigate('/forgot-password')}
@@ -256,12 +256,14 @@ export default function LoginPage() {
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                         disabled={isSubmitting}
                       >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
-                    {errors.password && (
-                      <p className="text-red-400 text-sm">{errors.password}</p>
-                    )}
+                    {errors.password && <p className="text-red-400 text-sm">{errors.password}</p>}
                   </div>
 
                   {/* Submit Button */}

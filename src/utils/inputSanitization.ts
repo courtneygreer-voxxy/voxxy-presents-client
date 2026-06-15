@@ -9,7 +9,7 @@ const htmlEntities: Record<string, string> = {
   '>': '&gt;',
   '"': '&quot;',
   "'": '&#x27;',
-  '/': '&#x2F;'
+  '/': '&#x2F;',
 }
 
 /**
@@ -36,7 +36,7 @@ export function sanitizeInput(input: string): string {
   sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
   sanitized = sanitized.replace(/javascript:/gi, '')
   sanitized = sanitized.replace(/on\w+\s*=/gi, '')
-  
+
   // Remove excessive whitespace
   sanitized = sanitized.replace(/\s+/g, ' ').trim()
 
@@ -52,24 +52,24 @@ export function sanitizeInput(input: string): string {
 export function validateEmail(email: string): boolean {
   // Basic email regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  
+
   if (!emailRegex.test(email)) {
     return false
   }
 
   // Additional security checks
   const sanitized = sanitizeInput(email.toLowerCase().trim())
-  
+
   // Check for suspicious patterns
   const suspiciousPatterns = [
-    /\.\./,  // Double dots
-    /@.*@/,  // Multiple @ symbols
-    /^[.-]/,  // Starting with dot or dash
-    /[.-]$/,  // Ending with dot or dash
-    /[<>]/,   // Angle brackets
+    /\.\./, // Double dots
+    /@.*@/, // Multiple @ symbols
+    /^[.-]/, // Starting with dot or dash
+    /[.-]$/, // Ending with dot or dash
+    /[<>]/, // Angle brackets
   ]
 
-  return !suspiciousPatterns.some(pattern => pattern.test(sanitized))
+  return !suspiciousPatterns.some((pattern) => pattern.test(sanitized))
 }
 
 /**
@@ -81,7 +81,7 @@ export function validateName(name: string): boolean {
   }
 
   const sanitized = sanitizeInput(name.trim())
-  
+
   // Check length limits
   if (sanitized.length < 2 || sanitized.length > 100) {
     return false
@@ -101,7 +101,7 @@ export function validateMessage(message: string): boolean {
   }
 
   const sanitized = sanitizeInput(message.trim())
-  
+
   // Check length limits
   if (sanitized.length > 500) {
     return false
@@ -110,7 +110,7 @@ export function validateMessage(message: string): boolean {
   // Check for excessive special characters (potential spam)
   const specialCharCount = (sanitized.match(/[!@#$%^&*(),.?":{}|<>]/g) || []).length
   const ratio = specialCharCount / sanitized.length
-  
+
   // If more than 30% special characters, likely spam
   if (ratio > 0.3) {
     return false
@@ -133,16 +133,16 @@ export function detectMaliciousContent(text: string): string[] {
 
   // Check for SQL injection patterns
   const sqlPatterns = ['drop table', 'delete from', 'insert into', 'update set', 'union select']
-  if (sqlPatterns.some(pattern => lowerText.includes(pattern))) {
+  if (sqlPatterns.some((pattern) => lowerText.includes(pattern))) {
     issues.push('SQL injection pattern detected')
   }
 
   // Check for excessive repetition (potential spam)
   const words = text.split(/\s+/)
   const wordCount = words.length
-  const uniqueWords = new Set(words.map(w => w.toLowerCase())).size
-  
-  if (wordCount > 10 && (uniqueWords / wordCount) < 0.3) {
+  const uniqueWords = new Set(words.map((w) => w.toLowerCase())).size
+
+  if (wordCount > 10 && uniqueWords / wordCount < 0.3) {
     issues.push('Excessive repetition detected')
   }
 
@@ -154,4 +154,60 @@ export function detectMaliciousContent(text: string): string[] {
   }
 
   return issues
+}
+
+export const buildInstagramUrl = (handle: string | undefined): string | undefined => {
+  // Construct full URLs from user input with defensive handling
+  try {
+    if (!handle || !handle.trim()) return undefined
+    // Remove @ symbol, https://, instagram.com, etc if user added them
+    let cleanHandle = handle
+      .trim()
+      .replace(/^@/, '')
+      .replace(/^https?:\/\//i, '')
+      .replace(/^(www\.)?instagram\.com\//i, '')
+      .trim()
+
+    // Only return if we have a valid handle left
+    return cleanHandle && cleanHandle.length > 0
+      ? `https://instagram.com/${cleanHandle}`
+      : undefined
+  } catch {
+    return undefined
+  }
+}
+
+export const buildTikTokUrl = (handle: string | undefined): string | undefined => {
+  try {
+    if (!handle || !handle.trim()) return undefined
+    // Remove @ symbol, https://, tiktok.com, etc if user added them
+    let cleanHandle = handle
+      .trim()
+      .replace(/^@/, '')
+      .replace(/^https?:\/\//i, '')
+      .replace(/^(www\.)?tiktok\.com\/@?/i, '')
+      .trim()
+
+    // Only return if we have a valid handle left
+    return cleanHandle && cleanHandle.length > 0 ? `https://tiktok.com/@${cleanHandle}` : undefined
+  } catch {
+    return undefined
+  }
+}
+
+export const buildWebsiteUrl = (site: string | undefined): string | undefined => {
+  try {
+    if (!site || !site.trim()) return undefined
+    let cleanSite = site.trim()
+
+    // If already a complete URL, validate and return
+    if (cleanSite.startsWith('http://') || cleanSite.startsWith('https://')) {
+      return cleanSite
+    }
+
+    // Otherwise add https:// prefix
+    return cleanSite.length > 0 ? `https://${cleanSite}` : undefined
+  } catch {
+    return undefined
+  }
 }

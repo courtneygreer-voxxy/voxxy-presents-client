@@ -16,20 +16,27 @@ interface User {
   username?: string
   status?: 'active' | 'suspended' | 'banned'
   product_context?: 'mobile' | 'presents' | 'both'
-  paid?: boolean  // LEGACY - Payment status for producers (deprecated, use subscription_active)
-  organization_id?: number  // For producers: their primary organization
+  paid?: boolean // LEGACY - Payment status for producers (deprecated, use subscription_active)
+  organization_id?: number // For producers: their primary organization
   // V4.0: Stripe subscription status (replaces legacy 'paid' field)
-  subscription_active?: boolean  // True if organization has active subscription
-  subscription_status?: string | null  // 'active', 'inactive', 'past_due', 'canceled'
-  subscription_display_status?: string  // Human-readable status
-  requires_payment?: boolean  // True if user needs to pay (producers only)
+  subscription_active?: boolean // True if organization has active subscription
+  subscription_status?: string | null // 'active', 'inactive', 'past_due', 'canceled'
+  subscription_display_status?: string // Human-readable status
+  requires_payment?: boolean // True if user needs to pay (producers only)
 }
 
 interface SignUpData {
   email: string
   password: string
   displayName: string
-  userType?: 'venue_owner' | 'consumer' | 'producer' | 'vendor' | 'guest' | 'club-owner' | 'venue-owner' // Legacy support for club-owner, venue-owner
+  userType?:
+    | 'venue_owner'
+    | 'consumer'
+    | 'producer'
+    | 'vendor'
+    | 'guest'
+    | 'club-owner'
+    | 'venue-owner' // Legacy support for club-owner, venue-owner
   role?: User['role']
 }
 
@@ -67,9 +74,9 @@ interface AuthContextType {
   hasRole: (role: User['role']) => boolean
 
   // Payment/Subscription helpers (V4.0)
-  isPaid: boolean  // True if user has active subscription (replaces legacy paid check)
-  requiresPayment: boolean  // True if user needs to pay
-  hasActiveSubscription: boolean  // True if subscription_active
+  isPaid: boolean // True if user has active subscription (replaces legacy paid check)
+  requiresPayment: boolean // True if user needs to pay
+  hasActiveSubscription: boolean // True if subscription_active
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -115,7 +122,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.log('✓ Loading cached user profile (instant)', {
           email: cachedProfile.email,
           role: cachedProfile.role,
-          id: cachedProfile.id
+          id: cachedProfile.id,
         })
         setCurrentUser(cachedProfile)
         setUserProfile(cachedProfile)
@@ -202,7 +209,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         email: data.email,
         password: data.password,
         name: data.displayName,
-        role: role
+        role: role,
       })
 
       // Login automatically saves the token
@@ -255,7 +262,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Track sign in
       analytics.trackUserSignIn(user.email, String(user.id), user.role)
 
-      console.log('✓ User profile loaded:', { email: user.email, role: user.role, confirmed: !!user.confirmed_at })
+      console.log('✓ User profile loaded:', {
+        email: user.email,
+        role: user.role,
+        confirmed: !!user.confirmed_at,
+      })
     } catch (err) {
       if (err instanceof ApiError) {
         // Use the main error message (which is user-friendly)
@@ -345,7 +356,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // DEPRECATED (but still work for backward compatibility)
   const isOrganizer = isProducer // Maps to producer role
-  const isVenueOwner = isVendor  // Maps to vendor role
+  const isVenueOwner = isVendor // Maps to vendor role
 
   const hasRole = (role: User['role']) => userProfile?.role === role
 
@@ -353,7 +364,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // These replace the legacy 'paid' boolean check with organization subscription status
   const hasActiveSubscription = userProfile?.subscription_active ?? false
   const requiresPayment = userProfile?.requires_payment ?? false
-  const isPaid = hasActiveSubscription  // New: based on subscription_active, not legacy paid field
+  const isPaid = hasActiveSubscription // New: based on subscription_active, not legacy paid field
 
   const value: AuthContextType = {
     currentUser,
@@ -378,14 +389,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // V4.0: Payment/Subscription helpers
     isPaid,
     requiresPayment,
-    hasActiveSubscription
+    hasActiveSubscription,
   }
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export { AuthContext }

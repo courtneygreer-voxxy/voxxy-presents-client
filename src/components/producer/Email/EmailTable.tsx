@@ -1,32 +1,51 @@
-import { useState } from 'react';
-import { ChevronUp, ChevronDown, ChevronsUpDown, HelpCircle } from 'lucide-react';
-import * as Tooltip from '@radix-ui/react-tooltip';
-import { ScheduledEmail, AuditFilters } from '@/types/email';
-import EmailRow from './EmailRow';
+import { useState } from 'react'
+import { ChevronUp, ChevronDown, ChevronsUpDown, HelpCircle } from 'lucide-react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { ScheduledEmail, AuditFilters } from '@/types/email'
+import EmailRow from './EmailRow'
 
-type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'email_type' | 'category' | 'recipient_count' | 'undelivered_count' | 'status';
-type SortDirection = 'asc' | 'desc';
+type SortColumn =
+  | 'name'
+  | 'subject'
+  | 'scheduled_for'
+  | 'email_type'
+  | 'category'
+  | 'recipient_count'
+  | 'undelivered_count'
+  | 'status'
+type SortDirection = 'asc' | 'desc'
 
 interface EmailTableProps {
-  emails: ScheduledEmail[];
-  eventSlug: string;
-  onEdit?: (email: ScheduledEmail) => void;
-  onPause?: (emailId: number) => Promise<void>;
-  onResume?: (emailId: number) => Promise<void>;
-  onSendNow?: (emailId: number) => Promise<void>;
-  onRetryFailed?: (emailId: number) => Promise<void>;
-  onDelete?: (emailId: number) => Promise<void>;
-  onViewAuditLog?: (filters: AuditFilters) => void;
-  sortColumn?: SortColumn | null;
-  sortDirection?: SortDirection;
-  onSort?: (column: SortColumn) => void;
+  emails: ScheduledEmail[]
+  eventSlug: string
+  onEdit?: (email: ScheduledEmail) => void
+  onPause?: (emailId: number) => Promise<void>
+  onResume?: (emailId: number) => Promise<void>
+  onSendNow?: (emailId: number) => Promise<void>
+  onRetryFailed?: (emailId: number) => Promise<void>
+  onDelete?: (emailId: number) => Promise<void>
+  onViewAuditLog?: (filters: AuditFilters) => void
+  sortColumn?: SortColumn | null
+  sortDirection?: SortDirection
+  onSort?: (column: SortColumn) => void
 }
 
-function SortIcon({ column, sortColumn, sortDirection }: { column: SortColumn; sortColumn?: SortColumn | null; sortDirection?: SortDirection }) {
-  if (sortColumn !== column) return <ChevronsUpDown className="h-3 w-3 text-foreground/45 dark:text-foreground/40" />;
-  return sortDirection === 'asc'
-    ? <ChevronUp className="h-3 w-3 text-violet-700 dark:text-primary" />
-    : <ChevronDown className="h-3 w-3 text-violet-700 dark:text-primary" />;
+function SortIcon({
+  column,
+  sortColumn,
+  sortDirection,
+}: {
+  column: SortColumn
+  sortColumn?: SortColumn | null
+  sortDirection?: SortDirection
+}) {
+  if (sortColumn !== column)
+    return <ChevronsUpDown className="h-3 w-3 text-foreground/45 dark:text-foreground/40" />
+  return sortDirection === 'asc' ? (
+    <ChevronUp className="h-3 w-3 text-violet-700 dark:text-primary" />
+  ) : (
+    <ChevronDown className="h-3 w-3 text-violet-700 dark:text-primary" />
+  )
 }
 
 // Check if email is a system email (matches backend SYSTEM_TRIGGERS)
@@ -42,9 +61,9 @@ function isSystemEmail(triggerType: string): boolean {
     'on_event_update',
     'on_event_cancel',
     'on_invitation_send',
-    'on_bulletin_post'
-  ];
-  return systemTriggers.includes(triggerType);
+    'on_bulletin_post',
+  ]
+  return systemTriggers.includes(triggerType)
 }
 
 export default function EmailTable({
@@ -61,15 +80,15 @@ export default function EmailTable({
   sortDirection,
   onSort,
 }: EmailTableProps) {
-  const [isSystemCollapsed, setIsSystemCollapsed] = useState(false);
-  const [isRemindersCollapsed, setIsRemindersCollapsed] = useState(false);
+  const [isSystemCollapsed, setIsSystemCollapsed] = useState(false)
+  const [isRemindersCollapsed, setIsRemindersCollapsed] = useState(false)
 
   if (emails.length === 0) {
     return (
       <div className="bg-background/5 rounded-lg border border-border p-12 text-center">
         <p className="text-foreground/60">No emails found</p>
       </div>
-    );
+    )
   }
 
   const col = (column: SortColumn, label: string, className?: string, title?: string) => {
@@ -79,7 +98,7 @@ export default function EmailTable({
         <div className={`flex items-center gap-1 ${className ?? ''}`} title={title}>
           {label}
         </div>
-      );
+      )
     }
 
     return (
@@ -91,12 +110,12 @@ export default function EmailTable({
         {label}
         <SortIcon column={column} sortColumn={sortColumn} sortDirection={sortDirection} />
       </button>
-    );
-  };
+    )
+  }
 
   // Group emails into system and reminders
-  const systemEmails = emails.filter(email => isSystemEmail(email.trigger_type));
-  const reminderEmails = emails.filter(email => !isSystemEmail(email.trigger_type));
+  const systemEmails = emails.filter((email) => isSystemEmail(email.trigger_type))
+  const reminderEmails = emails.filter((email) => !isSystemEmail(email.trigger_type))
 
   return (
     <div className="voxxy-table-shell">
@@ -109,7 +128,12 @@ export default function EmailTable({
           {col('email_type', 'Email Type')}
           {col('category', 'Audience')}
           {col('recipient_count', 'Recipients', 'justify-center')}
-          <div className="flex items-center justify-center" title="Emails that bounced or were dropped by SendGrid">Undelivered</div>
+          <div
+            className="flex items-center justify-center"
+            title="Emails that bounced or were dropped by SendGrid"
+          >
+            Undelivered
+          </div>
           <div className="flex items-center justify-center">Status</div>
           <div className="text-right">Actions</div>
         </div>
@@ -148,7 +172,8 @@ export default function EmailTable({
                         className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-emerald-400/30 shadow-xl max-w-xs z-50"
                         sideOffset={5}
                       >
-                        Core system emails that are automatically triggered by vendor actions or event milestones.
+                        Core system emails that are automatically triggered by vendor actions or
+                        event milestones.
                         <Tooltip.Arrow className="fill-gray-900" />
                       </Tooltip.Content>
                     </Tooltip.Portal>
@@ -156,20 +181,21 @@ export default function EmailTable({
                 </Tooltip.Provider>
               </div>
             </button>
-            {!isSystemCollapsed && systemEmails.map((email) => (
-              <EmailRow
-                key={`${email.id}-${email.scheduled_for}`}
-                email={email}
-                eventSlug={eventSlug}
-                onEdit={onEdit}
-                onPause={onPause}
-                onResume={onResume}
-                onSendNow={onSendNow}
-                onRetryFailed={onRetryFailed}
-                onDelete={onDelete}
-                onViewAuditLog={onViewAuditLog}
-              />
-            ))}
+            {!isSystemCollapsed &&
+              systemEmails.map((email) => (
+                <EmailRow
+                  key={`${email.id}-${email.scheduled_for}`}
+                  email={email}
+                  eventSlug={eventSlug}
+                  onEdit={onEdit}
+                  onPause={onPause}
+                  onResume={onResume}
+                  onSendNow={onSendNow}
+                  onRetryFailed={onRetryFailed}
+                  onDelete={onDelete}
+                  onViewAuditLog={onViewAuditLog}
+                />
+              ))}
           </>
         )}
 
@@ -212,23 +238,24 @@ export default function EmailTable({
                 </Tooltip.Provider>
               </div>
             </button>
-            {!isRemindersCollapsed && reminderEmails.map((email) => (
-              <EmailRow
-                key={`${email.id}-${email.scheduled_for}`}
-                email={email}
-                eventSlug={eventSlug}
-                onEdit={onEdit}
-                onPause={onPause}
-                onResume={onResume}
-                onSendNow={onSendNow}
-                onRetryFailed={onRetryFailed}
-                onDelete={onDelete}
-                onViewAuditLog={onViewAuditLog}
-              />
-            ))}
+            {!isRemindersCollapsed &&
+              reminderEmails.map((email) => (
+                <EmailRow
+                  key={`${email.id}-${email.scheduled_for}`}
+                  email={email}
+                  eventSlug={eventSlug}
+                  onEdit={onEdit}
+                  onPause={onPause}
+                  onResume={onResume}
+                  onSendNow={onSendNow}
+                  onRetryFailed={onRetryFailed}
+                  onDelete={onDelete}
+                  onViewAuditLog={onViewAuditLog}
+                />
+              ))}
           </>
         )}
       </div>
     </div>
-  );
+  )
 }

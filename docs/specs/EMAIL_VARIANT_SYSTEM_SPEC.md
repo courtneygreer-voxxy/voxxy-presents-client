@@ -24,11 +24,13 @@ A **variant** is a category-specific copy of an existing email that shares the s
 An event has 4 categories: Food, Beverage, Art, Merchandise.
 
 Without variants:
+
 ```
 "Application Accepted" (on_approval) → identical email to all categories
 ```
 
 With variants:
+
 ```
 "Application Accepted" (base, on_approval) → default fallback
 ├── "Application Accepted — Food"      → mentions kitchen setup, health permit requirements
@@ -38,6 +40,7 @@ With variants:
 ```
 
 ### Key Behavior
+
 - **All variants start as copies of the base** — producers don't start from scratch
 - **Unmodified variants still work** — the base content sends if no variant-specific edits are made
 - **Fallback to base** — if a new category is added after variants were created, it gets the base email
@@ -51,32 +54,34 @@ Variants only make sense for **trigger-based emails** (post-application), not **
 
 ### Two Email Types in the System
 
-| Type | Recipient Source | Service | Variants? |
-|------|-----------------|---------|-----------|
-| **Blast** | `event_invitations` → `vendor_contacts` | `InvitationReminderService` | No |
-| **Trigger** | `registrations` | `EmailSenderService` / `RegistrationEmailService` | Yes |
+| Type        | Recipient Source                        | Service                                           | Variants? |
+| ----------- | --------------------------------------- | ------------------------------------------------- | --------- |
+| **Blast**   | `event_invitations` → `vendor_contacts` | `InvitationReminderService`                       | No        |
+| **Trigger** | `registrations`                         | `EmailSenderService` / `RegistrationEmailService` | Yes       |
 
 ### Blast Emails (NO variants)
-| Trigger | Why No Variants |
-|---------|----------------|
-| `on_invitation_send` | No category assigned yet |
-| `on_application_open` | No category assigned yet |
-| `days_before_deadline` | No category assigned yet |
-| `on_bulletin_post` | Broadcast to all approved (no category distinction needed) |
+
+| Trigger                | Why No Variants                                            |
+| ---------------------- | ---------------------------------------------------------- |
+| `on_invitation_send`   | No category assigned yet                                   |
+| `on_application_open`  | No category assigned yet                                   |
+| `days_before_deadline` | No category assigned yet                                   |
+| `on_bulletin_post`     | Broadcast to all approved (no category distinction needed) |
 
 ### Trigger Emails (CAN have variants)
-| Trigger | Variant Use Case |
-|---------|-----------------|
-| `on_application_submit` | Category-specific confirmation details |
-| `on_approval` | Different onboarding instructions per category |
-| `on_rejection` | Category-specific waitlist messaging |
-| `on_waitlist` | Category-specific messaging |
-| `on_payment_received` | Category-specific receipt details |
-| `on_category_change` | Explain new category requirements |
-| `days_before_payment_deadline` | Category-specific payment amounts |
-| `on_payment_deadline` | Category-specific payment amounts |
-| `days_before_event` (countdown) | Category-specific load-in/setup instructions |
-| `on_event_update` | Category-specific impact messaging |
+
+| Trigger                         | Variant Use Case                               |
+| ------------------------------- | ---------------------------------------------- |
+| `on_application_submit`         | Category-specific confirmation details         |
+| `on_approval`                   | Different onboarding instructions per category |
+| `on_rejection`                  | Category-specific waitlist messaging           |
+| `on_waitlist`                   | Category-specific messaging                    |
+| `on_payment_received`           | Category-specific receipt details              |
+| `on_category_change`            | Explain new category requirements              |
+| `days_before_payment_deadline`  | Category-specific payment amounts              |
+| `on_payment_deadline`           | Category-specific payment amounts              |
+| `days_before_event` (countdown) | Category-specific load-in/setup instructions   |
+| `on_event_update`               | Category-specific impact messaging             |
 
 ---
 
@@ -100,6 +105,7 @@ end
 ```
 
 **Field definitions:**
+
 - `parent_email_id` — FK to the base `scheduled_email`. `NULL` = this IS the base email.
 - `variant_category` — The `vendor_category` string this variant targets. `NULL` on base emails.
 - Unique constraint on `(parent_email_id, variant_category)` prevents duplicate variants per category.
@@ -185,12 +191,14 @@ end
 ```
 
 **`POST /emails/:id/create_variants`**
+
 - Creates one variant per event category, copying subject/body from base
 - Returns the base email with nested variants
 
 **Request:** (no body needed — categories come from event's vendor_applications)
 
 **Response:**
+
 ```json
 {
   "id": 42,
@@ -217,10 +225,12 @@ end
 ```
 
 **`PATCH /emails/:id/variants/:variant_id`**
+
 - Updates a single variant's subject/body
 - Standard email update fields
 
 **`DELETE /emails/:id/remove_variants`**
+
 - Destroys all variants, reverting to single email for all categories
 
 ### 4.4 Serializer Changes
@@ -248,14 +258,17 @@ end
 ### 4.5 Template System Impact
 
 **`ScheduledEmailGenerator`** — When generating emails from a template for a new event:
+
 - Only generate base emails (variants are per-event, not per-template)
 - If saving an event's email sequence as a template, variants can optionally be included in `email_template_items` with a `variant_category` field
 
 **`email_template_items` table** — Optional future addition:
+
 ```ruby
 add_column :email_template_items, :parent_item_id, :bigint, null: true
 add_column :email_template_items, :variant_category, :string, null: true
 ```
+
 This allows templates to include pre-configured variants. Not required for MVP.
 
 ---
@@ -298,6 +311,7 @@ When editing a base email that has variants:
 ### 5.3 Live Preview
 
 When previewing a variant email:
+
 - Show category-specific variables resolved (e.g., `[vendorCategory]` → "Food Vendor")
 - Show a category selector in the preview panel to switch between previews
 
@@ -307,18 +321,18 @@ When previewing a variant email:
 // src/types/email.ts — additions
 interface ScheduledEmail {
   // ... existing fields ...
-  parent_email_id?: number | null;
-  variant_category?: string | null;
-  has_variants?: boolean;
-  variants?: ScheduledEmailVariant[];
+  parent_email_id?: number | null
+  variant_category?: string | null
+  has_variants?: boolean
+  variants?: ScheduledEmailVariant[]
 }
 
 interface ScheduledEmailVariant {
-  id: number;
-  parent_email_id: number;
-  variant_category: string;
-  subject_template: string;
-  body_template: string;
+  id: number
+  parent_email_id: number
+  variant_category: string
+  subject_template: string
+  body_template: string
 }
 ```
 
@@ -327,15 +341,19 @@ interface ScheduledEmailVariant {
 ## 6. Third-Party Impact
 
 ### SendGrid
+
 **No changes required.** Variants are resolved server-side before reaching SendGrid. Each email delivery is still a single SendGrid API call with fully rendered HTML. The variant system is purely an internal content-routing mechanism.
 
 ### Sidekiq / Workers
+
 **Minor change to `EmailSenderWorker`:** When processing a base email with variants, group recipients by category and send the appropriate variant content. The worker already processes one email at a time — it just needs the category-aware routing described in Section 4.2.
 
 ### TipTap (Frontend)
+
 **No library changes.** The editor component stays the same — it just receives different `body_template` content depending on which variant tab is selected. No custom TipTap nodes needed for variants.
 
 ### Libraries / SDKs
+
 **No new dependencies.** This feature uses existing Rails associations, existing API patterns, and existing frontend components. No new gems or npm packages required.
 
 ---
@@ -343,6 +361,7 @@ interface ScheduledEmailVariant {
 ## 7. Rollout Strategy
 
 ### Phase 1: Backend Foundation (this spec)
+
 - [ ] Migration: add `parent_email_id`, `variant_category` to `scheduled_emails`
 - [ ] Model: `resolve_for_category`, `variants` association, scopes
 - [ ] API: `create_variants`, `remove_variants`, variant update endpoint
@@ -351,12 +370,14 @@ interface ScheduledEmailVariant {
 - [ ] Tests: unit tests for resolution, integration tests for send flow
 
 ### Phase 2: Frontend UI (separate branch)
+
 - [ ] "Add Variant" button in sequence editor
 - [ ] Category tab switcher in email editor
 - [ ] Variant-aware preview
 - [ ] Type updates
 
 ### Phase 3: Template Integration (future)
+
 - [ ] Allow saving variant configurations in templates
 - [ ] Generate variants from template when creating events
 
@@ -364,15 +385,15 @@ interface ScheduledEmailVariant {
 
 ## 8. Edge Cases & Considerations
 
-| Scenario | Handling |
-|----------|---------|
-| New category added after variants exist | Falls back to base email. Producer can re-run "Add Variant" to create a variant for the new category. |
-| Category deleted/renamed | Orphaned variant still exists but won't match. `resolve_for_category` returns base. |
-| Variant email paused | Only that variant is paused. Other categories still get their variant or the base. |
-| Base email deleted | Cascade deletes all variants (`dependent: :destroy`). |
-| Base email paused | All variants should also be considered paused (enforce in worker). |
-| Variant metrics | Each variant tracks its own `recipient_count` and `delivery_counts`. Base email shows aggregate. |
-| Email preview | Frontend should allow previewing each variant. Backend preview endpoint should accept optional `variant_id` param. |
+| Scenario                                | Handling                                                                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| New category added after variants exist | Falls back to base email. Producer can re-run "Add Variant" to create a variant for the new category.              |
+| Category deleted/renamed                | Orphaned variant still exists but won't match. `resolve_for_category` returns base.                                |
+| Variant email paused                    | Only that variant is paused. Other categories still get their variant or the base.                                 |
+| Base email deleted                      | Cascade deletes all variants (`dependent: :destroy`).                                                              |
+| Base email paused                       | All variants should also be considered paused (enforce in worker).                                                 |
+| Variant metrics                         | Each variant tracks its own `recipient_count` and `delivery_counts`. Base email shows aggregate.                   |
+| Email preview                           | Frontend should allow previewing each variant. Backend preview endpoint should accept optional `variant_id` param. |
 
 ---
 

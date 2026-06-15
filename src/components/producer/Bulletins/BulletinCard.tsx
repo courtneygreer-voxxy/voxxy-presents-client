@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { Bulletin } from '../../../types/bulletin';
-import { Button } from '../../ui/button';
-import { Pin, Trash2, Edit, Check } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { useState } from 'react'
+import { Bulletin } from '../../../types/bulletin'
+import { Button } from '../../ui/button'
+import { Pin, Trash2, Edit, Check } from 'lucide-react'
+import { formatDistanceToNow } from 'date-fns'
 
 interface BulletinCardProps {
-  bulletin: Bulletin;
-  onEdit: (bulletin: Bulletin) => void;
-  onDelete: (id: number) => void;
-  onTogglePin: (id: number) => void;
-  isProducer: boolean;
+  bulletin: Bulletin
+  onEdit: (bulletin: Bulletin) => void
+  onDelete: (id: number) => void
+  onTogglePin: (id: number) => void
+  isProducer: boolean
 }
 
 export function BulletinCard({
@@ -17,45 +17,47 @@ export function BulletinCard({
   onEdit,
   onDelete,
   onTogglePin,
-  isProducer
+  isProducer,
 }: BulletinCardProps) {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isTogglingPin, setIsTogglingPin] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isTogglingPin, setIsTogglingPin] = useState(false)
 
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this bulletin?')) {
-      return;
+      return
     }
-    setIsDeleting(true);
+    setIsDeleting(true)
     try {
-      await onDelete(bulletin.id);
+      await onDelete(bulletin.id)
     } finally {
-      setIsDeleting(false);
+      setIsDeleting(false)
     }
-  };
+  }
 
   const handleTogglePin = async () => {
-    setIsTogglingPin(true);
+    setIsTogglingPin(true)
     try {
-      await onTogglePin(bulletin.id);
+      await onTogglePin(bulletin.id)
     } finally {
-      setIsTogglingPin(false);
+      setIsTogglingPin(false)
     }
-  };
+  }
 
   const getInitials = (name: string) => {
     return name
       .split(' ')
-      .map(n => n[0])
+      .map((n) => n[0])
       .join('')
       .toUpperCase()
-      .slice(0, 2);
-  };
+      .slice(0, 2)
+  }
 
   return (
-    <div className={`voxxy-gradient-card-deep rounded-lg p-6 border ${
-      bulletin.pinned ? 'border-primary' : 'border-border'
-    }`}>
+    <div
+      className={`voxxy-gradient-card-deep rounded-lg p-6 border ${
+        bulletin.pinned ? 'border-primary' : 'border-border'
+      }`}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-3">
@@ -67,12 +69,11 @@ export function BulletinCard({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-foreground font-semibold">{bulletin.subject}</h3>
-              {bulletin.pinned && (
-                <Pin className="w-4 h-4 text-primary fill-primary" />
-              )}
+              {bulletin.pinned && <Pin className="w-4 h-4 text-primary fill-primary" />}
             </div>
             <p className="text-muted-foreground text-sm">
-              {bulletin.author.name} · {formatDistanceToNow(new Date(bulletin.created_at), { addSuffix: true })}
+              {bulletin.author.name} ·{' '}
+              {formatDistanceToNow(new Date(bulletin.created_at), { addSuffix: true })}
             </p>
           </div>
         </div>
@@ -115,9 +116,7 @@ export function BulletinCard({
       </div>
 
       {/* Body */}
-      <div className="text-muted-foreground whitespace-pre-wrap mb-4">
-        {bulletin.body}
-      </div>
+      <div className="text-muted-foreground whitespace-pre-wrap mb-4">{bulletin.body}</div>
 
       {/* Footer Stats */}
       <div className="flex items-center gap-4 text-sm text-gray-500 pt-4 border-t border-border">
@@ -128,12 +127,8 @@ export function BulletinCard({
         <div>
           <span>{bulletin.view_count} views</span>
         </div>
-        {bulletin.read_by_current_user && (
-          <div className="text-primary">
-            ✓ Read
-          </div>
-        )}
+        {bulletin.read_by_current_user && <div className="text-primary">✓ Read</div>}
       </div>
     </div>
-  );
+  )
 }

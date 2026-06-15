@@ -18,14 +18,14 @@ interface PreviewDisclaimerModalProps {
   mode: 'preview' | 'beta'
 }
 
-export function PreviewDisclaimerModal({ 
-  isOpen, 
-  onClose, 
-  onContinue, 
-  mode 
+export function PreviewDisclaimerModal({
+  isOpen,
+  onClose,
+  onContinue,
+  mode,
 }: PreviewDisclaimerModalProps) {
   const isPreview = mode === 'preview'
-  
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -39,12 +39,9 @@ export function PreviewDisclaimerModal({
           </div>
           <DialogTitle className="flex items-center justify-center gap-2">
             {isPreview ? 'Preview Mode' : 'Beta Feature'}
-            <Badge 
-              variant="secondary" 
-              className={isPreview 
-                ? "bg-blue-100 text-blue-800" 
-                : "bg-primary/10 text-slate-800"
-              }
+            <Badge
+              variant="secondary"
+              className={isPreview ? 'bg-blue-100 text-blue-800' : 'bg-primary/10 text-slate-800'}
             >
               {isPreview ? 'Preview' : 'Beta'}
             </Badge>
@@ -57,12 +54,12 @@ export function PreviewDisclaimerModal({
                   <div className="text-sm">
                     <strong>What is Preview Mode?</strong>
                     <p className="text-gray-600 mt-1">
-                      You're seeing a preview of our upcoming platform integrations. 
-                      This demonstrates how the feature will work when it launches.
+                      You're seeing a preview of our upcoming platform integrations. This
+                      demonstrates how the feature will work when it launches.
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="bg-blue-50 p-3 rounded-lg mb-3">
                   <h4 className="font-medium text-blue-900 mb-2">What works in preview:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
@@ -71,7 +68,7 @@ export function PreviewDisclaimerModal({
                     <li>• Complete club creation process</li>
                   </ul>
                 </div>
-                
+
                 <div className="bg-amber-50 p-3 rounded-lg">
                   <h4 className="font-medium text-amber-900 mb-2">What's simulated:</h4>
                   <ul className="text-sm text-amber-800 space-y-1">
@@ -93,7 +90,7 @@ export function PreviewDisclaimerModal({
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="bg-primary/5 p-3 rounded-lg mb-3">
                   <h4 className="font-medium text-slate-900 mb-2">Beta features include:</h4>
                   <ul className="text-sm text-slate-800 space-y-1">
@@ -102,7 +99,7 @@ export function PreviewDisclaimerModal({
                     <li>• Priority feedback channel</li>
                   </ul>
                 </div>
-                
+
                 <div className="bg-amber-50 p-3 rounded-lg">
                   <h4 className="font-medium text-amber-900 mb-2">Please note:</h4>
                   <ul className="text-sm text-amber-800 space-y-1">
@@ -115,21 +112,15 @@ export function PreviewDisclaimerModal({
             )}
           </DialogDescription>
         </DialogHeader>
-        
+
         <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
-          <Button 
-            variant="outline" 
-            onClick={onClose}
-            className="w-full sm:w-auto"
-          >
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={onContinue}
             className={`w-full sm:w-auto ${
-              isPreview 
-                ? 'bg-blue-600 hover:bg-blue-700' 
-                : 'voxxy-btn-solid'
+              isPreview ? 'bg-blue-600 hover:bg-blue-700' : 'voxxy-btn-solid'
             }`}
           >
             Continue with {isPreview ? 'Preview' : 'Beta'}

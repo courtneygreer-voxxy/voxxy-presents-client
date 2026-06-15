@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Eye, EyeOff, Loader2, Mail, User, Lock, Users, Building2 } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Mail, User, Lock, Users, Palette } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail, validatePassword } from '@/utils/validation'
+import { analytics } from '@/lib/analytics'
 
 interface UnifiedSignUpFormProps {
   onSuccess?: (email: string) => void
@@ -37,7 +39,7 @@ type UserType = 'venue_owner' | 'vendor'
 export function UnifiedSignUpForm({
   onSuccess,
   onSwitchToLogin,
-  defaultTab = 'venue_owner'
+  defaultTab = 'venue_owner',
 }: UnifiedSignUpFormProps) {
   const { signUp, loading, error, clearError } = useAuth()
   const [activeTab, setActiveTab] = useState<UserType>(defaultTab)
@@ -47,7 +49,7 @@ export function UnifiedSignUpForm({
     password: '',
     confirmPassword: '',
     acceptTerms: false,
-    userType: defaultTab
+    userType: defaultTab,
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [showPassword, setShowPassword] = useState(false)
@@ -56,7 +58,7 @@ export function UnifiedSignUpForm({
 
   // Update user type when tab changes
   React.useEffect(() => {
-    setFormData(prev => ({ ...prev, userType: activeTab }))
+    setFormData((prev) => ({ ...prev, userType: activeTab }))
   }, [activeTab])
 
   // Real-time validation
@@ -95,11 +97,11 @@ export function UnifiedSignUpForm({
 
   // Handle input changes with validation
   const handleInputChange = (field: keyof FormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
 
     // Clear previous errors for this field (skip userType as it's not in FormErrors)
     if (field !== 'userType' && errors[field as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }))
+      setErrors((prev) => ({ ...prev, [field]: undefined }))
     }
 
     // Clear general auth error when user starts typing
@@ -139,20 +141,20 @@ export function UnifiedSignUpForm({
     if (!validateForm()) return
 
     setIsSubmitting(true)
-    setErrors(prev => ({ ...prev, submit: undefined }))
+    setErrors((prev) => ({ ...prev, submit: undefined }))
 
     try {
       await signUp({
         email: formData.email.trim(),
         password: formData.password,
         displayName: formData.displayName.trim(),
-        userType: formData.userType
+        userType: formData.userType,
       })
 
       onSuccess?.(formData.email.trim())
     } catch (err) {
       console.error('Signup error:', err)
-      setErrors(prev => ({ ...prev, submit: 'Failed to create account. Please try again.' }))
+      setErrors((prev) => ({ ...prev, submit: 'Failed to create account. Please try again.' }))
     } finally {
       setIsSubmitting(false)
     }
@@ -169,7 +171,7 @@ export function UnifiedSignUpForm({
             {isProducer ? (
               <Users className="h-5 w-5 text-primary" />
             ) : (
-              <Building2 className="h-5 w-5 text-primary" />
+              <Palette className="h-5 w-5 text-primary" />
             )}
             <h3 className="text-lg font-semibold text-foreground">
               {isProducer ? 'Create Producer Account' : 'Create Vendor Account'}
@@ -178,8 +180,7 @@ export function UnifiedSignUpForm({
           <p className="text-muted-foreground text-sm">
             {isProducer
               ? 'Start organizing and managing your events'
-              : 'Join as a vendor and connect with event producers'
-            }
+              : 'Join as a vendor and connect with event producers'}
           </p>
         </div>
 
@@ -195,21 +196,21 @@ export function UnifiedSignUpForm({
               <Input
                 id="displayName"
                 type="text"
-                placeholder={isProducer ? "Enter your name" : "Enter your business or artist name"}
+                placeholder={isProducer ? 'Enter your name' : 'Enter your business or artist name'}
                 value={formData.displayName}
                 onChange={(e) => handleInputChange('displayName', e.target.value)}
                 className="pl-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-primary"
                 disabled={isSubmitting}
               />
             </div>
-            {errors.displayName && (
-              <p className="text-red-400 text-sm">{errors.displayName}</p>
-            )}
+            {errors.displayName && <p className="text-red-400 text-sm">{errors.displayName}</p>}
           </div>
 
           {/* Email Field */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground">Email</Label>
+            <Label htmlFor="email" className="text-foreground">
+              Email
+            </Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -222,14 +223,14 @@ export function UnifiedSignUpForm({
                 disabled={isSubmitting}
               />
             </div>
-            {errors.email && (
-              <p className="text-red-400 text-sm">{errors.email}</p>
-            )}
+            {errors.email && <p className="text-red-400 text-sm">{errors.email}</p>}
           </div>
 
           {/* Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-foreground">Password</Label>
+            <Label htmlFor="password" className="text-foreground">
+              Password
+            </Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -261,7 +262,9 @@ export function UnifiedSignUpForm({
 
           {/* Confirm Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
+            <Label htmlFor="confirmPassword" className="text-foreground">
+              Confirm Password
+            </Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -298,20 +301,27 @@ export function UnifiedSignUpForm({
                 className="w-4 h-4 mt-1 text-primary bg-background/10 border-border rounded focus:ring-primary focus:ring-2"
                 disabled={isSubmitting}
               />
-              <Label htmlFor="acceptTerms" className="text-foreground/90 dark:text-muted-foreground text-sm leading-relaxed">
+              <Label
+                htmlFor="acceptTerms"
+                className="text-foreground/90 dark:text-muted-foreground text-sm leading-relaxed"
+              >
                 I agree to the{' '}
-                <a href="/legal/terms" className="text-primary hover:text-primary/70 underline transition-colors">
+                <a
+                  href="/legal/terms"
+                  className="text-primary hover:text-primary/70 underline transition-colors"
+                >
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="/legal/privacy" className="text-primary hover:text-primary/70 underline transition-colors">
+                <a
+                  href="/legal/privacy"
+                  className="text-primary hover:text-primary/70 underline transition-colors"
+                >
                   Privacy Policy
                 </a>
               </Label>
             </div>
-            {errors.acceptTerms && (
-              <p className="text-red-400 text-sm">{errors.acceptTerms}</p>
-            )}
+            {errors.acceptTerms && <p className="text-red-400 text-sm">{errors.acceptTerms}</p>}
           </div>
 
           {/* Submit Button */}
@@ -333,9 +343,7 @@ export function UnifiedSignUpForm({
           {/* Error Display */}
           {(error || errors.submit) && (
             <Alert className="bg-red-400/10 border-red-400/30">
-              <AlertDescription className="text-red-300">
-                {error || errors.submit}
-              </AlertDescription>
+              <AlertDescription className="text-red-300">{error || errors.submit}</AlertDescription>
             </Alert>
           )}
         </form>
@@ -345,7 +353,11 @@ export function UnifiedSignUpForm({
 
   return (
     <div className="w-full">
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as UserType)} className="w-full">
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as UserType)}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-2 mb-6 bg-background/10 backdrop-blur-sm">
           <TabsTrigger
             value="venue_owner"
@@ -358,8 +370,8 @@ export function UnifiedSignUpForm({
             value="vendor"
             className="data-[state=active]:bg-violet-200 data-[state=active]:text-foreground dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-muted-foreground"
           >
-            <Building2 className="h-4 w-4 mr-2" />
-            Vendor
+            <Palette className="h-4 w-4 mr-2" />
+            Artist
           </TabsTrigger>
         </TabsList>
 
@@ -368,7 +380,19 @@ export function UnifiedSignUpForm({
         </TabsContent>
 
         <TabsContent value="vendor" className="mt-0">
-          {getTabContent('vendor')}
+          <div className="flex flex-col items-center text-center space-y-5 py-8 px-4">
+            <Palette className="h-12 w-12 text-primary opacity-80" />
+            <h3 className="text-xl font-semibold text-foreground">Artist accounts coming soon</h3>
+            <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">
+              We're building something for independent artists. In the meantime, join the Voxxy Artist Network via SMS and be first to know when it launches.
+            </p>
+            <Link
+              to="/artists"
+              className="inline-flex items-center rounded-xl voxxy-btn-brand px-5 py-2.5 text-[14px] font-semibold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:brightness-105"
+            >
+              Join the Artist Network
+            </Link>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -1,25 +1,25 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-import { registrationsApi } from '@/services/api';
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { Calendar, MapPin, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
+import { registrationsApi } from '@/services/api'
 
 interface Registration {
-  id: number;
-  ticket_code: string;
-  email: string;
-  business_name: string;
-  vendor_category: string;
-  status: string;
-  created_at: string;
+  id: number
+  ticket_code: string
+  email: string
+  business_name: string
+  vendor_category: string
+  status: string
+  created_at: string
   event: {
-    id: number;
-    title: string;
-    slug: string;
+    id: number
+    title: string
+    slug: string
     dates: {
-      start?: string;
-    };
-    location?: string;
-  };
+      start?: string
+    }
+    location?: string
+  }
 }
 
 const STATUS_CONFIG = {
@@ -58,34 +58,34 @@ const STATUS_CONFIG = {
     bg: 'bg-primary/20',
     border: 'border-primary/30',
   },
-};
+}
 
 export default function ApplicationTrackingPage() {
-  const { ticketCode } = useParams<{ ticketCode: string }>();
-  const navigate = useNavigate();
-  const [registration, setRegistration] = useState<Registration | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { ticketCode } = useParams<{ ticketCode: string }>()
+  const navigate = useNavigate()
+  const [registration, setRegistration] = useState<Registration | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (ticketCode) {
-      fetchRegistration(ticketCode);
+      fetchRegistration(ticketCode)
     }
-  }, [ticketCode]);
+  }, [ticketCode])
 
   const fetchRegistration = async (code: string) => {
     try {
-      setLoading(true);
-      setError(null);
-      const data = await registrationsApi.trackByTicketCode(code);
-      setRegistration(data);
+      setLoading(true)
+      setError(null)
+      const data = await registrationsApi.trackByTicketCode(code)
+      setRegistration(data)
     } catch (err: any) {
-      console.error('Failed to fetch registration:', err);
-      setError(err.message || 'Application not found');
+      console.error('Failed to fetch registration:', err)
+      setError(err.message || 'Application not found')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -94,15 +94,15 @@ export default function ApplicationTrackingPage() {
       day: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
-    });
-  };
+    })
+  }
 
   if (loading) {
     return (
       <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
-    );
+    )
   }
 
   if (error || !registration) {
@@ -121,29 +121,33 @@ export default function ApplicationTrackingPage() {
           </button>
         </div>
       </div>
-    );
+    )
   }
 
-  const statusConfig = STATUS_CONFIG[registration.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending;
-  const StatusIcon = statusConfig.icon;
+  const statusConfig =
+    STATUS_CONFIG[registration.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending
+  const StatusIcon = statusConfig.icon
 
   return (
     <div className="min-h-screen voxxy-gradient-page-cool py-12 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Application Status
-          </h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Application Status</h1>
           <p className="text-foreground/60">
-            Tracking Code: <span className="font-mono text-violet-900 dark:text-primary">{registration.ticket_code}</span>
+            Tracking Code:{' '}
+            <span className="font-mono text-violet-900 dark:text-primary">
+              {registration.ticket_code}
+            </span>
           </p>
         </div>
 
         {/* Status Card */}
         <div className={`bg-background/5 border ${statusConfig.border} rounded-lg p-8 mb-6`}>
           <div className="flex items-center justify-center mb-6">
-            <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${statusConfig.bg}`}>
+            <div
+              className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${statusConfig.bg}`}
+            >
               <StatusIcon className={`w-12 h-12 ${statusConfig.color}`} />
             </div>
           </div>
@@ -153,7 +157,8 @@ export default function ApplicationTrackingPage() {
               {statusConfig.label}
             </h2>
             <p className="text-foreground/80">
-              Your vendor application for <span className="font-semibold">{registration.event.title}</span>
+              Your vendor application for{' '}
+              <span className="font-semibold">{registration.event.title}</span>
             </p>
           </div>
 
@@ -161,27 +166,32 @@ export default function ApplicationTrackingPage() {
           <div className="bg-background/5 border border-border rounded-lg p-6">
             {registration.status === 'pending' && (
               <p className="text-foreground/80 text-center">
-                Your application is currently being reviewed by the event organizers. You'll be notified by email when there's an update.
+                Your application is currently being reviewed by the event organizers. You'll be
+                notified by email when there's an update.
               </p>
             )}
             {registration.status === 'approved' && (
               <p className="text-foreground/80 text-center">
-                Congratulations! Your vendor application has been approved. Check your email for next steps and payment information.
+                Congratulations! Your vendor application has been approved. Check your email for
+                next steps and payment information.
               </p>
             )}
             {registration.status === 'rejected' && (
               <p className="text-foreground/80 text-center">
-                Unfortunately, your application was not selected for this event. We encourage you to apply for future opportunities.
+                Unfortunately, your application was not selected for this event. We encourage you to
+                apply for future opportunities.
               </p>
             )}
             {registration.status === 'waitlist' && (
               <p className="text-foreground/80 text-center">
-                You've been added to the waitlist. If a spot becomes available, you'll be notified via email.
+                You've been added to the waitlist. If a spot becomes available, you'll be notified
+                via email.
               </p>
             )}
             {registration.status === 'confirmed' && (
               <p className="text-foreground/80 text-center">
-                Your vendor spot is confirmed! Check your email for event day details and vendor guidelines.
+                Your vendor spot is confirmed! Check your email for event day details and vendor
+                guidelines.
               </p>
             )}
           </div>
@@ -261,5 +271,5 @@ export default function ApplicationTrackingPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

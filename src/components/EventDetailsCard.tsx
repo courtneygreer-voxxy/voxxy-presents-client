@@ -1,12 +1,12 @@
 import React from 'react'
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
-import { CalendarIcon, X } from "lucide-react"
-import { format } from "date-fns"
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Button } from '@/components/ui/button'
+import { CalendarIcon, X } from 'lucide-react'
+import { format } from 'date-fns'
 
 export interface EventDetails {
   id: string
@@ -25,12 +25,12 @@ interface EventDetailsCardProps {
   onRemove: (index: number) => void
 }
 
-export default function EventDetailsCard({ 
-  event, 
-  index, 
-  mainLocation, 
-  onUpdate, 
-  onRemove 
+export default function EventDetailsCard({
+  event,
+  index,
+  mainLocation,
+  onUpdate,
+  onRemove,
 }: EventDetailsCardProps) {
   return (
     <div className="border rounded-lg p-4 space-y-4 bg-muted">
@@ -53,12 +53,9 @@ export default function EventDetailsCard({
           <Label>Date *</Label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left font-normal"
-              >
+              <Button variant="outline" className="w-full justify-start text-left font-normal">
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {event.date ? format(event.date, "PPP") : "Pick a date"}
+                {event.date ? format(event.date, 'PPP') : 'Pick a date'}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
@@ -119,9 +116,7 @@ export default function EventDetailsCard({
           placeholder={`Leave empty to use: ${mainLocation}`}
         />
         {!event.location && (
-          <p className="text-xs text-gray-500 mt-1">
-            Will use main location: {mainLocation}
-          </p>
+          <p className="text-xs text-gray-500 mt-1">Will use main location: {mainLocation}</p>
         )}
       </div>
     </div>

@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { X, Mail, Send, Users, CheckCircle2 } from 'lucide-react';
-import { vendorContactsApi, VendorContact } from '@/services/api';
+import { useState } from 'react'
+import { X, Mail, Send, Users, CheckCircle2 } from 'lucide-react'
+import { vendorContactsApi, VendorContact } from '@/services/api'
 
 interface BulkEmailModalProps {
-  contacts: VendorContact[];
-  selectedContactIds: number[];
-  onClose: () => void;
-  onSuccess: () => void;
+  contacts: VendorContact[]
+  selectedContactIds: number[]
+  onClose: () => void
+  onSuccess: () => void
 }
 
 export default function BulkEmailModal({
@@ -15,76 +15,76 @@ export default function BulkEmailModal({
   onClose,
   onSuccess,
 }: BulkEmailModalProps) {
-  const [isSending, setIsSending] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [isSending, setIsSending] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showSuccess, setShowSuccess] = useState(false)
 
   const [formData, setFormData] = useState({
     subject: '',
     message: '',
-  });
+  })
 
   // Get selected contacts
-  const selectedContacts = contacts.filter(c => selectedContactIds.includes(c.id));
+  const selectedContacts = contacts.filter((c) => selectedContactIds.includes(c.id))
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string> = {}
 
     if (!formData.subject.trim()) {
-      newErrors.subject = 'Subject is required';
+      newErrors.subject = 'Subject is required'
     }
 
     if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
+      newErrors.message = 'Message is required'
     }
 
     if (selectedContacts.length === 0) {
-      newErrors.recipients = 'No recipients selected';
+      newErrors.recipients = 'No recipients selected'
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleChange = (field: keyof typeof formData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }))
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!validateForm()) {
-      return;
+      return
     }
 
-    setIsSending(true);
+    setIsSending(true)
     try {
       await vendorContactsApi.bulkEmail(selectedContactIds, {
         subject: formData.subject,
         message: formData.message,
-      });
+      })
 
       // Show success state
-      setShowSuccess(true);
+      setShowSuccess(true)
 
       // Close after 2 seconds
       setTimeout(() => {
-        onSuccess();
-        onClose();
-      }, 2000);
+        onSuccess()
+        onClose()
+      }, 2000)
     } catch (error: any) {
-      setErrors({ submit: error.message || 'Failed to send emails' });
-      setIsSending(false);
+      setErrors({ submit: error.message || 'Failed to send emails' })
+      setIsSending(false)
     }
-  };
+  }
 
   // Success state
   if (showSuccess) {
@@ -96,11 +96,12 @@ export default function BulkEmailModal({
           </div>
           <h3 className="text-2xl font-bold text-foreground mb-2">Emails Sent!</h3>
           <p className="text-foreground/60">
-            Successfully sent email to {selectedContacts.length} {selectedContacts.length === 1 ? 'contact' : 'contacts'}
+            Successfully sent email to {selectedContacts.length}{' '}
+            {selectedContacts.length === 1 ? 'contact' : 'contacts'}
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -115,7 +116,8 @@ export default function BulkEmailModal({
             <div>
               <h2 className="text-2xl font-bold text-foreground">Send Email</h2>
               <p className="text-foreground/60 text-sm mt-0.5">
-                {selectedContacts.length} {selectedContacts.length === 1 ? 'recipient' : 'recipients'}
+                {selectedContacts.length}{' '}
+                {selectedContacts.length === 1 ? 'recipient' : 'recipients'}
               </p>
             </div>
           </div>
@@ -147,9 +149,7 @@ export default function BulkEmailModal({
                       <p className="text-sm font-medium text-foreground truncate">
                         {contact.contact_name}
                       </p>
-                      <p className="text-xs text-foreground/60 truncate">
-                        {contact.email}
-                      </p>
+                      <p className="text-xs text-foreground/60 truncate">{contact.email}</p>
                     </div>
                     {contact.business_name && (
                       <span className="text-xs text-foreground/40 ml-2">
@@ -160,9 +160,7 @@ export default function BulkEmailModal({
                 ))}
               </div>
             </div>
-            {errors.recipients && (
-              <p className="mt-2 text-sm text-red-400">{errors.recipients}</p>
-            )}
+            {errors.recipients && <p className="mt-2 text-sm text-red-400">{errors.recipients}</p>}
           </div>
 
           {/* Subject */}
@@ -181,9 +179,7 @@ export default function BulkEmailModal({
                 errors.subject ? 'border-red-500' : 'border-border'
               } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all disabled:opacity-50`}
             />
-            {errors.subject && (
-              <p className="mt-1 text-sm text-red-400">{errors.subject}</p>
-            )}
+            {errors.subject && <p className="mt-1 text-sm text-red-400">{errors.subject}</p>}
           </div>
 
           {/* Message */}
@@ -202,9 +198,7 @@ export default function BulkEmailModal({
                 errors.message ? 'border-red-500' : 'border-border'
               } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none disabled:opacity-50`}
             />
-            {errors.message && (
-              <p className="mt-1 text-sm text-red-400">{errors.message}</p>
-            )}
+            {errors.message && <p className="mt-1 text-sm text-red-400">{errors.message}</p>}
             <p className="mt-2 text-xs text-foreground/40">
               Tip: Personalize your message to increase engagement
             </p>
@@ -219,7 +213,8 @@ export default function BulkEmailModal({
               <div className="text-sm text-blue-200">
                 <p className="font-medium mb-1">Email will be sent from your organization</p>
                 <p className="text-blue-300/80">
-                  Recipients will receive this as a bulk email. Consider personalizing the message for better engagement.
+                  Recipients will receive this as a bulk email. Consider personalizing the message
+                  for better engagement.
                 </p>
               </div>
             </div>
@@ -263,5 +258,5 @@ export default function BulkEmailModal({
         </form>
       </div>
     </div>
-  );
+  )
 }

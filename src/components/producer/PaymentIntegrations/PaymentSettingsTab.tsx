@@ -1,25 +1,30 @@
-import { useState } from 'react';
-import { DollarSign, Receipt } from 'lucide-react';
-import EventPaymentSettings from './EventPaymentSettings';
-import PaymentTransactionsList from './PaymentTransactionsList';
-import { DebugPanel } from '../DebugPanel';
+import { useState } from 'react'
+import { DollarSign, Receipt } from 'lucide-react'
+import EventPaymentSettings from './EventPaymentSettings'
+import PaymentTransactionsList from './PaymentTransactionsList'
+import { DebugPanel } from '../DebugPanel'
 
 interface PaymentSettingsTabProps {
-  eventSlug: string;
-  organizationId: number;
-  event?: any;
-  isAdmin?: boolean;
+  eventSlug: string
+  organizationId: number
+  event?: any
+  isAdmin?: boolean
 }
 
-type TabView = 'settings' | 'transactions';
+type TabView = 'settings' | 'transactions'
 
-export default function PaymentSettingsTab({ eventSlug, organizationId, event, isAdmin }: PaymentSettingsTabProps) {
-  const [activeTab, setActiveTab] = useState<TabView>('settings');
+export default function PaymentSettingsTab({
+  eventSlug,
+  organizationId,
+  event,
+  isAdmin,
+}: PaymentSettingsTabProps) {
+  const [activeTab, setActiveTab] = useState<TabView>('settings')
 
   const tabs = [
     { id: 'settings' as TabView, label: 'Payment Sync', icon: DollarSign },
     { id: 'transactions' as TabView, label: 'Transactions', icon: Receipt },
-  ];
+  ]
 
   return (
     <div className="p-3 md:p-4 space-y-6">
@@ -27,7 +32,7 @@ export default function PaymentSettingsTab({ eventSlug, organizationId, event, i
       <div className="border-b border-primary/20">
         <div className="flex gap-2">
           {tabs.map((tab) => {
-            const Icon = tab.icon;
+            const Icon = tab.icon
             return (
               <button
                 key={tab.id}
@@ -41,7 +46,7 @@ export default function PaymentSettingsTab({ eventSlug, organizationId, event, i
                 <Icon className="w-4 h-4" />
                 {tab.label}
               </button>
-            );
+            )
           })}
         </div>
       </div>
@@ -80,5 +85,5 @@ export default function PaymentSettingsTab({ eventSlug, organizationId, event, i
         isAdmin={isAdmin}
       />
     </div>
-  );
+  )
 }

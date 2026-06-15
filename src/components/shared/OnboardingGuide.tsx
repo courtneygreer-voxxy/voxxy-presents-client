@@ -1,21 +1,21 @@
-import { useEffect, useState, useCallback } from 'react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import type { OnboardingStep } from '@/hooks/useOnboarding';
+import { useEffect, useState, useCallback } from 'react'
+import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import type { OnboardingStep } from '@/hooks/useOnboarding'
 
 interface OnboardingGuideProps {
-  step: OnboardingStep;
-  currentStep: number;
-  totalSteps: number;
-  onNext: () => void;
-  onBack: () => void;
-  onSkip: () => void;
+  step: OnboardingStep
+  currentStep: number
+  totalSteps: number
+  onNext: () => void
+  onBack: () => void
+  onSkip: () => void
 }
 
 interface TargetRect {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
+  top: number
+  left: number
+  width: number
+  height: number
 }
 
 export function OnboardingGuide({
@@ -26,89 +26,89 @@ export function OnboardingGuide({
   onBack,
   onSkip,
 }: OnboardingGuideProps) {
-  const [targetRect, setTargetRect] = useState<TargetRect | null>(null);
+  const [targetRect, setTargetRect] = useState<TargetRect | null>(null)
 
   const updateTargetRect = useCallback(() => {
-    const el = document.querySelector(step.targetSelector);
+    const el = document.querySelector(step.targetSelector)
     if (el) {
-      const rect = el.getBoundingClientRect();
+      const rect = el.getBoundingClientRect()
       setTargetRect({
         top: rect.top,
         left: rect.left,
         width: rect.width,
         height: rect.height,
-      });
+      })
     } else {
-      console.warn(`[OnboardingGuide] Target not found: ${step.targetSelector}`);
-      setTargetRect(null);
+      console.warn(`[OnboardingGuide] Target not found: ${step.targetSelector}`)
+      setTargetRect(null)
     }
-  }, [step.targetSelector]);
+  }, [step.targetSelector])
 
   useEffect(() => {
-    const timer = setTimeout(updateTargetRect, 200);
-    window.addEventListener('resize', updateTargetRect);
+    const timer = setTimeout(updateTargetRect, 200)
+    window.addEventListener('resize', updateTargetRect)
     return () => {
-      clearTimeout(timer);
-      window.removeEventListener('resize', updateTargetRect);
-    };
-  }, [updateTargetRect]);
+      clearTimeout(timer)
+      window.removeEventListener('resize', updateTargetRect)
+    }
+  }, [updateTargetRect])
 
   // Keyboard navigation
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onSkip();
-      if (e.key === 'ArrowRight' || e.key === 'Enter') onNext();
-      if (e.key === 'ArrowLeft') onBack();
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [onNext, onBack, onSkip]);
+      if (e.key === 'Escape') onSkip()
+      if (e.key === 'ArrowRight' || e.key === 'Enter') onNext()
+      if (e.key === 'ArrowLeft') onBack()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onNext, onBack, onSkip])
 
-  const isLastStep = currentStep === totalSteps - 1;
-  const isFirstStep = currentStep === 0;
-  const placement = step.placement || 'bottom';
+  const isLastStep = currentStep === totalSteps - 1
+  const isFirstStep = currentStep === 0
+  const placement = step.placement || 'bottom'
 
   // Calculate tooltip position, clamped to viewport
   const getTooltipStyle = (): React.CSSProperties => {
     if (!targetRect) {
-      return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)', position: 'fixed' };
+      return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)', position: 'fixed' }
     }
 
-    const padding = 16;
-    const tooltipWidth = 320;
-    const tooltipHeight = 200; // approximate
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+    const padding = 16
+    const tooltipWidth = 320
+    const tooltipHeight = 200 // approximate
+    const vw = window.innerWidth
+    const vh = window.innerHeight
 
-    let top: number;
-    let left: number;
+    let top: number
+    let left: number
 
     switch (placement) {
       case 'right':
-        top = targetRect.top + targetRect.height / 2 - tooltipHeight / 2;
-        left = targetRect.left + targetRect.width + padding;
-        break;
+        top = targetRect.top + targetRect.height / 2 - tooltipHeight / 2
+        left = targetRect.left + targetRect.width + padding
+        break
       case 'left':
-        top = targetRect.top + targetRect.height / 2 - tooltipHeight / 2;
-        left = targetRect.left - tooltipWidth - padding;
-        break;
+        top = targetRect.top + targetRect.height / 2 - tooltipHeight / 2
+        left = targetRect.left - tooltipWidth - padding
+        break
       case 'top':
-        top = targetRect.top - tooltipHeight - padding;
-        left = targetRect.left + targetRect.width / 2 - tooltipWidth / 2;
-        break;
+        top = targetRect.top - tooltipHeight - padding
+        left = targetRect.left + targetRect.width / 2 - tooltipWidth / 2
+        break
       case 'bottom':
       default:
-        top = targetRect.top + targetRect.height + padding;
-        left = targetRect.left + targetRect.width / 2 - tooltipWidth / 2;
-        break;
+        top = targetRect.top + targetRect.height + padding
+        left = targetRect.left + targetRect.width / 2 - tooltipWidth / 2
+        break
     }
 
     // Clamp to viewport
-    top = Math.max(16, Math.min(top, vh - tooltipHeight - 16));
-    left = Math.max(16, Math.min(left, vw - tooltipWidth - 16));
+    top = Math.max(16, Math.min(top, vh - tooltipHeight - 16))
+    left = Math.max(16, Math.min(left, vw - tooltipWidth - 16))
 
-    return { position: 'fixed', top, left };
-  };
+    return { position: 'fixed', top, left }
+  }
 
   return (
     <div className="fixed inset-0 z-[9999]" role="dialog" aria-label="Onboarding guide">
@@ -187,5 +187,5 @@ export function OnboardingGuide({
         </div>
       </div>
     </div>
-  );
+  )
 }

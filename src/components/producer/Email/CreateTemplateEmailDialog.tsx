@@ -1,16 +1,22 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RichTextEditor } from './RichTextEditor';
-import type { EmailCategory, TriggerType, CreateEmailTemplateItemRequest } from '@/types/email';
-import { joinEmailBody, STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
-import { frontendToBackend } from '@/utils/emailVariables';
-import { logger } from '@/utils/logger';
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { RichTextEditor } from './RichTextEditor'
+import type { EmailCategory, TriggerType, CreateEmailTemplateItemRequest } from '@/types/email'
+import { joinEmailBody, STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter'
+import { frontendToBackend } from '@/utils/emailVariables'
+import { logger } from '@/utils/logger'
 
 const createTemplateEmailSchema = z.object({
   name: z.string().min(1, 'Email name is required'),
@@ -20,9 +26,9 @@ const createTemplateEmailSchema = z.object({
   trigger_type: z.string().min(1, 'Trigger type is required'),
   trigger_value: z.number().min(0).optional(),
   position: z.number().min(1),
-});
+})
 
-type CreateTemplateEmailFormData = z.infer<typeof createTemplateEmailSchema>;
+type CreateTemplateEmailFormData = z.infer<typeof createTemplateEmailSchema>
 
 // Only time-based triggers that can be manually created
 const TIME_BASED_TRIGGERS = [
@@ -32,53 +38,60 @@ const TIME_BASED_TRIGGERS = [
   { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true },
   { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false },
   { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true },
-];
+]
 
 // Email categories for template emails (generic, not vendor-specific)
 const EMAIL_CATEGORIES: { value: EmailCategory; label: string; description: string }[] = [
   {
     value: 'event_announcements',
     label: 'Event Announcements',
-    description: 'General event info sent to all invitees (before they apply)'
+    description: 'General event info sent to all invitees (before they apply)',
   },
   {
     value: 'application_updates',
     label: 'Application Updates',
-    description: 'Application status, approval, rejection, waitlist'
+    description: 'Application status, approval, rejection, waitlist',
   },
   {
     value: 'payment_reminders',
     label: 'Payment Reminders',
-    description: 'Payment due dates, confirmations, reminders'
+    description: 'Payment due dates, confirmations, reminders',
   },
   {
     value: 'event_countdown',
     label: 'Event Countdown',
-    description: 'Days before event, day-of reminders, setup info'
+    description: 'Days before event, day-of reminders, setup info',
   },
   {
     value: 'event_updates',
     label: 'Event Updates',
-    description: 'Post-event follow-ups, event changes, general updates'
+    description: 'Post-event follow-ups, event changes, general updates',
   },
-];
+]
 
 interface CreateTemplateEmailDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: CreateEmailTemplateItemRequest) => Promise<void>;
-  nextPosition: number;  // Next available position in the sequence
+  isOpen: boolean
+  onClose: () => void
+  onSubmit: (data: CreateEmailTemplateItemRequest) => Promise<void>
+  nextPosition: number // Next available position in the sequence
 }
 
 export function CreateTemplateEmailDialog({
   isOpen,
   onClose,
   onSubmit,
-  nextPosition
+  nextPosition,
 }: CreateTemplateEmailDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<CreateTemplateEmailFormData>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<CreateTemplateEmailFormData>({
     resolver: zodResolver(createTemplateEmailSchema),
     defaultValues: {
       name: '',
@@ -89,20 +102,20 @@ export function CreateTemplateEmailDialog({
       trigger_value: 1,
       position: nextPosition,
     },
-  });
+  })
 
-  const triggerType = watch('trigger_type');
-  const emailType = watch('email_type');
-  const selectedTrigger = TIME_BASED_TRIGGERS.find(t => t.value === triggerType);
-  const selectedCategory = EMAIL_CATEGORIES.find(c => c.value === emailType);
+  const triggerType = watch('trigger_type')
+  const emailType = watch('email_type')
+  const selectedTrigger = TIME_BASED_TRIGGERS.find((t) => t.value === triggerType)
+  const selectedCategory = EMAIL_CATEGORIES.find((c) => c.value === emailType)
 
   const handleFormSubmit = async (data: CreateTemplateEmailFormData) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       // Join content with footer and convert to backend format
-      const fullBody = joinEmailBody(data.body_template, STANDARD_EMAIL_FOOTER);
-      const convertedBody = frontendToBackend(fullBody);
-      const convertedSubject = frontendToBackend(data.subject_template);
+      const fullBody = joinEmailBody(data.body_template, STANDARD_EMAIL_FOOTER)
+      const convertedBody = frontendToBackend(fullBody)
+      const convertedSubject = frontendToBackend(data.subject_template)
 
       await onSubmit({
         name: data.name,
@@ -111,23 +124,23 @@ export function CreateTemplateEmailDialog({
         position: data.position,
         trigger_type: data.trigger_type as TriggerType,
         trigger_value: selectedTrigger?.requiresValue ? data.trigger_value : undefined,
-        trigger_time: '08:00',  // Default to 8:00 AM
-        enabled_by_default: true,  // Default to enabled
-      });
+        trigger_time: '08:00', // Default to 8:00 AM
+        enabled_by_default: true, // Default to enabled
+      })
 
-      reset();
-      onClose();
+      reset()
+      onClose()
     } catch (error) {
-      logger.error('Failed to create template email', { error });
+      logger.error('Failed to create template email', { error })
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleClose = () => {
-    reset();
-    onClose();
-  };
+    reset()
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -135,14 +148,17 @@ export function CreateTemplateEmailDialog({
         <DialogHeader>
           <DialogTitle className="text-foreground text-xl">Add Email to Template</DialogTitle>
           <p className="text-foreground/60 text-sm">
-            Create a generic email that will be copied to all vendor categories during event creation
+            Create a generic email that will be copied to all vendor categories during event
+            creation
           </p>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 mt-4">
           {/* Email Name */}
           <div>
-            <label className="block text-sm font-medium text-foreground/80 mb-1.5">Email Name</label>
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">
+              Email Name
+            </label>
             <Input
               {...register('name')}
               placeholder="e.g., 3 Days Before Event Reminder"
@@ -153,16 +169,15 @@ export function CreateTemplateEmailDialog({
 
           {/* Email Category */}
           <div>
-            <label className="block text-sm font-medium text-foreground/80 mb-1.5">Email Category</label>
-            <Select
-              value={emailType}
-              onValueChange={(value) => setValue('email_type', value)}
-            >
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">
+              Email Category
+            </label>
+            <Select value={emailType} onValueChange={(value) => setValue('email_type', value)}>
               <SelectTrigger className="bg-background/5 border-border text-foreground">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="voxxy-select-surface">
-                {EMAIL_CATEGORIES.map(cat => (
+                {EMAIL_CATEGORIES.map((cat) => (
                   <SelectItem key={cat.value} value={cat.value} className="text-foreground">
                     {cat.label}
                   </SelectItem>
@@ -172,18 +187,24 @@ export function CreateTemplateEmailDialog({
             {selectedCategory && (
               <p className="text-xs text-foreground/50 mt-1">{selectedCategory.description}</p>
             )}
-            {errors.email_type && <p className="text-red-400 text-xs mt-1">{errors.email_type.message}</p>}
+            {errors.email_type && (
+              <p className="text-red-400 text-xs mt-1">{errors.email_type.message}</p>
+            )}
           </div>
 
           {/* Subject */}
           <div>
-            <label className="block text-sm font-medium text-foreground/80 mb-1.5">Subject Line</label>
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">
+              Subject Line
+            </label>
             <Input
               {...register('subject_template')}
               placeholder="e.g., Don't forget: [eventName] is in 3 days!"
               className="bg-background/5 border-border text-foreground placeholder:text-foreground/40"
             />
-            {errors.subject_template && <p className="text-red-400 text-xs mt-1">{errors.subject_template.message}</p>}
+            {errors.subject_template && (
+              <p className="text-red-400 text-xs mt-1">{errors.subject_template.message}</p>
+            )}
             <p className="text-xs text-foreground/50 mt-1">
               Use variables like [eventName], [eventDate], [firstName]
             </p>
@@ -192,15 +213,17 @@ export function CreateTemplateEmailDialog({
           {/* Trigger Type */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-foreground/80 mb-1.5">When to Send</label>
+              <label className="block text-sm font-medium text-foreground/80 mb-1.5">
+                When to Send
+              </label>
               <Select
                 value={triggerType}
                 onValueChange={(value) => {
-                  setValue('trigger_type', value);
+                  setValue('trigger_type', value)
                   // Reset trigger_value when changing trigger type
-                  const newTrigger = TIME_BASED_TRIGGERS.find(t => t.value === value);
+                  const newTrigger = TIME_BASED_TRIGGERS.find((t) => t.value === value)
                   if (newTrigger?.requiresValue) {
-                    setValue('trigger_value', 1);
+                    setValue('trigger_value', 1)
                   }
                 }}
               >
@@ -208,7 +231,7 @@ export function CreateTemplateEmailDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="voxxy-select-surface">
-                  {TIME_BASED_TRIGGERS.map(type => (
+                  {TIME_BASED_TRIGGERS.map((type) => (
                     <SelectItem key={type.value} value={type.value} className="text-foreground">
                       {type.label}
                     </SelectItem>
@@ -219,7 +242,9 @@ export function CreateTemplateEmailDialog({
 
             {selectedTrigger?.requiresValue && (
               <div>
-                <label className="block text-sm font-medium text-foreground/80 mb-1.5">Number of Days</label>
+                <label className="block text-sm font-medium text-foreground/80 mb-1.5">
+                  Number of Days
+                </label>
                 <Input
                   type="number"
                   {...register('trigger_value', { valueAsNumber: true })}
@@ -232,7 +257,9 @@ export function CreateTemplateEmailDialog({
 
           {/* Position */}
           <div>
-            <label className="block text-sm font-medium text-foreground/80 mb-1.5">Position in Sequence</label>
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">
+              Position in Sequence
+            </label>
             <Input
               type="number"
               {...register('position', { valueAsNumber: true })}
@@ -243,20 +270,27 @@ export function CreateTemplateEmailDialog({
             <p className="text-xs text-foreground/50 mt-1">
               Order in the email sequence (1-40). Default: {nextPosition}
             </p>
-            {errors.position && <p className="text-red-400 text-xs mt-1">{errors.position.message}</p>}
+            {errors.position && (
+              <p className="text-red-400 text-xs mt-1">{errors.position.message}</p>
+            )}
           </div>
 
           {/* Body */}
           <div>
-            <label className="block text-sm font-medium text-foreground/80 mb-1.5">Email Body</label>
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">
+              Email Body
+            </label>
             <RichTextEditor
               content={watch('body_template') || ''}
               onChange={(html) => setValue('body_template', html, { shouldValidate: true })}
               placeholder="Write your email message... The unsubscribe footer will be added automatically."
             />
-            {errors.body_template && <p className="text-red-400 text-xs mt-1">{errors.body_template.message}</p>}
+            {errors.body_template && (
+              <p className="text-red-400 text-xs mt-1">{errors.body_template.message}</p>
+            )}
             <p className="text-xs text-foreground/50 mt-1">
-              This is a generic template - it will be copied for each vendor category when an event is created
+              This is a generic template - it will be copied for each vendor category when an event
+              is created
             </p>
           </div>
 
@@ -271,16 +305,12 @@ export function CreateTemplateEmailDialog({
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="voxxy-btn-cta"
-            >
+            <Button type="submit" disabled={isSubmitting} className="voxxy-btn-cta">
               {isSubmitting ? 'Adding...' : 'Add to Template'}
             </Button>
           </div>
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

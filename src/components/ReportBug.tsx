@@ -1,21 +1,21 @@
-import { useState } from 'react';
-import { X, Bug, Send } from 'lucide-react';
-import { bugReportsApi } from '@/services/api';
+import { useState } from 'react'
+import { X, Bug, Send } from 'lucide-react'
+import { bugReportsApi } from '@/services/api'
 
 interface ReportBugProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
   errorContext?: {
-    errorMessage?: string;
-    componentName?: string;
-    timestamp?: string;
-    userAgent?: string;
-    url?: string;
-    formData?: any;
-    stack?: string;
-    componentStack?: string;
-  };
-  autoShow?: boolean; // Whether this was triggered automatically (after failures)
+    errorMessage?: string
+    componentName?: string
+    timestamp?: string
+    userAgent?: string
+    url?: string
+    formData?: any
+    stack?: string
+    componentStack?: string
+  }
+  autoShow?: boolean // Whether this was triggered automatically (after failures)
 }
 
 export default function ReportBug({
@@ -28,22 +28,22 @@ export default function ReportBug({
     name: '',
     email: '',
     description: '',
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  })
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!formData.name || !formData.email) {
-      setError('Please provide your name and email');
-      return;
+      setError('Please provide your name and email')
+      return
     }
 
     try {
-      setSubmitting(true);
-      setError(null);
+      setSubmitting(true)
+      setError(null)
 
       // Collect browser and error context
       const bugReport = {
@@ -59,35 +59,35 @@ export default function ReportBug({
           viewport: `${window.innerWidth}x${window.innerHeight}`,
           auto_reported: autoShow,
         },
-      };
+      }
 
-      console.log('[Bug Report] Submitting:', bugReport);
+      console.log('[Bug Report] Submitting:', bugReport)
 
       // Submit to backend API
-      await bugReportsApi.create(bugReport);
+      await bugReportsApi.create(bugReport)
 
-      console.log('[Bug Report] Successfully submitted');
+      console.log('[Bug Report] Successfully submitted')
 
-      setSubmitted(true);
+      setSubmitted(true)
 
       // Close after 2 seconds
       setTimeout(() => {
-        onClose();
+        onClose()
         // Reset form
         setTimeout(() => {
-          setSubmitted(false);
-          setFormData({ name: '', email: '', description: '' });
-        }, 300);
-      }, 2000);
+          setSubmitted(false)
+          setFormData({ name: '', email: '', description: '' })
+        }, 300)
+      }, 2000)
     } catch (err: any) {
-      console.error('Failed to submit bug report:', err);
-      setError('Failed to submit report. Please try again or contact team@heyvoxxy.com');
+      console.error('Failed to submit bug report:', err)
+      setError('Failed to submit report. Please try again or contact team@heyvoxxy.com')
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   if (submitted) {
     return (
@@ -104,7 +104,7 @@ export default function ReportBug({
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -136,7 +136,9 @@ export default function ReportBug({
         {/* Auto-show context message */}
         {autoShow && errorContext?.errorMessage && (
           <div className="mb-4 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-            <p className="mb-1 text-xs font-medium text-red-700 dark:text-red-300">Error Details:</p>
+            <p className="mb-1 text-xs font-medium text-red-700 dark:text-red-300">
+              Error Details:
+            </p>
             <p className="text-xs text-muted-foreground">{errorContext.errorMessage}</p>
           </div>
         )}
@@ -194,8 +196,8 @@ export default function ReportBug({
           {/* Technical Info Notice */}
           <div className="bg-background/5 border border-border rounded-lg p-3">
             <p className="text-xs text-muted-foreground">
-              <strong className="text-foreground/80">Note:</strong> Browser information and error details
-              will be automatically included to help us diagnose the issue.
+              <strong className="text-foreground/80">Note:</strong> Browser information and error
+              details will be automatically included to help us diagnose the issue.
             </p>
           </div>
 
@@ -240,5 +242,5 @@ export default function ReportBug({
         </form>
       </div>
     </div>
-  );
+  )
 }

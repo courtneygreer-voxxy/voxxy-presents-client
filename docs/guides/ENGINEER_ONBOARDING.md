@@ -12,17 +12,20 @@
 ### Project Status: V3.0 Migration - Phase 1 Day 2 Complete ✅
 
 We're in the middle of refactoring the platform from a simple event organizer tool into a **two-sided marketplace** connecting:
+
 - **Producers** (event organizers) who create organizations and post event needs
 - **Vendors** (service providers like venues, caterers, photographers) who browse events and apply to opportunities
 
 ### What's Been Completed
 
 #### Phase 0 ✅ (Oct 28)
+
 - Security hardening (CORS lockdown, environment validation)
 - Dependency locking (33 packages locked to specific versions)
 - Production deployment verified
 
 #### Phase 1 Day 1 ✅ (Oct 28)
+
 - Database role refactoring: `organizer` → `producer`, `venue_owner` → `vendor`
 - Profile object renaming in database schema
 - Beta approval system removed for producers
@@ -30,6 +33,7 @@ We're in the middle of refactoring the platform from a simple event organizer to
 - Documentation reorganization (26 MD files into clean structure)
 
 #### Phase 1 Day 2 ✅ (Oct 29, 2:15 AM)
+
 - Complete vendor signup flow (2-step form with vendor type selection)
 - Vendor listing creation and edit functionality
 - API endpoint created: `PUT /api/vendors/by-slug/:slug`
@@ -48,11 +52,13 @@ See the **[Day 3 Task List](#day-3-tasks)** below for immediate priorities.
 ### The Big Pivot
 
 **Before V3.0** (Old Model):
+
 - Organization owners create events
 - Public users subscribe and RSVP to events
 - Simple one-sided platform
 
 **After V3.0** (New Model - What We're Building):
+
 - **Producers** create organizations and post event needs (like job postings)
 - **Vendors** discover events, save favorites, and apply to opportunities
 - **Two-sided marketplace** with producer review and approval workflow
@@ -60,12 +66,12 @@ See the **[Day 3 Task List](#day-3-tasks)** below for immediate priorities.
 
 ### User Roles
 
-| Role | Who They Are | What They Do |
-|------|--------------|--------------|
-| **admin** | Voxxy team | Platform management, moderation |
-| **producer** | Event organizers | Create orgs, post events, review vendor applications |
-| **vendor** | Service providers | Browse events, apply, collaborate after acceptance |
-| **user** | Public/guests | View public pages, subscribe (no login) |
+| Role         | Who They Are      | What They Do                                         |
+| ------------ | ----------------- | ---------------------------------------------------- |
+| **admin**    | Voxxy team        | Platform management, moderation                      |
+| **producer** | Event organizers  | Create orgs, post events, review vendor applications |
+| **vendor**   | Service providers | Browse events, apply, collaborate after acceptance   |
+| **user**     | Public/guests     | View public pages, subscribe (no login)              |
 
 ### Core Features We're Building
 
@@ -81,6 +87,7 @@ See the **[Day 3 Task List](#day-3-tasks)** below for immediate priorities.
 ### Tech Stack
 
 **Frontend** (this repo):
+
 - React 18 + TypeScript
 - Vite (build tool)
 - Tailwind CSS + shadcn/ui components
@@ -88,12 +95,14 @@ See the **[Day 3 Task List](#day-3-tasks)** below for immediate priorities.
 - Mixpanel (analytics)
 
 **Backend** (separate repo):
+
 - Ruby on Rails API
 - PostgreSQL database
 - Render.com (deployment)
 - SendGrid (email notifications)
 
 **Repositories**:
+
 - **Client**: https://github.com/courtneygreer-voxxy/voxxy-presents-client
 - **API**: https://github.com/courtneygreer-voxxy/voxxy-presents-api
 
@@ -145,12 +154,14 @@ cd voxxy-presents-api
 ### 2. Install Dependencies
 
 **Client**:
+
 ```bash
 cd voxxy-presents-client
 npm install
 ```
 
 **API** (Rails):
+
 ```bash
 cd voxxy-presents-api
 bundle install
@@ -160,6 +171,7 @@ rails db:create db:migrate db:seed
 ### 3. Environment Setup
 
 **Client** - Create `.env.local`:
+
 ```env
 VITE_ENVIRONMENT=development
 VITE_API_BASE_URL=http://localhost:3001/api
@@ -169,6 +181,7 @@ VITE_MIXPANEL_TOKEN=...
 ```
 
 **API** (Rails) - Create `.env`:
+
 ```env
 RAILS_ENV=development
 PORT=3001
@@ -189,6 +202,7 @@ EMAIL_TEST_MODE=true
 ```
 
 **Get Credentials From**:
+
 - Database setup: Run `rails db:create db:migrate db:seed` in the API repo
 - Mixpanel token: Check existing `.env.example` or ask team
 - SendGrid API key: Ask team (optional for local development)
@@ -196,6 +210,7 @@ EMAIL_TEST_MODE=true
 ### 4. Start Development Servers
 
 **Terminal 1 - API**:
+
 ```bash
 cd voxxy-presents-api
 rails s -p 3001
@@ -203,6 +218,7 @@ rails s -p 3001
 ```
 
 **Terminal 2 - Client**:
+
 ```bash
 cd voxxy-presents-client
 npm run dev
@@ -223,7 +239,9 @@ npm run dev
 Before you start coding, read these documents to understand the full context:
 
 ### 1. [V3.0 Technical Requirements](./v3-migration/VOXXY_PRESENTS_MVP_TECHNICAL_REQUIREMENTS_V3.md) ⭐ **MOST IMPORTANT**
+
 **Read First!** Complete project specification including:
+
 - Executive summary and product vision
 - Database schema changes required
 - API endpoints to build
@@ -232,16 +250,20 @@ Before you start coding, read these documents to understand the full context:
 - **Known Issues section** - bugs and tech debt
 
 ### 2. [Phase 1 Day 2 Completion Report](./phase-reports/PHASE-1-DAY-2-VENDOR-SAVE-COMPLETE.md)
+
 Latest progress update showing:
+
 - What was completed yesterday
 - How vendor signup/edit flow works
 - API deployment details
 - Testing results
 
 ### 3. [Known Issues](./v3-migration/VOXXY_PRESENTS_MVP_TECHNICAL_REQUIREMENTS_V3.md#-known-issues--technical-debt)
+
 Current bugs and technical debt you should be aware of (linked in main spec doc).
 
 ### 4. [Contributing Guide](./CONTRIBUTING.md)
+
 Git workflow, PR process, code standards.
 
 ---
@@ -257,6 +279,7 @@ Git workflow, PR process, code standards.
 **Goal**: Create the `vendor_applications` table in PostgreSQL via Rails migration.
 
 **Tasks**:
+
 - [ ] Review the [VendorApplication interface](./v3-migration/VOXXY_PRESENTS_MVP_TECHNICAL_REQUIREMENTS_V3.md#1-vendorapplications-critical---phase-1) in the main spec
 - [ ] Create Rails migration for `vendor_applications` table
 - [ ] Add database indexes:
@@ -268,10 +291,12 @@ Git workflow, PR process, code standards.
 - [ ] Create seed data (2-3 sample applications) to work with
 
 **Files to Create/Modify**:
+
 - `voxxy-presents-api/db/migrate/xxx_create_vendor_applications.rb`
 - `voxxy-presents-api/db/seeds.rb` (add sample applications)
 
 **Reference**:
+
 - Look at existing migrations in `db/migrate/` for patterns
 - Run `rails db:migrate` after creating migration
 
@@ -282,12 +307,14 @@ Git workflow, PR process, code standards.
 **Goal**: Define TypeScript interfaces for vendor applications.
 
 **Tasks**:
+
 - [ ] Create `src/types/application.ts` with `VendorApplication` interface
 - [ ] Add status types: `ApplicationStatus = 'pending' | 'accepted' | 'rejected' | 'waitlisted' | 'withdrawn'`
 - [ ] Add vendor type enum if not already exists
 - [ ] Export types for use across the app
 
 **Example Structure**:
+
 ```typescript
 // src/types/application.ts
 export type ApplicationStatus = 'pending' | 'accepted' | 'rejected' | 'waitlisted' | 'withdrawn'
@@ -323,6 +350,7 @@ export interface VendorApplication {
 **Repository**: `voxxy-presents-api`
 
 **Tasks**:
+
 - [ ] Create `src/routes/applications.ts`
 - [ ] Implement `POST /api/events/:eventId/applications` (vendor submits application)
 - [ ] Implement `GET /api/events/:eventId/applications` (producer gets all applications for event)
@@ -333,13 +361,16 @@ export interface VendorApplication {
 - [ ] Register routes in Rails router
 
 **Files to Create**:
+
 - `voxxy-presents-api/app/controllers/api/applications_controller.rb`
 - `voxxy-presents-api/app/models/vendor_application.rb`
 
 **Files to Modify**:
+
 - `voxxy-presents-api/config/routes.rb` (register routes)
 
 **Testing**:
+
 - Use `curl` or Postman to test each endpoint
 - Verify authorization via controller before_actions
 
@@ -352,6 +383,7 @@ export interface VendorApplication {
 **Goal**: Allow producers to browse vendors and save favorites.
 
 **Tasks**:
+
 - [ ] Update `src/types/database.ts` - Add `savedVendorIds: string[]` to Organization interface
 - [ ] Create vendor service methods in `src/services/vendorService.ts`:
   - `saveVendor(organizationId, vendorId)`
@@ -362,12 +394,14 @@ export interface VendorApplication {
 - [ ] Add vendor filtering by type (dropdown or checkboxes)
 
 **Files to Modify**:
+
 - `src/types/database.ts`
 - `src/services/vendorService.ts`
 - `src/pages/VendorProfilePage.tsx` (add save button)
 - `src/pages/OrganizationAdminEnhanced.tsx` (add saved vendors section)
 
 **API Endpoints Needed** (build these in API repo):
+
 - `POST /api/organizations/:id/save-vendor` (add vendor to saved list)
 - `DELETE /api/organizations/:id/save-vendor/:vendorId` (remove from saved list)
 - `GET /api/organizations/:id/saved-vendors` (get all saved vendors)
@@ -381,6 +415,7 @@ export interface VendorApplication {
 **Goal**: Vendors can browse all events and filter by their vendor type.
 
 **Tasks**:
+
 - [ ] Create `src/pages/VendorEventBrowserPage.tsx`
 - [ ] Fetch all events with `listedToVendorNetwork: true`
 - [ ] Display event cards with:
@@ -392,6 +427,7 @@ export interface VendorApplication {
 - [ ] Add route to `src/App.tsx`: `/vendor/events`
 
 **Reference**:
+
 - Look at existing event listing pages for styling consistency
 
 ---
@@ -401,6 +437,7 @@ export interface VendorApplication {
 **Goal**: Vendors can submit applications to events.
 
 **Tasks**:
+
 - [ ] Create `src/components/vendor/VendorApplicationForm.tsx`
 - [ ] Form fields:
   - Message/cover letter (textarea)
@@ -410,6 +447,7 @@ export interface VendorApplication {
 - [ ] Handle errors (already applied, event closed, etc.)
 
 **Integration**:
+
 - Add "Apply" button to event detail pages when viewed by vendors
 - Open modal/form when clicked
 
@@ -448,6 +486,7 @@ export interface VendorApplication {
 ### Git Workflow
 
 1. **Always work on a feature branch**:
+
    ```bash
    git checkout main
    git pull origin main
@@ -455,12 +494,14 @@ export interface VendorApplication {
    ```
 
 2. **Commit frequently with descriptive messages**:
+
    ```bash
    git add -A
    git commit -m "feat: add vendor application submission endpoint"
    ```
 
 3. **Push and create PR when ready**:
+
    ```bash
    git push origin feature/application-system
    # Create PR on GitHub
@@ -484,6 +525,7 @@ export interface VendorApplication {
    - [ ] Verify database data via Rails console (`rails c`)
 
 2. **Build Before Committing**:
+
    ```bash
    npm run build
    # Fix any TypeScript errors
@@ -510,6 +552,7 @@ export interface VendorApplication {
 All API calls go through service files in `src/services/`.
 
 **Example** (`src/services/vendorService.ts`):
+
 ```typescript
 class VendorService {
   private API_BASE_URL = getApiBaseUrl()
@@ -525,7 +568,7 @@ class VendorService {
     const response = await fetch(`${this.API_BASE_URL}/vendors/by-slug/${slug}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updates)
+      body: JSON.stringify(updates),
     })
     if (!response.ok) {
       const error = await response.json()
@@ -543,6 +586,7 @@ export default new VendorService()
 Use functional components with hooks.
 
 **Example**:
+
 ```typescript
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -620,6 +664,7 @@ console.log('📦 Data:', JSON.stringify(data, null, 2))
    - Recent [Phase Reports](./phase-reports/)
 
 2. **Search the codebase**:
+
    ```bash
    # Find similar components
    grep -r "VendorProfile" src/
@@ -629,6 +674,7 @@ console.log('📦 Data:', JSON.stringify(data, null, 2))
    ```
 
 3. **Check Git history**:
+
    ```bash
    git log --oneline --all --grep="vendor"
    ```
@@ -641,15 +687,19 @@ console.log('📦 Data:', JSON.stringify(data, null, 2))
 ### Common Issues & Solutions
 
 **Issue**: CORS error when calling API
+
 - **Solution**: Make sure API is running on `http://localhost:3001` and ALLOWED_ORIGINS includes `http://localhost:5173`
 
 **Issue**: TypeScript errors about missing types
+
 - **Solution**: Check `src/types/database.ts` and `src/types/vendor.ts` for type definitions, or create new ones
 
 **Issue**: API authorization error (401/403)
+
 - **Solution**: Check that you're sending the correct auth token in headers and that the user has the required role
 
 **Issue**: "Cannot read property X of undefined"
+
 - **Solution**: Add optional chaining `?.` or null checks before accessing nested properties
 
 ---
@@ -666,6 +716,7 @@ By end of day, you should have:
 - [ ] Local testing successful (can submit and retrieve applications)
 
 **Stretch Goals**:
+
 - [ ] Vendor discovery (save/unsave) functionality working
 - [ ] Vendor event browser page started
 - [ ] Application form UI component created
@@ -681,6 +732,7 @@ Share this in team communication:
 **Blockers**: [Anything stopping you - missing credentials, unclear requirements, etc.]
 
 **Example**:
+
 ```
 Yesterday: Set up local environment, read V3.0 spec, reviewed vendor signup flow
 Today: Creating vendor_applications Rails migration and building API endpoints
@@ -703,4 +755,4 @@ You now have everything you need to get started. Remember:
 
 ---
 
-*Last Updated: November 22, 2025 - Updated for Rails API migration*
+_Last Updated: November 22, 2025 - Updated for Rails API migration_

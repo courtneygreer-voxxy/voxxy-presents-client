@@ -1,4 +1,5 @@
 # Invitation Email Display Fix
+
 **Date:** 2026-01-17
 **Issue:** Invitation emails not appearing at top of scheduled emails list
 **Status:** ✅ FIXED + Enhanced Debugging
@@ -8,27 +9,30 @@
 ## 🔍 What Was Fixed
 
 ### 1. **TypeScript Type Mismatch**
+
 **File:** `src/services/api.ts:2149-2167`
 
 **Before:**
+
 ```typescript
 meta: {
   total_count: number
   pending_count: number
   sent_count: number
-  accepted_count: number  // ❌ Missing viewed_count
+  accepted_count: number // ❌ Missing viewed_count
   declined_count: number
   expired_count: number
 }
 ```
 
 **After:**
+
 ```typescript
 meta: {
   total_count: number
   pending_count: number
   sent_count: number
-  viewed_count: number     // ✅ Added to match backend
+  viewed_count: number // ✅ Added to match backend
   accepted_count: number
   declined_count: number
   expired_count: number
@@ -38,9 +42,11 @@ meta: {
 ---
 
 ### 2. **Enhanced Error Handling & Debugging**
+
 **File:** `src/components/producer/Email/EmailAutomationTab.tsx:61-136`
 
 **Added comprehensive logging to track:**
+
 - ✅ API response structure
 - ✅ Invitation counts (total, sent, viewed)
 - ✅ Number of invitations with `sent_at` timestamps
@@ -53,6 +59,7 @@ meta: {
 ## 🎯 How the System Works
 
 ### Backend Flow:
+
 1. **User creates event invitations** (POST `/events/:slug/invitations/batch`)
 2. **Invitations are marked as sent**:
    ```ruby
@@ -70,6 +77,7 @@ meta: {
    ```
 
 ### Frontend Flow:
+
 1. **Fetch scheduled emails** → `scheduledEmailsApi.getByEvent(eventSlug)`
 2. **Fetch invitations** → `eventInvitationsApi.getByEvent(eventSlug)`
 3. **Check if invitations were sent**:
@@ -80,7 +88,7 @@ meta: {
    ```
 4. **Add virtual email to front of list**:
    ```typescript
-   allEmails.unshift(invitationEmail);
+   allEmails.unshift(invitationEmail)
    ```
 
 ---
@@ -96,6 +104,7 @@ Navigate to: **Email Automation Tab** for your event
 You should see these logs in order:
 
 #### **1. Invitations API Response**
+
 ```
 📨 Invitations API Response: {
   total_count: 5,
@@ -109,6 +118,7 @@ You should see these logs in order:
 **❌ If `sent_count = 0`:** Check database - are invitations actually marked as "sent"?
 
 #### **2. Virtual Email Creation**
+
 ```
 🎯 Creating virtual invitation email (sent_count: 5)
    Found 5 invitations with sent_at timestamp
@@ -127,6 +137,7 @@ You should see these logs in order:
 **❌ If you don't see this:** Check the `sent_count` in step 1
 
 #### **3. Final Email List**
+
 ```
 📋 Total emails to display: 6
    - Scheduled emails from API: 5
@@ -141,18 +152,22 @@ You should see these logs in order:
 ## 🔎 Troubleshooting Scenarios
 
 ### Scenario 1: API Call Failing
+
 **Symptoms:**
+
 ```
 ❌ Failed to fetch invitations: Network error
    Full error: [error object]
 ```
 
 **Causes:**
+
 - Network connectivity issue
 - API authentication problem
 - Backend server error
 
 **Fix:**
+
 - Check network tab in DevTools
 - Verify JWT token is valid
 - Check Rails logs for errors
@@ -160,7 +175,9 @@ You should see these logs in order:
 ---
 
 ### Scenario 2: No Sent Invitations
+
 **Symptoms:**
+
 ```
 📨 Invitations API Response: {
   sent_count: 0,  ← Problem!
@@ -170,11 +187,13 @@ You should see these logs in order:
 ```
 
 **Causes:**
+
 - No invitations have been created yet
 - Invitations exist but status ≠ "sent"
 - Invitations were created but `mark_as_sent!` never ran
 
 **Fix - Check Database:**
+
 ```sql
 -- Check if invitations exist
 SELECT * FROM event_invitations WHERE event_id = [your_event_id];
@@ -192,6 +211,7 @@ WHERE event_id = [your_event_id] AND status = 'sent';
 ```
 
 **Fix - Rails Console:**
+
 ```ruby
 event = Event.find_by(slug: "your-event-slug")
 
@@ -208,7 +228,9 @@ end
 ---
 
 ### Scenario 3: Invitations Have No `sent_at` Timestamp
+
 **Symptoms:**
+
 ```
 📨 Invitations API Response: {
   sent_count: 5,  ← Invitations exist
@@ -220,11 +242,13 @@ end
 ```
 
 **Causes:**
+
 - Old invitations created before `sent_at` logic
 - `mark_as_sent!` method not called
 - Database migration issue
 
 **Fix - Rails Console:**
+
 ```ruby
 event = Event.find_by(slug: "your-event-slug")
 
@@ -237,20 +261,25 @@ end
 ---
 
 ### Scenario 4: Virtual Email Created But Not Visible
+
 **Symptoms:**
+
 ```
 ✅ Added invitation announcement email to position 0
 📋 Total emails to display: 6
    - Virtual invitation email: YES
 ```
+
 But you still don't see it in the UI!
 
 **Causes:**
+
 - Filtering removing it (status filter, search query)
 - Frontend component not rendering it
 - CSS hiding it
 
 **Fix - Check Filters:**
+
 1. Clear any search queries
 2. Set status filter to "All Emails"
 3. Check browser DevTools Elements tab to see if it's rendered but hidden
@@ -260,6 +289,7 @@ But you still don't see it in the UI!
 ## 🧪 Testing Checklist
 
 ### Test 1: Fresh Event with Invitations
+
 - [ ] Create new event
 - [ ] Add vendor contacts
 - [ ] Create batch invitations
@@ -270,6 +300,7 @@ But you still don't see it in the UI!
 - [ ] Verify sent date matches earliest `sent_at`
 
 ### Test 2: Existing Event
+
 - [ ] Find event with existing sent invitations
 - [ ] Check database: `SELECT * FROM event_invitations WHERE event_id = X AND status = 'sent'`
 - [ ] Navigate to Email Automation tab
@@ -277,6 +308,7 @@ But you still don't see it in the UI!
 - [ ] Verify invitation email appears
 
 ### Test 3: Edge Cases
+
 - [ ] Event with no invitations → Should NOT show invitation email
 - [ ] Event with pending (not sent) invitations → Should NOT show invitation email
 - [ ] Event with sent invitations but no `sent_at` → Should show with current timestamp
@@ -287,6 +319,7 @@ But you still don't see it in the UI!
 ## 📊 Database Queries for Debugging
 
 ### Check Invitation Status for Event
+
 ```sql
 SELECT
   e.slug AS event_slug,
@@ -301,6 +334,7 @@ GROUP BY e.slug, ei.status;
 ```
 
 ### Find Events Missing sent_at Timestamps
+
 ```sql
 SELECT
   e.slug,
@@ -316,12 +350,14 @@ GROUP BY e.slug;
 ## 📝 Key Code Locations
 
 ### Frontend:
+
 - **API Type Definition:** `src/services/api.ts:2149-2167`
 - **Virtual Email Creation:** `src/components/producer/Email/EmailAutomationTab.tsx:61-136`
 - **Email Row Component:** `src/components/producer/Email/EmailRow.tsx:106` (checks `isInvitationAnnouncement`)
 - **TypeScript Interface:** `src/types/email.ts:102` (has `isInvitationAnnouncement?: boolean`)
 
 ### Backend:
+
 - **Invitations Controller:** `app/controllers/api/v1/presents/event_invitations_controller.rb`
 - **EventInvitation Model:** `app/models/event_invitation.rb:28-30` (`mark_as_sent!` method)
 - **Database Schema:** `db/schema.rb:220-236`
@@ -331,6 +367,7 @@ GROUP BY e.slug;
 ## ✅ Success Criteria
 
 The fix is working when:
+
 - ✅ Invitation email appears at position 0 (top of list)
 - ✅ Shows "Event Announcement (Invitations Sent)" as name
 - ✅ Shows status badge as "sent"

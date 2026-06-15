@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { X, Tag, Users, Trash2, MapPin } from 'lucide-react';
-import type { Category } from '@/types/category';
+import { useState } from 'react'
+import { X, Tag, Users, Trash2, MapPin } from 'lucide-react'
+import type { Category } from '@/types/category'
 
 interface BulkActionToolbarProps {
-  selectedCount: number;
-  categories: Category[];
-  onCategoryUpdate: (categoryNames: string[]) => void;
-  onLocationUpdate: (location: string) => void;
-  onDelete: () => void;
-  onClear: () => void;
-  loading?: boolean;
+  selectedCount: number
+  categories: Category[]
+  onCategoryUpdate: (categoryNames: string[]) => void
+  onLocationUpdate: (location: string) => void
+  onDelete: () => void
+  onClear: () => void
+  loading?: boolean
 }
 
 export function BulkActionToolbar({
@@ -21,27 +21,27 @@ export function BulkActionToolbar({
   onClear,
   loading = false,
 }: BulkActionToolbarProps) {
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const [locationInput, setLocationInput] = useState('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
+  const [locationInput, setLocationInput] = useState('')
 
   const handleApplyCategory = () => {
-    if (!selectedCategoryId) return;
+    if (!selectedCategoryId) return
 
-    const category = categories.find(c => c.id === selectedCategoryId);
-    if (!category) return;
+    const category = categories.find((c) => c.id === selectedCategoryId)
+    if (!category) return
 
-    onCategoryUpdate([category.name]);
-    setSelectedCategoryId(null);
-  };
+    onCategoryUpdate([category.name])
+    setSelectedCategoryId(null)
+  }
 
   const handleApplyLocation = () => {
-    if (!locationInput.trim()) return;
+    if (!locationInput.trim()) return
 
-    onLocationUpdate(locationInput.trim());
-    setLocationInput('');
-  };
+    onLocationUpdate(locationInput.trim())
+    setLocationInput('')
+  }
 
-  if (selectedCount === 0) return null;
+  if (selectedCount === 0) return null
 
   return (
     <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 border border-border rounded-lg p-4 mb-4">
@@ -56,9 +56,7 @@ export function BulkActionToolbar({
               <p className="text-sm font-medium text-foreground">
                 {selectedCount} {selectedCount === 1 ? 'contact' : 'contacts'} selected
               </p>
-              <p className="text-xs text-foreground/60">
-                Apply bulk actions to selected contacts
-              </p>
+              <p className="text-xs text-foreground/60">Apply bulk actions to selected contacts</p>
             </div>
           </div>
         </div>
@@ -70,7 +68,9 @@ export function BulkActionToolbar({
             <Tag className="w-4 h-4 text-foreground/60" />
             <select
               value={selectedCategoryId || ''}
-              onChange={(e) => setSelectedCategoryId(e.target.value ? Number(e.target.value) : null)}
+              onChange={(e) =>
+                setSelectedCategoryId(e.target.value ? Number(e.target.value) : null)
+              }
               className="px-3 py-2 bg-background/10 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
               disabled={loading}
             >
@@ -100,8 +100,8 @@ export function BulkActionToolbar({
               onChange={(e) => setLocationInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleApplyLocation();
+                  e.preventDefault()
+                  handleApplyLocation()
                 }
               }}
               placeholder="City, State..."
@@ -143,5 +143,5 @@ export function BulkActionToolbar({
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -3,12 +3,14 @@
 ## Changes Made
 
 ### 1. Enhanced Debug Panel (`src/components/debug/DebugPanel.tsx`)
+
 - Added step-by-step logging with `[ROLE SWITCH]` prefix
 - Added verification step: fetches current user after update to verify role changed
 - Added 500ms delay to ensure database has updated
 - Shows clear error alert if verification fails
 
 ### 2. Enhanced API Logging (`src/services/api.ts`)
+
 - Added detailed logging for `updateUser` with `[API]` prefix
 - Logs endpoint, payload, token status, response status, and response data
 - Better error messages
@@ -41,29 +43,36 @@
 ## Common Issues & Solutions
 
 ### Issue 1: API returns 404
+
 **Console shows:** `📥 [API] Response status: 404 Not Found`
 
 **Solution:** Rails endpoint `/users/:id` doesn't exist. Check Rails routes:
+
 ```bash
 # In rails console:
 rails routes | grep users
 ```
 
 Should show:
+
 ```
 PATCH  /users/:id  users#update
 ```
 
 ### Issue 2: API returns 401 Unauthorized
+
 **Console shows:** `📥 [API] Response status: 401 Unauthorized`
 
 **Solution:** JWT token is invalid or expired. Check:
+
 - Is Rails server running?
 - Is the token in localStorage valid?
 - Check Rails logs for authentication errors
 
 ### Issue 3: API returns 200 but role doesn't change
+
 **Console shows:**
+
 ```
 📥 [API] Response status: 200 OK
 ❌ [ROLE SWITCH] Role verification failed!
@@ -71,11 +80,13 @@ PATCH  /users/:id  users#update
 ```
 
 **Solution:** Rails is accepting the request but not saving the role. Check:
+
 - Rails `UsersController#update` permits the `:role` parameter
 - Rails model has `role` field
 - No validation errors preventing save
 
 **Example Rails controller:**
+
 ```ruby
 class UsersController < ApplicationController
   def update
@@ -97,9 +108,11 @@ end
 ```
 
 ### Issue 4: API returns 422 Unprocessable Entity
+
 **Console shows:** `📥 [API] Response status: 422 Unprocessable Entity`
 
 **Solution:** Rails validation failed. Check console for error details:
+
 ```
 📥 [API] Response data: { errors: ["Role is invalid", "Role must be one of: consumer, vendor, producer, admin, guest"] }
 ```
@@ -109,10 +122,12 @@ Fix: Ensure role value matches Rails enum/validation.
 ## What to Report Back
 
 Please copy-paste the **full console output** starting from `🔄 [ROLE SWITCH] Starting:` through either:
+
 - `✅ [ROLE SWITCH] Success! Reloading page...` (success case)
 - `❌ [ROLE SWITCH] Failed:` (error case)
 
 Also include:
+
 - Your current role before clicking
 - Which role button you clicked
 - The final role after page reload

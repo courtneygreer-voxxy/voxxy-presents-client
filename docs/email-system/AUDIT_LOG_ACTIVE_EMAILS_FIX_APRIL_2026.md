@@ -11,6 +11,7 @@
 ### Symptoms
 
 **User Report:**
+
 - ✅ Invitation emails appear in audit log
 - ❌ Application Received emails DON'T appear in audit log
 - ❌ Application Approved emails DON'T appear
@@ -21,6 +22,7 @@
 ### Investigation
 
 **Frontend Console Logs:**
+
 ```
 🔍 [Audit Log] Filtering by email_name: Application Received (Food Vendor)
 📊 [Audit Log] Available email names: ['Invitation to Apply', '3 Days Until Application Deadline', ...]
@@ -28,6 +30,7 @@
 ```
 
 **Database Check:**
+
 ```sql
 -- Email exists in database
 ID: 4651
@@ -67,6 +70,7 @@ The system has two types of email statuses:
 **Line:** 153
 
 **Before Fix:**
+
 ```typescript
 for (const email of scheduledEmails) {
   // Handle sent emails - fetch actual delivery records
@@ -77,6 +81,7 @@ for (const email of scheduledEmails) {
 ```
 
 **Result:**
+
 - ✅ "Invitation to Apply" (status: sent) → deliveries fetched
 - ❌ "Application Received" (status: active) → **SKIPPED!**
 - ❌ "Application Approved" (status: active) → **SKIPPED!**
@@ -89,6 +94,7 @@ for (const email of scheduledEmails) {
 **Lines:** 148-156
 
 **After Fix:**
+
 ```typescript
 for (const email of scheduledEmails) {
   // Handle sent/active emails - fetch actual delivery records
@@ -106,6 +112,7 @@ for (const email of scheduledEmails) {
 ### Before Fix
 
 **Audit Log showed:**
+
 - ✅ Invitation to Apply
 - ✅ 3 Days Until Application Deadline
 - ✅ Payment Due Today
@@ -118,6 +125,7 @@ for (const email of scheduledEmails) {
 ### After Fix
 
 **Audit Log now shows:**
+
 - ✅ Invitation to Apply
 - ✅ 3 Days Until Application Deadline
 - ✅ Payment Due Today
@@ -130,6 +138,7 @@ for (const email of scheduledEmails) {
 ### Email Types Fixed
 
 All event-triggered transactional emails now appear in audit log:
+
 - ✅ Application Received (on_application_submit)
 - ✅ Application Approved (on_approval)
 - ✅ Application Declined (on_rejection)
@@ -156,6 +165,7 @@ All event-triggered transactional emails now appear in audit log:
 ### Expected Results
 
 **Before Fix:**
+
 ```
 Available email names: [
   'Invitation to Apply',
@@ -165,6 +175,7 @@ Available email names: [
 ```
 
 **After Fix:**
+
 ```
 Available email names: [
   'Invitation to Apply',
@@ -183,12 +194,14 @@ Available email names: [
 ### Safe Deployment
 
 ✅ **No breaking changes**
+
 - Only adds more emails to the audit log
 - Existing emails (sent status) still work
 - No database changes required
 - No API changes required
 
 ✅ **Performance**
+
 - Same number of API calls as before
 - Just includes more emails in the loop
 - Client-side filtering unchanged
@@ -196,16 +209,19 @@ Available email names: [
 ### Edge Cases Handled
 
 **What if active email has no deliveries?**
+
 - API returns empty array `[]`
 - Loop continues, no entries added
 - No errors thrown
 
 **What if active email has 100+ deliveries?**
+
 - All deliveries fetched and displayed
 - Pagination handles large lists (100 items per page)
 - Performance should be fine
 
 **What about scheduled (future) emails?**
+
 - Still handled by the `else if` block (lines 183-213)
 - Shows who WILL receive the email
 - Unchanged by this fix
@@ -215,11 +231,13 @@ Available email names: [
 ## 📝 Related Files
 
 ### Frontend
+
 - `src/components/producer/Email/EmailAuditLogOverlay.tsx` - Audit log overlay (FIXED)
 - `src/components/producer/Email/EmailAuditTable.tsx` - Table display
 - `src/components/producer/Email/EmailAuditFilters.tsx` - Filter UI
 
 ### Backend
+
 - `app/controllers/api/v1/presents/scheduled_emails_controller.rb` - API endpoints
 - `app/models/scheduled_email.rb` - Email status logic
 - `app/models/email_delivery.rb` - Delivery tracking
@@ -229,6 +247,7 @@ Available email names: [
 ## 📅 Timeline
 
 **April 9, 2026:**
+
 - User reported: "Application Received emails not showing in audit log, only invitations visible"
 - Investigation: Found frontend only checking `status === 'sent'`
 - Root cause: Transactional emails have `status === 'active'`, not `'sent'`

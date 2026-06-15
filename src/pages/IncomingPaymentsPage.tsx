@@ -1,110 +1,119 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { incomingPaymentsApi, organizationsApi, eventsApi } from '@/services/api';
-import { DollarSign, AlertCircle, CheckCircle, XCircle, Clock, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { incomingPaymentsApi, organizationsApi, eventsApi } from '@/services/api'
+import {
+  DollarSign,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 interface IncomingPayment {
-  id: number;
-  organization_id: number;
-  event_id: number | null;
-  registration_id: number | null;
-  status: 'received' | 'processing' | 'matched' | 'unmatched' | 'failed';
-  ticket_code: string | null;
-  eventbrite_order_id: string;
-  email: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  ticket_type: string | null;
-  payment_date: string | null;
-  payment_amount: number | null;
-  payment_currency: string | null;
-  processed_at: string | null;
-  error_message: string | null;
-  created_at: string;
+  id: number
+  organization_id: number
+  event_id: number | null
+  registration_id: number | null
+  status: 'received' | 'processing' | 'matched' | 'unmatched' | 'failed'
+  ticket_code: string | null
+  eventbrite_order_id: string
+  email: string | null
+  first_name: string | null
+  last_name: string | null
+  ticket_type: string | null
+  payment_date: string | null
+  payment_amount: number | null
+  payment_currency: string | null
+  processed_at: string | null
+  error_message: string | null
+  created_at: string
   event?: {
-    id: number;
-    title: string;
-    slug: string;
-  };
+    id: number
+    title: string
+    slug: string
+  }
   registration?: {
-    id: number;
-    name: string;
-    email: string;
-  };
+    id: number
+    name: string
+    email: string
+  }
 }
 
 interface Organization {
-  id: number;
-  slug: string;
-  name: string;
-  user_id: number;
+  id: number
+  slug: string
+  name: string
+  user_id: number
 }
 
 export default function IncomingPaymentsPage() {
-  const { userProfile } = useAuth();
-  const [organization, setOrganization] = useState<Organization | null>(null);
-  const [payments, setPayments] = useState<IncomingPayment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const { userProfile } = useAuth()
+  const [organization, setOrganization] = useState<Organization | null>(null)
+  const [payments, setPayments] = useState<IncomingPayment[]>([])
+  const [loading, setLoading] = useState(true)
+  const [statusFilter, setStatusFilter] = useState<string>('all')
 
   // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const perPage = 50;
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const perPage = 50
 
   // Fetch organization
   useEffect(() => {
     const fetchOrganization = async () => {
-      if (!userProfile?.id) return;
+      if (!userProfile?.id) return
 
       try {
-        const orgs = await organizationsApi.getAll();
-        const userOrg = orgs.find((org: Organization) => org.user_id === userProfile.id);
+        const orgs = await organizationsApi.getAll()
+        const userOrg = orgs.find((org: Organization) => org.user_id === userProfile.id)
         if (userOrg) {
-          setOrganization(userOrg);
+          setOrganization(userOrg)
         }
       } catch (err) {
-        console.error('Failed to fetch organization:', err);
-        toast.error('Failed to load organization');
+        console.error('Failed to fetch organization:', err)
+        toast.error('Failed to load organization')
       }
-    };
+    }
 
-    fetchOrganization();
-  }, [userProfile]);
+    fetchOrganization()
+  }, [userProfile])
 
   // Fetch payments
   useEffect(() => {
     const fetchPayments = async () => {
-      if (!organization?.slug) return;
+      if (!organization?.slug) return
 
       try {
-        setLoading(true);
+        setLoading(true)
         const params: any = {
           page: currentPage,
           per_page: perPage,
-        };
-
-        if (statusFilter !== 'all') {
-          params.status = statusFilter;
         }
 
-        const response = await incomingPaymentsApi.getAll(organization.slug, params);
-        setPayments(response.payments);
-        setTotalPages(response.pagination.total_pages);
-        setTotalCount(response.pagination.total_count);
-      } catch (err: any) {
-        console.error('Failed to fetch payments:', err);
-        toast.error(err.message || 'Failed to load payments');
-      } finally {
-        setLoading(false);
-      }
-    };
+        if (statusFilter !== 'all') {
+          params.status = statusFilter
+        }
 
-    fetchPayments();
-  }, [organization, currentPage, statusFilter]);
+        const response = await incomingPaymentsApi.getAll(organization.slug, params)
+        setPayments(response.payments)
+        setTotalPages(response.pagination.total_pages)
+        setTotalCount(response.pagination.total_count)
+      } catch (err: any) {
+        console.error('Failed to fetch payments:', err)
+        toast.error(err.message || 'Failed to load payments')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPayments()
+  }, [organization, currentPage, statusFilter])
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -114,56 +123,56 @@ export default function IncomingPaymentsPage() {
             <CheckCircle className="h-3 w-3" />
             Matched
           </span>
-        );
+        )
       case 'unmatched':
         return (
           <span className="inline-flex items-center gap-1 rounded border border-amber-600/35 bg-amber-500/10 px-2 py-1 text-xs text-amber-700 dark:text-amber-400">
             <AlertCircle className="h-3 w-3" />
             Unmatched
           </span>
-        );
+        )
       case 'failed':
         return (
           <span className="inline-flex items-center gap-1 rounded border border-red-600/35 bg-red-500/10 px-2 py-1 text-xs text-red-700 dark:text-red-400">
             <XCircle className="h-3 w-3" />
             Failed
           </span>
-        );
+        )
       case 'processing':
         return (
           <span className="inline-flex items-center gap-1 rounded border border-blue-600/35 bg-blue-500/10 px-2 py-1 text-xs text-blue-700 dark:text-blue-400">
             <Clock className="h-3 w-3" />
             Processing
           </span>
-        );
+        )
       default:
         return (
           <span className="inline-flex items-center gap-1 rounded border border-border bg-muted px-2 py-1 text-xs text-muted-foreground">
             {status}
           </span>
-        );
+        )
     }
-  };
+  }
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString();
-  };
+    if (!dateString) return 'N/A'
+    return new Date(dateString).toLocaleString()
+  }
 
   const formatAmount = (amount: number | null, currency: string | null) => {
-    if (amount === null) return 'N/A';
-    return `${currency || 'USD'} ${amount.toFixed(2)}`;
-  };
+    if (amount === null) return 'N/A'
+    return `${currency || 'USD'} ${amount.toFixed(2)}`
+  }
 
   if (!userProfile) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Loading...</p>
       </div>
-    );
+    )
   }
 
-  const sectionShell = cn('glass-card p-4 shadow-sm');
+  const sectionShell = cn('glass-card p-4 shadow-sm')
 
   return (
     <div className="h-full overflow-y-auto">
@@ -189,14 +198,14 @@ export default function IncomingPaymentsPage() {
                 <button
                   key={status}
                   onClick={() => {
-                    setStatusFilter(status);
-                    setCurrentPage(1);
+                    setStatusFilter(status)
+                    setCurrentPage(1)
                   }}
                   className={cn(
                     'px-3 py-1.5 text-xs font-medium rounded-lg transition-colors',
                     statusFilter === status
                       ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground border border-border hover:bg-muted/80 hover:text-foreground'
+                      : 'bg-muted text-muted-foreground border border-border hover:bg-muted/80 hover:text-foreground',
                   )}
                 >
                   {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -212,9 +221,7 @@ export default function IncomingPaymentsPage() {
         {/* Payments Table */}
         <div className={sectionShell}>
           {loading ? (
-            <div className="py-12 text-center text-muted-foreground">
-              Loading payments...
-            </div>
+            <div className="py-12 text-center text-muted-foreground">Loading payments...</div>
           ) : payments.length === 0 ? (
             <div className="py-12 text-center">
               <DollarSign className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-50" />
@@ -228,25 +235,42 @@ export default function IncomingPaymentsPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">Received</th>
-                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">Status</th>
-                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">Email</th>
-                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">Name</th>
-                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">Amount</th>
-                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">Ticket Code</th>
-                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">Event</th>
-                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">Order ID</th>
+                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">
+                        Received
+                      </th>
+                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">
+                        Status
+                      </th>
+                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">
+                        Email
+                      </th>
+                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">
+                        Name
+                      </th>
+                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">
+                        Amount
+                      </th>
+                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">
+                        Ticket Code
+                      </th>
+                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">
+                        Event
+                      </th>
+                      <th className="text-left py-3 px-2 text-xs font-semibold text-foreground">
+                        Order ID
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {payments.map((payment) => (
-                      <tr key={payment.id} className="border-b border-border hover:bg-accent/20 transition-colors">
+                      <tr
+                        key={payment.id}
+                        className="border-b border-border hover:bg-accent/20 transition-colors"
+                      >
                         <td className="py-3 px-2 text-xs text-muted-foreground">
                           {formatDate(payment.created_at)}
                         </td>
-                        <td className="py-3 px-2">
-                          {getStatusBadge(payment.status)}
-                        </td>
+                        <td className="py-3 px-2">{getStatusBadge(payment.status)}</td>
                         <td className="py-3 px-2 text-xs text-foreground font-medium">
                           {payment.email || 'N/A'}
                         </td>
@@ -281,7 +305,7 @@ export default function IncomingPaymentsPage() {
                   </span>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
                       className="flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg border border-border bg-muted text-foreground hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -289,7 +313,7 @@ export default function IncomingPaymentsPage() {
                       Previous
                     </button>
                     <button
-                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
                       className="flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg border border-border bg-muted text-foreground hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -304,5 +328,5 @@ export default function IncomingPaymentsPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

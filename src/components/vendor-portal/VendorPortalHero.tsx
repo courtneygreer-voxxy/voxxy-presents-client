@@ -1,12 +1,12 @@
-import { Building2, Calendar, Clock } from 'lucide-react';
-import type { EventDetails } from '@/types/eventPortal';
+import { Building2, Calendar, Clock } from 'lucide-react'
+import type { EventDetails } from '@/types/eventPortal'
 
 export interface VendorPortalHeroProps {
-  event: EventDetails;
-  formatDate: (dateString: string | null) => string;
-  formatTime: (timeString: string | null) => string;
-  isProducerPreview: boolean;
-  onSignOut?: () => void;
+  event: EventDetails
+  formatDate: (dateString: string | null) => string
+  formatTime: (timeString: string | null) => string
+  isProducerPreview: boolean
+  onSignOut?: () => void
 }
 
 export function VendorPortalHero({
@@ -23,10 +23,7 @@ export function VendorPortalHero({
         {(isProducerPreview || onSignOut) && (
           <div className="mb-4 flex items-center justify-between gap-3">
             {isProducerPreview && (
-              <div
-                role="status"
-                className="glass-card rounded-xl px-3 py-2.5 text-left"
-              >
+              <div role="status" className="glass-card rounded-xl px-3 py-2.5 text-left">
                 <p className="text-xs font-semibold text-foreground">Applicant preview</p>
                 <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
                   Same page applicants see after they sign in.
@@ -80,5 +77,5 @@ export function VendorPortalHero({
         </div>
       </div>
     </div>
-  );
+  )
 }

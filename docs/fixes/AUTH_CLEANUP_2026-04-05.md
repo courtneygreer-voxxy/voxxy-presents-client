@@ -25,11 +25,12 @@ Consolidated email verification and payment request flows into a unified account
 ```typescript
 const handleSignOut = async () => {
   await signOut()
-  navigate('/')  // ← Added explicit redirect
+  navigate('/') // ← Added explicit redirect
 }
 ```
 
 **Files Modified**:
+
 - `src/pages/BetaPendingPage.tsx` (line 53)
 
 ---
@@ -37,11 +38,13 @@ const handleSignOut = async () => {
 ### 2. Consolidated Email Verification & Payment Flows
 
 **Previous Implementation**:
+
 - Separate pages for email verification and payment requests
 - Users navigated between multiple screens
 - Fragmented account setup experience
 
 **New Implementation**:
+
 - Single unified "Account Setup Hub" (`BetaPendingPage`)
 - 2-step checklist always visible:
   - **Step 1**: Email Verification (shows form or "✓ Complete")
@@ -50,12 +53,14 @@ const handleSignOut = async () => {
 - Cohesive glass-morphism design matching signup flow
 
 **Benefits**:
+
 - Clear progress tracking for users
 - Reduced navigation complexity
 - Consistent UI/UX throughout onboarding
 - Single source of truth for account setup state
 
 **Files Modified**:
+
 - `src/pages/BetaPendingPage.tsx` - Enhanced with verification form and 2-step flow
 - `src/App.tsx` - Updated route comments and redirects
 - `src/pages/SignUpPage.tsx` - Redirects to `/pending` after signup
@@ -67,6 +72,7 @@ const handleSignOut = async () => {
 **Deleted Files** (11 total):
 
 #### Legacy Auth Pages (9 files):
+
 1. `src/pages/EmailVerificationPage.tsx` - Consolidated into BetaPendingPage
 2. `src/pages/ClubOwnerSignUpPage.tsx` - Replaced by unified SignUpPage
 3. `src/pages/VenueOwnerSignUpPage.tsx` - Replaced by unified SignUpPage
@@ -78,13 +84,16 @@ const handleSignOut = async () => {
 9. `src/pages/AuthTypePage.tsx` - No longer needed
 
 #### Legacy Legal Pages (2 files):
+
 10. `src/pages/PrivacyPolicyPage.tsx` - Replaced by `/legal/PrivacyPolicyPage.tsx`
 11. `src/pages/TermsOfServicePage.tsx` - Replaced by `/legal/TermsOfServicePage.tsx`
 
 **Files Modified**:
+
 - `src/App.tsx` - Removed unused imports
 
 **Impact**:
+
 - Reduced codebase by ~140KB
 - Eliminated maintenance overhead for duplicate functionality
 - Improved code discoverability and navigation
@@ -184,6 +193,7 @@ None. All legacy routes have been updated to redirect to new unified routes for 
 ## Related Files
 
 ### Modified Files
+
 - `src/pages/BetaPendingPage.tsx`
 - `src/App.tsx`
 - `src/pages/SignUpPage.tsx`
@@ -191,6 +201,7 @@ None. All legacy routes have been updated to redirect to new unified routes for 
 - `docs/architecture/CODEBASE_ANALYSIS.md`
 
 ### Deleted Files
+
 - See "Removed Legacy Authentication Pages" section above
 
 ---

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import {
   Search,
   ChevronDown,
@@ -12,127 +12,141 @@ import {
   Star,
   Check,
   ExternalLink,
-  Edit2
-} from 'lucide-react';
-import { eventInvitationsApi, vendorApplicationsApi, registrationsApi, emailDeliveriesApi } from '@/services/api';
-import { useEmailNotifications } from '@/hooks/useEmailNotifications';
-import { EmailConfirmationDialog } from './EmailConfirmationDialog';
-import { DebugPanel } from './DebugPanel';
-import { Badge, type BadgeVariant } from '@/components/ui/badge';
+  Edit2,
+} from 'lucide-react'
+import {
+  eventInvitationsApi,
+  vendorApplicationsApi,
+  registrationsApi,
+  emailDeliveriesApi,
+} from '@/services/api'
+import { useEmailNotifications } from '@/hooks/useEmailNotifications'
+import { EmailConfirmationDialog } from './EmailConfirmationDialog'
+import { DebugPanel } from './DebugPanel'
+import { Badge, type BadgeVariant } from '@/components/ui/badge'
 
 // Unified invite row interface
 interface InviteRow {
-  id: string;
-  businessName: string;
-  contactName?: string;
-  email: string;
-  phone?: string;
-  instagram?: string;
-  tiktok?: string;
-  website?: string;
-  portfolioUrl?: string;
-  category: string;
-  status: 'invited' | 'applied' | 'approved' | 'waitlist' | 'declined' | 'bounced' | 'unsubscribed';
-  paymentStatus?: 'paid' | 'pending' | 'confirmed' | 'overdue' | 'n/a';
-  source: 'contact' | 'net_new';
-  isReturning?: boolean;
-  hasVoxxyCard?: boolean;
-  voxxyCardId?: string | null;
-  reviewedAt?: string | null;
-  appliedAt?: string | null;
-  producerNotes?: string | null;
-  location?: string;
-  tags?: string[];
-  registrationId?: number;
-  invitationId?: number;
+  id: string
+  businessName: string
+  contactName?: string
+  email: string
+  phone?: string
+  instagram?: string
+  tiktok?: string
+  website?: string
+  portfolioUrl?: string
+  category: string
+  status: 'invited' | 'applied' | 'approved' | 'waitlist' | 'declined' | 'bounced' | 'unsubscribed'
+  paymentStatus?: 'paid' | 'pending' | 'confirmed' | 'overdue' | 'n/a'
+  source: 'contact' | 'net_new'
+  isReturning?: boolean
+  hasVoxxyCard?: boolean
+  voxxyCardId?: string | null
+  reviewedAt?: string | null
+  appliedAt?: string | null
+  producerNotes?: string | null
+  location?: string
+  tags?: string[]
+  registrationId?: number
+  invitationId?: number
 }
 
 interface InvitesTabProps {
-  eventSlug: string;
-  organizationId?: number;
-  event?: any;
-  isAdmin?: boolean;
+  eventSlug: string
+  organizationId?: number
+  event?: any
+  isAdmin?: boolean
 }
 
-type StatusFilter = 'all' | 'invited' | 'applied' | 'approved' | 'waitlist' | 'declined' | 'bounced' | 'unsubscribed';
-type ReviewFilter = 'all' | 'reviewed' | 'unreviewed';
-type PaymentFilter = 'all' | 'paid' | 'pending' | 'n/a';
-type SourceFilter = 'all' | 'contact' | 'net_new';
+type StatusFilter =
+  | 'all'
+  | 'invited'
+  | 'applied'
+  | 'approved'
+  | 'waitlist'
+  | 'declined'
+  | 'bounced'
+  | 'unsubscribed'
+type ReviewFilter = 'all' | 'reviewed' | 'unreviewed'
+type PaymentFilter = 'all' | 'paid' | 'pending' | 'n/a'
+type SourceFilter = 'all' | 'contact' | 'net_new'
 
 export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }: InvitesTabProps) {
-  const [inviteRows, setInviteRows] = useState<InviteRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const [hasNextPage, setHasNextPage] = useState(false);
-  const PER_PAGE = 50;
+  const [inviteRows, setInviteRows] = useState<InviteRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const [hasNextPage, setHasNextPage] = useState(false)
+  const PER_PAGE = 50
 
   // Filters
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all');
-  const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>('all');
-  const [sourceFilter, setSourceFilter] = useState<SourceFilter>('all');
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+  const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all')
+  const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>('all')
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>('all')
 
   // UI state
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
-  const [notesEditValue, setNotesEditValue] = useState('');
-  const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
-  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [editingNotesId, setEditingNotesId] = useState<string | null>(null)
+  const [notesEditValue, setNotesEditValue] = useState('')
+  const [isUpdatingCategory, setIsUpdatingCategory] = useState(false)
+  const [availableCategories, setAvailableCategories] = useState<string[]>([])
 
   // Email history state
-  const [emailHistoryExpanded, setEmailHistoryExpanded] = useState<string | null>(null);
-  const [emailHistoryData, setEmailHistoryData] = useState<Record<string, any[]>>({});
-  const [loadingEmailHistory, setLoadingEmailHistory] = useState<string | null>(null);
+  const [emailHistoryExpanded, setEmailHistoryExpanded] = useState<string | null>(null)
+  const [emailHistoryData, setEmailHistoryData] = useState<Record<string, any[]>>({})
+  const [loadingEmailHistory, setLoadingEmailHistory] = useState<string | null>(null)
 
   // Email notifications hook
-  const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } = useEmailNotifications();
+  const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } =
+    useEmailNotifications()
 
   useEffect(() => {
-    fetchInviteRows(1);
-  }, [eventSlug]);
+    fetchInviteRows(1)
+  }, [eventSlug])
 
   const fetchInviteRows = async (page: number = 1, append: boolean = false) => {
     try {
       if (append) {
-        setLoadingMore(true);
+        setLoadingMore(true)
       } else {
-        setLoading(true);
+        setLoading(true)
       }
-      setError(null);
+      setError(null)
 
       // Fetch invitations (people who were invited) with pagination
-      const invitationsResponse = await eventInvitationsApi.getByEvent(eventSlug, page, PER_PAGE);
-      const invitations = invitationsResponse.invitations || [];
+      const invitationsResponse = await eventInvitationsApi.getByEvent(eventSlug, page, PER_PAGE)
+      const invitations = invitationsResponse.invitations || []
 
       // Store pagination metadata
       if (invitationsResponse.meta?.pagination) {
-        setCurrentPage(invitationsResponse.meta.pagination.current_page);
-        setTotalPages(invitationsResponse.meta.pagination.total_pages);
-        setTotalCount(invitationsResponse.meta.pagination.total_count);
-        setHasNextPage(invitationsResponse.meta.pagination.has_next_page);
+        setCurrentPage(invitationsResponse.meta.pagination.current_page)
+        setTotalPages(invitationsResponse.meta.pagination.total_pages)
+        setTotalCount(invitationsResponse.meta.pagination.total_count)
+        setHasNextPage(invitationsResponse.meta.pagination.has_next_page)
       }
 
       // Fetch vendor applications and their submissions
-      const vendorApps = await vendorApplicationsApi.getByEvent(eventSlug);
+      const vendorApps = await vendorApplicationsApi.getByEvent(eventSlug)
 
-      const allSubmissions: any[] = [];
+      const allSubmissions: any[] = []
 
       for (const app of vendorApps) {
         try {
-          const submissions = await vendorApplicationsApi.getSubmissions(app.id);
+          const submissions = await vendorApplicationsApi.getSubmissions(app.id)
           const submissionsWithApp = submissions.map((sub: any) => ({
             ...sub,
             vendor_application: { id: app.id, name: app.name },
-          }));
-          allSubmissions.push(...submissionsWithApp);
+          }))
+          allSubmissions.push(...submissionsWithApp)
         } catch (err) {
-          console.error(`Failed to fetch submissions for app ${app.id}:`, err);
+          console.error(`Failed to fetch submissions for app ${app.id}:`, err)
         }
       }
 
@@ -140,22 +154,22 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
       // supplemented by any vendor_category values from submissions.
       // We use app.name (not app.categories) because each vendor application IS a category
       // (e.g. "Artists", "Vendors", "Premium Corner Booth") and app.categories is unreliably populated.
-      const categoriesSet = new Set<string>();
+      const categoriesSet = new Set<string>()
       vendorApps.forEach((app: any) => {
-        if (app.name) categoriesSet.add(app.name);
-      });
+        if (app.name) categoriesSet.add(app.name)
+      })
       allSubmissions.forEach((sub: any) => {
-        if (sub.vendor_category) categoriesSet.add(sub.vendor_category);
-      });
-      setAvailableCategories(Array.from(categoriesSet).sort());
+        if (sub.vendor_category) categoriesSet.add(sub.vendor_category)
+      })
+      setAvailableCategories(Array.from(categoriesSet).sort())
 
       // Merge logic: match by email (case-insensitive)
-      const emailMap = new Map<string, InviteRow>();
+      const emailMap = new Map<string, InviteRow>()
 
       // First, add all submissions/registrations
       allSubmissions.forEach((submission) => {
-        const email = submission.email?.toLowerCase();
-        if (!email) return;
+        const email = submission.email?.toLowerCase()
+        if (!email) return
 
         emailMap.set(email, {
           id: `reg-${submission.id}`,
@@ -173,35 +187,35 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
           source: 'net_new', // Will be updated if matched with invitation
           appliedAt: submission.created_at,
           registrationId: submission.id,
-        });
-      });
+        })
+      })
 
       // Then, merge invitations
       invitations.forEach((invitation: any) => {
-        const contact = invitation.vendor_contact;
-        if (!contact) return;
+        const contact = invitation.vendor_contact
+        if (!contact) return
 
-        const email = contact.email?.toLowerCase();
-        if (!email) return;
+        const email = contact.email?.toLowerCase()
+        if (!email) return
 
         if (emailMap.has(email)) {
           // Contact applied - update source and merge contact data
-          const existing = emailMap.get(email)!;
-          existing.source = 'contact';
-          existing.isReturning = contact.source === 'returning' || contact.source === 'past_event';
-          existing.producerNotes = contact.notes;
-          existing.tags = contact.tags || [];
-          existing.location = contact.location || existing.location;
-          existing.invitationId = invitation.id; // Track invitation for email history
+          const existing = emailMap.get(email)!
+          existing.source = 'contact'
+          existing.isReturning = contact.source === 'returning' || contact.source === 'past_event'
+          existing.producerNotes = contact.notes
+          existing.tags = contact.tags || []
+          existing.location = contact.location || existing.location
+          existing.invitationId = invitation.id // Track invitation for email history
           // Merge social media - prefer application data but fall back to contact data
-          existing.instagram = existing.instagram || contact.instagram_handle;
-          existing.tiktok = existing.tiktok || contact.tiktok_handle;
-          existing.website = existing.website || contact.website;
-          existing.phone = existing.phone || contact.phone;
+          existing.instagram = existing.instagram || contact.instagram_handle
+          existing.tiktok = existing.tiktok || contact.tiktok_handle
+          existing.website = existing.website || contact.website
+          existing.phone = existing.phone || contact.phone
         } else {
           // Contact was invited but hasn't applied yet
           // Map invitation status - use 'unsubscribed' if they were unsubscribed, otherwise 'invited'
-          const inviteStatus = invitation.status === 'unsubscribed' ? 'unsubscribed' : 'invited';
+          const inviteStatus = invitation.status === 'unsubscribed' ? 'unsubscribed' : 'invited'
 
           emailMap.set(email, {
             id: `inv-${invitation.id}`,
@@ -221,305 +235,328 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
             tags: contact.tags || [],
             location: contact.location,
             invitationId: invitation.id,
-          });
+          })
         }
-      });
+      })
 
       if (append) {
-        setInviteRows((prev) => [...prev, ...Array.from(emailMap.values())]);
+        setInviteRows((prev) => [...prev, ...Array.from(emailMap.values())])
       } else {
-        setInviteRows(Array.from(emailMap.values()));
+        setInviteRows(Array.from(emailMap.values()))
       }
     } catch (err: any) {
-      console.error('Failed to fetch invite rows:', err);
-      setError(err.message || 'Failed to load invite data');
+      console.error('Failed to fetch invite rows:', err)
+      setError(err.message || 'Failed to load invite data')
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      setLoading(false)
+      setLoadingMore(false)
     }
-  };
+  }
 
   const handleLoadMore = () => {
     if (hasNextPage && !loadingMore) {
-      fetchInviteRows(currentPage + 1, true);
+      fetchInviteRows(currentPage + 1, true)
     }
-  };
+  }
 
   // Map registration status to invite row status
   const mapRegistrationStatus = (regStatus: string): InviteRow['status'] => {
     switch (regStatus) {
       case 'pending':
-        return 'applied';
+        return 'applied'
       case 'approved':
       case 'confirmed':
-        return 'approved';
+        return 'approved'
       case 'waitlist':
-        return 'waitlist';
+        return 'waitlist'
       case 'rejected':
-        return 'declined';
+        return 'declined'
       default:
-        return 'applied';
+        return 'applied'
     }
-  };
+  }
 
   // Handle expanding row (sets reviewedAt if not already set)
   const handleExpandRow = (id: string) => {
     if (expandedId === id) {
-      setExpandedId(null);
-      return;
+      setExpandedId(null)
+      return
     }
 
-    setExpandedId(id);
+    setExpandedId(id)
 
     // Mark as reviewed if not already
-    const row = inviteRows.find((r) => r.id === id);
+    const row = inviteRows.find((r) => r.id === id)
     if (row && !row.reviewedAt) {
       setInviteRows((prev) =>
-        prev.map((r) =>
-          r.id === id ? { ...r, reviewedAt: new Date().toISOString() } : r
-        )
-      );
+        prev.map((r) => (r.id === id ? { ...r, reviewedAt: new Date().toISOString() } : r)),
+      )
     }
-  };
+  }
 
   // Handle category update
   const handleUpdateCategory = async (row: InviteRow, newCategory: string) => {
     if (!row.registrationId) {
-      alert('Cannot update category: No application found');
-      return;
+      alert('Cannot update category: No application found')
+      return
     }
 
     try {
-      setIsUpdatingCategory(true);
-      await registrationsApi.update(row.registrationId, { vendor_category: newCategory });
+      setIsUpdatingCategory(true)
+      await registrationsApi.update(row.registrationId, { vendor_category: newCategory })
 
       // Update local state
       setInviteRows((prev) =>
-        prev.map((r) => (r.id === row.id ? { ...r, category: newCategory } : r))
-      );
+        prev.map((r) => (r.id === row.id ? { ...r, category: newCategory } : r)),
+      )
     } catch (err: any) {
-      console.error('Failed to update category:', err);
-      alert(`Failed to update category: ${err.message}`);
+      console.error('Failed to update category:', err)
+      alert(`Failed to update category: ${err.message}`)
     } finally {
-      setIsUpdatingCategory(false);
+      setIsUpdatingCategory(false)
     }
-  };
+  }
 
   // Handle status update
-  const handleUpdateStatus = async (row: InviteRow, newStatus: 'approved' | 'waitlist' | 'declined') => {
+  const handleUpdateStatus = async (
+    row: InviteRow,
+    newStatus: 'approved' | 'waitlist' | 'declined',
+  ) => {
     if (!row.registrationId) {
-      alert('Cannot update status: No application found');
-      return;
+      alert('Cannot update status: No application found')
+      return
     }
 
     try {
-      setUpdatingId(row.id);
+      setUpdatingId(row.id)
 
       // Map to registration status
-      const regStatus = newStatus === 'approved' ? 'approved' : newStatus === 'waitlist' ? 'waitlist' : 'rejected';
-      const response = await registrationsApi.update(row.registrationId, { status: regStatus });
+      const regStatus =
+        newStatus === 'approved' ? 'approved' : newStatus === 'waitlist' ? 'waitlist' : 'rejected'
+      const response = await registrationsApi.update(row.registrationId, { status: regStatus })
 
       // Handle email notification
       if (response.email_notification) {
-        handleEmailNotification(response.email_notification, undefined, row.registrationId);
+        handleEmailNotification(response.email_notification, undefined, row.registrationId)
       }
 
       // Update local state
       setInviteRows((prev) =>
         prev.map((r) =>
-          r.id === row.id ? { ...r, status: newStatus, reviewedAt: r.reviewedAt || new Date().toISOString() } : r
-        )
-      );
+          r.id === row.id
+            ? { ...r, status: newStatus, reviewedAt: r.reviewedAt || new Date().toISOString() }
+            : r,
+        ),
+      )
     } catch (err: any) {
-      console.error('Failed to update status:', err);
-      alert(`Failed to update status: ${err.message}`);
+      console.error('Failed to update status:', err)
+      alert(`Failed to update status: ${err.message}`)
     } finally {
-      setUpdatingId(null);
+      setUpdatingId(null)
     }
-  };
+  }
 
   // Handle payment status toggle
   const handleTogglePayment = async (row: InviteRow) => {
-    if (!row.registrationId || row.status !== 'approved') return;
+    if (!row.registrationId || row.status !== 'approved') return
 
     try {
-      setUpdatingId(row.id);
-      const newPaymentStatus = row.paymentStatus === 'paid' ? 'pending' : 'paid';
-      const response = await registrationsApi.update(row.registrationId, { payment_status: newPaymentStatus });
+      setUpdatingId(row.id)
+      const newPaymentStatus = row.paymentStatus === 'paid' ? 'pending' : 'paid'
+      const response = await registrationsApi.update(row.registrationId, {
+        payment_status: newPaymentStatus,
+      })
 
       // Handle email notification
       if (response.email_notification) {
-        handleEmailNotification(response.email_notification, undefined, row.registrationId);
+        handleEmailNotification(response.email_notification, undefined, row.registrationId)
       }
 
       setInviteRows((prev) =>
-        prev.map((r) => (r.id === row.id ? { ...r, paymentStatus: newPaymentStatus } : r))
-      );
+        prev.map((r) => (r.id === row.id ? { ...r, paymentStatus: newPaymentStatus } : r)),
+      )
     } catch (err: any) {
-      console.error('Failed to update payment status:', err);
-      alert(`Failed to update payment: ${err.message}`);
+      console.error('Failed to update payment status:', err)
+      alert(`Failed to update payment: ${err.message}`)
     } finally {
-      setUpdatingId(null);
+      setUpdatingId(null)
     }
-  };
+  }
 
   // Handle producer notes save
   const handleSaveNotes = async (row: InviteRow) => {
     // For now, just update local state
     // TODO: Add API call to save notes if backend supports it
     setInviteRows((prev) =>
-      prev.map((r) => (r.id === row.id ? { ...r, producerNotes: notesEditValue } : r))
-    );
-    setEditingNotesId(null);
-    setNotesEditValue('');
-  };
+      prev.map((r) => (r.id === row.id ? { ...r, producerNotes: notesEditValue } : r)),
+    )
+    setEditingNotesId(null)
+    setNotesEditValue('')
+  }
 
   // Handle email history toggle
-  const handleToggleEmailHistory = async (rowId: string, registrationId?: number, invitationId?: number) => {
+  const handleToggleEmailHistory = async (
+    rowId: string,
+    registrationId?: number,
+    invitationId?: number,
+  ) => {
     console.log('[EMAIL HISTORY DEBUG v2.12.2025] Toggle called with:', {
       rowId,
       registrationId,
       invitationId,
       eventSlug,
-      timestamp: new Date().toISOString()
-    });
+      timestamp: new Date().toISOString(),
+    })
 
     // If clicking the same row, collapse it
     if (emailHistoryExpanded === rowId) {
-      console.log('[EMAIL HISTORY DEBUG] Collapsing row');
-      setEmailHistoryExpanded(null);
-      return;
+      console.log('[EMAIL HISTORY DEBUG] Collapsing row')
+      setEmailHistoryExpanded(null)
+      return
     }
 
     // Expand this row
-    setEmailHistoryExpanded(rowId);
+    setEmailHistoryExpanded(rowId)
 
     // If we already have data for this row, don't fetch again
     if (emailHistoryData[rowId]) {
-      console.log('[EMAIL HISTORY DEBUG] Using cached data:', emailHistoryData[rowId]);
-      return;
+      console.log('[EMAIL HISTORY DEBUG] Using cached data:', emailHistoryData[rowId])
+      return
     }
 
     // Fetch email history
     try {
-      setLoadingEmailHistory(rowId);
-      let history;
+      setLoadingEmailHistory(rowId)
+      let history
 
       if (registrationId) {
-        console.log('[EMAIL HISTORY DEBUG] Fetching from registration endpoint:', registrationId);
-        history = await emailDeliveriesApi.getByRegistration(registrationId);
-        console.log('[EMAIL HISTORY DEBUG] Registration response:', history);
+        console.log('[EMAIL HISTORY DEBUG] Fetching from registration endpoint:', registrationId)
+        history = await emailDeliveriesApi.getByRegistration(registrationId)
+        console.log('[EMAIL HISTORY DEBUG] Registration response:', history)
       } else if (invitationId) {
-        console.log('[EMAIL HISTORY DEBUG] Fetching from invitation endpoint:', { eventSlug, invitationId });
-        history = await emailDeliveriesApi.getByInvitation(eventSlug, invitationId);
-        console.log('[EMAIL HISTORY DEBUG] Invitation response:', history);
+        console.log('[EMAIL HISTORY DEBUG] Fetching from invitation endpoint:', {
+          eventSlug,
+          invitationId,
+        })
+        history = await emailDeliveriesApi.getByInvitation(eventSlug, invitationId)
+        console.log('[EMAIL HISTORY DEBUG] Invitation response:', history)
       } else {
-        console.error('[EMAIL HISTORY DEBUG] No ID provided!');
-        throw new Error('No registration or invitation ID provided');
+        console.error('[EMAIL HISTORY DEBUG] No ID provided!')
+        throw new Error('No registration or invitation ID provided')
       }
 
-      console.log('[EMAIL HISTORY DEBUG] Setting history data, length:', history?.length || 0);
-      setEmailHistoryData((prev) => ({ ...prev, [rowId]: history }));
+      console.log('[EMAIL HISTORY DEBUG] Setting history data, length:', history?.length || 0)
+      setEmailHistoryData((prev) => ({ ...prev, [rowId]: history }))
     } catch (err: any) {
       console.error('[EMAIL HISTORY DEBUG] Error caught:', {
         message: err.message,
         status: err.status,
         response: err.response,
-        fullError: err
-      });
+        fullError: err,
+      })
       // Show empty state instead of alerting
-      setEmailHistoryData((prev) => ({ ...prev, [rowId]: [] }));
+      setEmailHistoryData((prev) => ({ ...prev, [rowId]: [] }))
     } finally {
-      setLoadingEmailHistory(null);
+      setLoadingEmailHistory(null)
     }
-  };
+  }
 
   const getStatusBadge = (status: InviteRow['status']) => {
     switch (status) {
       case 'invited':
-        return { label: 'Invited', variant: 'tintSlate' as BadgeVariant };
+        return { label: 'Invited', variant: 'tintSlate' as BadgeVariant }
       case 'applied':
-        return { label: 'Applied', variant: 'tintBlue' as BadgeVariant };
+        return { label: 'Applied', variant: 'tintBlue' as BadgeVariant }
       case 'approved':
-        return { label: 'Approved', variant: 'tintGreen' as BadgeVariant };
+        return { label: 'Approved', variant: 'tintGreen' as BadgeVariant }
       case 'waitlist':
-        return { label: 'Waitlist', variant: 'tintYellow' as BadgeVariant };
+        return { label: 'Waitlist', variant: 'tintYellow' as BadgeVariant }
       case 'declined':
-        return { label: 'Declined', variant: 'tintRed' as BadgeVariant };
+        return { label: 'Declined', variant: 'tintRed' as BadgeVariant }
       case 'bounced':
-        return { label: 'Bounced', variant: 'tintOrange' as BadgeVariant };
+        return { label: 'Bounced', variant: 'tintOrange' as BadgeVariant }
       case 'unsubscribed':
-        return { label: 'Unsubscribed', variant: 'tintMuted' as BadgeVariant };
+        return { label: 'Unsubscribed', variant: 'tintMuted' as BadgeVariant }
       default:
-        return { label: status, variant: 'tintMuted' as BadgeVariant };
+        return { label: status, variant: 'tintMuted' as BadgeVariant }
     }
-  };
+  }
 
   const getPaymentBadge = (paymentStatus?: InviteRow['paymentStatus']) => {
     switch (paymentStatus) {
       case 'paid':
       case 'confirmed':
-        return { label: 'Paid', variant: 'tintGreen' as BadgeVariant };
+        return { label: 'Paid', variant: 'tintGreen' as BadgeVariant }
       case 'overdue':
-        return { label: 'Overdue', variant: 'tintRed' as BadgeVariant };
+        return { label: 'Overdue', variant: 'tintRed' as BadgeVariant }
       case 'pending':
-        return { label: 'Pending', variant: 'tintYellow' as BadgeVariant };
+        return { label: 'Pending', variant: 'tintYellow' as BadgeVariant }
       case 'n/a':
       default:
-        return { label: '—', variant: 'tintMuted' as BadgeVariant };
+        return { label: '—', variant: 'tintMuted' as BadgeVariant }
     }
-  };
+  }
 
   // Filter rows
   const filteredRows = inviteRows.filter((row) => {
     // Search filter
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+      const query = searchQuery.toLowerCase()
       const matches =
         row.businessName?.toLowerCase().includes(query) ||
         row.contactName?.toLowerCase().includes(query) ||
         row.email?.toLowerCase().includes(query) ||
         row.category?.toLowerCase().includes(query) ||
-        row.location?.toLowerCase().includes(query);
-      if (!matches) return false;
+        row.location?.toLowerCase().includes(query)
+      if (!matches) return false
     }
 
     // Status filter
-    if (statusFilter !== 'all' && row.status !== statusFilter) return false;
+    if (statusFilter !== 'all' && row.status !== statusFilter) return false
 
     // Review filter
-    if (reviewFilter === 'reviewed' && !row.reviewedAt) return false;
-    if (reviewFilter === 'unreviewed' && row.reviewedAt) return false;
+    if (reviewFilter === 'reviewed' && !row.reviewedAt) return false
+    if (reviewFilter === 'unreviewed' && row.reviewedAt) return false
 
     // Payment filter
     if (paymentFilter !== 'all') {
-      if (paymentFilter === 'n/a' && row.paymentStatus !== 'n/a') return false;
-      if (paymentFilter === 'paid' && row.paymentStatus !== 'paid' && row.paymentStatus !== 'confirmed') return false;
-      if (paymentFilter === 'pending' && row.paymentStatus !== 'pending') return false;
+      if (paymentFilter === 'n/a' && row.paymentStatus !== 'n/a') return false
+      if (
+        paymentFilter === 'paid' &&
+        row.paymentStatus !== 'paid' &&
+        row.paymentStatus !== 'confirmed'
+      )
+        return false
+      if (paymentFilter === 'pending' && row.paymentStatus !== 'pending') return false
     }
 
     // Source filter
-    if (sourceFilter !== 'all' && row.source !== sourceFilter) return false;
+    if (sourceFilter !== 'all' && row.source !== sourceFilter) return false
 
-    return true;
-  });
+    return true
+  })
 
-  const hasActiveFilters = statusFilter !== 'all' || reviewFilter !== 'all' || paymentFilter !== 'all' || sourceFilter !== 'all' || searchQuery.trim() !== '';
+  const hasActiveFilters =
+    statusFilter !== 'all' ||
+    reviewFilter !== 'all' ||
+    paymentFilter !== 'all' ||
+    sourceFilter !== 'all' ||
+    searchQuery.trim() !== ''
 
   const clearFilters = () => {
-    setStatusFilter('all');
-    setReviewFilter('all');
-    setPaymentFilter('all');
-    setSourceFilter('all');
-    setSearchQuery('');
-  };
+    setStatusFilter('all')
+    setReviewFilter('all')
+    setPaymentFilter('all')
+    setSourceFilter('all')
+    setSearchQuery('')
+  }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -535,7 +572,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -543,7 +580,9 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
       {/* Header */}
       <div className="mb-3">
         <h2 className="text-lg font-bold text-foreground mb-0.5">Invites</h2>
-        <p className="text-[10px] text-foreground/85 dark:text-foreground/60">{filteredRows.length} contacts</p>
+        <p className="text-[10px] text-foreground/85 dark:text-foreground/60">
+          {filteredRows.length} contacts
+        </p>
       </div>
 
       {/* Search Bar */}
@@ -631,21 +670,33 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
           {/* Table Header */}
           <div className="grid grid-cols-[auto_2fr_1fr_1fr_1fr_1fr_1fr] gap-3 px-3 py-2 bg-background/5 border-b border-border">
             <div className="w-6" /> {/* Expand icon */}
-            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">Business Name</div>
-            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">Category</div>
-            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">Status</div>
-            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">Payment</div>
-            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">Source</div>
-            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">Reviewed</div>
+            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">
+              Business Name
+            </div>
+            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">
+              Category
+            </div>
+            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">
+              Status
+            </div>
+            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">
+              Payment
+            </div>
+            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">
+              Source
+            </div>
+            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">
+              Reviewed
+            </div>
           </div>
 
           {/* Table Body */}
           <div>
             {filteredRows.map((row) => {
-              const isExpanded = expandedId === row.id;
-              const statusBadge = getStatusBadge(row.status);
-              const paymentBadge = getPaymentBadge(row.paymentStatus);
-              const isUnreviewed = row.status === 'applied' && !row.reviewedAt;
+              const isExpanded = expandedId === row.id
+              const statusBadge = getStatusBadge(row.status)
+              const paymentBadge = getPaymentBadge(row.paymentStatus)
+              const isUnreviewed = row.status === 'applied' && !row.reviewedAt
 
               return (
                 <div
@@ -667,8 +718,12 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-foreground font-medium">{row.businessName}</span>
-                      {row.isReturning && <Star className="w-3 h-3 text-yellow-400" fill="currentColor" />}
+                      <span className="text-sm text-foreground font-medium">
+                        {row.businessName}
+                      </span>
+                      {row.isReturning && (
+                        <Star className="w-3 h-3 text-yellow-400" fill="currentColor" />
+                      )}
                     </div>
                     <div>
                       <Badge variant="tintPurple" className="px-2 py-0.5 text-[10px] font-medium">
@@ -676,13 +731,19 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                       </Badge>
                     </div>
                     <div>
-                      <Badge variant={statusBadge.variant} className="px-2 py-0.5 text-[10px] font-medium">
+                      <Badge
+                        variant={statusBadge.variant}
+                        className="px-2 py-0.5 text-[10px] font-medium"
+                      >
                         {statusBadge.label}
                       </Badge>
                     </div>
                     <div>
                       {row.status === 'approved' && row.paymentStatus !== 'n/a' ? (
-                        <Badge variant={paymentBadge.variant} className="px-2 py-0.5 text-[10px] font-medium">
+                        <Badge
+                          variant={paymentBadge.variant}
+                          className="px-2 py-0.5 text-[10px] font-medium"
+                        >
                           {paymentBadge.label}
                         </Badge>
                       ) : (
@@ -717,7 +778,9 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {/* Left Column - Contact Info */}
                         <div className="space-y-3">
-                          <h4 className="text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">Contact Info</h4>
+                          <h4 className="text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">
+                            Contact Info
+                          </h4>
 
                           {row.contactName && (
                             <div>
@@ -728,7 +791,10 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
                           <div>
                             <p className="text-[10px] text-foreground/60 mb-0.5">Email</p>
-                            <a href={`mailto:${row.email}`} className="text-sm text-primary hover:text-primary/70 flex items-center gap-1.5 transition-colors">
+                            <a
+                              href={`mailto:${row.email}`}
+                              className="text-sm text-primary hover:text-primary/70 flex items-center gap-1.5 transition-colors"
+                            >
                               <Mail className="w-3.5 h-3.5" />
                               {row.email}
                             </a>
@@ -737,7 +803,10 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {row.phone && (
                             <div>
                               <p className="text-[10px] text-foreground/60 mb-0.5">Phone</p>
-                              <a href={`tel:${row.phone}`} className="text-sm text-primary hover:text-primary/70 flex items-center gap-1.5 transition-colors">
+                              <a
+                                href={`tel:${row.phone}`}
+                                className="text-sm text-primary hover:text-primary/70 flex items-center gap-1.5 transition-colors"
+                              >
                                 <Phone className="w-3.5 h-3.5" />
                                 {row.phone}
                               </a>
@@ -757,7 +826,11 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                             <div className="flex flex-wrap gap-2">
                               {row.instagram && (
                                 <a
-                                  href={row.instagram.startsWith('http') ? row.instagram : `https://instagram.com/${row.instagram.replace('@', '')}`}
+                                  href={
+                                    row.instagram.startsWith('http')
+                                      ? row.instagram
+                                      : `https://instagram.com/${row.instagram.replace('@', '')}`
+                                  }
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground/80 hover:text-foreground transition-smooth"
@@ -769,7 +842,11 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                               )}
                               {row.tiktok && (
                                 <a
-                                  href={row.tiktok.startsWith('http') ? row.tiktok : `https://tiktok.com/@${row.tiktok.replace('@', '')}`}
+                                  href={
+                                    row.tiktok.startsWith('http')
+                                      ? row.tiktok
+                                      : `https://tiktok.com/@${row.tiktok.replace('@', '')}`
+                                  }
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground/80 hover:text-foreground transition-smooth"
@@ -781,7 +858,11 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                               )}
                               {row.website && (
                                 <a
-                                  href={row.website.startsWith('http') ? row.website : `https://${row.website}`}
+                                  href={
+                                    row.website.startsWith('http')
+                                      ? row.website
+                                      : `https://${row.website}`
+                                  }
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground/80 hover:text-foreground transition-smooth"
@@ -801,7 +882,13 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {(row.registrationId || row.invitationId) && (
                             <div className="pt-3 border-t border-border">
                               <button
-                                onClick={() => handleToggleEmailHistory(row.id, row.registrationId, row.invitationId)}
+                                onClick={() =>
+                                  handleToggleEmailHistory(
+                                    row.id,
+                                    row.registrationId,
+                                    row.invitationId,
+                                  )
+                                }
                                 className="w-full flex items-center justify-between text-left hover:bg-background/5 p-2 rounded-lg transition-smooth"
                               >
                                 <span className="text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">
@@ -823,15 +910,25 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                     </div>
                                   ) : emailHistoryData[row.id]?.length > 0 ? (
                                     emailHistoryData[row.id].map((delivery: any) => {
-                                      const deliveryStatus = delivery.status;
-                                      const emailSubject = delivery.subject || delivery.scheduled_email?.subject || 'Unknown Email';
-                                      const deliveredDate = delivery.delivered_at || delivery.sent_at || delivery.created_at;
+                                      const deliveryStatus = delivery.status
+                                      const emailSubject =
+                                        delivery.subject ||
+                                        delivery.scheduled_email?.subject ||
+                                        'Unknown Email'
+                                      const deliveredDate =
+                                        delivery.delivered_at ||
+                                        delivery.sent_at ||
+                                        delivery.created_at
 
-                                      let deliveryVariant: BadgeVariant = 'tintMuted';
-                                      if (deliveryStatus === 'delivered') deliveryVariant = 'tintGreen';
-                                      else if (deliveryStatus === 'bounced') deliveryVariant = 'tintRed';
-                                      else if (deliveryStatus === 'dropped') deliveryVariant = 'tintOrange';
-                                      else if (deliveryStatus === 'unsubscribed') deliveryVariant = 'tintYellow';
+                                      let deliveryVariant: BadgeVariant = 'tintMuted'
+                                      if (deliveryStatus === 'delivered')
+                                        deliveryVariant = 'tintGreen'
+                                      else if (deliveryStatus === 'bounced')
+                                        deliveryVariant = 'tintRed'
+                                      else if (deliveryStatus === 'dropped')
+                                        deliveryVariant = 'tintOrange'
+                                      else if (deliveryStatus === 'unsubscribed')
+                                        deliveryVariant = 'tintYellow'
 
                                       return (
                                         <div
@@ -844,16 +941,24 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                                 {emailSubject}
                                               </p>
                                               <p className="text-[10px] text-foreground/60 mt-0.5">
-                                                {deliveredDate ? new Date(deliveredDate).toLocaleDateString('en-US', {
-                                                  month: 'short',
-                                                  day: 'numeric',
-                                                  year: 'numeric',
-                                                  hour: 'numeric',
-                                                  minute: '2-digit'
-                                                }) : 'Date unknown'}
+                                                {deliveredDate
+                                                  ? new Date(deliveredDate).toLocaleDateString(
+                                                      'en-US',
+                                                      {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                        year: 'numeric',
+                                                        hour: 'numeric',
+                                                        minute: '2-digit',
+                                                      },
+                                                    )
+                                                  : 'Date unknown'}
                                               </p>
                                             </div>
-                                            <Badge variant={deliveryVariant} className="px-2 py-0.5 text-[10px] font-medium whitespace-nowrap">
+                                            <Badge
+                                              variant={deliveryVariant}
+                                              className="px-2 py-0.5 text-[10px] font-medium whitespace-nowrap"
+                                            >
                                               {deliveryStatus}
                                             </Badge>
                                           </div>
@@ -868,17 +973,24 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
                                           {/* Action buttons */}
                                           <div className="flex gap-2 mt-2">
-                                            {(deliveryStatus === 'bounced' || deliveryStatus === 'dropped') && (
+                                            {(deliveryStatus === 'bounced' ||
+                                              deliveryStatus === 'dropped') && (
                                               <button
                                                 onClick={async () => {
                                                   try {
-                                                    await emailDeliveriesApi.retry(delivery.id);
-                                                    alert('Email queued for retry');
+                                                    await emailDeliveriesApi.retry(delivery.id)
+                                                    alert('Email queued for retry')
                                                     // Refresh email history
-                                                    const updated = await emailDeliveriesApi.getByRegistration(row.registrationId!);
-                                                    setEmailHistoryData((prev) => ({ ...prev, [row.id]: updated }));
+                                                    const updated =
+                                                      await emailDeliveriesApi.getByRegistration(
+                                                        row.registrationId!,
+                                                      )
+                                                    setEmailHistoryData((prev) => ({
+                                                      ...prev,
+                                                      [row.id]: updated,
+                                                    }))
                                                   } catch (err: any) {
-                                                    alert(`Failed to retry: ${err.message}`);
+                                                    alert(`Failed to retry: ${err.message}`)
                                                   }
                                                 }}
                                                 className="text-[10px] px-2 py-1 rounded bg-primary/20 text-violet-950 dark:text-primary hover:bg-primary/30 transition-smooth"
@@ -888,7 +1000,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                             )}
                                           </div>
                                         </div>
-                                      );
+                                      )
                                     })
                                   ) : (
                                     <div className="py-2">
@@ -900,7 +1012,9 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                           </p>
                                         </div>
                                       ) : (
-                                        <p className="text-xs text-foreground/40 italic">No email history found</p>
+                                        <p className="text-xs text-foreground/40 italic">
+                                          No email history found
+                                        </p>
                                       )}
                                     </div>
                                   )}
@@ -915,7 +1029,9 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {/* Status Actions (only for applied/approved/waitlist/declined) */}
                           {row.status !== 'invited' && row.registrationId && (
                             <div>
-                              <p className="text-[10px] text-foreground/60 mb-1.5 uppercase tracking-wide">Status</p>
+                              <p className="text-[10px] text-foreground/60 mb-1.5 uppercase tracking-wide">
+                                Status
+                              </p>
                               {updatingId === row.id ? (
                                 <div className="flex items-center justify-center py-3">
                                   <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -943,14 +1059,20 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                 </div>
                               ) : (
                                 <div className="flex items-center gap-2">
-                                  <Badge variant={statusBadge.variant} className="rounded-lg px-2.5 py-1.5 text-xs font-medium">
+                                  <Badge
+                                    variant={statusBadge.variant}
+                                    className="rounded-lg px-2.5 py-1.5 text-xs font-medium"
+                                  >
                                     {statusBadge.label}
                                   </Badge>
                                   <select
                                     value={row.status}
                                     onChange={(e) => {
-                                      const newStatus = e.target.value as 'approved' | 'waitlist' | 'declined';
-                                      handleUpdateStatus(row, newStatus);
+                                      const newStatus = e.target.value as
+                                        | 'approved'
+                                        | 'waitlist'
+                                        | 'declined'
+                                      handleUpdateStatus(row, newStatus)
                                     }}
                                     className="flex-1 px-2.5 py-1.5 rounded-lg bg-background/10 text-foreground text-xs border border-border hover:bg-background/20 transition-smooth"
                                   >
@@ -966,7 +1088,9 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {/* Category Dropdown (only for applied/approved/waitlist) */}
                           {row.status !== 'invited' && row.registrationId && (
                             <div>
-                              <p className="text-[10px] text-foreground/60 mb-1.5 uppercase tracking-wide">Category</p>
+                              <p className="text-[10px] text-foreground/60 mb-1.5 uppercase tracking-wide">
+                                Category
+                              </p>
                               <select
                                 value={row.category}
                                 onChange={(e) => handleUpdateCategory(row, e.target.value)}
@@ -975,11 +1099,14 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                               >
                                 {availableCategories.length > 0 ? (
                                   // Show all available categories, ensuring current category is included
-                                  [...new Set([row.category, ...availableCategories])].filter(Boolean).sort().map((category) => (
-                                    <option key={category} value={category}>
-                                      {category}
-                                    </option>
-                                  ))
+                                  [...new Set([row.category, ...availableCategories])]
+                                    .filter(Boolean)
+                                    .sort()
+                                    .map((category) => (
+                                      <option key={category} value={category}>
+                                        {category}
+                                      </option>
+                                    ))
                                 ) : (
                                   <option value={row.category}>{row.category}</option>
                                 )}
@@ -990,9 +1117,14 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {/* Payment Toggle (only for approved) */}
                           {row.status === 'approved' && row.paymentStatus !== 'n/a' && (
                             <div>
-                              <p className="text-[10px] text-foreground/60 mb-1.5 uppercase tracking-wide">Payment</p>
+                              <p className="text-[10px] text-foreground/60 mb-1.5 uppercase tracking-wide">
+                                Payment
+                              </p>
                               <div className="flex items-center gap-2">
-                                <Badge variant={paymentBadge.variant} className="rounded-lg px-2.5 py-1.5 text-xs font-medium">
+                                <Badge
+                                  variant={paymentBadge.variant}
+                                  className="rounded-lg px-2.5 py-1.5 text-xs font-medium"
+                                >
                                   {paymentBadge.label}
                                 </Badge>
                                 <button
@@ -1009,12 +1141,14 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {/* Producer Notes */}
                           <div>
                             <div className="flex items-center justify-between mb-1.5">
-                              <p className="text-[10px] text-foreground/60 uppercase tracking-wide">Producer Notes</p>
+                              <p className="text-[10px] text-foreground/60 uppercase tracking-wide">
+                                Producer Notes
+                              </p>
                               {editingNotesId !== row.id && (
                                 <button
                                   onClick={() => {
-                                    setEditingNotesId(row.id);
-                                    setNotesEditValue(row.producerNotes || '');
+                                    setEditingNotesId(row.id)
+                                    setNotesEditValue(row.producerNotes || '')
                                   }}
                                   className="text-primary hover:text-primary/70 transition-colors"
                                 >
@@ -1040,8 +1174,8 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                   </button>
                                   <button
                                     onClick={() => {
-                                      setEditingNotesId(null);
-                                      setNotesEditValue('');
+                                      setEditingNotesId(null)
+                                      setNotesEditValue('')
                                     }}
                                     className="px-3 py-1.5 rounded-lg bg-background/5 text-foreground/60 hover:text-foreground hover:bg-background/10 transition-smooth text-xs"
                                   >
@@ -1051,7 +1185,9 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                               </div>
                             ) : (
                               <p className="text-xs text-foreground/80">
-                                {row.producerNotes || <span className="text-foreground/40 italic">No notes yet</span>}
+                                {row.producerNotes || (
+                                  <span className="text-foreground/40 italic">No notes yet</span>
+                                )}
                               </p>
                             )}
                           </div>
@@ -1059,9 +1195,11 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {/* Meta Info */}
                           <div className="pt-3 border-t border-border">
                             <p className="text-[10px] text-foreground/40">
-                              {row.appliedAt && `Applied: ${new Date(row.appliedAt).toLocaleDateString()}`}
+                              {row.appliedAt &&
+                                `Applied: ${new Date(row.appliedAt).toLocaleDateString()}`}
                               {row.appliedAt && row.reviewedAt && ' • '}
-                              {row.reviewedAt && `Reviewed: ${new Date(row.reviewedAt).toLocaleDateString()}`}
+                              {row.reviewedAt &&
+                                `Reviewed: ${new Date(row.reviewedAt).toLocaleDateString()}`}
                               {(row.appliedAt || row.reviewedAt) && ' • '}
                               Source: {row.source === 'contact' ? 'Contact List' : 'Net New'}
                             </p>
@@ -1071,7 +1209,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                     </div>
                   )}
                 </div>
-              );
+              )
             })}
           </div>
 
@@ -1124,5 +1262,5 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
         isAdmin={isAdmin}
       />
     </div>
-  );
+  )
 }

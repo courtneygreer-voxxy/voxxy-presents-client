@@ -1,64 +1,74 @@
-import { useState, useEffect } from 'react';
-import { Bug, Calendar, User, Mail, AlertCircle, ChevronDown, ChevronUp, ExternalLink, ArrowLeft } from 'lucide-react';
-import { bugReportsApi } from '@/services/api';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect } from 'react'
+import {
+  Bug,
+  Calendar,
+  User,
+  Mail,
+  AlertCircle,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  ArrowLeft,
+} from 'lucide-react'
+import { bugReportsApi } from '@/services/api'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface BugReport {
-  id: number;
-  name: string;
-  email: string;
-  bug_description: string;
+  id: number
+  name: string
+  email: string
+  bug_description: string
   error_context?: {
-    errorMessage?: string;
-    componentName?: string;
-    timestamp?: string;
-    browser?: string;
-    url?: string;
-    screen_resolution?: string;
-    viewport?: string;
-    auto_reported?: boolean;
-    stack?: string;
-    componentStack?: string;
-    formData?: any;
-  };
-  created_at: string;
+    errorMessage?: string
+    componentName?: string
+    timestamp?: string
+    browser?: string
+    url?: string
+    screen_resolution?: string
+    viewport?: string
+    auto_reported?: boolean
+    stack?: string
+    componentStack?: string
+    formData?: any
+  }
+  created_at: string
 }
 
 export default function AdminBugReportsPage() {
-  const { userProfile } = useAuth();
-  const [reports, setReports] = useState<BugReport[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const { userProfile } = useAuth()
+  const [reports, setReports] = useState<BugReport[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState<number | null>(null)
 
   // Redirect if not admin
   useEffect(() => {
     if (userProfile && userProfile.role !== 'admin') {
-      window.location.href = '/';
+      window.location.href = '/'
     }
-  }, [userProfile]);
+  }, [userProfile])
 
   useEffect(() => {
-    loadBugReports();
-  }, []);
+    loadBugReports()
+  }, [])
 
   const loadBugReports = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const data = await bugReportsApi.getAll();
-      setReports(data);
-      console.log('Bug reports loaded:', data);
+      setLoading(true)
+      setError(null)
+      const data = await bugReportsApi.getAll()
+      setReports(data)
+      console.log('Bug reports loaded:', data)
     } catch (err: any) {
-      console.error('Failed to load bug reports:', err);
-      setError(err.message || 'Failed to load bug reports');
+      console.error('Failed to load bug reports:', err)
+      setError(err.message || 'Failed to load bug reports')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = new Date(dateString)
     return date.toLocaleString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -66,19 +76,19 @@ export default function AdminBugReportsPage() {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
-    });
-  };
+    })
+  }
 
   const toggleExpand = (id: number) => {
-    setExpandedId(expandedId === id ? null : id);
-  };
+    setExpandedId(expandedId === id ? null : id)
+  }
 
   if (loading) {
     return (
       <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -95,7 +105,7 @@ export default function AdminBugReportsPage() {
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -137,15 +147,13 @@ export default function AdminBugReportsPage() {
             <div className="bg-background/5 border border-border rounded-lg p-12 text-center">
               <Bug className="w-12 h-12 text-foreground/40 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">No Bug Reports Yet</h3>
-              <p className="text-foreground/60">
-                Bug reports submitted by users will appear here.
-              </p>
+              <p className="text-foreground/60">Bug reports submitted by users will appear here.</p>
             </div>
           ) : (
             <div className="space-y-3">
               {reports.map((report) => {
-                const isExpanded = expandedId === report.id;
-                const isAutoReported = report.error_context?.auto_reported;
+                const isExpanded = expandedId === report.id
+                const isAutoReported = report.error_context?.auto_reported
 
                 return (
                   <div
@@ -158,11 +166,13 @@ export default function AdminBugReportsPage() {
                       className="w-full p-4 flex items-start gap-4 text-left hover:bg-background/5 transition-colors"
                     >
                       {/* Icon */}
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                        isAutoReported
-                          ? 'bg-red-500/20 border border-red-400/30'
-                          : 'bg-primary/20 border border-primary/30'
-                      }`}>
+                      <div
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                          isAutoReported
+                            ? 'bg-red-500/20 border border-red-400/30'
+                            : 'bg-primary/20 border border-primary/30'
+                        }`}
+                      >
                         {isAutoReported ? (
                           <AlertCircle className="w-5 h-5 text-red-400" />
                         ) : (
@@ -175,7 +185,9 @@ export default function AdminBugReportsPage() {
                         <div className="flex items-start justify-between gap-4 mb-2">
                           <div className="flex-1 min-w-0">
                             <h3 className="text-foreground font-medium truncate">
-                              {report.error_context?.errorMessage || report.bug_description || 'Bug Report'}
+                              {report.error_context?.errorMessage ||
+                                report.bug_description ||
+                                'Bug Report'}
                             </h3>
                             {report.error_context?.componentName && (
                               <p className="text-xs text-primary mt-1">
@@ -222,7 +234,9 @@ export default function AdminBugReportsPage() {
                         {/* User Description */}
                         {report.bug_description && (
                           <div>
-                            <h4 className="text-sm font-semibold text-foreground mb-2">User Description</h4>
+                            <h4 className="text-sm font-semibold text-foreground mb-2">
+                              User Description
+                            </h4>
                             <p className="text-sm text-foreground/70 whitespace-pre-wrap">
                               {report.bug_description}
                             </p>
@@ -232,7 +246,9 @@ export default function AdminBugReportsPage() {
                         {/* Error Context */}
                         {report.error_context && (
                           <div className="space-y-3">
-                            <h4 className="text-sm font-semibold text-foreground">Technical Details</h4>
+                            <h4 className="text-sm font-semibold text-foreground">
+                              Technical Details
+                            </h4>
 
                             {/* URL */}
                             {report.error_context.url && (
@@ -262,10 +278,13 @@ export default function AdminBugReportsPage() {
                               )}
                               {report.error_context.screen_resolution && (
                                 <div>
-                                  <p className="text-xs text-foreground/50 mb-1">Screen / Viewport</p>
+                                  <p className="text-xs text-foreground/50 mb-1">
+                                    Screen / Viewport
+                                  </p>
                                   <p className="text-sm text-foreground/70">
                                     {report.error_context.screen_resolution}
-                                    {report.error_context.viewport && ` / ${report.error_context.viewport}`}
+                                    {report.error_context.viewport &&
+                                      ` / ${report.error_context.viewport}`}
                                   </p>
                                 </div>
                               )}
@@ -294,7 +313,9 @@ export default function AdminBugReportsPage() {
                             {/* Form Data (if available) */}
                             {report.error_context.formData && (
                               <div>
-                                <p className="text-xs text-foreground/50 mb-1">Form Data (at time of error)</p>
+                                <p className="text-xs text-foreground/50 mb-1">
+                                  Form Data (at time of error)
+                                </p>
                                 <pre className="text-xs text-foreground/60 font-mono bg-black/40 border border-border rounded p-3 overflow-x-auto max-h-48">
                                   {JSON.stringify(report.error_context.formData, null, 2)}
                                 </pre>
@@ -316,12 +337,12 @@ export default function AdminBugReportsPage() {
                       </div>
                     )}
                   </div>
-                );
+                )
               })}
             </div>
           )}
         </div>
       </div>
     </div>
-  );
+  )
 }

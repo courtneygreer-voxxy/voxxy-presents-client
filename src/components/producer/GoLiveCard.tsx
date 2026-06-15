@@ -1,89 +1,89 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Send, Mail, AlertCircle, Check, Users, ExternalLink, Rocket } from 'lucide-react';
-import { eventsApi } from '@/services/api';
-import GoLiveInvitationEditor from './GoLiveInvitationEditor';
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Send, Mail, AlertCircle, Check, Users, ExternalLink, Rocket } from 'lucide-react'
+import { eventsApi } from '@/services/api'
+import GoLiveInvitationEditor from './GoLiveInvitationEditor'
 
 interface GoLiveCardProps {
-  event: any;
-  onGoLive: () => void | Promise<void>;
-  organizationId?: number;
+  event: any
+  onGoLive: () => void | Promise<void>
+  organizationId?: number
 }
 
 export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCardProps) {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [showEditor, setShowEditor] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [updatingInvitations, setUpdatingInvitations] = useState(false);
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [showEditor, setShowEditor] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
+  const [updatingInvitations, setUpdatingInvitations] = useState(false)
 
   // Live status state - use state instead of derived value to ensure re-renders
-  const [isLive, setIsLive] = useState(event.status?.is_live || false);
+  const [isLive, setIsLive] = useState(event.status?.is_live || false)
 
   // Update isLive when event prop changes (fixes issue where state doesn't update after going live)
   useEffect(() => {
-    const newIsLive = event.status?.is_live || false;
-    setIsLive(newIsLive);
-  }, [event, event.status?.is_live]);
+    const newIsLive = event.status?.is_live || false
+    setIsLive(newIsLive)
+  }, [event, event.status?.is_live])
 
-  const invitationCount = event.invitation_draft?.total_count || 0;
-  const hasInvitations = invitationCount > 0;
+  const invitationCount = event.invitation_draft?.total_count || 0
+  const hasInvitations = invitationCount > 0
 
   // Count scheduled emails that are paused
-  const hasScheduledEmails = true;
+  const hasScheduledEmails = true
 
   const handleSaveInvitations = async (data: {
-    invitation_list_ids: number[];
-    invitation_contact_ids: number[];
-    invitation_excluded_ids: number[];
+    invitation_list_ids: number[]
+    invitation_contact_ids: number[]
+    invitation_excluded_ids: number[]
   }) => {
-    setUpdatingInvitations(true);
-    setError(null);
+    setUpdatingInvitations(true)
+    setError(null)
 
     try {
-      await eventsApi.update(event.slug, data);
-      await onGoLive();
-      setShowEditor(false);
+      await eventsApi.update(event.slug, data)
+      await onGoLive()
+      setShowEditor(false)
     } catch (err: any) {
-      console.error('Failed to update invitation list:', err);
-      setError(err.message || 'Failed to update invitation list');
+      console.error('Failed to update invitation list:', err)
+      setError(err.message || 'Failed to update invitation list')
     } finally {
-      setUpdatingInvitations(false);
+      setUpdatingInvitations(false)
     }
-  };
+  }
 
   const handleGoLive = async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
 
     try {
-      await eventsApi.goLive(event.slug);
+      await eventsApi.goLive(event.slug)
 
       // Show success animation briefly
-      setSuccess(true);
-      setShowConfirm(false);
+      setSuccess(true)
+      setShowConfirm(false)
 
       // Refresh parent event data
-      await onGoLive();
+      await onGoLive()
 
       // Hide success animation after 2 seconds
       setTimeout(() => {
-        setSuccess(false);
-      }, 2000);
+        setSuccess(false)
+      }, 2000)
     } catch (err: any) {
-      console.error('Failed to go live:', err);
-      setError(err.message || 'Failed to activate event');
+      console.error('Failed to go live:', err)
+      setError(err.message || 'Failed to activate event')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleEditPortal = () => {
-    const slug = event.namespaced_slug || event.slug;
-    navigate(`/portal/${slug}`);
-  };
+    const slug = event.namespaced_slug || event.slug
+    navigate(`/portal/${slug}`)
+  }
 
   // Already live - show success state
   if (isLive) {
@@ -99,11 +99,12 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
           <p className="text-lg font-semibold text-foreground">Live</p>
         </div>
         <p className="text-xs text-muted-foreground">
-          {hasInvitations && `${invitationCount} invitation${invitationCount !== 1 ? 's' : ''} being sent in background. `}
+          {hasInvitations &&
+            `${invitationCount} invitation${invitationCount !== 1 ? 's' : ''} being sent in background. `}
           Emails active.
         </p>
       </div>
-    );
+    )
   }
 
   // Success animation
@@ -117,7 +118,7 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   // Confirmation dialog
@@ -174,8 +175,8 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
           </button>
           <button
             onClick={() => {
-              setShowConfirm(false);
-              setError(null);
+              setShowConfirm(false)
+              setError(null)
             }}
             disabled={loading}
             className="w-full px-3 py-2 bg-background/5 hover:bg-background/10 text-foreground text-xs rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -184,7 +185,7 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   // Editor view - review and edit invitation list
@@ -205,8 +206,8 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
               organizationId={organizationId}
               onSave={handleSaveInvitations}
               onCancel={() => {
-                setShowEditor(false);
-                setError(null);
+                setShowEditor(false)
+                setError(null)
               }}
             />
             {error && (
@@ -217,7 +218,7 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
           </>
         )}
       </div>
-    );
+    )
   }
 
   // Draft state — 3 pill action buttons
@@ -262,18 +263,20 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
         <button
           onClick={() => {
             if (!organizationId) {
-              setError('Organization information is required');
-              return;
+              setError('Organization information is required')
+              return
             }
-            setShowEditor(true);
-            setError(null);
+            setShowEditor(true)
+            setError(null)
           }}
           className="group flex flex-col items-center gap-2 rounded-xl border border-purple-200/40 bg-violet-50/60 px-2 py-3.5 text-center transition-all hover:border-purple-300/60 hover:bg-violet-50 hover:shadow-sm dark:border-purple-500/20 dark:bg-purple-950/30 dark:hover:border-purple-500/35 dark:hover:bg-purple-950/45"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/12 transition-colors group-hover:bg-purple-500/20 dark:bg-purple-500/20 dark:group-hover:bg-purple-500/30">
             <Users className="h-4 w-4 text-purple-700 dark:text-purple-300" />
           </div>
-          <span className="text-[11px] font-medium leading-tight text-foreground">Review Invites</span>
+          <span className="text-[11px] font-medium leading-tight text-foreground">
+            Review Invites
+          </span>
         </button>
 
         {/* Go Live */}
@@ -288,5 +291,5 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
         </button>
       </div>
     </div>
-  );
+  )
 }

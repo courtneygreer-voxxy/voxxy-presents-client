@@ -1,38 +1,38 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, Store, Menu, X, LogOut } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import SettingsPage from './SettingsPage';
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Calendar, Users, Settings, Store, Menu, X, LogOut } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import SettingsPage from './SettingsPage'
 
-type NavItem = 'events' | 'network' | 'settings';
+type NavItem = 'events' | 'network' | 'settings'
 
 export default function VendorDashboard() {
-  const [activeNav, setActiveNav] = useState<NavItem>('events');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { userProfile, isAuthenticated, loading: authLoading, signOut } = useAuth();
-  const navigate = useNavigate();
+  const [activeNav, setActiveNav] = useState<NavItem>('events')
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { userProfile, isAuthenticated, loading: authLoading, signOut } = useAuth()
+  const navigate = useNavigate()
 
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      navigate('/');
+      navigate('/')
     }
-  }, [isAuthenticated, authLoading, navigate]);
+  }, [isAuthenticated, authLoading, navigate])
 
   const handleLogout = async () => {
     try {
-      await signOut();
-      navigate('/');
+      await signOut()
+      navigate('/')
     } catch (err) {
-      console.error('Logout failed:', err);
+      console.error('Logout failed:', err)
     }
-  };
+  }
 
   const navItems = [
     { id: 'events' as NavItem, label: 'Events', icon: Calendar },
     { id: 'network' as NavItem, label: 'Network', icon: Users },
     { id: 'settings' as NavItem, label: 'Settings', icon: Settings },
-  ];
+  ]
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -45,17 +45,21 @@ export default function VendorDashboard() {
       )}
 
       {/* Left Sidebar */}
-      <aside className={`
+      <aside
+        className={`
         w-[220px]
         bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-all duration-300
         fixed lg:relative inset-y-0 left-0 z-50
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
+      `}
+      >
         {/* Sidebar Header */}
         <div className="p-6 border-b border-sidebar-border">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <span className="text-3xl font-bold text-sidebar-foreground tracking-wider block mb-2">VOXXY</span>
+              <span className="text-3xl font-bold text-sidebar-foreground tracking-wider block mb-2">
+                VOXXY
+              </span>
               <p className="text-sm text-sidebar-foreground/70">Vendor</p>
             </div>
             {/* Mobile Close Button */}
@@ -71,29 +75,30 @@ export default function VendorDashboard() {
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2">
           {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeNav === item.id;
+            const Icon = item.icon
+            const isActive = activeNav === item.id
 
             return (
               <button
                 key={item.id}
                 onClick={() => {
-                  setActiveNav(item.id);
-                  setIsMobileMenuOpen(false);
+                  setActiveNav(item.id)
+                  setIsMobileMenuOpen(false)
                 }}
                 className={`
                   w-full flex items-center gap-3 px-4 py-3 rounded-lg
                   text-sm font-medium transition-all
-                  ${isActive
-                    ? 'voxxy-nav-tab-active shadow-lg'
-                    : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent'
+                  ${
+                    isActive
+                      ? 'voxxy-nav-tab-active shadow-lg'
+                      : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent'
                   }
                 `}
               >
                 <Icon className="w-5 h-5" />
                 {item.label}
               </button>
-            );
+            )
           })}
         </nav>
 
@@ -149,5 +154,5 @@ export default function VendorDashboard() {
         </main>
       </div>
     </div>
-  );
+  )
 }

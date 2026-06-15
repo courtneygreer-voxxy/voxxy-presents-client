@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { XCircle, RefreshCw, ArrowLeft, HelpCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { stripeService } from "@/services/stripeService"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { XCircle, RefreshCw, ArrowLeft, HelpCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { stripeService } from '@/services/stripeService'
 import { useState } from 'react'
 import { useForceTheme } from '@/hooks/useForceTheme'
 
@@ -37,7 +37,6 @@ export default function PaymentCanceledPage() {
 
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-2xl space-y-8">
-
           {/* Canceled Card */}
           <Card className="bg-background/10 backdrop-blur-md border-2 border-orange-400/30 shadow-2xl">
             <CardHeader className="text-center pb-6 space-y-4">
@@ -64,11 +63,10 @@ export default function PaymentCanceledPage() {
             <CardContent className="space-y-6">
               {/* Status Message */}
               <div className="bg-orange-500/10 border border-orange-400/30 rounded-lg p-6 text-center space-y-2">
-                <p className="text-foreground font-semibold text-lg">
-                  Your payment was canceled
-                </p>
+                <p className="text-foreground font-semibold text-lg">Your payment was canceled</p>
                 <p className="text-foreground/85 dark:text-muted-foreground">
-                  Don't worry! You can try again whenever you're ready to activate your producer account.
+                  Don't worry! You can try again whenever you're ready to activate your producer
+                  account.
                 </p>
               </div>
 
@@ -119,7 +117,8 @@ export default function PaymentCanceledPage() {
                   <li>• The payment session expired</li>
                 </ul>
                 <p className="text-sm text-muted-foreground pt-2">
-                  <strong className="text-foreground">No charges were made.</strong> When you're ready, you can restart the payment process.
+                  <strong className="text-foreground">No charges were made.</strong> When you're
+                  ready, you can restart the payment process.
                 </p>
               </div>
 

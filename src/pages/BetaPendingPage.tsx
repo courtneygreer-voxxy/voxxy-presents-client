@@ -1,21 +1,40 @@
 import React, { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
-import { ArrowRight, CheckCircle, Mail, Loader2, AlertCircle, ArrowLeft, Check, Sparkles, DollarSign, Calendar, Users, BarChart3, Zap, CreditCard, Building2, Trash2, Info } from "lucide-react"
-import { Link, useNavigate } from "react-router-dom"
-import { useAuth } from "@/contexts/AuthContext"
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import {
+  ArrowRight,
+  CheckCircle,
+  Mail,
+  Loader2,
+  AlertCircle,
+  ArrowLeft,
+  Check,
+  Sparkles,
+  DollarSign,
+  Calendar,
+  Users,
+  BarChart3,
+  Zap,
+  CreditCard,
+  Building2,
+  Trash2,
+  Info,
+} from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 import { authApi, organizationsApi, ApiError } from '@/services/api'
-import { Separator } from "@/components/ui/separator"
+import { Separator } from '@/components/ui/separator'
 import { stripeService } from '@/services/stripeService'
 import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function BetaPendingPage() {
   useForceTheme('dark')
   const navigate = useNavigate()
-  const { userProfile, signOut, refreshUserProfile, isProducer, isEmailVerified, isPaid } = useAuth()
+  const { userProfile, signOut, refreshUserProfile, isProducer, isEmailVerified, isPaid } =
+    useAuth()
 
   // Payment state
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
@@ -182,34 +201,34 @@ export default function BetaPendingPage() {
   const features = [
     {
       icon: Calendar,
-      title: "Unlimited Events",
-      description: "Create and manage as many events as you need"
+      title: 'Unlimited Events',
+      description: 'Create and manage as many events as you need',
     },
     {
       icon: Users,
-      title: "Vendor Management",
-      description: "Accept and manage vendor applications with ease"
+      title: 'Vendor Management',
+      description: 'Accept and manage vendor applications with ease',
     },
     {
       icon: Mail,
-      title: "Automated Email Campaigns",
-      description: "Send targeted emails to vendors and attendees"
+      title: 'Automated Email Campaigns',
+      description: 'Send targeted emails to vendors and attendees',
     },
     {
       icon: BarChart3,
-      title: "Analytics & Reporting",
-      description: "Track registrations, payments, and engagement"
+      title: 'Analytics & Reporting',
+      description: 'Track registrations, payments, and engagement',
     },
     {
       icon: Zap,
-      title: "Payment Integration",
-      description: "Sync with Eventbrite and track vendor payments"
+      title: 'Payment Integration',
+      description: 'Sync with Eventbrite and track vendor payments',
     },
     {
       icon: CreditCard,
-      title: "Custom Branding",
-      description: "Customize your event pages and application forms"
-    }
+      title: 'Custom Branding',
+      description: 'Customize your event pages and application forms',
+    },
   ]
 
   return (
@@ -237,7 +256,10 @@ export default function BetaPendingPage() {
               </Button>
 
               <CardTitle className="text-3xl font-bold text-foreground mb-3">
-                Welcome to <span className="bg-gradient-to-r from-primary via-voxxy-pink to-primary bg-clip-text text-transparent">Voxxy</span>
+                Welcome to{' '}
+                <span className="bg-gradient-to-r from-primary via-voxxy-pink to-primary bg-clip-text text-transparent">
+                  Voxxy
+                </span>
               </CardTitle>
               <CardDescription className="text-base">
                 Complete the steps below to finish setting up your account
@@ -251,7 +273,10 @@ export default function BetaPendingPage() {
                   <div className="flex items-center gap-2 mb-2">
                     <Building2 className="h-5 w-5 text-blue-400" />
                     <h3 className="text-white font-semibold">Your Organization (Auto-Created)</h3>
-                    <Badge variant="outline" className="ml-auto bg-blue-500/20 border-blue-400/30 text-blue-300 text-xs">
+                    <Badge
+                      variant="outline"
+                      className="ml-auto bg-blue-500/20 border-blue-400/30 text-blue-300 text-xs"
+                    >
                       <Info className="h-3 w-3 mr-1" />
                       Debugging Info
                     </Badge>
@@ -271,13 +296,16 @@ export default function BetaPendingPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-gray-400">Subscription Status</span>
-                      <span className="text-yellow-300 font-medium">{organization.subscription_status || 'inactive'}</span>
+                      <span className="text-yellow-300 font-medium">
+                        {organization.subscription_status || 'inactive'}
+                      </span>
                     </div>
                   </div>
                   <Alert className="bg-blue-500/10 border-blue-400/30 mt-3">
                     <Info className="h-4 w-4 text-blue-400" />
                     <AlertDescription className="text-blue-200 text-xs">
-                      This organization was automatically created for you. You can update these details in Settings after completing payment.
+                      This organization was automatically created for you. You can update these
+                      details in Settings after completing payment.
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -307,7 +335,8 @@ export default function BetaPendingPage() {
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground italic">
-                      Meant to sign up as a different role or with another email? Use the request form below to contact us & we'll update your account information!
+                      Meant to sign up as a different role or with another email? Use the request
+                      form below to contact us & we'll update your account information!
                     </p>
                   </div>
 
@@ -353,7 +382,9 @@ export default function BetaPendingPage() {
                     <>
                       <Mail className="h-6 w-6 text-pink-400" />
                       <h3 className="text-lg font-semibold text-foreground">Verify Your Email</h3>
-                      <span className="ml-auto text-sm text-yellow-400 font-medium">Step 1 of 2</span>
+                      <span className="ml-auto text-sm text-yellow-400 font-medium">
+                        Step 1 of 2
+                      </span>
                     </>
                   )}
                 </div>
@@ -361,7 +392,6 @@ export default function BetaPendingPage() {
 
                 {!isEmailVerified ? (
                   <>
-
                     {/* Display User Email */}
                     <div className="bg-pink-500/10 border-2 border-pink-400 rounded-lg p-4">
                       <p className="text-sm text-gray-200 text-center">
@@ -430,9 +460,7 @@ export default function BetaPendingPage() {
                     </form>
 
                     <div className="text-center pt-2">
-                      <p className="text-muted-foreground text-sm mb-2">
-                        Didn't receive the code?
-                      </p>
+                      <p className="text-muted-foreground text-sm mb-2">Didn't receive the code?</p>
                       <Button
                         type="button"
                         variant="ghost"
@@ -468,7 +496,9 @@ export default function BetaPendingPage() {
                     <div className="text-center mb-8">
                       <div className="flex items-center justify-center gap-2 mb-4">
                         <Sparkles className="h-6 w-6 text-primary" />
-                        <h4 className="text-2xl font-bold text-foreground">Start Your Producer Account</h4>
+                        <h4 className="text-2xl font-bold text-foreground">
+                          Start Your Producer Account
+                        </h4>
                       </div>
                       <p className="text-muted-foreground text-base max-w-2xl mx-auto leading-relaxed">
                         Get instant access to all producer features with our $80/month plan
@@ -525,7 +555,9 @@ export default function BetaPendingPage() {
                           {!isEmailVerified ? (
                             <div className="text-center p-6 bg-yellow-500/10 border-2 border-yellow-400 rounded-lg">
                               <AlertCircle className="h-10 w-10 text-yellow-400 mx-auto mb-3" />
-                              <h5 className="text-foreground font-semibold mb-2">Email Verification Required</h5>
+                              <h5 className="text-foreground font-semibold mb-2">
+                                Email Verification Required
+                              </h5>
                               <p className="text-muted-foreground text-sm">
                                 Please verify your email first (Step 1 above) to start payment
                               </p>
@@ -533,7 +565,9 @@ export default function BetaPendingPage() {
                           ) : isPaid ? (
                             <div className="text-center p-6 bg-green-500/10 border-2 border-green-400 rounded-lg">
                               <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-3" />
-                              <h5 className="text-foreground font-semibold text-lg mb-2">Payment Complete!</h5>
+                              <h5 className="text-foreground font-semibold text-lg mb-2">
+                                Payment Complete!
+                              </h5>
                               <p className="text-muted-foreground text-sm mb-4">
                                 Your producer account is active. Redirecting to dashboard...
                               </p>
@@ -620,7 +654,8 @@ export default function BetaPendingPage() {
                         <h4 className="font-semibold">Are you sure?</h4>
                       </div>
                       <p className="text-sm text-red-800/90 dark:text-red-200">
-                        This will permanently delete your account and all associated data. This action cannot be undone.
+                        This will permanently delete your account and all associated data. This
+                        action cannot be undone.
                       </p>
                       <div className="flex gap-3 justify-center pt-2">
                         <Button

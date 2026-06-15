@@ -11,16 +11,16 @@ services:
       - key: VITE_SITE_URL
         value: https://www.voxxypresents.com
       - key: VITE_SITE_NAME
-        value: "Voxxy Presents"
+        value: 'Voxxy Presents'
       - key: VITE_SITE_DESCRIPTION
-        value: "Welcome to Voxxy Presents"
+        value: 'Welcome to Voxxy Presents'
     domains:
       - www.voxxypresents.com
       - voxxypresents.com
     autoDeploy: true
     branch: main
     rootDir: .
-    
+
   # Staging environment
   - type: web
     name: voxxy-presents-client-staging
@@ -38,9 +38,9 @@ services:
       - key: VITE_SITE_URL
         value: https://voxxy-presents-client-staging.onrender.com
       - key: VITE_SITE_NAME
-        value: "Voxxy Presents (Staging)"
+        value: 'Voxxy Presents (Staging)'
       - key: VITE_SITE_DESCRIPTION
-        value: "Voxxy Presents Staging Environment"
+        value: 'Voxxy Presents Staging Environment'
     autoDeploy: true
     branch: staging
     rootDir: .
@@ -58,9 +58,9 @@ services:
       - key: VITE_SITE_URL
         value: https://dev-voxxy-presents.onrender.com
       - key: VITE_SITE_NAME
-        value: "Voxxy Presents (Dev)"
+        value: 'Voxxy Presents (Dev)'
       - key: VITE_SITE_DESCRIPTION
-        value: "Voxxy Presents Development Environment"
+        value: 'Voxxy Presents Development Environment'
     autoDeploy: true
     branch: develop
     rootDir: .

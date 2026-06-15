@@ -27,7 +27,11 @@ interface UseEmailNotificationsReturn {
     isLoading: boolean
   }
   // Actions
-  handleEmailNotification: (notification: EmailNotification | null, eventSlug?: string, registrationId?: number) => void
+  handleEmailNotification: (
+    notification: EmailNotification | null,
+    eventSlug?: string,
+    registrationId?: number,
+  ) => void
   handleConfirmSend: () => void
   closeDialog: () => void
 }
@@ -42,7 +46,7 @@ export function useEmailNotifications(): UseEmailNotificationsReturn {
   const handleEmailNotification = (
     notification: EmailNotification | null,
     slug?: string,
-    regId?: number
+    regId?: number,
   ) => {
     if (!notification || !notification.requires_confirmation) {
       return

@@ -1,6 +1,7 @@
 # Guest Application Flow - Quick Reference Guide
 
 ## Overview
+
 Voxxy Presents is a **vendor application platform**, not a general event ticketing system. Guests can apply for vendor spots but cannot RSVP as attendees.
 
 ---
@@ -8,6 +9,7 @@ Voxxy Presents is a **vendor application platform**, not a general event ticketi
 ## Quick Start: Guest Vendor Application
 
 ### 1. Event Discovery
+
 ```
 GET /api/v1/presents/events/:slug
 ├─ Display event details, poster, capacity
@@ -16,6 +18,7 @@ GET /api/v1/presents/events/:slug
 ```
 
 ### 2. Apply as Vendor
+
 ```
 GET /events/:slug/apply
 ├─ Email (required)
@@ -29,6 +32,7 @@ POST /api/v1/presents/events/:slug/registrations
 ```
 
 ### 3. Confirmation
+
 ```
 GET /applications/success?ticket_code=...&event=...
 ├─ Display ticket_code
@@ -37,6 +41,7 @@ GET /applications/success?ticket_code=...&event=...
 ```
 
 ### 4. Track Status
+
 ```
 GET /applications/track/:ticketCode
 ├─ Shows current status (pending/approved/rejected/waitlist/confirmed)
@@ -48,24 +53,24 @@ GET /applications/track/:ticketCode
 
 ## Endpoint Summary
 
-| Method | Endpoint | Auth | Purpose |
-|--------|----------|------|---------|
-| GET | `/api/v1/presents/events/:slug` | ❌ | Get event details |
-| POST | `/api/v1/presents/events/:slug/registrations` | ❌ | Submit application |
-| GET | `/api/v1/presents/registrations/track/:code` | ❌ | Track application |
-| GET | `/api/v1/presents/vendor_applications/lookup/:code` | ❌ | Lookup by short code |
+| Method | Endpoint                                            | Auth | Purpose              |
+| ------ | --------------------------------------------------- | ---- | -------------------- |
+| GET    | `/api/v1/presents/events/:slug`                     | ❌   | Get event details    |
+| POST   | `/api/v1/presents/events/:slug/registrations`       | ❌   | Submit application   |
+| GET    | `/api/v1/presents/registrations/track/:code`        | ❌   | Track application    |
+| GET    | `/api/v1/presents/vendor_applications/lookup/:code` | ❌   | Lookup by short code |
 
 ---
 
 ## Routes
 
-| Route | Purpose | Component |
-|-------|---------|-----------|
-| `/events/:slug` | View event details | `PublicEventDetailPage` |
-| `/events/:slug/apply` | Apply as vendor | `VendorApplicationForm` |
-| `/applications/success` | Confirmation page | `ApplicationConfirmationPage` |
-| `/applications/track/:ticketCode` | Track application | `ApplicationTrackingPage` |
-| `/apply/:code` | Short link redirect | `ShortLinkRedirectPage` |
+| Route                             | Purpose             | Component                     |
+| --------------------------------- | ------------------- | ----------------------------- |
+| `/events/:slug`                   | View event details  | `PublicEventDetailPage`       |
+| `/events/:slug/apply`             | Apply as vendor     | `VendorApplicationForm`       |
+| `/applications/success`           | Confirmation page   | `ApplicationConfirmationPage` |
+| `/applications/track/:ticketCode` | Track application   | `ApplicationTrackingPage`     |
+| `/apply/:code`                    | Short link redirect | `ShortLinkRedirectPage`       |
 
 ---
 
@@ -84,6 +89,7 @@ confirmed → Vendor spot confirmed (event day details via email)
 ## Key Files
 
 **Pages:**
+
 - `src/pages/PublicEventDetailPage.tsx`
 - `src/pages/VendorApplicationForm.tsx`
 - `src/pages/ApplicationConfirmationPage.tsx`
@@ -91,6 +97,7 @@ confirmed → Vendor spot confirmed (event day details via email)
 - `src/pages/ShortLinkRedirectPage.tsx`
 
 **API Service:**
+
 - `src/services/api.ts` (registrationsApi, vendorApplicationsApi)
 
 ---
@@ -98,11 +105,13 @@ confirmed → Vendor spot confirmed (event day details via email)
 ## Form Validation
 
 **Required fields:**
+
 - Email (valid email format)
 - Business Name (non-empty)
 - Vendor Category (must select from available options)
 
 **Optional fields:**
+
 - Phone (optional if not provided)
 - Newsletter subscription (defaults to true)
 
@@ -111,6 +120,7 @@ confirmed → Vendor spot confirmed (event day details via email)
 ## Response Models
 
 ### Registration
+
 ```typescript
 {
   id: number
@@ -120,11 +130,14 @@ confirmed → Vendor spot confirmed (event day details via email)
   vendor_category: string
   status: 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed'
   created_at: string
-  event: { id, title, slug, dates, location }
+  event: {
+    ;(id, title, slug, dates, location)
+  }
 }
 ```
 
 ### Event
+
 ```typescript
 {
   id: number
@@ -147,6 +160,7 @@ confirmed → Vendor spot confirmed (event day details via email)
 ## Common Workflows
 
 ### Guest Views Event and Applies
+
 1. Navigate to `/events/music-festival-2025`
 2. Scroll to "Vendor Opportunities" section
 3. Click "Apply as Vendor"
@@ -155,12 +169,14 @@ confirmed → Vendor spot confirmed (event day details via email)
 6. Redirected to `/applications/success?ticket_code=APP-123&event=music-festival-2025`
 
 ### Guest Tracks Application Later
+
 1. Navigate to `/applications/track/APP-123`
 2. System looks up application by ticket code
 3. Displays current status and details
 4. Guest can click "View Event" or "Browse More Events"
 
 ### Producer Shares Vendor Link
+
 1. Producer has event with vendor_application_id = 42
 2. Generates short code (backend responsibility)
 3. Sends link: `voxxypresents.com/apply/ABC123`
@@ -195,6 +211,7 @@ confirmed → Vendor spot confirmed (event day details via email)
 ## Email Integration
 
 When vendor applies:
+
 1. Confirmation email sent to applicant
 2. Email includes ticket code and tracking link
 3. When status changes, email notification sent

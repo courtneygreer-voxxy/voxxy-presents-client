@@ -14,8 +14,8 @@ import {
   ErrorSeverity,
   EmailDeliveryStatus,
   getFormErrorSeverity,
-  getEmailErrorSeverity
-} from '@/utils/errorMonitoring';
+  getEmailErrorSeverity,
+} from '@/utils/errorMonitoring'
 ```
 
 ---
@@ -27,52 +27,58 @@ import {
 **File: `/src/pages/VendorApplicationForm.tsx`**
 
 #### Before: Basic Error Handling
+
 ```typescript
 const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  e.preventDefault()
 
   try {
-    setSubmitting(true);
-    const response = await registrationsApi.submitVendorApplication(event.slug, formData);
-    navigate(`/events/${event.slug}/confirmation/${response.ticket_code}`);
+    setSubmitting(true)
+    const response = await registrationsApi.submitVendorApplication(event.slug, formData)
+    navigate(`/events/${event.slug}/confirmation/${response.ticket_code}`)
   } catch (err: any) {
-    setError(err.message || 'Failed to submit application');
+    setError(err.message || 'Failed to submit application')
   } finally {
-    setSubmitting(false);
+    setSubmitting(false)
   }
-};
+}
 ```
 
 #### After: With Error Monitoring
+
 ```typescript
 const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  e.preventDefault()
 
   if (!application || !event) {
-    setError('No vendor application found for this event');
-    return;
+    setError('No vendor application found for this event')
+    return
   }
 
   // Validation
   if (!formData.name || !formData.email || !formData.business_name || !formData.vendor_category) {
-    const validationError = 'Please fill in all required fields';
-    setError(validationError);
+    const validationError = 'Please fill in all required fields'
+    setError(validationError)
 
     // Track validation errors for monitoring
-    trackFormError(validationError, {
-      formType: FormType.VENDOR_APPLICATION,
-      eventSlug: event.slug,
-      eventId: event.id,
-      eventTitle: event.title,
-      applicationId: application.id,
-      applicationName: application.name,
-      validationErrors: ['Missing required fields'],
-      url: window.location.href,
-      userAgent: navigator.userAgent,
-      viewport: `${window.innerWidth}x${window.innerHeight}`,
-    }, ErrorSeverity.LOW); // Low severity - user error, not system error
+    trackFormError(
+      validationError,
+      {
+        formType: FormType.VENDOR_APPLICATION,
+        eventSlug: event.slug,
+        eventId: event.id,
+        eventTitle: event.title,
+        applicationId: application.id,
+        applicationName: application.name,
+        validationErrors: ['Missing required fields'],
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        viewport: `${window.innerWidth}x${window.innerHeight}`,
+      },
+      ErrorSeverity.LOW,
+    ) // Low severity - user error, not system error
 
-    return;
+    return
   }
 
   // Validate at least one social/portfolio link
@@ -80,46 +86,56 @@ const handleSubmit = async (e: React.FormEvent) => {
     (formData.website && formData.website.trim()) ||
     (formData.instagram_handle && formData.instagram_handle.trim()) ||
     (formData.tiktok_handle && formData.tiktok_handle.trim()) ||
-    (formData.facebook_handle && formData.facebook_handle.trim());
+    (formData.facebook_handle && formData.facebook_handle.trim())
 
   if (!hasAtLeastOneLink) {
-    const validationError = 'Please provide at least one link to your work (website or social media)';
-    setError(validationError);
+    const validationError =
+      'Please provide at least one link to your work (website or social media)'
+    setError(validationError)
 
-    trackFormError(validationError, {
-      formType: FormType.VENDOR_APPLICATION,
-      eventSlug: event.slug,
-      eventId: event.id,
-      eventTitle: event.title,
-      applicationId: application.id,
-      applicationName: application.name,
-      validationErrors: ['Missing social/portfolio link'],
-      url: window.location.href,
-    }, ErrorSeverity.LOW);
+    trackFormError(
+      validationError,
+      {
+        formType: FormType.VENDOR_APPLICATION,
+        eventSlug: event.slug,
+        eventId: event.id,
+        eventTitle: event.title,
+        applicationId: application.id,
+        applicationName: application.name,
+        validationErrors: ['Missing social/portfolio link'],
+        url: window.location.href,
+      },
+      ErrorSeverity.LOW,
+    )
 
-    return;
+    return
   }
 
   if (!formData.agreed_to_terms) {
-    const validationError = 'You must agree to the Privacy Policy and Terms of Service to submit your application';
-    setError(validationError);
+    const validationError =
+      'You must agree to the Privacy Policy and Terms of Service to submit your application'
+    setError(validationError)
 
-    trackFormError(validationError, {
-      formType: FormType.VENDOR_APPLICATION,
-      eventSlug: event.slug,
-      eventId: event.id,
-      applicationId: application.id,
-      validationErrors: ['Terms not agreed'],
-      url: window.location.href,
-    }, ErrorSeverity.LOW);
+    trackFormError(
+      validationError,
+      {
+        formType: FormType.VENDOR_APPLICATION,
+        eventSlug: event.slug,
+        eventId: event.id,
+        applicationId: application.id,
+        validationErrors: ['Terms not agreed'],
+        url: window.location.href,
+      },
+      ErrorSeverity.LOW,
+    )
 
-    return;
+    return
   }
 
   try {
-    setSubmitting(true);
-    setError(null);
-    setRetryAttempt(0);
+    setSubmitting(true)
+    setError(null)
+    setRetryAttempt(0)
 
     // Build payload
     const payload = {
@@ -134,7 +150,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       tiktok_handle: buildTikTokUrl(formData.tiktok_handle),
       website: buildWebsiteUrl(formData.website),
       note_to_host: formData.note_to_host || undefined,
-    };
+    }
 
     // Submit with retry logic
     const response = await retryOperation(
@@ -144,30 +160,34 @@ const handleSubmit = async (e: React.FormEvent) => {
         baseDelay: 2000,
         maxDelay: 10000,
         onRetry: (attempt) => {
-          console.log(`Retry attempt ${attempt}`);
-          setRetryAttempt(attempt);
+          console.log(`Retry attempt ${attempt}`)
+          setRetryAttempt(attempt)
 
           // Track retry attempts
-          trackFormError('Form submission retry', {
-            formType: FormType.VENDOR_APPLICATION,
-            eventSlug: event.slug,
-            eventId: event.id,
-            eventTitle: event.title,
-            applicationId: application.id,
-            applicationName: application.name,
-            attemptNumber: attempt,
-            totalAttempts: 3,
-            userEmail: formData.email,
-            apiEndpoint: `/v1/presents/events/${event.slug}/registrations`,
-          }, ErrorSeverity.MEDIUM);
+          trackFormError(
+            'Form submission retry',
+            {
+              formType: FormType.VENDOR_APPLICATION,
+              eventSlug: event.slug,
+              eventId: event.id,
+              eventTitle: event.title,
+              applicationId: application.id,
+              applicationName: application.name,
+              attemptNumber: attempt,
+              totalAttempts: 3,
+              userEmail: formData.email,
+              apiEndpoint: `/v1/presents/events/${event.slug}/registrations`,
+            },
+            ErrorSeverity.MEDIUM,
+          )
         },
         shouldRetry: (error: any) => {
-          const status = error.status || 0;
+          const status = error.status || 0
           // Only retry on network errors or 5xx server errors
-          return status === 0 || status >= 500;
+          return status === 0 || status >= 500
         },
-      }
-    );
+      },
+    )
 
     // Success! Track it
     trackFormSuccess({
@@ -189,65 +209,72 @@ const handleSubmit = async (e: React.FormEvent) => {
         has_tiktok: !!formData.tiktok_handle,
         subscribed: formData.subscribed,
       },
-    });
+    })
 
     // Clear saved form data
     if (slug && applicationId) {
-      const formId = `vendor-app-${slug}-${applicationId}`;
-      clearFormData(formId);
+      const formId = `vendor-app-${slug}-${applicationId}`
+      clearFormData(formId)
     }
 
     // Navigate to confirmation
-    navigate(`/events/${event.slug}/confirmation/${response.ticket_code}`);
-
+    navigate(`/events/${event.slug}/confirmation/${response.ticket_code}`)
   } catch (err: any) {
-    const status = err.status || 0;
-    const errorMessage = err.message || 'An unexpected error occurred';
+    const status = err.status || 0
+    const errorMessage = err.message || 'An unexpected error occurred'
 
     // Determine error severity
-    const severity = getFormErrorSeverity(FormType.VENDOR_APPLICATION, status);
+    const severity = getFormErrorSeverity(FormType.VENDOR_APPLICATION, status)
 
     // Track the error with full context
-    trackFormError(err, {
-      formType: FormType.VENDOR_APPLICATION,
-      eventSlug: event.slug,
-      eventId: event.id,
-      eventTitle: event.title,
-      applicationId: application.id,
-      applicationName: application.name,
-      userEmail: formData.email,
-      httpStatus: status,
-      apiEndpoint: `/v1/presents/events/${event.slug}/registrations`,
-      errorMessage,
-      errorCode: err.code,
-      attemptNumber: retryAttempt + 1,
-      totalAttempts: 3,
-      url: window.location.href,
-      userAgent: navigator.userAgent,
-      viewport: `${window.innerWidth}x${window.innerHeight}`,
-      formData: {
-        business_name: formData.business_name,
-        vendor_category: formData.vendor_category,
-        has_website: !!formData.website,
-        has_instagram: !!formData.instagram_handle,
+    trackFormError(
+      err,
+      {
+        formType: FormType.VENDOR_APPLICATION,
+        eventSlug: event.slug,
+        eventId: event.id,
+        eventTitle: event.title,
+        applicationId: application.id,
+        applicationName: application.name,
+        userEmail: formData.email,
+        httpStatus: status,
+        apiEndpoint: `/v1/presents/events/${event.slug}/registrations`,
+        errorMessage,
+        errorCode: err.code,
+        attemptNumber: retryAttempt + 1,
+        totalAttempts: 3,
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        viewport: `${window.innerWidth}x${window.innerHeight}`,
+        formData: {
+          business_name: formData.business_name,
+          vendor_category: formData.vendor_category,
+          has_website: !!formData.website,
+          has_instagram: !!formData.instagram_handle,
+        },
       },
-    }, severity);
+      severity,
+    )
 
     // User-friendly error messages
     if (status === 422) {
-      setError('Please check your form entries. Some information may be invalid.');
+      setError('Please check your form entries. Some information may be invalid.')
     } else if (status === 409) {
-      setError('You may have already applied for this event. Please check your email for confirmation.');
+      setError(
+        'You may have already applied for this event. Please check your email for confirmation.',
+      )
     } else if (status === 0) {
-      setError('Unable to connect to the server. Please check your internet connection and try again.');
+      setError(
+        'Unable to connect to the server. Please check your internet connection and try again.',
+      )
     } else if (status >= 500) {
-      setError('Our servers are experiencing issues. Please try again in a few moments.');
+      setError('Our servers are experiencing issues. Please try again in a few moments.')
     } else {
-      setError(errorMessage);
+      setError(errorMessage)
     }
 
     // Auto-show bug report after 3 failures
-    failedAttemptsRef.current++;
+    failedAttemptsRef.current++
     if (failedAttemptsRef.current >= 3) {
       setErrorContext({
         error: errorMessage,
@@ -258,14 +285,14 @@ const handleSubmit = async (e: React.FormEvent) => {
           ...formData,
           agreed_to_terms: undefined, // Don't include in bug report
         },
-      });
-      setShowBugReport(true);
-      failedAttemptsRef.current = 0;
+      })
+      setShowBugReport(true)
+      failedAttemptsRef.current = 0
     }
   } finally {
-    setSubmitting(false);
+    setSubmitting(false)
   }
-};
+}
 ```
 
 ---
@@ -276,27 +303,31 @@ const handleSubmit = async (e: React.FormEvent) => {
 
 ```typescript
 const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+  e.preventDefault()
 
-  if (isSubmitting || isSubmitted) return;
+  if (isSubmitting || isSubmitted) return
 
   // Validation
   if (!name.trim() || !email.trim() || !message.trim()) {
-    const validationError = 'Please fill out all fields';
-    setError(validationError);
+    const validationError = 'Please fill out all fields'
+    setError(validationError)
 
-    trackFormError(validationError, {
-      formType: FormType.CONTACT_FORM,
-      validationErrors: ['Missing required fields'],
-      url: window.location.href,
-    }, ErrorSeverity.LOW);
+    trackFormError(
+      validationError,
+      {
+        formType: FormType.CONTACT_FORM,
+        validationErrors: ['Missing required fields'],
+        url: window.location.href,
+      },
+      ErrorSeverity.LOW,
+    )
 
-    return;
+    return
   }
 
   try {
-    setIsSubmitting(true);
-    setError(null);
+    setIsSubmitting(true)
+    setError(null)
 
     const payload = {
       type: 'beta_request',
@@ -304,17 +335,17 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       email: email.trim(),
       description: message.trim(),
       source: 'contact_page',
-    };
+    }
 
     const response = await fetch(`${API_BASE_URL}/contact_submissions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    });
+    })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP ${response.status}`);
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.message || `HTTP ${response.status}`)
     }
 
     // Success!
@@ -327,33 +358,36 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         source: 'contact_page',
         message_length: message.length,
       },
-    });
+    })
 
     // Track conversion
-    trackConversion('Contact Form Submitted');
+    trackConversion('Contact Form Submitted')
 
-    setIsSubmitted(true);
-
+    setIsSubmitted(true)
   } catch (err: any) {
-    const status = err.status || 0;
-    const errorMessage = err.message || 'Failed to submit contact form';
-    const severity = getFormErrorSeverity(FormType.CONTACT_FORM, status);
+    const status = err.status || 0
+    const errorMessage = err.message || 'Failed to submit contact form'
+    const severity = getFormErrorSeverity(FormType.CONTACT_FORM, status)
 
-    trackFormError(err, {
-      formType: FormType.CONTACT_FORM,
-      userEmail: email,
-      httpStatus: status,
-      apiEndpoint: '/contact_submissions',
-      errorMessage,
-      url: window.location.href,
-      userAgent: navigator.userAgent,
-    }, severity);
+    trackFormError(
+      err,
+      {
+        formType: FormType.CONTACT_FORM,
+        userEmail: email,
+        httpStatus: status,
+        apiEndpoint: '/contact_submissions',
+        errorMessage,
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+      },
+      severity,
+    )
 
-    setError('Failed to submit. Please try again or email us directly at team@voxxypresents.com');
+    setError('Failed to submit. Please try again or email us directly at team@voxxypresents.com')
   } finally {
-    setIsSubmitting(false);
+    setIsSubmitting(false)
   }
-};
+}
 ```
 
 ---
@@ -443,16 +477,16 @@ end
 **File: `/src/services/api.ts` or where you poll email delivery status**
 
 ```typescript
-import { trackEmailError, trackEmailSuccess, EmailDeliveryStatus } from '@/utils/errorMonitoring';
+import { trackEmailError, trackEmailSuccess, EmailDeliveryStatus } from '@/utils/errorMonitoring'
 
 /**
  * Check email delivery status for a registration
  */
 export async function checkEmailDeliveryStatus(registrationId: number) {
   try {
-    const response = await emailDeliveriesApi.getByRegistration(registrationId);
+    const response = await emailDeliveriesApi.getByRegistration(registrationId)
 
-    const delivery = response.data;
+    const delivery = response.data
 
     if (delivery.status === 'failed' || delivery.status === 'bounced') {
       // Track email failure
@@ -471,7 +505,7 @@ export async function checkEmailDeliveryStatus(registrationId: number) {
         failureReason: delivery.error_message,
         sentAt: delivery.sent_at,
         failedAt: delivery.failed_at || new Date().toISOString(),
-      });
+      })
     } else if (delivery.status === 'delivered') {
       // Track success (optional)
       trackEmailSuccess({
@@ -483,13 +517,13 @@ export async function checkEmailDeliveryStatus(registrationId: number) {
         provider: 'sendgrid',
         sentAt: delivery.sent_at,
         deliveredAt: delivery.delivered_at,
-      });
+      })
     }
 
-    return delivery;
+    return delivery
   } catch (error: any) {
-    console.error('Failed to check email delivery status:', error);
-    throw error;
+    console.error('Failed to check email delivery status:', error)
+    throw error
   }
 }
 ```
@@ -501,22 +535,18 @@ export async function checkEmailDeliveryStatus(registrationId: number) {
 **File: `/src/App.tsx` or authentication logic**
 
 ```typescript
-import { setUserContext, clearUserContext } from '@/utils/errorMonitoring';
+import { setUserContext, clearUserContext } from '@/utils/errorMonitoring'
 
 // After successful login
 function handleLoginSuccess(user: User) {
-  setUserContext(
-    user.id,
-    user.email,
-    user.organization?.id
-  );
+  setUserContext(user.id, user.email, user.organization?.id)
 
   // Continue with app logic...
 }
 
 // On logout
 function handleLogout() {
-  clearUserContext();
+  clearUserContext()
 
   // Continue with logout logic...
 }
@@ -556,6 +586,7 @@ function handleLogout() {
 ### Production Monitoring
 
 After deployment:
+
 1. Monitor Discord `#voxxy-alerts` channel
 2. Check Sentry dashboard daily for first week
 3. Review error trends weekly
@@ -565,13 +596,13 @@ After deployment:
 
 ## Alert Thresholds
 
-| Error Type | Severity | Alert Timing | Expected Volume |
-|------------|----------|--------------|-----------------|
-| Validation errors | LOW | Batch (1/hour) | 10-50/day (normal) |
-| Form submission failures | HIGH | Immediate | 0-5/day (expect low) |
-| Email delivery failures | HIGH | Immediate | 0-10/day (expect low) |
-| Payment confirmations failed | CRITICAL | Immediate | 0/day (must be 0) |
-| Server errors (5xx) | CRITICAL | Immediate | 0-2/day (expect very low) |
+| Error Type                   | Severity | Alert Timing   | Expected Volume           |
+| ---------------------------- | -------- | -------------- | ------------------------- |
+| Validation errors            | LOW      | Batch (1/hour) | 10-50/day (normal)        |
+| Form submission failures     | HIGH     | Immediate      | 0-5/day (expect low)      |
+| Email delivery failures      | HIGH     | Immediate      | 0-10/day (expect low)     |
+| Payment confirmations failed | CRITICAL | Immediate      | 0/day (must be 0)         |
+| Server errors (5xx)          | CRITICAL | Immediate      | 0-2/day (expect very low) |
 
 ---
 
