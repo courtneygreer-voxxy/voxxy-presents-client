@@ -68,19 +68,24 @@ export function generateCSVTemplate(): string {
   return csvContent
 }
 
-export function downloadCSVTemplate(): void {
-  const csv = generateCSVTemplate()
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+function triggerBrowserDownload(blob: Blob, filename: string): void {
   const link = document.createElement('a')
   const url = URL.createObjectURL(blob)
 
   link.setAttribute('href', url)
-  link.setAttribute('download', 'vendor_contacts_template.csv')
+  link.setAttribute('download', filename)
   link.style.visibility = 'hidden'
 
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
+  window.setTimeout(() => URL.revokeObjectURL(url), 0)
+}
+
+export function downloadCSVTemplate(): void {
+  const csv = generateCSVTemplate()
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  triggerBrowserDownload(blob, 'vendor_contacts_template.csv')
 }
 
 export function downloadErrorReport(
@@ -94,14 +99,5 @@ export function downloadErrorReport(
   ].join('\n')
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  const url = URL.createObjectURL(blob)
-
-  link.setAttribute('href', url)
-  link.setAttribute('download', fileName)
-  link.style.visibility = 'hidden'
-
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
+  triggerBrowserDownload(blob, fileName)
 }

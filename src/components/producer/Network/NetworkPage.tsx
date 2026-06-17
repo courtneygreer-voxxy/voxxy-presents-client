@@ -4,7 +4,6 @@ import {
   Upload,
   Save,
   X,
-  Filter,
   Tag,
   Plus,
   Edit2,
@@ -25,6 +24,7 @@ import {
   categoriesApi,
   eventsApi,
   VendorContact,
+  ContactList,
 } from '@/services/api'
 import type { Category, CategoryFeePreference } from '@/types/category'
 import { PAYMENT_PRICE_TYPES } from '@/components/producer/CreateEventWizard/types'
@@ -33,12 +33,26 @@ import AddContactModal from './AddContactModal'
 import EditContactModal from './EditContactModal'
 import { CSVUploadModal } from './CSVUploadModal'
 import ListsManagement from './Lists/ListsManagement'
-import SmartListBuilder from './Lists/SmartListBuilder'
-import { BulkActionToolbar } from './BulkActionToolbar'
+import BulkEditModal from './BulkEditModal'
 import ContactExportModal from './ContactExportModal'
 import type { ActiveFilter, FilterFieldConfig } from '@/components/shared/SearchFilterBar'
 import { notify } from '@/errors/notify'
 import { getApiErrorMessage } from '@/errors/getApiErrorMessage'
+import {
+  IMPORT_BATCH_VIEW_LABEL,
+  IMPORT_TAG_COUNTS_FOOTNOTE,
+  IMPORT_TAG_COUNTS_LABEL,
+  IMPORT_WHERE_DID_THEY_GO,
+  SAVE_AS_LIST_LABEL,
+  BULK_EDIT_LABEL,
+  TAGS_EMPTY_HINT,
+} from './copy'
+import {
+  type ImportSession,
+  clearImportSession,
+  loadImportSession,
+  saveImportSession,
+} from './importSession'
 
 type NetworkTab = 'contacts' | 'lists' | 'categories'
 
@@ -194,7 +208,8 @@ export default function NetworkPage({
   const [eventStatusFilter, setEventStatusFilter] = useState<string>('all') // 'all' | 'approved' | 'pending' | 'rejected' etc.
   const [orgEvents, setOrgEvents] = useState<{ id: number; title: string }[]>([])
   const [showExportModal, setShowExportModal] = useState(false)
-  const [showFilters, setShowFilters] = useState(false)
+  const [showBulkEditModal, setShowBulkEditModal] = useState(false)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
   const actionsMenuRef = useRef<HTMLDivElement>(null)
 
   // SearchFilterBar state
@@ -226,17 +241,6 @@ export default function NetworkPage({
   const [listName, setListName] = useState('')
   const [savingList, setSavingList] = useState(false)
 
-  // Create smart list modal state
-  const [isCreatingList, setIsCreatingList] = useState(false)
-  const [createListName, setCreateListName] = useState('')
-  const [createListDescription, setCreateListDescription] = useState('')
-  const [createListFilters, setCreateListFilters] = useState<{
-    categories?: string[]
-    locations?: string[]
-    tags?: string[]
-  }>({})
-  const [savingCreateList, setSavingCreateList] = useState(false)
-
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1)
   const [perPage] = useState(100)
@@ -250,17 +254,20 @@ export default function NetworkPage({
   // Bulk update state
   const [bulkUpdateLoading, setBulkUpdateLoading] = useState(false)
 
+  // Post-import session + saved lists (for one-click list creation)
+  const [importSession, setImportSession] = useState<ImportSession | null>(null)
+  const [viewingImportBatch, setViewingImportBatch] = useState(false)
+  const [savedLists, setSavedLists] = useState<ContactList[]>([])
+
   // Derive filter arrays from activeFilters
   const locationFilters = activeFilters.find((f) => f.fieldKey === 'location')?.values || []
   const categoryFilters = activeFilters.find((f) => f.fieldKey === 'category')?.values || []
   const tagFilters = activeFilters.find((f) => f.fieldKey === 'tags')?.values || []
-  const hasActiveFilters =
-    locationFilters.length > 0 ||
-    categoryFilters.length > 0 ||
-    tagFilters.length > 0 ||
-    updatedAtRange !== 'all' ||
-    eventFilter !== 'all' ||
-    eventStatusFilter !== 'all'
+  const hasListableFilters =
+    locationFilters.length > 0 || categoryFilters.length > 0 || tagFilters.length > 0
+  const hasAdvancedFilters =
+    updatedAtRange !== 'all' || eventFilter !== 'all' || eventStatusFilter !== 'all'
+  const hasActiveFilters = hasListableFilters || hasAdvancedFilters
 
   // Filter field config for SearchFilterBar
   const filterFieldConfigs: FilterFieldConfig[] = [
@@ -292,22 +299,90 @@ export default function NetworkPage({
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  // Fetch filter options from backend on mount
-  useEffect(() => {
-    const loadFilterOptions = async () => {
-      try {
-        const options = await vendorContactsApi.getFilterOptions(organizationId)
-        setFilterOptions({
-          locations: options.locations || [],
-          categories: options.categories || [],
-          tags: options.tags || [],
-        })
-      } catch (err) {
-        console.error('Failed to load filter options:', err)
-      }
+  const refreshFilterOptions = async () => {
+    try {
+      const options = await vendorContactsApi.getFilterOptions(organizationId)
+      setFilterOptions({
+        locations: options.locations || [],
+        categories: options.categories || [],
+        tags: options.tags || [],
+      })
+    } catch (err) {
+      console.error('Failed to load filter options:', err)
     }
-    loadFilterOptions()
+  }
+
+  const refreshSavedLists = async () => {
+    try {
+      const response = await contactListsApi.getAll(organizationId)
+      setSavedLists(response.contact_lists || [])
+    } catch (err) {
+      console.error('Failed to load saved lists:', err)
+    }
+  }
+
+  // Fetch filter options on mount
+  useEffect(() => {
+    refreshFilterOptions()
+    refreshSavedLists()
+    const stored = loadImportSession(organizationId)
+    if (stored) setImportSession(stored)
   }, [organizationId])
+
+  useEffect(() => {
+    if (showBulkEditModal) {
+      refreshSavedLists()
+    }
+  }, [showBulkEditModal, organizationId])
+
+  const handleImportSuccess = async (session: ImportSession) => {
+    saveImportSession(organizationId, session)
+    setImportSession(session)
+    await refreshFilterOptions()
+    fetchContacts(1)
+  }
+
+  const dismissImportSession = () => {
+    clearImportSession(organizationId)
+    setImportSession(null)
+    setViewingImportBatch(false)
+  }
+
+  const viewImportUpload = () => {
+    if (!importSession) return
+    setSearchTerm('')
+    setUpdatedAtRange('all')
+    setEventFilter('all')
+    setEventStatusFilter('all')
+    setViewingManualList(null)
+    setShowSaveInput(false)
+    setListName('')
+
+    const tagsToFilter =
+      importSession.tags.length === 1 && importSession.primaryTag
+        ? [importSession.primaryTag]
+        : importSession.tags
+
+    const withoutListable = activeFilters.filter(
+      (f) => f.fieldKey !== 'tags' && f.fieldKey !== 'category' && f.fieldKey !== 'location',
+    )
+    if (tagsToFilter.length > 0) {
+      setActiveFilters([...withoutListable, { fieldKey: 'tags', values: tagsToFilter }])
+    } else {
+      setActiveFilters(withoutListable)
+    }
+
+    setViewingImportBatch(true)
+    setCurrentPage(1)
+  }
+
+  const clearImportBatchView = () => {
+    setViewingImportBatch(false)
+    const withoutTags = activeFilters.filter((f) => f.fieldKey !== 'tags')
+    setActiveFilters(withoutTags)
+    setCurrentPage(1)
+    fetchContacts(1)
+  }
 
   // Fetch org events for the event filter dropdown
   useEffect(() => {
@@ -551,24 +626,86 @@ export default function NetworkPage({
     }
   }
 
-  const handleBulkLocationUpdate = async (location: string) => {
+  const handleBulkAddToList = async (listId: number) => {
     if (selectedContacts.length === 0) return
+
+    const list = savedLists.find((l) => l.id === listId)
+    if (!list) return
 
     try {
       setBulkUpdateLoading(true)
-      const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
-        location,
-      })
-      notify.success({
-        key: 'network.bulkUpdateSuccess',
-        params: { count: result.updated_count },
-        fallback: result.message,
-      })
-      await fetchContacts(currentPage)
+
+      if (list.list_type === 'manual') {
+        const existingIds = list.contact_ids || []
+        const mergedIds = [...new Set([...existingIds, ...selectedContacts])]
+        await contactListsApi.update(listId, { contact_ids: mergedIds })
+        await refreshSavedLists()
+        notify.success({
+          key: 'network.bulkAddToListSuccess',
+          params: { count: selectedContacts.length, listName: list.name },
+        })
+      } else {
+        const filters = list.filters || {}
+        const filterTags = filters.tags || []
+        const filterCategories = filters.categories || []
+        const filterLocations = filters.locations || []
+
+        if (
+          filterTags.length === 0 &&
+          filterCategories.length === 0 &&
+          filterLocations.length === 0
+        ) {
+          notify.error({
+            key: 'network.bulkApplyListNoFilters',
+            params: { listName: list.name },
+          })
+          return
+        }
+
+        if (filterCategories.length > 0) {
+          await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
+            categories: filterCategories,
+            category_mode: 'append',
+          })
+        }
+
+        if (filterTags.length > 0) {
+          await Promise.all(
+            selectedContacts.map((contactId) =>
+              Promise.all(filterTags.map((tag) => vendorContactsApi.addTag(contactId, tag)))
+            )
+          )
+        }
+
+        if (filterLocations.length === 1) {
+          await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
+            location: filterLocations[0],
+          })
+        }
+
+        const appliedParts = [
+          filterCategories.length > 0 ? 'categories' : null,
+          filterTags.length > 0 ? 'tags' : null,
+          filterLocations.length === 1 ? 'location' : null,
+        ].filter(Boolean)
+
+        notify.success({
+          key: 'network.bulkApplyListSuccess',
+          params: {
+            applied: appliedParts.join(', '),
+            listName: list.name,
+            count: selectedContacts.length,
+          },
+        })
+
+        await refreshFilterOptions()
+        await fetchContacts(currentPage)
+      }
+
       setSelectedContacts([])
     } catch (error: unknown) {
       notify.error({
-        key: 'network.bulkLocationUpdateFailed',
+        key: 'network.bulkAddToListFailed',
         fallback: getApiErrorMessage(error),
       })
     } finally {
@@ -587,6 +724,7 @@ export default function NetworkPage({
     setEventFilter('all')
     setEventStatusFilter('all')
     setViewingManualList(null)
+    setViewingImportBatch(false)
     setShowSaveInput(false)
     setListName('')
   }
@@ -805,45 +943,6 @@ export default function NetworkPage({
     }
   }
 
-  const handleStartCreateList = () => {
-    setIsCreatingList(true)
-    setCreateListName('')
-    setCreateListDescription('')
-    setCreateListFilters({})
-  }
-
-  const handleCancelCreateList = () => {
-    setIsCreatingList(false)
-    setCreateListName('')
-    setCreateListDescription('')
-    setCreateListFilters({})
-  }
-
-  const handleSaveCreateList = async () => {
-    if (!createListName.trim()) return
-    setSavingCreateList(true)
-    try {
-      await contactListsApi.create(organizationId, {
-        name: createListName.trim(),
-        description: createListDescription.trim() || undefined,
-        list_type: 'smart',
-        filters: createListFilters,
-      })
-      setIsCreatingList(false)
-      setCreateListName('')
-      setCreateListDescription('')
-      setCreateListFilters({})
-      onTabChange?.('lists')
-    } catch (err: unknown) {
-      notify.error({
-        key: 'network.createListFailed',
-        fallback: getApiErrorMessage(err),
-      })
-    } finally {
-      setSavingCreateList(false)
-    }
-  }
-
   // Get displayed contacts (with client-side filters applied)
   const displayedContacts = applyClientSideFilters(contacts)
 
@@ -923,9 +1022,8 @@ export default function NetworkPage({
           <CSVUploadModal
             open={showCSVUploadModal}
             onClose={() => setShowCSVUploadModal(false)}
-            onSuccess={() => {
-              fetchContacts()
-            }}
+            organizationId={organizationId}
+            onSuccess={handleImportSuccess}
           />
         )}
       </>
@@ -939,11 +1037,9 @@ export default function NetworkPage({
       {/* Contacts Tab */}
       {activeTab === 'contacts' && (
         <>
-          {/* Search & Filter Bar with Action Buttons */}
+          {/* Search & filter bar */}
           <div className="space-y-2">
-            {/* Search Row with Action Buttons */}
             <div className="flex items-center gap-2">
-              {/* Search Input */}
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/65 dark:text-foreground/40" />
                 <input
@@ -956,7 +1052,6 @@ export default function NetworkPage({
                 />
               </div>
 
-              {/* Actions dropdown */}
               <div className="relative" ref={actionsMenuRef}>
                 <button
                   onClick={() => setActionsMenuOpen((prev) => !prev)}
@@ -982,16 +1077,6 @@ export default function NetworkPage({
                     </button>
                     <button
                       onClick={() => {
-                        handleStartCreateList()
-                        setActionsMenuOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
-                    >
-                      <Filter className="w-3.5 h-3.5" />
-                      Create List
-                    </button>
-                    <button
-                      onClick={() => {
                         setShowCSVUploadModal(true)
                         setActionsMenuOpen(false)
                       }}
@@ -1000,69 +1085,34 @@ export default function NetworkPage({
                       <Upload className="w-3.5 h-3.5" />
                       Import CSV
                     </button>
+                    <button
+                      onClick={() => {
+                        setShowBulkEditModal(true)
+                        setActionsMenuOpen(false)
+                      }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
+                    >
+                      <Users className="w-3.5 h-3.5" />
+                      {BULK_EDIT_LABEL}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowExportModal(true)
+                        setActionsMenuOpen(false)
+                      }}
+                      disabled={displayedContacts.length === 0}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      Export
+                    </button>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Filter toggle + Export */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  hasActiveFilters
-                    ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
-                    : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border hover:bg-accent/60 dark:hover:bg-card/70 dark:border-white/10'
-                }`}
-              >
-                <Filter className="w-3.5 h-3.5" />
-                Filters
-                {hasActiveFilters && (
-                  <span className="flex items-center justify-center w-4 h-4 bg-primary/50 text-primary-foreground text-[10px] font-bold rounded-full">
-                    {
-                      [
-                        categoryFilters.length > 0,
-                        locationFilters.length > 0,
-                        tagFilters.length > 0,
-                        updatedAtRange !== 'all',
-                        eventFilter !== 'all',
-                        eventStatusFilter !== 'all',
-                      ].filter(Boolean).length
-                    }
-                  </span>
-                )}
-                {showFilters ? (
-                  <ChevronUp className="w-3 h-3" />
-                ) : (
-                  <ChevronDown className="w-3 h-3" />
-                )}
-              </button>
-
-              {hasActiveFilters && (
-                <button
-                  onClick={clearAllFilters}
-                  className="flex items-center gap-1 px-2 py-1.5 text-xs text-foreground/75 dark:text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                  Clear all
-                </button>
-              )}
-
-              <div className="ml-auto">
-                <button
-                  onClick={() => setShowExportModal(true)}
-                  disabled={displayedContacts.length === 0}
-                  className="flex items-center gap-1.5 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs font-medium text-foreground transition-all hover:bg-accent/60 whitespace-nowrap dark:bg-card/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  <span>Export ({displayedContacts.length})</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Collapsible Filter Bar */}
-            {showFilters && (
-              <div className="flex items-center gap-2 flex-wrap pt-1">
+            {/* Unified filter bar */}
+            <div className="flex items-center gap-2 flex-wrap">
                 {/* 1. Category */}
                 {(() => {
                   const field = filterFieldConfigs.find((f) => f.key === 'category')
@@ -1150,7 +1200,30 @@ export default function NetworkPage({
                   )
                 })()}
 
-                {/* 4. Updated */}
+                {filterOptions.tags.length === 0 && (
+                  <p className="text-[10px] text-foreground/50 w-full">{TAGS_EMPTY_HINT}</p>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                  className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                    hasAdvancedFilters
+                      ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
+                      : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border hover:bg-accent/60 dark:border-white/10'
+                  }`}
+                >
+                  More filters
+                  {showAdvancedFilters ? (
+                    <ChevronUp className="w-3 h-3" />
+                  ) : (
+                    <ChevronDown className="w-3 h-3" />
+                  )}
+                </button>
+
+                {showAdvancedFilters && (
+                  <>
+                {/* Updated */}
                 <select
                   value={updatedAtRange}
                   onChange={(e) => setUpdatedAtRange(e.target.value as typeof updatedAtRange)}
@@ -1167,7 +1240,7 @@ export default function NetworkPage({
                   <option value="30d">Last 30 days</option>
                 </select>
 
-                {/* 5. Shows Attended */}
+                {/* Shows Attended */}
                 <select
                   value={eventFilter}
                   onChange={(e) => {
@@ -1190,7 +1263,7 @@ export default function NetworkPage({
                   ))}
                 </select>
 
-                {/* 6. App Status (contextual — shows when a specific show is selected) */}
+                {/* App Status (contextual — shows when a specific show is selected) */}
                 {eventFilter !== 'all' && eventFilter !== 'none' && (
                   <select
                     value={eventStatusFilter}
@@ -1210,9 +1283,126 @@ export default function NetworkPage({
                     <option value="cancelled">Cancelled</option>
                   </select>
                 )}
+                  </>
+                )}
+
+              <div className="ml-auto flex items-center gap-2 flex-wrap">
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearAllFilters}
+                    className="flex items-center gap-1 px-2 py-1.5 text-xs text-foreground/75 dark:text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                    Clear all
+                  </button>
+                )}
+
+                {hasListableFilters &&
+                  (!showSaveInput ? (
+                    <button
+                      onClick={() => setShowSaveInput(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg transition-colors"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      {SAVE_AS_LIST_LABEL}
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={listName}
+                        onChange={(e) => setListName(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSaveList()}
+                        placeholder="List name..."
+                        className="w-40 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary dark:bg-background/10"
+                        autoFocus
+                      />
+                      <button
+                        onClick={handleSaveList}
+                        disabled={savingList || !listName.trim()}
+                        className="flex items-center gap-1 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg disabled:opacity-50 transition-colors"
+                      >
+                        <Save className="w-3 h-3" />
+                        {savingList ? 'Saving...' : 'Save'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowSaveInput(false)
+                          setListName('')
+                        }}
+                        className="p-1.5 text-foreground/65 dark:text-foreground/40 hover:text-foreground transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
               </div>
-            )}
+            </div>
           </div>
+
+          {/* Post-import banner */}
+          {importSession && (
+            <div className="px-3 py-3 bg-primary/10 border border-primary/30 rounded-lg space-y-2">
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  You imported {importSession.created + importSession.updated} contacts
+                </p>
+                <p className="text-xs text-foreground/70 mt-1">{IMPORT_WHERE_DID_THEY_GO}</p>
+                {importSession.listsCreated.length > 0 && (
+                  <p className="text-xs text-foreground/60 mt-1">
+                    Lists created: {importSession.listsCreated.join(', ')}
+                  </p>
+                )}
+              </div>
+
+              {importSession.tags.length > 0 && (
+                <div>
+                  <p className="text-[11px] font-medium text-foreground/60 mb-1">
+                    {IMPORT_TAG_COUNTS_LABEL}
+                  </p>
+                  <p className="text-xs text-foreground/80">
+                    {importSession.tags
+                      .map((tag) => `${tag}: ${importSession.tagCounts?.[tag] ?? 0}`)
+                      .join(' · ')}
+                  </p>
+                  <p className="text-[10px] text-foreground/50 mt-1">{IMPORT_TAG_COUNTS_FOOTNOTE}</p>
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={viewImportUpload}
+                  className="flex items-center gap-1.5 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg transition-colors"
+                >
+                  {IMPORT_BATCH_VIEW_LABEL}
+                </button>
+                <button
+                  type="button"
+                  onClick={dismissImportSession}
+                  className="text-xs text-foreground/60 hover:text-foreground ml-auto"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Import batch view banner */}
+          {viewingImportBatch && importSession && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-primary/15 border border-primary/30 rounded-lg">
+              <Upload className="w-4 h-4 text-primary flex-shrink-0" />
+              <span className="text-sm text-foreground/80">Viewing this import</span>
+              <button
+                type="button"
+                onClick={clearImportBatchView}
+                className="ml-auto flex items-center gap-1 text-xs text-foreground/60 hover:text-foreground transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+                Clear
+              </button>
+            </div>
+          )}
 
           {/* Manual List Banner */}
           {viewingManualList && (
@@ -1232,50 +1422,6 @@ export default function NetworkPage({
                 <X className="w-3.5 h-3.5" />
                 Clear
               </button>
-            </div>
-          )}
-
-          {/* Save as List (when filters active) */}
-          {hasActiveFilters && (
-            <div className="flex items-center gap-2">
-              {!showSaveInput ? (
-                <button
-                  onClick={() => setShowSaveInput(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-violet-950 hover:text-violet-900 dark:text-primary dark:hover:text-primary/70 text-xs font-medium rounded-lg transition-colors border border-primary/40 dark:border-primary/30"
-                >
-                  <Save className="w-3.5 h-3.5" />
-                  Save as List
-                </button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={listName}
-                    onChange={(e) => setListName(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSaveList()}
-                    placeholder="List name..."
-                    className="w-40 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary dark:bg-background/10"
-                    autoFocus
-                  />
-                  <button
-                    onClick={handleSaveList}
-                    disabled={savingList || !listName.trim()}
-                    className="flex items-center gap-1 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg disabled:opacity-50 transition-colors"
-                  >
-                    <Save className="w-3 h-3" />
-                    {savingList ? 'Saving...' : 'Save'}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowSaveInput(false)
-                      setListName('')
-                    }}
-                    className="p-1.5 text-foreground/65 dark:text-foreground/40 hover:text-foreground transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
             </div>
           )}
 
@@ -1302,17 +1448,6 @@ export default function NetworkPage({
                 </button>
               </div>
             )}
-
-          {/* Bulk Action Toolbar */}
-          <BulkActionToolbar
-            selectedCount={selectedContacts.length}
-            categories={categories}
-            onCategoryUpdate={handleBulkCategoryUpdate}
-            onLocationUpdate={handleBulkLocationUpdate}
-            onDelete={handleBulkDelete}
-            onClear={() => setSelectedContacts([])}
-            loading={bulkUpdateLoading}
-          />
 
           {/* Contacts Table */}
           {displayedContacts.length > 0 && (
@@ -1356,9 +1491,8 @@ export default function NetworkPage({
             <CSVUploadModal
               open={showCSVUploadModal}
               onClose={() => setShowCSVUploadModal(false)}
-              onSuccess={() => {
-                fetchContacts()
-              }}
+              organizationId={organizationId}
+              onSuccess={handleImportSuccess}
             />
           )}
           <ContactExportModal
@@ -1367,6 +1501,18 @@ export default function NetworkPage({
             contactCount={displayedContacts.length}
             organizationSlug={organizationSlug}
             fetchAllContacts={fetchAllFilteredContacts}
+          />
+          <BulkEditModal
+            open={showBulkEditModal}
+            onClose={() => setShowBulkEditModal(false)}
+            selectedCount={selectedContacts.length}
+            categories={categories}
+            lists={savedLists}
+            onAddCategory={handleBulkCategoryUpdate}
+            onAddToList={handleBulkAddToList}
+            onDelete={handleBulkDelete}
+            onClearSelection={() => setSelectedContacts([])}
+            loading={bulkUpdateLoading}
           />
         </>
       )}
@@ -1726,94 +1872,6 @@ export default function NetworkPage({
         </div>
       )}
 
-      {/* Create Smart List Modal */}
-      {isCreatingList && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
-            {/* Modal Header */}
-            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-primary/20 px-6 py-3 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-foreground">Create Smart List</h2>
-              <button
-                onClick={handleCancelCreateList}
-                className="text-foreground/60 hover:text-foreground transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 space-y-5">
-              {/* List Name */}
-              <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">
-                  List Name
-                </label>
-                <input
-                  type="text"
-                  value={createListName}
-                  onChange={(e) => setCreateListName(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  placeholder="List name"
-                  autoFocus
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">
-                  Description (optional)
-                </label>
-                <textarea
-                  value={createListDescription}
-                  onChange={(e) => setCreateListDescription(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all"
-                  rows={2}
-                  placeholder="Description (optional)"
-                />
-              </div>
-
-              {/* Filters */}
-              <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">
-                  Filters
-                </label>
-                <SmartListBuilder
-                  organizationId={organizationId}
-                  filters={createListFilters}
-                  onFiltersChange={setCreateListFilters}
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={handleCancelCreateList}
-                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-border text-foreground/90 hover:bg-background/5 transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSaveCreateList}
-                  disabled={savingCreateList || !createListName.trim()}
-                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-primary/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
-                >
-                  {savingCreateList ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      Create List
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

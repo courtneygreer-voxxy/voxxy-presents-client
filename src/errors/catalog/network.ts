@@ -20,4 +20,15 @@ export const networkCatalog = {
   'network.deleteCategoryFailed': 'Failed to delete category.',
   'network.saveListFailed': 'Failed to save list.',
   'network.createListFailed': 'Failed to create list.',
+  'network.bulkAddToListSuccess': (p: MessageParams) => {
+    const count = Number(p.count ?? 0)
+    return `Added ${count} contact${count === 1 ? '' : 's'} to "${p.listName}"`
+  },
+  'network.bulkApplyListSuccess': (p: MessageParams) => {
+    const count = Number(p.count ?? 0)
+    return `Applied ${p.applied} from "${p.listName}" to ${count} contact${count === 1 ? '' : 's'}`
+  },
+  'network.bulkApplyListNoFilters': (p: MessageParams) =>
+    `"${p.listName}" has no filters to apply. Edit the list on the Lists tab first.`,
+  'network.bulkAddToListFailed': 'Failed to add contacts to list.',
 } as const satisfies Record<string, string | ((params: MessageParams) => string)>
