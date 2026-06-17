@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 import { analytics } from '@/lib/analytics'
 
-const trackFooterLink = (label: string) => analytics.track('footer_link_clicked', { link_label: label, page: 'landing' })
+const trackFooterLink = (label: string) =>
+  analytics.track('footer_link_clicked', { link_label: label, page: 'landing' })
 
 export default function Footer() {
   return (
@@ -15,8 +16,8 @@ export default function Footer() {
               VOXXY
             </span>
             <p className="leading-relaxed text-white/80">
-              Event infrastructure for recurring event producers. Focus on creating experiences,
-              we'll handle the vendor coordination.
+              Built for the people who bring people together. CRM, communications, and community
+              tools for art market and event producers.
             </p>
           </div>
 
@@ -30,19 +31,22 @@ export default function Footer() {
                   <Link
                     to="/features"
                     className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light"
+                    onClick={() => trackFooterLink('Features')}
                   >
-                    For Artists
+                    Features
                   </Link>
                 </li>
                 <li>
-                  <a
-                    href="https://apps.apple.com/us/app/voxxy/id6746337878"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    to="/artists"
                     className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light"
+                    onClick={() => {
+                      analytics.track('artists_page_link_clicked', { page: 'landing' })
+                      trackFooterLink('For Artists')
+                    }}
                   >
-                    Voxxy Mobile
-                  </a>
+                    For Artists
+                  </Link>
                 </li>
                 {/* Voxxy Mobile link hidden until re-enabled */}
               </ul>
@@ -56,6 +60,7 @@ export default function Footer() {
                   <Link
                     to="/about"
                     className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light"
+                    onClick={() => trackFooterLink('About Us')}
                   >
                     About Us
                   </Link>
@@ -64,6 +69,7 @@ export default function Footer() {
                   <Link
                     to="/help"
                     className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light"
+                    onClick={() => trackFooterLink('Help Center')}
                   >
                     Help Center
                   </Link>
@@ -72,6 +78,7 @@ export default function Footer() {
                   <Link
                     to="/contact"
                     className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light"
+                    onClick={() => trackFooterLink('Contact')}
                   >
                     Contact
                   </Link>
@@ -87,6 +94,7 @@ export default function Footer() {
                   <Link
                     to="/legal/terms"
                     className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light"
+                    onClick={() => trackFooterLink('Terms')}
                   >
                     Terms
                   </Link>
@@ -95,6 +103,7 @@ export default function Footer() {
                   <Link
                     to="/legal/privacy"
                     className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light"
+                    onClick={() => trackFooterLink('Privacy')}
                   >
                     Privacy
                   </Link>
@@ -103,6 +112,7 @@ export default function Footer() {
                   <Link
                     to="/legal/acceptable-use"
                     className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light"
+                    onClick={() => trackFooterLink('Acceptable Use')}
                   >
                     Acceptable Use
                   </Link>
@@ -111,6 +121,7 @@ export default function Footer() {
                   <Link
                     to="/legal/cookies"
                     className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light"
+                    onClick={() => trackFooterLink('Cookies')}
                   >
                     Cookies
                   </Link>

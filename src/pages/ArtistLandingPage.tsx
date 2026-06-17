@@ -13,7 +13,8 @@ export default function ArtistLandingPage() {
   // --- Per-route meta / OG ---
   useEffect(() => {
     const prevTitle = document.title
-    const prevDescription = document.querySelector<HTMLMetaElement>('meta[name="description"]')?.content ?? ''
+    const prevDescription =
+      document.querySelector<HTMLMetaElement>('meta[name="description"]')?.content ?? ''
     const prevRobots = document.querySelector<HTMLMetaElement>('meta[name="robots"]')?.content ?? ''
 
     const setMeta = (name: string, content: string) => {
@@ -37,10 +38,16 @@ export default function ArtistLandingPage() {
     }
 
     document.title = 'Finally. Get Discovered. | Voxxy Artist Network'
-    setMeta('description', "There are curators and markets looking for artists exactly like you. They just can't find you yet. Join the Voxxy Artist Network.")
+    setMeta(
+      'description',
+      "There are curators and markets looking for artists exactly like you. They just can't find you yet. Join the Voxxy Artist Network.",
+    )
     setMeta('robots', 'index, follow')
     setOg('og:title', 'Finally. Get Discovered. | Voxxy Artist Network')
-    setOg('og:description', "There are curators and markets looking for artists exactly like you. They just can't find you yet. Join the Voxxy Artist Network.")
+    setOg(
+      'og:description',
+      "There are curators and markets looking for artists exactly like you. They just can't find you yet. Join the Voxxy Artist Network.",
+    )
     setOg('og:image', 'https://www.voxxypresents.com/artists/hero.jpg')
 
     return () => {
@@ -73,10 +80,8 @@ export default function ArtistLandingPage() {
       <main className="flex flex-1 items-center justify-center px-6 pt-24 pb-8 md:px-12 md:pt-28">
         <div className="container mx-auto max-w-[1200px]">
           <div className="grid items-stretch gap-12 md:grid-cols-2 md:gap-16">
-
             {/* ── LEFT: Demo visual ── */}
             <div className="flex items-center justify-center">
-
               {/* Mobile app screenshot — fills column to match right side height */}
               <div className="relative w-full">
                 <img
@@ -90,7 +95,6 @@ export default function ArtistLandingPage() {
 
             {/* ── RIGHT: Copy + CTA ── */}
             <div className="flex flex-col items-start">
-
               {/* Label */}
               <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">
                 Art Call
@@ -106,8 +110,8 @@ export default function ArtistLandingPage() {
 
               {/* Subhead */}
               <p className="mb-8 max-w-[460px] text-[17px] leading-relaxed text-white/68">
-                Curators and markets are actively searching for artists exactly like you.
-                The gap isn't your work, it's that they can't find you yet.
+                Curators and markets are actively searching for artists exactly like you. The gap
+                isn't your work, it's that they can't find you yet.
               </p>
 
               {/* Outcome lines — stacked, no bullets, no pipes */}
@@ -136,10 +140,13 @@ export default function ArtistLandingPage() {
               {/* TCPA consent disclosure */}
               <p className="mb-7 max-w-[420px] text-[10px] leading-relaxed text-white/30">
                 By texting ARTIST, you agree to receive recurring automated marketing and
-                informational texts from Voxxy at the number provided. Consent is not a
-                condition of purchase. Msg &amp; data rates may apply. Msg frequency varies.
-                Reply STOP to cancel, HELP for help. See our{' '}
-                <Link to="/legal/privacy" className="underline transition-colors hover:text-white/55">
+                informational texts from Voxxy at the number provided. Consent is not a condition of
+                purchase. Msg &amp; data rates may apply. Msg frequency varies. Reply STOP to
+                cancel, HELP for help. See our{' '}
+                <Link
+                  to="/legal/privacy"
+                  className="underline transition-colors hover:text-white/55"
+                >
                   Privacy Policy
                 </Link>{' '}
                 and{' '}
@@ -147,7 +154,10 @@ export default function ArtistLandingPage() {
                   Terms
                 </Link>{' '}
                 and our{' '}
-                <Link to="/about#ai-pledge" className="underline transition-colors hover:text-white/55">
+                <Link
+                  to="/about#ai-pledge"
+                  className="underline transition-colors hover:text-white/55"
+                >
                   AI Pledge
                 </Link>
                 .
@@ -174,7 +184,6 @@ export default function ArtistLandingPage() {
           </div>
         </div>
       </main>
-
 
       <Footer />
     </div>

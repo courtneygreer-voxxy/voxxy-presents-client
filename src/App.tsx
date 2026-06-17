@@ -236,6 +236,7 @@ export default function App() {
               PUBLIC ROUTES
               ========================================== */}
             <Route path="/" element={<HomePage />} />
+            <Route path="/artists" element={<ArtistLandingPage />} />
             <Route path="/features" element={<FeaturesPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/help" element={<HelpPage />} />

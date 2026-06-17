@@ -355,7 +355,12 @@ export function UnifiedSignUpForm({
     <div className="w-full">
       <Tabs
         value={activeTab}
-        onValueChange={(value) => setActiveTab(value as UserType)}
+        onValueChange={(value) => {
+          setActiveTab(value as UserType)
+          if (value === 'vendor') {
+            analytics.track('artist_tab_clicked', { page: 'signup' })
+          }
+        }}
         className="w-full"
       >
         <TabsList className="grid w-full grid-cols-2 mb-6 bg-background/10 backdrop-blur-sm">
@@ -384,7 +389,8 @@ export function UnifiedSignUpForm({
             <Palette className="h-12 w-12 text-primary opacity-80" />
             <h3 className="text-xl font-semibold text-foreground">Artist accounts coming soon</h3>
             <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">
-              We're building something for independent artists. In the meantime, join the Voxxy Artist Network via SMS and be first to know when it launches.
+              We're building something for independent artists. In the meantime, join the Voxxy
+              Artist Network via SMS and be first to know when it launches.
             </p>
             <Link
               to="/artists"
