@@ -2,11 +2,15 @@ import type { MessageParams } from './index'
 
 export const networkCatalog = {
   'network.deleteContactFailed': 'Failed to delete contact.',
-  'network.bulkDeleteSuccess': (p: MessageParams) =>
-    `Successfully deleted ${p.count} contacts`,
+  'network.bulkDeleteSuccess': (p: MessageParams) => {
+    const count = Number(p.count ?? 0)
+    return `Successfully deleted ${count} contact${count === 1 ? '' : 's'}`
+  },
   'network.bulkDeleteFailed': 'Failed to delete contacts.',
-  'network.bulkUpdateSuccess': (p: MessageParams) =>
-    `Successfully updated ${p.count} contacts`,
+  'network.bulkUpdateSuccess': (p: MessageParams) => {
+    const count = Number(p.count ?? 0)
+    return `Successfully updated ${count} contact${count === 1 ? '' : 's'}`
+  },
   'network.bulkUpdateFailed': 'Failed to update contacts.',
   'network.bulkLocationUpdateFailed': 'Failed to update location.',
   'network.categoryNameRequired': 'Category name is required.',

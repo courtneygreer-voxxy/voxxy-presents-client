@@ -13,11 +13,11 @@ export interface NotifyOptions {
 }
 
 function resolveMessage(options: NotifyOptions): string {
-  if (options.fallback) {
-    return options.fallback
-  }
   if (options.key) {
     return getMessage(options.key, options.params ?? {})
+  }
+  if (options.fallback) {
+    return options.fallback
   }
   return getMessage('global.unexpected')
 }
