@@ -697,11 +697,15 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
+      // Guard every field: business_name (and others) can be null now that
+      // business name was removed from the application form. Calling
+      // .toLowerCase() on a null field throws during render and trips the
+      // ErrorBoundary (see Sentry REACT-FRONT-END-8).
       const matches =
-        applicant.business_name.toLowerCase().includes(query) ||
+        applicant.business_name?.toLowerCase().includes(query) ||
         applicant.contact_name?.toLowerCase().includes(query) ||
-        applicant.email.toLowerCase().includes(query) ||
-        applicant.vendor_category.toLowerCase().includes(query)
+        applicant.email?.toLowerCase().includes(query) ||
+        applicant.vendor_category?.toLowerCase().includes(query)
       if (!matches) return false
     }
 
