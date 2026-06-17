@@ -670,10 +670,11 @@ export default function NetworkPage({
         }
 
         if (filterTags.length > 0) {
-          await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
-            tags: filterTags,
-            tag_mode: 'append',
-          })
+          await Promise.all(
+            selectedContacts.map((contactId) =>
+              Promise.all(filterTags.map((tag) => vendorContactsApi.addTag(contactId, tag)))
+            )
+          )
         }
 
         if (filterLocations.length === 1) {

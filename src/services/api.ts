@@ -2903,7 +2903,6 @@ export const vendorContactsApi = {
       featured?: boolean
       location?: string
       category_mode?: 'replace' | 'append'
-      tag_mode?: 'replace' | 'append'
     },
   ): Promise<{ message: string; updated_count: number; total_selected: number }> {
     return fetchApi<{ message: string; updated_count: number; total_selected: number }>(
