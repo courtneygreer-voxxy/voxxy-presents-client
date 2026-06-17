@@ -37,6 +37,8 @@ import SmartListBuilder from './Lists/SmartListBuilder'
 import { BulkActionToolbar } from './BulkActionToolbar'
 import ContactExportModal from './ContactExportModal'
 import type { ActiveFilter, FilterFieldConfig } from '@/components/shared/SearchFilterBar'
+import { notify } from '@/errors/notify'
+import { getApiErrorMessage } from '@/errors/getApiErrorMessage'
 
 type NetworkTab = 'contacts' | 'lists' | 'categories'
 
@@ -464,8 +466,11 @@ export default function NetworkPage({
       await vendorContactsApi.delete(contactId)
       setContacts((prev) => prev.filter((c) => c.id !== contactId))
       setSelectedContacts((prev) => prev.filter((id) => id !== contactId))
-    } catch (err: any) {
-      alert(err.message || 'Failed to delete contact')
+    } catch (err: unknown) {
+      notify.error({
+        key: 'network.deleteContactFailed',
+        fallback: getApiErrorMessage(err),
+      })
     }
   }
 
@@ -481,7 +486,11 @@ export default function NetworkPage({
     try {
       setBulkUpdateLoading(true)
       const result = await vendorContactsApi.bulkDelete(organizationId, selectedContacts)
-      alert(result.message || `Successfully deleted ${result.deleted_count} contacts`)
+      notify.success({
+        key: 'network.bulkDeleteSuccess',
+        params: { count: result.deleted_count },
+        fallback: result.message,
+      })
       await fetchContacts(currentPage)
       try {
         const options = await vendorContactsApi.getFilterOptions(organizationId)
@@ -494,8 +503,11 @@ export default function NetworkPage({
         /* ignore */
       }
       setSelectedContacts([])
-    } catch (error: any) {
-      alert(`Failed to delete contacts: ${error.message || 'Unknown error'}`)
+    } catch (error: unknown) {
+      notify.error({
+        key: 'network.bulkDeleteFailed',
+        fallback: getApiErrorMessage(error),
+      })
     } finally {
       setBulkUpdateLoading(false)
     }
@@ -522,11 +534,18 @@ export default function NetworkPage({
         categories: categoryNames,
         category_mode: categoryMode,
       })
-      alert(result.message || `Successfully updated ${result.updated_count} contacts`)
+      notify.success({
+        key: 'network.bulkUpdateSuccess',
+        params: { count: result.updated_count },
+        fallback: result.message,
+      })
       await fetchContacts(currentPage)
       setSelectedContacts([])
-    } catch (error: any) {
-      alert(`Failed to update contacts: ${error.message || 'Unknown error'}`)
+    } catch (error: unknown) {
+      notify.error({
+        key: 'network.bulkUpdateFailed',
+        fallback: getApiErrorMessage(error),
+      })
     } finally {
       setBulkUpdateLoading(false)
     }
@@ -540,11 +559,18 @@ export default function NetworkPage({
       const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
         location,
       })
-      alert(result.message || `Successfully updated ${result.updated_count} contacts`)
+      notify.success({
+        key: 'network.bulkUpdateSuccess',
+        params: { count: result.updated_count },
+        fallback: result.message,
+      })
       await fetchContacts(currentPage)
       setSelectedContacts([])
-    } catch (error: any) {
-      alert(`Failed to update location: ${error.message || 'Unknown error'}`)
+    } catch (error: unknown) {
+      notify.error({
+        key: 'network.bulkLocationUpdateFailed',
+        fallback: getApiErrorMessage(error),
+      })
     } finally {
       setBulkUpdateLoading(false)
     }
@@ -692,7 +718,7 @@ export default function NetworkPage({
 
   const handleSaveCategory = async () => {
     if (!categoryFormData.name.trim()) {
-      alert('Category name is required')
+      notify.error({ key: 'network.categoryNameRequired' })
       return
     }
     const payload = {
@@ -712,10 +738,11 @@ export default function NetworkPage({
       setEditingCategory(null)
       setCategoryFormData({ ...emptyCategory })
       setPaymentPreferences([])
-    } catch (error: any) {
-      alert(
-        `Failed to save category: ${error.response?.data?.error || error.message || 'Please try again.'}`,
-      )
+    } catch (error: unknown) {
+      notify.error({
+        key: 'network.saveCategoryFailed',
+        fallback: getApiErrorMessage(error),
+      })
     }
   }
 
@@ -729,19 +756,21 @@ export default function NetworkPage({
         usageDetails.push(`${stats.email_templates_count} email template(s)`)
       if (stats?.scheduled_emails_count)
         usageDetails.push(`${stats.scheduled_emails_count} scheduled email(s)`)
-      alert(
-        `Cannot delete this category. It is currently being used by:\n\n${usageDetails.join('\n')}\n\nPlease remove these associations first.`,
-      )
+      notify.warning({
+        key: 'network.deleteCategoryBlocked',
+        params: { usageDetails: usageDetails.join('\n') },
+      })
       return
     }
     if (!confirm(`Are you sure you want to delete the category "${category.name}"?`)) return
     try {
       await categoriesApi.delete(category.id)
       await loadCategories()
-    } catch (error: any) {
-      alert(
-        `Failed to delete category: ${error.response?.data?.error || error.message || 'Please try again.'}`,
-      )
+    } catch (error: unknown) {
+      notify.error({
+        key: 'network.deleteCategoryFailed',
+        fallback: getApiErrorMessage(error),
+      })
     }
   }
 
@@ -766,8 +795,11 @@ export default function NetworkPage({
       setListName('')
       setShowSaveInput(false)
       onTabChange?.('lists')
-    } catch (err: any) {
-      alert(err.message || 'Failed to save list')
+    } catch (err: unknown) {
+      notify.error({
+        key: 'network.saveListFailed',
+        fallback: getApiErrorMessage(err),
+      })
     } finally {
       setSavingList(false)
     }
@@ -802,8 +834,11 @@ export default function NetworkPage({
       setCreateListDescription('')
       setCreateListFilters({})
       onTabChange?.('lists')
-    } catch (err: any) {
-      alert(err.message || 'Failed to create list')
+    } catch (err: unknown) {
+      notify.error({
+        key: 'network.createListFailed',
+        fallback: getApiErrorMessage(err),
+      })
     } finally {
       setSavingCreateList(false)
     }

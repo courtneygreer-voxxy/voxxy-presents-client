@@ -3670,3 +3670,4 @@ export const emailTestsApi = {
 }
 
 export { ApiError }
+export { getApiErrorMessage } from '@/errors/getApiErrorMessage'

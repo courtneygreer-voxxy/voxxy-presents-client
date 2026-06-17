@@ -989,3 +989,56 @@
 .email-preview-content li {
   color: hsl(var(--foreground) / 0.9);
 }
+
+/* Sonner — align toast colors with Voxxy theme tokens (Toaster in App.tsx) */
+[data-sonner-toaster][data-sonner-theme='light'] {
+  --normal-bg: hsl(var(--card));
+  --normal-border: hsl(var(--border));
+  --normal-text: hsl(var(--card-foreground));
+  --normal-bg-hover: hsl(var(--muted));
+  --normal-border-hover: hsl(var(--border));
+
+  --success-bg: hsl(var(--primary) / 0.12);
+  --success-border: hsl(var(--primary) / 0.35);
+  --success-text: hsl(var(--primary));
+
+  --info-bg: hsl(var(--chart-2) / 0.12);
+  --info-border: hsl(var(--chart-2) / 0.35);
+  --info-text: hsl(var(--chart-2));
+
+  --warning-bg: hsl(var(--chart-3) / 0.14);
+  --warning-border: hsl(var(--chart-3) / 0.4);
+  --warning-text: hsl(31 92% 38%);
+
+  --error-bg: hsl(var(--destructive) / 0.12);
+  --error-border: hsl(var(--destructive) / 0.4);
+  --error-text: hsl(var(--destructive));
+}
+
+[data-sonner-toaster][data-sonner-theme='dark'] {
+  --normal-bg: hsl(var(--card));
+  --normal-border: hsl(var(--border));
+  --normal-text: hsl(var(--card-foreground));
+  --normal-bg-hover: hsl(var(--muted));
+  --normal-border-hover: hsl(var(--border));
+
+  --success-bg: hsl(var(--primary) / 0.2);
+  --success-border: hsl(var(--primary) / 0.45);
+  --success-text: hsl(var(--primary));
+
+  --info-bg: hsl(var(--chart-2) / 0.2);
+  --info-border: hsl(var(--chart-2) / 0.45);
+  --info-text: hsl(var(--chart-2));
+
+  --warning-bg: hsl(var(--chart-3) / 0.18);
+  --warning-border: hsl(var(--chart-3) / 0.45);
+  --warning-text: hsl(var(--chart-3));
+
+  --error-bg: hsl(var(--destructive) / 0.22);
+  --error-border: hsl(var(--destructive) / 0.55);
+  --error-text: hsl(var(--destructive-foreground));
+}
+
+[data-sonner-toast][data-styled='true'] [data-description] {
+  color: hsl(var(--muted-foreground)) !important;
+}
