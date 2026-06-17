@@ -170,8 +170,7 @@ export default function VendorApplicationForm() {
 
     autoSaveTimerRef.current = setTimeout(() => {
       // Only save if form has been touched (not all defaults)
-      const hasData =
-        formData.first_name || formData.last_name || formData.email || formData.business_name
+      const hasData = formData.first_name || formData.last_name || formData.email
       if (hasData) {
         saveFormData(formId, formData)
         console.log('[AutoSave] Form data saved')
@@ -223,7 +222,6 @@ export default function VendorApplicationForm() {
         email: data.email || prev.email,
         first_name: data.first_name || prev.first_name,
         last_name: data.last_name || prev.last_name,
-        business_name: data.business_name || prev.business_name,
       }))
 
       console.log('Form pre-filled with invitation data')
@@ -639,24 +637,7 @@ export default function VendorApplicationForm() {
                 </div>
               </div>
 
-              <div className="mt-3">
-                <label className="block text-xs font-medium text-foreground mb-1.5">
-                  Business/Brand Name{' '}
-                  <span className="text-muted-foreground text-[10px] ml-1 font-normal">
-                    (optional)
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.business_name}
-                  onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
-                  placeholder="Your business or brand name"
-                  className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
-                />
-              </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-
                 {/* Email */}
                 <div>
                   <label className="block text-xs font-medium text-foreground mb-1.5">
