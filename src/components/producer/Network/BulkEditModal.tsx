@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { X, Tag, MapPin, Hash, Plus, Trash2 } from 'lucide-react'
+import { X, Tag, MapPin, Hash, Trash2 } from 'lucide-react'
 import type { Category } from '@/types/category'
+import TagInput from './TagInput'
 import {
   BULK_EDIT_EMPTY_HINT,
   BULK_EDIT_LABEL,
@@ -37,7 +38,6 @@ export default function BulkEditModal({
 }: BulkEditModalProps) {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
   const [tags, setTags] = useState<string[]>([])
-  const [tagInput, setTagInput] = useState('')
   const [location, setLocation] = useState('')
 
   const handleApplyCategory = () => {
@@ -46,18 +46,6 @@ export default function BulkEditModal({
     if (!category) return
     onApplyCategory([category.name])
     setSelectedCategoryId(null)
-  }
-
-  const handleAddTag = (raw?: string) => {
-    const tag = (raw ?? tagInput).trim().toLowerCase()
-    if (tag && !tags.includes(tag)) {
-      setTags((prev) => [...prev, tag])
-    }
-    setTagInput('')
-  }
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags((prev) => prev.filter((t) => t !== tagToRemove))
   }
 
   const handleApplyTags = () => {
@@ -76,9 +64,6 @@ export default function BulkEditModal({
   if (!open) return null
 
   const hasSelection = selectedCount > 0
-  const tagSuggestions = availableTags
-    .filter((t) => t.toLowerCase().includes(tagInput.toLowerCase()) && !tags.includes(t))
-    .slice(0, 5)
 
   return (
     <div
@@ -149,66 +134,12 @@ export default function BulkEditModal({
                   <Hash className="w-3.5 h-3.5" />
                   Tags
                 </label>
-                <div className="relative">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault()
-                          handleAddTag()
-                        }
-                      }}
-                      placeholder="Add tag..."
-                      disabled={loading}
-                      className="flex-1 px-3 py-2 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                    <button
-                      onClick={() => handleAddTag()}
-                      disabled={!tagInput.trim() || loading}
-                      className="flex items-center gap-1 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-violet-950 dark:text-primary disabled:opacity-50 disabled:cursor-not-allowed text-sm rounded-lg transition-colors border border-primary/30 whitespace-nowrap"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      Add
-                    </button>
-                  </div>
-                  {tagInput.length > 0 && tagSuggestions.length > 0 && (
-                    <div className="absolute left-0 right-16 z-10 mt-1 bg-muted border border-border rounded-lg shadow-xl max-h-32 overflow-y-auto">
-                      {tagSuggestions.map((tag) => (
-                        <button
-                          key={tag}
-                          type="button"
-                          onClick={() => handleAddTag(tag)}
-                          className="w-full text-left px-3 py-2 text-sm text-foreground/80 hover:bg-background/10 transition-colors"
-                        >
-                          #{tag}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                {tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2.5 py-0.5 bg-primary/20 text-violet-950 dark:text-primary rounded-full text-xs flex items-center gap-1.5 border border-primary/30"
-                      >
-                        #{tag}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveTag(tag)}
-                          className="hover:opacity-80"
-                          aria-label={`Remove ${tag}`}
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
+                <TagInput
+                  value={tags}
+                  onChange={setTags}
+                  availableTags={availableTags}
+                  disabled={loading}
+                />
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-[11px] text-foreground/50">{BULK_EDIT_TAGS_HINT}</p>
                   <button
