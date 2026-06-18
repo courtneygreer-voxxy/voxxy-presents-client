@@ -23,6 +23,13 @@ export const SAVE_AS_LIST_LABEL = 'Save as List'
 
 export const NEW_LIST_LABEL = 'New List'
 
+// Filter panel / saved queries (filters create "queries")
+export const SAVE_QUERY_LABEL = 'Save query'
+
+export const SAVED_QUERIES_LABEL = 'Saved queries'
+
+export const SAVED_QUERIES_EMPTY = 'No saved queries yet. Build a filter and save it as a query.'
+
 export const BULK_EDIT_LABEL = 'Edit Selected Contacts'
 
 export const BULK_EDIT_EMPTY_HINT =
