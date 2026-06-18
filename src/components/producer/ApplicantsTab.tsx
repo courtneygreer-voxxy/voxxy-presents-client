@@ -971,128 +971,130 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           )}
 
           {/* Table */}
-          <div className="flex-1 overflow-auto voxxy-table-shell">
-            <table className="w-full text-xs">
-              <thead className="voxxy-table-header">
-                <tr className="voxxy-table-header-row">
-                  <th className="px-3 py-2.5 text-left w-8">
-                    <input
-                      type="checkbox"
-                      checked={allCurrentPageSelected}
-                      onChange={toggleCurrentPage}
-                      className="rounded border-border accent-primary"
-                    />
-                  </th>
-                  <th className="px-3 py-2.5 text-left font-medium">Name</th>
-                  <th className="px-3 py-2.5 text-left font-medium">Business</th>
-                  <th className="px-3 py-2.5 text-left font-medium">Email</th>
-                  <th className="px-3 py-2.5 text-left font-medium">Category</th>
-                  <th className="px-3 py-2.5 text-left font-medium">Status</th>
-                  <th className="px-3 py-2.5 text-left font-medium">Payment</th>
-                  <th className="px-3 py-2.5 text-left font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tablePageApplicants.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="px-3 py-12 text-center text-foreground/50">
-                      {hasActiveFilters ? 'No matches found' : 'No applicants yet'}
-                    </td>
+          <div className="flex-1 overflow-auto">
+            <div className="voxxy-table-shell">
+              <table className="w-full text-xs">
+                <thead className="voxxy-table-header">
+                  <tr className="voxxy-table-header-row">
+                    <th className="px-3 py-2.5 text-left w-8">
+                      <input
+                        type="checkbox"
+                        checked={allCurrentPageSelected}
+                        onChange={toggleCurrentPage}
+                        className="rounded border-border accent-primary"
+                      />
+                    </th>
+                    <th className="px-3 py-2.5 text-left font-medium">Name</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Business</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Email</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Category</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Status</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Payment</th>
+                    <th className="px-3 py-2.5 text-left font-medium">Actions</th>
                   </tr>
-                ) : (
-                  tablePageApplicants.map((applicant) => {
-                    const statusBadge = getStatusBadge(applicant.status)
-                    const paymentBadge = getPaymentBadge(applicant.payment_status)
-                    return (
-                      <tr key={applicant.id} className="voxxy-table-row voxxy-table-row-hover">
-                        <td className="px-3 py-2">
-                          <input
-                            type="checkbox"
-                            checked={selectedApplicantIds.has(applicant.id)}
-                            onChange={() => toggleTableRow(applicant.id)}
-                            className="rounded border-border accent-primary"
-                          />
-                        </td>
-                        <td className="px-3 py-2">
-                          <div className="font-medium text-foreground truncate max-w-[140px]">
-                            {applicant.contact_name || '—'}
-                          </div>
-                        </td>
-                        <td className="px-3 py-2">
-                          <div className="text-foreground/70 truncate max-w-[130px]">
-                            {applicant.business_name || '—'}
-                          </div>
-                        </td>
-                        <td className="px-3 py-2">
-                          <div
-                            className="text-foreground/70 truncate max-w-[140px]"
-                            title={applicant.email}
-                          >
-                            {applicant.email}
-                          </div>
-                        </td>
-                        <td className="px-3 py-2">
-                          {applicant.status !== 'invited' ? (
-                            <Badge
-                              variant="tintPurple"
-                              className="rounded px-1.5 py-0.5 text-[9px] font-medium"
+                </thead>
+                <tbody>
+                  {tablePageApplicants.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="px-3 py-12 text-center text-foreground/50">
+                        {hasActiveFilters ? 'No matches found' : 'No applicants yet'}
+                      </td>
+                    </tr>
+                  ) : (
+                    tablePageApplicants.map((applicant) => {
+                      const statusBadge = getStatusBadge(applicant.status)
+                      const paymentBadge = getPaymentBadge(applicant.payment_status)
+                      return (
+                        <tr key={applicant.id} className="voxxy-table-row voxxy-table-row-hover">
+                          <td className="px-3 py-2">
+                            <input
+                              type="checkbox"
+                              checked={selectedApplicantIds.has(applicant.id)}
+                              onChange={() => toggleTableRow(applicant.id)}
+                              className="rounded border-border accent-primary"
+                            />
+                          </td>
+                          <td className="px-3 py-2">
+                            <div className="font-medium text-foreground truncate max-w-[140px]">
+                              {applicant.contact_name || '—'}
+                            </div>
+                          </td>
+                          <td className="px-3 py-2">
+                            <div className="text-foreground/70 truncate max-w-[130px]">
+                              {applicant.business_name || '—'}
+                            </div>
+                          </td>
+                          <td className="px-3 py-2">
+                            <div
+                              className="text-foreground/70 truncate max-w-[140px]"
+                              title={applicant.email}
                             >
-                              {applicant.vendor_category}
-                            </Badge>
-                          ) : (
-                            <span className="text-foreground/40">—</span>
-                          )}
-                        </td>
-                        <td className="px-3 py-2">
-                          <Badge
-                            variant={statusBadge.variant}
-                            className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-medium"
-                          >
-                            {React.createElement(statusBadge.icon, { className: 'h-2 w-2' })}
-                            {statusBadge.label}
-                          </Badge>
-                        </td>
-                        <td className="px-3 py-2">
-                          {applicant.status !== 'approved' && applicant.status !== 'confirmed' ? (
+                              {applicant.email}
+                            </div>
+                          </td>
+                          <td className="px-3 py-2">
+                            {applicant.status !== 'invited' ? (
+                              <Badge
+                                variant="tintPurple"
+                                className="rounded px-1.5 py-0.5 text-[9px] font-medium"
+                              >
+                                {applicant.vendor_category}
+                              </Badge>
+                            ) : (
+                              <span className="text-foreground/40">—</span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2">
                             <Badge
-                              variant="default"
-                              className="rounded px-1.5 py-0.5 text-[9px] font-medium opacity-50"
+                              variant={statusBadge.variant}
+                              className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-medium"
                             >
-                              N/A
+                              {React.createElement(statusBadge.icon, { className: 'h-2 w-2' })}
+                              {statusBadge.label}
                             </Badge>
-                          ) : paymentBadge ? (
-                            <Badge
-                              variant={paymentBadge.variant}
-                              className="rounded px-1.5 py-0.5 text-[9px] font-medium"
+                          </td>
+                          <td className="px-3 py-2">
+                            {applicant.status !== 'approved' && applicant.status !== 'confirmed' ? (
+                              <Badge
+                                variant="default"
+                                className="rounded px-1.5 py-0.5 text-[9px] font-medium opacity-50"
+                              >
+                                N/A
+                              </Badge>
+                            ) : paymentBadge ? (
+                              <Badge
+                                variant={paymentBadge.variant}
+                                className="rounded px-1.5 py-0.5 text-[9px] font-medium"
+                              >
+                                {paymentBadge.label}
+                              </Badge>
+                            ) : (
+                              <Badge
+                                variant="tintYellow"
+                                className="rounded px-1.5 py-0.5 text-[9px] font-medium"
+                              >
+                                Pending
+                              </Badge>
+                            )}
+                          </td>
+                          <td className="px-3 py-2">
+                            <button
+                              onClick={() => {
+                                setViewMode('focused')
+                                setSelectedApplicant(applicant)
+                              }}
+                              className="text-primary hover:text-primary/70 transition-smooth underline text-[10px]"
                             >
-                              {paymentBadge.label}
-                            </Badge>
-                          ) : (
-                            <Badge
-                              variant="tintYellow"
-                              className="rounded px-1.5 py-0.5 text-[9px] font-medium"
-                            >
-                              Pending
-                            </Badge>
-                          )}
-                        </td>
-                        <td className="px-3 py-2">
-                          <button
-                            onClick={() => {
-                              setViewMode('focused')
-                              setSelectedApplicant(applicant)
-                            }}
-                            className="text-primary hover:text-primary/70 transition-smooth underline text-[10px]"
-                          >
-                            View
-                          </button>
-                        </td>
-                      </tr>
-                    )
-                  })
-                )}
-              </tbody>
-            </table>
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      )
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Table Pagination */}
