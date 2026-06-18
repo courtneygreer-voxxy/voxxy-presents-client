@@ -3,7 +3,8 @@ export const LISTS_ARE_SAVED_FILTERS =
 
 export const CONTACTS_ALWAYS_IN_ALL = 'Contacts are always stored in All Contacts.'
 
-export const TAGS_ARE_LABELS = 'Tags (like "Seattle" or "Oklahoma City") are labels on those contacts.'
+export const TAGS_ARE_LABELS =
+  'Tags (like "Seattle" or "Oklahoma City") are labels on those contacts.'
 
 export const LISTS_FROM_TAGS =
   'Lists are saved filters on tags. You can create or update lists now.'
@@ -25,15 +26,13 @@ export const NEW_LIST_LABEL = 'New List'
 export const BULK_EDIT_LABEL = 'Edit Selected Contacts'
 
 export const BULK_EDIT_EMPTY_HINT =
-  'Select contacts using the checkboxes in the table, then add a category or list here.'
+  'Select contacts using the checkboxes in the table, then update their category, tags, or location here.'
 
-export const BULK_EDIT_NO_LISTS_HINT = 'No lists yet. Create one on the Lists tab.'
+export const BULK_EDIT_TAGS_HINT =
+  'Added tags are appended to each contact; existing tags are kept.'
 
-export const BULK_EDIT_FILTER_LIST_HINT =
-  "This list's tags, categories, and location will be applied to selected contacts."
-
-export const BULK_EDIT_MANUAL_LIST_HINT =
-  'Selected contacts will be added to this list.'
+export const BULK_EDIT_LOCATION_HINT =
+  'Location replaces the existing location on each selected contact.'
 
 export const FILTER_BAR_HINT =
   'Category, location, and tags narrow All Contacts. Save active filters as a list.'

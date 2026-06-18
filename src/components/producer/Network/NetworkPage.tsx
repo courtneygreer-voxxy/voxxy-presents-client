@@ -24,7 +24,6 @@ import {
   categoriesApi,
   eventsApi,
   VendorContact,
-  ContactList,
 } from '@/services/api'
 import type { Category, CategoryFeePreference } from '@/types/category'
 import { PAYMENT_PRICE_TYPES } from '@/components/producer/CreateEventWizard/types'
@@ -257,8 +256,6 @@ export default function NetworkPage({
   // Post-import session + saved lists (for one-click list creation)
   const [importSession, setImportSession] = useState<ImportSession | null>(null)
   const [viewingImportBatch, setViewingImportBatch] = useState(false)
-  const [savedLists, setSavedLists] = useState<ContactList[]>([])
-
   // Derive filter arrays from activeFilters
   const locationFilters = activeFilters.find((f) => f.fieldKey === 'location')?.values || []
   const categoryFilters = activeFilters.find((f) => f.fieldKey === 'category')?.values || []
@@ -312,28 +309,12 @@ export default function NetworkPage({
     }
   }
 
-  const refreshSavedLists = async () => {
-    try {
-      const response = await contactListsApi.getAll(organizationId)
-      setSavedLists(response.contact_lists || [])
-    } catch (err) {
-      console.error('Failed to load saved lists:', err)
-    }
-  }
-
   // Fetch filter options on mount
   useEffect(() => {
     refreshFilterOptions()
-    refreshSavedLists()
     const stored = loadImportSession(organizationId)
     if (stored) setImportSession(stored)
   }, [organizationId])
-
-  useEffect(() => {
-    if (showBulkEditModal) {
-      refreshSavedLists()
-    }
-  }, [showBulkEditModal, organizationId])
 
   const handleImportSuccess = async (session: ImportSession) => {
     saveImportSession(organizationId, session)
@@ -626,86 +607,54 @@ export default function NetworkPage({
     }
   }
 
-  const handleBulkAddToList = async (listId: number) => {
-    if (selectedContacts.length === 0) return
-
-    const list = savedLists.find((l) => l.id === listId)
-    if (!list) return
+  const handleBulkTags = async (tags: string[]) => {
+    if (selectedContacts.length === 0 || tags.length === 0) return
 
     try {
       setBulkUpdateLoading(true)
-
-      if (list.list_type === 'manual') {
-        const existingIds = list.contact_ids || []
-        const mergedIds = [...new Set([...existingIds, ...selectedContacts])]
-        await contactListsApi.update(listId, { contact_ids: mergedIds })
-        await refreshSavedLists()
-        notify.success({
-          key: 'network.bulkAddToListSuccess',
-          params: { count: selectedContacts.length, listName: list.name },
-        })
-      } else {
-        const filters = list.filters || {}
-        const filterTags = filters.tags || []
-        const filterCategories = filters.categories || []
-        const filterLocations = filters.locations || []
-
-        if (
-          filterTags.length === 0 &&
-          filterCategories.length === 0 &&
-          filterLocations.length === 0
-        ) {
-          notify.error({
-            key: 'network.bulkApplyListNoFilters',
-            params: { listName: list.name },
-          })
-          return
-        }
-
-        if (filterCategories.length > 0) {
-          await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
-            categories: filterCategories,
-            category_mode: 'append',
-          })
-        }
-
-        if (filterTags.length > 0) {
-          await Promise.all(
-            selectedContacts.map((contactId) =>
-              Promise.all(filterTags.map((tag) => vendorContactsApi.addTag(contactId, tag)))
-            )
-          )
-        }
-
-        if (filterLocations.length === 1) {
-          await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
-            location: filterLocations[0],
-          })
-        }
-
-        const appliedParts = [
-          filterCategories.length > 0 ? 'categories' : null,
-          filterTags.length > 0 ? 'tags' : null,
-          filterLocations.length === 1 ? 'location' : null,
-        ].filter(Boolean)
-
-        notify.success({
-          key: 'network.bulkApplyListSuccess',
-          params: {
-            applied: appliedParts.join(', '),
-            listName: list.name,
-            count: selectedContacts.length,
-          },
-        })
-
-        await refreshFilterOptions()
-        await fetchContacts(currentPage)
-      }
-
+      // Append tags without clobbering existing ones (bulkUpdate replaces the tag set).
+      await Promise.all(
+        selectedContacts.map((contactId) =>
+          Promise.all(tags.map((tag) => vendorContactsApi.addTag(contactId, tag))),
+        ),
+      )
+      notify.success({
+        key: 'network.bulkUpdateSuccess',
+        params: { count: selectedContacts.length },
+        fallback: `Added ${tags.length} tag${tags.length === 1 ? '' : 's'} to ${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'}.`,
+      })
+      await refreshFilterOptions()
+      await fetchContacts(currentPage)
       setSelectedContacts([])
     } catch (error: unknown) {
       notify.error({
-        key: 'network.bulkAddToListFailed',
+        key: 'network.bulkUpdateFailed',
+        fallback: getApiErrorMessage(error),
+      })
+    } finally {
+      setBulkUpdateLoading(false)
+    }
+  }
+
+  const handleBulkLocation = async (location: string) => {
+    if (selectedContacts.length === 0 || !location.trim()) return
+
+    try {
+      setBulkUpdateLoading(true)
+      const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
+        location: location.trim(),
+      })
+      notify.success({
+        key: 'network.bulkUpdateSuccess',
+        params: { count: result.updated_count },
+        fallback: result.message,
+      })
+      await refreshFilterOptions()
+      await fetchContacts(currentPage)
+      setSelectedContacts([])
+    } catch (error: unknown) {
+      notify.error({
+        key: 'network.bulkUpdateFailed',
         fallback: getApiErrorMessage(error),
       })
     } finally {
@@ -1113,178 +1062,178 @@ export default function NetworkPage({
 
             {/* Unified filter bar */}
             <div className="flex items-center gap-2 flex-wrap">
-                {/* 1. Category */}
-                {(() => {
-                  const field = filterFieldConfigs.find((f) => f.key === 'category')
-                  if (!field) return null
-                  const selectedValues =
-                    activeFilters.find((f) => f.fieldKey === 'category')?.values || []
-                  return (
-                    <FilterDropdownButton
-                      field={field}
-                      selectedValues={selectedValues}
-                      onChange={(values) => {
-                        const existing = activeFilters.find((f) => f.fieldKey === 'category')
-                        if (existing) {
-                          if (values.length === 0)
-                            setActiveFilters(activeFilters.filter((f) => f.fieldKey !== 'category'))
-                          else
-                            setActiveFilters(
-                              activeFilters.map((f) =>
-                                f.fieldKey === 'category' ? { ...f, values } : f,
-                              ),
-                            )
-                        } else if (values.length > 0) {
-                          setActiveFilters([...activeFilters, { fieldKey: 'category', values }])
-                        }
-                      }}
-                    />
-                  )
-                })()}
+              {/* 1. Category */}
+              {(() => {
+                const field = filterFieldConfigs.find((f) => f.key === 'category')
+                if (!field) return null
+                const selectedValues =
+                  activeFilters.find((f) => f.fieldKey === 'category')?.values || []
+                return (
+                  <FilterDropdownButton
+                    field={field}
+                    selectedValues={selectedValues}
+                    onChange={(values) => {
+                      const existing = activeFilters.find((f) => f.fieldKey === 'category')
+                      if (existing) {
+                        if (values.length === 0)
+                          setActiveFilters(activeFilters.filter((f) => f.fieldKey !== 'category'))
+                        else
+                          setActiveFilters(
+                            activeFilters.map((f) =>
+                              f.fieldKey === 'category' ? { ...f, values } : f,
+                            ),
+                          )
+                      } else if (values.length > 0) {
+                        setActiveFilters([...activeFilters, { fieldKey: 'category', values }])
+                      }
+                    }}
+                  />
+                )
+              })()}
 
-                {/* 2. Location */}
-                {(() => {
-                  const field = filterFieldConfigs.find((f) => f.key === 'location')
-                  if (!field) return null
-                  const selectedValues =
-                    activeFilters.find((f) => f.fieldKey === 'location')?.values || []
-                  return (
-                    <FilterDropdownButton
-                      field={field}
-                      selectedValues={selectedValues}
-                      onChange={(values) => {
-                        const existing = activeFilters.find((f) => f.fieldKey === 'location')
-                        if (existing) {
-                          if (values.length === 0)
-                            setActiveFilters(activeFilters.filter((f) => f.fieldKey !== 'location'))
-                          else
-                            setActiveFilters(
-                              activeFilters.map((f) =>
-                                f.fieldKey === 'location' ? { ...f, values } : f,
-                              ),
-                            )
-                        } else if (values.length > 0) {
-                          setActiveFilters([...activeFilters, { fieldKey: 'location', values }])
-                        }
-                      }}
-                    />
-                  )
-                })()}
+              {/* 2. Location */}
+              {(() => {
+                const field = filterFieldConfigs.find((f) => f.key === 'location')
+                if (!field) return null
+                const selectedValues =
+                  activeFilters.find((f) => f.fieldKey === 'location')?.values || []
+                return (
+                  <FilterDropdownButton
+                    field={field}
+                    selectedValues={selectedValues}
+                    onChange={(values) => {
+                      const existing = activeFilters.find((f) => f.fieldKey === 'location')
+                      if (existing) {
+                        if (values.length === 0)
+                          setActiveFilters(activeFilters.filter((f) => f.fieldKey !== 'location'))
+                        else
+                          setActiveFilters(
+                            activeFilters.map((f) =>
+                              f.fieldKey === 'location' ? { ...f, values } : f,
+                            ),
+                          )
+                      } else if (values.length > 0) {
+                        setActiveFilters([...activeFilters, { fieldKey: 'location', values }])
+                      }
+                    }}
+                  />
+                )
+              })()}
 
-                {/* 3. Tags */}
-                {(() => {
-                  const field = filterFieldConfigs.find((f) => f.key === 'tags')
-                  if (!field) return null
-                  const selectedValues =
-                    activeFilters.find((f) => f.fieldKey === 'tags')?.values || []
-                  return (
-                    <FilterDropdownButton
-                      field={field}
-                      selectedValues={selectedValues}
-                      onChange={(values) => {
-                        const existing = activeFilters.find((f) => f.fieldKey === 'tags')
-                        if (existing) {
-                          if (values.length === 0)
-                            setActiveFilters(activeFilters.filter((f) => f.fieldKey !== 'tags'))
-                          else
-                            setActiveFilters(
-                              activeFilters.map((f) =>
-                                f.fieldKey === 'tags' ? { ...f, values } : f,
-                              ),
-                            )
-                        } else if (values.length > 0) {
-                          setActiveFilters([...activeFilters, { fieldKey: 'tags', values }])
-                        }
-                      }}
-                    />
-                  )
-                })()}
+              {/* 3. Tags */}
+              {(() => {
+                const field = filterFieldConfigs.find((f) => f.key === 'tags')
+                if (!field) return null
+                const selectedValues =
+                  activeFilters.find((f) => f.fieldKey === 'tags')?.values || []
+                return (
+                  <FilterDropdownButton
+                    field={field}
+                    selectedValues={selectedValues}
+                    onChange={(values) => {
+                      const existing = activeFilters.find((f) => f.fieldKey === 'tags')
+                      if (existing) {
+                        if (values.length === 0)
+                          setActiveFilters(activeFilters.filter((f) => f.fieldKey !== 'tags'))
+                        else
+                          setActiveFilters(
+                            activeFilters.map((f) =>
+                              f.fieldKey === 'tags' ? { ...f, values } : f,
+                            ),
+                          )
+                      } else if (values.length > 0) {
+                        setActiveFilters([...activeFilters, { fieldKey: 'tags', values }])
+                      }
+                    }}
+                  />
+                )
+              })()}
 
-                {filterOptions.tags.length === 0 && (
-                  <p className="text-[10px] text-foreground/50 w-full">{TAGS_EMPTY_HINT}</p>
+              {filterOptions.tags.length === 0 && (
+                <p className="text-[10px] text-foreground/50 w-full">{TAGS_EMPTY_HINT}</p>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                  hasAdvancedFilters
+                    ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
+                    : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border hover:bg-accent/60 dark:border-white/10'
+                }`}
+              >
+                More filters
+                {showAdvancedFilters ? (
+                  <ChevronUp className="w-3 h-3" />
+                ) : (
+                  <ChevronDown className="w-3 h-3" />
                 )}
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                  className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                    hasAdvancedFilters
-                      ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
-                      : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border hover:bg-accent/60 dark:border-white/10'
-                  }`}
-                >
-                  More filters
-                  {showAdvancedFilters ? (
-                    <ChevronUp className="w-3 h-3" />
-                  ) : (
-                    <ChevronDown className="w-3 h-3" />
-                  )}
-                </button>
-
-                {showAdvancedFilters && (
-                  <>
-                {/* Updated */}
-                <select
-                  value={updatedAtRange}
-                  onChange={(e) => setUpdatedAtRange(e.target.value as typeof updatedAtRange)}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
-                    updatedAtRange !== 'all'
-                      ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
-                      : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border dark:border-white/10'
-                  }`}
-                >
-                  <option value="all">Updated</option>
-                  <option value="24h">Last 24h</option>
-                  <option value="48h">Last 48h</option>
-                  <option value="7d">Last 7 days</option>
-                  <option value="30d">Last 30 days</option>
-                </select>
-
-                {/* Shows Attended */}
-                <select
-                  value={eventFilter}
-                  onChange={(e) => {
-                    setEventFilter(e.target.value)
-                    if (e.target.value === 'all' || e.target.value === 'none')
-                      setEventStatusFilter('all')
-                  }}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer max-w-[180px] truncate ${
-                    eventFilter !== 'all'
-                      ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
-                      : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border dark:border-white/10'
-                  }`}
-                >
-                  <option value="all">Shows Attended</option>
-                  <option value="none">No Shows</option>
-                  {orgEvents.map((ev) => (
-                    <option key={ev.id} value={String(ev.id)}>
-                      {ev.title}
-                    </option>
-                  ))}
-                </select>
-
-                {/* App Status (contextual — shows when a specific show is selected) */}
-                {eventFilter !== 'all' && eventFilter !== 'none' && (
+              {showAdvancedFilters && (
+                <>
+                  {/* Updated */}
                   <select
-                    value={eventStatusFilter}
-                    onChange={(e) => setEventStatusFilter(e.target.value)}
+                    value={updatedAtRange}
+                    onChange={(e) => setUpdatedAtRange(e.target.value as typeof updatedAtRange)}
                     className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
-                      eventStatusFilter !== 'all'
+                      updatedAtRange !== 'all'
                         ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
                         : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border dark:border-white/10'
                     }`}
                   >
-                    <option value="all">App Status</option>
-                    <option value="approved">Approved</option>
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="waitlist">Waitlist</option>
-                    <option value="cancelled">Cancelled</option>
+                    <option value="all">Updated</option>
+                    <option value="24h">Last 24h</option>
+                    <option value="48h">Last 48h</option>
+                    <option value="7d">Last 7 days</option>
+                    <option value="30d">Last 30 days</option>
                   </select>
-                )}
-                  </>
-                )}
+
+                  {/* Shows Attended */}
+                  <select
+                    value={eventFilter}
+                    onChange={(e) => {
+                      setEventFilter(e.target.value)
+                      if (e.target.value === 'all' || e.target.value === 'none')
+                        setEventStatusFilter('all')
+                    }}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer max-w-[180px] truncate ${
+                      eventFilter !== 'all'
+                        ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
+                        : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border dark:border-white/10'
+                    }`}
+                  >
+                    <option value="all">Shows Attended</option>
+                    <option value="none">No Shows</option>
+                    {orgEvents.map((ev) => (
+                      <option key={ev.id} value={String(ev.id)}>
+                        {ev.title}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* App Status (contextual — shows when a specific show is selected) */}
+                  {eventFilter !== 'all' && eventFilter !== 'none' && (
+                    <select
+                      value={eventStatusFilter}
+                      onChange={(e) => setEventStatusFilter(e.target.value)}
+                      className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
+                        eventStatusFilter !== 'all'
+                          ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
+                          : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border dark:border-white/10'
+                      }`}
+                    >
+                      <option value="all">App Status</option>
+                      <option value="approved">Approved</option>
+                      <option value="pending">Pending</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="rejected">Rejected</option>
+                      <option value="waitlist">Waitlist</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  )}
+                </>
+              )}
 
               <div className="ml-auto flex items-center gap-2 flex-wrap">
                 {hasActiveFilters && (
@@ -1365,7 +1314,9 @@ export default function NetworkPage({
                       .map((tag) => `${tag}: ${importSession.tagCounts?.[tag] ?? 0}`)
                       .join(' · ')}
                   </p>
-                  <p className="text-[10px] text-foreground/50 mt-1">{IMPORT_TAG_COUNTS_FOOTNOTE}</p>
+                  <p className="text-[10px] text-foreground/50 mt-1">
+                    {IMPORT_TAG_COUNTS_FOOTNOTE}
+                  </p>
                 </div>
               )}
 
@@ -1507,9 +1458,10 @@ export default function NetworkPage({
             onClose={() => setShowBulkEditModal(false)}
             selectedCount={selectedContacts.length}
             categories={categories}
-            lists={savedLists}
-            onAddCategory={handleBulkCategoryUpdate}
-            onAddToList={handleBulkAddToList}
+            availableTags={filterOptions.tags}
+            onApplyCategory={handleBulkCategoryUpdate}
+            onApplyTags={handleBulkTags}
+            onApplyLocation={handleBulkLocation}
             onDelete={handleBulkDelete}
             onClearSelection={() => setSelectedContacts([])}
             loading={bulkUpdateLoading}
@@ -1871,7 +1823,6 @@ export default function NetworkPage({
           </div>
         </div>
       )}
-
     </div>
   )
 }
