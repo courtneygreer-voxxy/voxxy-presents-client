@@ -1,3 +1,6 @@
+// ⚠️ WIP — shipped prematurely. This Filter → Query UX has ACTIVE KNOWN BUGS
+// (load-time regression, "Save query" not persisting, "Apply" not updating the
+// table). See docs/tickets/NETWORK_QUERY_UX_KNOWN_ISSUES.md before relying on it.
 import { useState, useEffect } from 'react'
 import {
   X,
