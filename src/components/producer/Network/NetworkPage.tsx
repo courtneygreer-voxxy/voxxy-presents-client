@@ -30,6 +30,7 @@ import { PAYMENT_PRICE_TYPES } from '@/components/producer/CreateEventWizard/typ
 import ContactsTable from './ContactsTable'
 import AddContactModal from './AddContactModal'
 import EditContactModal from './EditContactModal'
+import ViewContactModal from './ViewContactModal'
 import { CSVUploadModal } from './CSVUploadModal'
 import ListsManagement from './Lists/ListsManagement'
 import BulkEditModal from './BulkEditModal'
@@ -199,6 +200,7 @@ export default function NetworkPage({
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedContacts, setSelectedContacts] = useState<number[]>([])
   const [editingContact, setEditingContact] = useState<VendorContact | null>(null)
+  const [viewingContact, setViewingContact] = useState<VendorContact | null>(null)
   const [actionsMenuOpen, setActionsMenuOpen] = useState(false)
 
   // Client-side filter states
@@ -1409,6 +1411,7 @@ export default function NetworkPage({
               onSelectAll={handleSelectAll}
               onDeleteContact={handleDeleteContact}
               onEditContact={handleEditContact}
+              onViewContact={setViewingContact}
               paginationMeta={paginationMeta}
               onPageChange={handlePageChange}
             />
@@ -1435,6 +1438,17 @@ export default function NetworkPage({
                   prev.map((c) => (c.id === updatedContact.id ? updatedContact : c)),
                 )
                 setEditingContact(null)
+              }}
+            />
+          )}
+          {viewingContact && (
+            <ViewContactModal
+              contact={viewingContact}
+              onClose={() => setViewingContact(null)}
+              onEdit={() => {
+                const contact = viewingContact
+                setViewingContact(null)
+                handleEditContact(contact)
               }}
             />
           )}
