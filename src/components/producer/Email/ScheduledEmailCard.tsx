@@ -62,6 +62,7 @@ export default function ScheduledEmailCard({
   const isSent = email.status === 'sent'
   const isPaused = email.status === 'paused'
   const isScheduled = email.status === 'scheduled'
+  const isProcessingStatus = email.status === 'processing'
   const isFailed = email.status === 'failed'
 
   // Determine if card should be clickable (all scheduled emails are now editable)
@@ -83,9 +84,11 @@ export default function ScheduledEmailCard({
           ? 'bg-yellow-500/10 text-yellow-400'
           : isFailed
             ? 'bg-red-500/10 text-red-400'
-            : isScheduled
-              ? 'bg-blue-500/10 text-blue-400'
-              : 'bg-muted/10 text-muted-foreground'
+            : isProcessingStatus
+              ? 'bg-green-500/10 text-green-400'
+              : isScheduled
+                ? 'bg-blue-500/10 text-blue-400'
+                : 'bg-muted/10 text-muted-foreground'
       }`}
     >
       {email.status.charAt(0).toUpperCase() + email.status.slice(1)}

@@ -235,6 +235,7 @@ export type TriggerType =
 
 export type ScheduledEmailStatus =
   | 'scheduled'
+  | 'processing'
   | 'paused'
   | 'active'
   | 'sent'
