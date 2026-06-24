@@ -43,6 +43,11 @@ import { DebugPanel } from './DebugPanel'
 import ApplicantsExportModal from './ApplicantsExportModal'
 import { Badge, type BadgeVariant } from '@/components/ui/badge'
 import {
+  SearchFilterBar,
+  type FilterFieldConfig,
+  type ActiveFilter,
+} from '@/components/shared/SearchFilterBar'
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -113,6 +118,19 @@ type StatusFilter =
   | 'rejected'
   | 'cancelled'
   | 'opted_out'
+
+// Status filter values paired with their human-facing labels (used by the
+// shared SearchFilterBar, which works in terms of display labels).
+const STATUS_FILTER_OPTIONS: { value: Exclude<StatusFilter, 'all'>; label: string }[] = [
+  { value: 'invited', label: 'Invited' },
+  { value: 'pending', label: 'New' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'confirmed', label: 'Confirmed' },
+  { value: 'waitlist', label: 'Waitlisted' },
+  { value: 'rejected', label: 'Declined' },
+  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'opted_out', label: 'Opted Out' },
+]
 
 export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsTabProps) {
   const [applicants, setApplicants] = useState<Applicant[]>([])
@@ -769,15 +787,46 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
   ].sort()
 
   const hasActiveFilters =
-    statusFilter !== 'all' ||
-    (statusFilter === 'invited' && !showInvited) ||
-    categoryFilter !== 'all' ||
-    searchQuery.trim() !== ''
+    statusFilter !== 'all' || categoryFilter !== 'all' || searchQuery.trim() !== ''
 
-  const clearFilters = () => {
-    setStatusFilter('all')
-    setCategoryFilter('all')
-    setSearchQuery('')
+  // --- Shared filter bar (button + applied-chips) config ---
+  const filterFieldConfigs: FilterFieldConfig[] = [
+    {
+      key: 'status',
+      label: 'Status',
+      multi: false,
+      options: STATUS_FILTER_OPTIONS.map((o) => o.label),
+    },
+    ...(uniqueCategories.length > 0
+      ? [
+          {
+            key: 'category',
+            label: 'Category',
+            multi: false,
+            options: uniqueCategories as string[],
+          } as FilterFieldConfig,
+        ]
+      : []),
+  ]
+
+  const filterBarActiveFilters: ActiveFilter[] = []
+  if (statusFilter !== 'all') {
+    const label = STATUS_FILTER_OPTIONS.find((o) => o.value === statusFilter)?.label
+    if (label) filterBarActiveFilters.push({ fieldKey: 'status', values: [label] })
+  }
+  if (categoryFilter !== 'all') {
+    filterBarActiveFilters.push({ fieldKey: 'category', values: [categoryFilter] })
+  }
+
+  const handleFilterBarChange = (filters: ActiveFilter[]) => {
+    const statusLabel = filters.find((f) => f.fieldKey === 'status')?.values[0]
+    const matchedStatus = STATUS_FILTER_OPTIONS.find((o) => o.label === statusLabel)
+    setStatusFilter(matchedStatus ? matchedStatus.value : 'all')
+
+    const categoryValue = filters.find((f) => f.fieldKey === 'category')?.values[0]
+    setCategoryFilter(categoryValue ?? 'all')
+
+    setTablePage(1)
   }
 
   const formatDate = (dateString?: string) => {
@@ -960,79 +1009,13 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
       {viewMode === 'table' && (
         <div className="flex-1 flex flex-col overflow-hidden p-3 md:p-4 gap-3">
           {/* Filters row */}
-          <div className="flex flex-wrap gap-2 items-center">
-            <Select
-              value={statusFilter}
-              onValueChange={(v) => {
-                setStatusFilter(v as StatusFilter)
-                setTablePage(1)
-              }}
-            >
-              <SelectTrigger className="h-8 w-36 rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground focus:ring-1 focus:ring-primary/50">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent className="border-border bg-muted text-foreground shadow-xl">
-                <SelectItem value="all" className="text-xs">
-                  All Status
-                </SelectItem>
-                <SelectItem value="invited" className="text-xs">
-                  Invited
-                </SelectItem>
-                <SelectItem value="pending" className="text-xs">
-                  New
-                </SelectItem>
-                <SelectItem value="approved" className="text-xs">
-                  Approved
-                </SelectItem>
-                <SelectItem value="confirmed" className="text-xs">
-                  Confirmed
-                </SelectItem>
-                <SelectItem value="waitlist" className="text-xs">
-                  Waitlisted
-                </SelectItem>
-                <SelectItem value="rejected" className="text-xs">
-                  Declined
-                </SelectItem>
-                <SelectItem value="cancelled" className="text-xs">
-                  Cancelled
-                </SelectItem>
-                <SelectItem value="opted_out" className="text-xs">
-                  Opted Out
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            {uniqueCategories.length > 0 && (
-              <Select
-                value={categoryFilter}
-                onValueChange={(v) => {
-                  setCategoryFilter(v)
-                  setTablePage(1)
-                }}
-              >
-                <SelectTrigger className="h-8 w-40 rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground focus:ring-1 focus:ring-primary/50">
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
-                <SelectContent className="border-border bg-muted text-foreground shadow-xl">
-                  <SelectItem value="all" className="text-xs">
-                    All Categories
-                  </SelectItem>
-                  {uniqueCategories.map((cat) => (
-                    <SelectItem key={cat} value={cat} className="text-xs">
-                      {cat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="px-2 py-1.5 rounded-lg bg-background/5 text-foreground/60 hover:text-foreground text-xs transition-smooth"
-              >
-                Clear filters
-              </button>
-            )}
-          </div>
+          <SearchFilterBar
+            variant="button"
+            showSearch={false}
+            filterFields={filterFieldConfigs}
+            activeFilters={filterBarActiveFilters}
+            onFiltersChange={handleFilterBarChange}
+          />
 
           {/* Select-all banner */}
           {allCurrentPageSelected &&
@@ -1228,74 +1211,13 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
               </div>
 
               {/* Status & Category Filters */}
-              <div className="space-y-1.5">
-                <Select
-                  value={statusFilter}
-                  onValueChange={(value) => setStatusFilter(value as StatusFilter)}
-                >
-                  <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-primary/50">
-                    <SelectValue placeholder="All Status" />
-                  </SelectTrigger>
-                  <SelectContent className="border-border bg-muted text-foreground shadow-xl">
-                    <SelectItem value="all" className="text-xs focus:bg-background/10">
-                      All Status
-                    </SelectItem>
-                    <SelectItem value="invited" className="text-xs focus:bg-background/10">
-                      Invited
-                    </SelectItem>
-                    <SelectItem value="pending" className="text-xs focus:bg-background/10">
-                      New
-                    </SelectItem>
-                    <SelectItem value="approved" className="text-xs focus:bg-background/10">
-                      Approved
-                    </SelectItem>
-                    <SelectItem value="confirmed" className="text-xs focus:bg-background/10">
-                      Confirmed
-                    </SelectItem>
-                    <SelectItem value="waitlist" className="text-xs focus:bg-background/10">
-                      Waitlisted
-                    </SelectItem>
-                    <SelectItem value="rejected" className="text-xs focus:bg-background/10">
-                      Declined
-                    </SelectItem>
-                    <SelectItem value="cancelled" className="text-xs focus:bg-background/10">
-                      Cancelled
-                    </SelectItem>
-                    <SelectItem value="opted_out" className="text-xs focus:bg-background/10">
-                      Opted Out
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                {uniqueCategories.length > 0 && (
-                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                    <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-primary/50">
-                      <SelectValue placeholder="All Categories" />
-                    </SelectTrigger>
-                    <SelectContent className="border-border bg-muted text-foreground shadow-xl">
-                      <SelectItem value="all" className="text-xs focus:bg-background/10">
-                        All Categories
-                      </SelectItem>
-                      {uniqueCategories.map((cat) => (
-                        <SelectItem
-                          key={cat}
-                          value={cat}
-                          className="text-xs focus:bg-background/10"
-                        >
-                          {cat}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-                {hasActiveFilters && (
-                  <button
-                    onClick={clearFilters}
-                    className="w-full px-2 py-1.5 rounded-lg bg-background/5 text-foreground dark:text-foreground/60 hover:text-foreground hover:bg-background/10 text-xs transition-smooth"
-                  >
-                    Clear filters
-                  </button>
-                )}
-              </div>
+              <SearchFilterBar
+                variant="button"
+                showSearch={false}
+                filterFields={filterFieldConfigs}
+                activeFilters={filterBarActiveFilters}
+                onFiltersChange={handleFilterBarChange}
+              />
             </div>
 
             {/* Applicant List */}
