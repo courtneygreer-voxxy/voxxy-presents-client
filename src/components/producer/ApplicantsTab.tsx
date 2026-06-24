@@ -113,7 +113,7 @@ type StatusFilter =
   | 'invited'
   | 'pending'
   | 'approved'
-  | 'confirmed'
+  | 'paid'
   | 'waitlist'
   | 'rejected'
   | 'cancelled'
@@ -127,7 +127,7 @@ const STATUS_FILTER_OPTIONS: { value: Exclude<StatusFilter, 'all'>; label: strin
   { value: 'invited', label: 'Invited' },
   { value: 'pending', label: 'New' },
   { value: 'approved', label: 'Approved' },
-  { value: 'confirmed', label: 'Paid' },
+  { value: 'paid', label: 'Paid' },
   { value: 'waitlist', label: 'Waitlisted' },
   { value: 'rejected', label: 'Declined' },
   { value: 'opted_out', label: 'Opted Out' },
@@ -681,12 +681,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           variant: 'tintGreen' as BadgeVariant,
           icon: CheckCircle,
         }
-      case 'confirmed':
-        return {
-          label: 'Paid',
-          variant: 'tintGreenDeep' as BadgeVariant,
-          icon: CheckCircle,
-        }
       case 'waitlist':
         return {
           label: 'Waitlisted',
@@ -774,6 +768,9 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
       if (statusFilter === 'opted_out') {
         // Merged group: "Opted Out" covers both opted_out and cancelled.
         if (applicant.status !== 'opted_out' && applicant.status !== 'cancelled') return false
+      } else if (statusFilter === 'paid') {
+        // "Paid" filters by payment_status — a vendor can be approved+paid regardless of status value.
+        if (applicant.payment_status !== 'paid' && applicant.payment_status !== 'confirmed') return false
       } else if (applicant.status !== statusFilter) {
         return false
       }
