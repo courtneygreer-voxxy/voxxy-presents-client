@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Search, X, Check, ChevronDown } from 'lucide-react'
+import { Search, X, Check, ChevronDown, Filter } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 // --- Types ---
@@ -19,9 +19,20 @@ export interface ActiveFilter {
 
 interface SearchFilterBarProps {
   searchPlaceholder?: string
-  searchValue: string
-  onSearchChange: (value: string) => void
+  searchValue?: string
+  onSearchChange?: (value: string) => void
   onSearchSubmit?: () => void
+  /** Hide the search input (e.g. when the parent already renders one). Defaults to true. */
+  showSearch?: boolean
+  /**
+   * Layout for the filter controls:
+   * - 'inline' (default): one always-visible dropdown button per field.
+   * - 'button': a single "Filter" button that opens a panel of all fields,
+   *   with applied filters shown as removable chips below.
+   */
+  variant?: 'inline' | 'button'
+  /** Label for the collapsed filter button (button variant only). Defaults to 'Filter'. */
+  filterButtonLabel?: string
   filterFields: FilterFieldConfig[]
   activeFilters: ActiveFilter[]
   onFiltersChange: (filters: ActiveFilter[]) => void
@@ -56,12 +67,17 @@ function FilterDropdown({
   }, [])
 
   const filtered = field.options.filter((opt) => opt.toLowerCase().includes(search.toLowerCase()))
+  const isMulti = field.multi !== false
 
   const handleToggle = (value: string) => {
     if (selectedValues.includes(value)) {
       onChange(selectedValues.filter((v) => v !== value))
-    } else {
+    } else if (isMulti) {
       onChange([...selectedValues, value])
+    } else {
+      onChange([value])
+      setOpen(false)
+      setSearch('')
     }
   }
 
@@ -116,15 +132,20 @@ function FilterDropdown({
                   className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-foreground/90 dark:text-foreground/80 hover:bg-background/10 rounded transition-colors"
                 >
                   <div
-                    className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                    className={`w-3.5 h-3.5 border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                      isMulti ? 'rounded' : 'rounded-full'
+                    } ${
                       selectedValues.includes(option)
                         ? 'bg-primary/50 border-primary'
                         : 'border-border'
                     }`}
                   >
-                    {selectedValues.includes(option) && (
-                      <Check className="w-2.5 h-2.5 text-foreground" strokeWidth={3} />
-                    )}
+                    {selectedValues.includes(option) &&
+                      (isMulti ? (
+                        <Check className="w-2.5 h-2.5 text-foreground" strokeWidth={3} />
+                      ) : (
+                        <div className="w-1.5 h-1.5 rounded-full bg-foreground" />
+                      ))}
                   </div>
                   <span className="truncate text-left">{option}</span>
                 </button>
@@ -147,19 +168,132 @@ function FilterDropdown({
   )
 }
 
+// --- Collapsed Filter Button + Panel (button variant) ---
+
+function FilterButtonPanel({
+  label,
+  filterFields,
+  activeFilters,
+  activeFilterCount,
+  onToggleValue,
+  onClearAll,
+}: {
+  label: string
+  filterFields: FilterFieldConfig[]
+  activeFilters: ActiveFilter[]
+  activeFilterCount: number
+  onToggleValue: (field: FilterFieldConfig, value: string) => void
+  onClearAll: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all ${
+          activeFilterCount > 0
+            ? 'border-primary/40 bg-primary/20 text-violet-950 dark:border-primary/30 dark:text-primary'
+            : 'border-border bg-card/80 text-foreground hover:bg-accent/60 dark:bg-card/50 dark:text-foreground/80 dark:border-white/10'
+        }`}
+      >
+        <Filter className="h-3.5 w-3.5" />
+        <span>{label}</span>
+        {activeFilterCount > 0 && (
+          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary/50 text-[10px] font-bold text-primary-foreground">
+            {activeFilterCount}
+          </span>
+        )}
+        <ChevronDown className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 z-50 mt-1 w-64 overflow-hidden rounded-lg border border-border bg-muted shadow-xl">
+          <div className="max-h-96 space-y-3 overflow-y-auto p-3">
+            {filterFields.map((field) => {
+              const selectedValues =
+                activeFilters.find((f) => f.fieldKey === field.key)?.values || []
+              const isMulti = field.multi !== false
+              const Icon = field.icon
+              return (
+                <div key={field.key}>
+                  <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                    {Icon && <Icon className="h-3.5 w-3.5" />}
+                    {field.label}
+                  </div>
+                  <div className="space-y-0.5">
+                    {field.options.map((option) => {
+                      const selected = selectedValues.includes(option)
+                      return (
+                        <button
+                          key={option}
+                          onClick={() => onToggleValue(field, option)}
+                          className="flex w-full items-center gap-2.5 rounded px-2 py-1.5 text-xs text-foreground/90 transition-colors hover:bg-background/10 dark:text-foreground/80"
+                        >
+                          <div
+                            className={`flex h-3.5 w-3.5 flex-shrink-0 items-center justify-center border-2 transition-colors ${
+                              isMulti ? 'rounded' : 'rounded-full'
+                            } ${selected ? 'border-primary bg-primary/50' : 'border-border'}`}
+                          >
+                            {selected &&
+                              (isMulti ? (
+                                <Check className="h-2.5 w-2.5 text-foreground" strokeWidth={3} />
+                              ) : (
+                                <div className="h-1.5 w-1.5 rounded-full bg-foreground" />
+                              ))}
+                          </div>
+                          <span className="truncate text-left">{option}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          {activeFilterCount > 0 && (
+            <div className="border-t border-border p-1.5">
+              <button
+                onClick={onClearAll}
+                className="w-full py-1 text-xs text-foreground/75 transition-colors hover:text-foreground dark:text-muted-foreground"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // --- Main Component ---
 
 export function SearchFilterBar({
   searchPlaceholder = 'Search...',
-  searchValue,
+  searchValue = '',
   onSearchChange,
   onSearchSubmit,
+  showSearch = true,
+  variant = 'inline',
+  filterButtonLabel = 'Filter',
   filterFields,
   activeFilters,
   onFiltersChange,
   extraFilters,
 }: SearchFilterBarProps) {
-  const activeFilterCount = activeFilters.filter((f) => f.values.length > 0).length
+  const activeFilterCount = activeFilters.reduce((sum, f) => sum + f.values.length, 0)
 
   const handleUpdateFilterValues = (fieldKey: string, values: string[]) => {
     const existing = activeFilters.find((f) => f.fieldKey === fieldKey)
@@ -175,24 +309,100 @@ export function SearchFilterBar({
     }
   }
 
+  const handleToggleValue = (field: FilterFieldConfig, value: string) => {
+    const current = activeFilters.find((f) => f.fieldKey === field.key)?.values || []
+    if (current.includes(value)) {
+      handleUpdateFilterValues(field.key, current.filter((v) => v !== value))
+    } else if (field.multi !== false) {
+      handleUpdateFilterValues(field.key, [...current, value])
+    } else {
+      handleUpdateFilterValues(field.key, [value])
+    }
+  }
+
   const handleClearAll = () => {
     onFiltersChange([])
   }
 
+  // Flatten active filters into chips, keeping a reference to their field for labels.
+  const appliedChips = activeFilters.flatMap((f) => {
+    const field = filterFields.find((ff) => ff.key === f.fieldKey)
+    return f.values.map((value) => ({ fieldKey: f.fieldKey, field, value }))
+  })
+
+  // --- Button variant: single Filter button + applied-filter chips below ---
+  if (variant === 'button') {
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          {showSearch && (
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/55 dark:text-foreground/40" />
+              <input
+                type="text"
+                value={searchValue}
+                onChange={(e) => onSearchChange?.(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit?.()}
+                placeholder={searchPlaceholder}
+                className="w-full rounded-lg border border-border bg-background/5 py-2.5 pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+          )}
+          {filterFields.length > 0 && (
+            <FilterButtonPanel
+              label={filterButtonLabel}
+              filterFields={filterFields}
+              activeFilters={activeFilters}
+              activeFilterCount={activeFilterCount}
+              onToggleValue={handleToggleValue}
+              onClearAll={handleClearAll}
+            />
+          )}
+          {extraFilters}
+        </div>
+
+        {appliedChips.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {appliedChips.map(({ fieldKey, field, value }) => (
+              <button
+                key={`${fieldKey}:${value}`}
+                onClick={() => field && handleToggleValue(field, value)}
+                className="flex items-center gap-1 rounded-full border border-primary/30 bg-primary/15 px-2.5 py-1 text-xs font-medium text-violet-950 transition-colors hover:bg-primary/25 dark:text-primary"
+              >
+                {field && <span className="text-foreground/60 dark:text-foreground/50">{field.label}:</span>}
+                <span>{value}</span>
+                <X className="h-3 w-3" />
+              </button>
+            ))}
+            <button
+              onClick={handleClearAll}
+              className="flex items-center gap-1 px-2 py-1 text-xs text-foreground/75 transition-colors hover:text-foreground dark:text-muted-foreground"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // --- Inline variant (default): one dropdown button per field ---
   return (
     <div className="space-y-2">
       {/* Search bar */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/55 dark:text-foreground/40" />
-        <input
-          type="text"
-          value={searchValue}
-          onChange={(e) => onSearchChange(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit?.()}
-          placeholder={searchPlaceholder}
-          className="w-full pl-10 pr-3 py-2.5 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
-        />
-      </div>
+      {showSearch && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/55 dark:text-foreground/40" />
+          <input
+            type="text"
+            value={searchValue}
+            onChange={(e) => onSearchChange?.(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit?.()}
+            placeholder={searchPlaceholder}
+            className="w-full pl-10 pr-3 py-2.5 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+          />
+        </div>
+      )}
 
       {/* Filter dropdowns - always visible underneath */}
       {(filterFields.length > 0 || extraFilters) && (

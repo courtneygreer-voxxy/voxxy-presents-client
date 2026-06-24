@@ -364,10 +364,9 @@ export default function VendorApplicationForm() {
         clearFormData(formId)
       }
 
-      // Redirect to confirmation page with application code
-      navigate(
-        `/applications/success?application_code=${response.application_code}&event=${event.slug}`,
-      )
+      // Redirect to confirmation page with unique ticket code (falls back to shared application code)
+      const confirmationCode = response.ticket_code || response.application_code
+      navigate(`/applications/success?ticket_code=${confirmationCode}&event=${event.slug}`)
     } catch (err: any) {
       console.log('Failed to submit application:', err)
 
