@@ -17,6 +17,7 @@ import type { VendorContact } from '@/services/api'
 import { formatDistanceToNow } from 'date-fns'
 import SmartListBuilder from './SmartListBuilder'
 import { contactsToCsv, triggerCsvDownload } from '../contactsCsvExport'
+import { LISTS_ARE_SAVED_FILTERS, NEW_LIST_LABEL } from '../copy'
 
 interface ListsManagementProps {
   organizationId: number
@@ -236,24 +237,20 @@ export default function ListsManagement({
               <Filter className="w-8 h-8 text-foreground/40" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">No Saved Lists Yet</h3>
-            <p className="text-foreground/50 text-sm mb-4">
-              Create a smart list with filter combinations or use the filters on the All Contacts
-              tab and save them as a reusable list.
-            </p>
+            <p className="text-foreground/50 text-sm mb-4">{LISTS_ARE_SAVED_FILTERS}</p>
             <button
               onClick={handleStartCreate}
               className="mb-4 flex items-center gap-2 px-5 py-2.5 voxxy-btn-cta text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all mx-auto"
             >
               <Plus className="w-4 h-4" />
-              Create Smart List
+              {NEW_LIST_LABEL}
             </button>
             <div className="voxxy-surface-subtle rounded-lg p-4 text-left">
               <p className="text-foreground/70 text-xs font-medium mb-2">How it works:</p>
               <ol className="text-foreground/50 text-xs space-y-1.5 list-decimal list-inside">
-                <li>Create a list with custom filters or from the All Contacts tab</li>
-                <li>Select filters for locations, categories, or tags</li>
-                <li>Save the filter combination with a name</li>
-                <li>Use saved lists to quickly invite contacts to events</li>
+                <li>Import or add contacts — they live in All Contacts</li>
+                <li>Tag contacts (e.g., Seattle, Returning)</li>
+                <li>Save a list = reusable filter on those tags</li>
               </ol>
             </div>
           </div>
@@ -265,7 +262,7 @@ export default function ListsManagement({
             <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
               {/* Modal Header */}
               <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-primary/20 px-6 py-3 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-foreground">Create Smart List</h2>
+                <h2 className="text-lg font-bold text-foreground">{NEW_LIST_LABEL}</h2>
                 <button
                   onClick={handleCancelCreate}
                   className="text-foreground/60 hover:text-foreground transition-colors"
@@ -354,19 +351,20 @@ export default function ListsManagement({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0">
           <h3 className="text-lg font-semibold text-foreground mb-1">Saved Lists</h3>
           <p className="text-sm text-foreground/60">
             {lists.length} {lists.length === 1 ? 'list' : 'lists'} saved
           </p>
+          <p className="text-xs text-foreground/50 mt-2 max-w-xl">{LISTS_ARE_SAVED_FILTERS}</p>
         </div>
         <button
           onClick={handleStartCreate}
           className="flex items-center gap-2 px-4 py-2.5 voxxy-btn-cta text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
         >
           <Plus className="w-4 h-4" />
-          Create Smart List
+          {NEW_LIST_LABEL}
         </button>
       </div>
 
@@ -638,7 +636,7 @@ export default function ListsManagement({
           <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
             {/* Modal Header */}
             <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-primary/20 px-6 py-3 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-foreground">Create Smart List</h2>
+              <h2 className="text-lg font-bold text-foreground">{NEW_LIST_LABEL}</h2>
               <button
                 onClick={handleCancelCreate}
                 className="text-foreground/60 hover:text-foreground transition-colors"

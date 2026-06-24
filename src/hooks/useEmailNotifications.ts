@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { eventsApi, registrationsApi } from '@/services/api'
-import { toast } from 'sonner'
+import { notify } from '@/errors/notify'
+import { getApiErrorMessage } from '@/errors/getApiErrorMessage'
+import { getMessage } from '@/errors/catalog'
 
 interface EmailNotification {
   type: 'event_details_changed' | 'event_canceled' | 'payment_confirmed' | 'category_changed'
@@ -16,7 +18,6 @@ interface EmailNotification {
 }
 
 interface UseEmailNotificationsReturn {
-  // Dialog state
   dialogOpen: boolean
   dialogProps: {
     title: string
@@ -26,7 +27,6 @@ interface UseEmailNotificationsReturn {
     type: EmailNotification['type'] | undefined
     isLoading: boolean
   }
-  // Actions
   handleEmailNotification: (
     notification: EmailNotification | null,
     eventSlug?: string,
@@ -34,6 +34,25 @@ interface UseEmailNotificationsReturn {
   ) => void
   handleConfirmSend: () => void
   closeDialog: () => void
+}
+
+function showEmailSendSuccess(result: {
+  message: string
+  sent_count?: number
+  failed_count?: number
+}) {
+  const hasRecipientStats = result.sent_count !== undefined
+  notify.success({
+    key: 'email.sendSuccess',
+    params: { message: result.message },
+    fallback: result.message,
+    description: hasRecipientStats
+      ? getMessage('email.sendSuccessDescription', {
+          sentCount: result.sent_count ?? 0,
+          failedCount: result.failed_count ?? 0,
+        })
+      : undefined,
+  })
 }
 
 export function useEmailNotifications(): UseEmailNotificationsReturn {
@@ -70,33 +89,25 @@ export function useEmailNotifications(): UseEmailNotificationsReturn {
         case 'event_details_changed':
           if (!eventSlug) throw new Error('Event slug is required')
           result = await eventsApi.sendEventUpdateEmails(eventSlug)
-          toast.success(result.message, {
-            description: `Sent to ${result.sent_count} recipients${
-              result.failed_count ? ` (${result.failed_count} failed)` : ''
-            }`,
-          })
+          showEmailSendSuccess(result)
           break
 
         case 'event_canceled':
           if (!eventSlug) throw new Error('Event slug is required')
           result = await eventsApi.sendCancellationEmails(eventSlug)
-          toast.success(result.message, {
-            description: `Sent to ${result.sent_count} recipients${
-              result.failed_count ? ` (${result.failed_count} failed)` : ''
-            }`,
-          })
+          showEmailSendSuccess(result)
           break
 
         case 'payment_confirmed':
           if (!registrationId) throw new Error('Registration ID is required')
           result = await registrationsApi.sendPaymentConfirmation(registrationId)
-          toast.success(result.message)
+          showEmailSendSuccess(result)
           break
 
         case 'category_changed':
           if (!registrationId) throw new Error('Registration ID is required')
           result = await registrationsApi.sendCategoryChangeNotification(registrationId)
-          toast.success(result.message)
+          showEmailSendSuccess(result)
           break
 
         default:
@@ -105,10 +116,11 @@ export function useEmailNotifications(): UseEmailNotificationsReturn {
 
       setDialogOpen(false)
       setCurrentNotification(null)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to send email notification:', error)
-      toast.error('Failed to send email', {
-        description: error.message || 'An unexpected error occurred',
+      notify.error({
+        key: 'email.sendFailed',
+        fallback: getApiErrorMessage(error) || getMessage('email.sendFailedDescription'),
       })
     } finally {
       setIsLoading(false)

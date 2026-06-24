@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
-import { X, Plus, ChevronDown, Check } from 'lucide-react'
+import { X, ChevronDown, Check } from 'lucide-react'
 import { vendorContactsApi, categoriesApi, VendorContact } from '@/services/api'
 import type { Category } from '@/types/category'
 import SimsLoadingScreen from '@/components/ui/SimsLoadingScreen'
 import SuccessMessage from '@/components/ui/SuccessMessage'
 import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles'
 import { cn } from '@/lib/utils'
+import TagInput from './TagInput'
 
 interface AddContactModalProps {
   organizationId: number
@@ -21,7 +22,6 @@ export default function AddContactModal({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [tagInput, setTagInput] = useState('')
   const [organizationCategories, setOrganizationCategories] = useState<Category[]>([])
 
   const contactFieldClass = (field?: string) =>
@@ -109,24 +109,6 @@ export default function AddContactModal({
       categories: prev.categories.includes(category)
         ? prev.categories.filter((c) => c !== category)
         : [...prev.categories, category],
-    }))
-  }
-
-  const handleAddTag = () => {
-    const tag = tagInput.trim().toLowerCase()
-    if (tag && !formData.tags.includes(tag)) {
-      setFormData((prev) => ({
-        ...prev,
-        tags: [...prev.tags, tag],
-      }))
-      setTagInput('')
-    }
-  }
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }))
   }
 
@@ -544,85 +526,14 @@ export default function AddContactModal({
 
               {/* Tags */}
               <div>
-                <label
-                  htmlFor="tags"
-                  className="block text-foreground text-sm font-medium mb-2 dark:text-foreground/90"
-                >
+                <label className="block text-foreground text-sm font-medium mb-2 dark:text-foreground/90">
                   Tags
                 </label>
-                <div className="relative">
-                  <div className="flex gap-2 mb-2">
-                    <input
-                      id="tags"
-                      type="text"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault()
-                          handleAddTag()
-                        }
-                      }}
-                      placeholder="Add tag..."
-                      className={cn(contactFieldClass(), 'flex-1')}
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddTag}
-                      className="px-4 py-2.5 bg-primary/20 hover:bg-primary/30 text-violet-950 dark:text-primary text-sm rounded-lg transition-colors flex items-center gap-2 border border-primary/30"
-                    >
-                      Add
-                    </button>
-                  </div>
-                  {tagInput.length > 0 &&
-                    availableTags.filter(
-                      (t) =>
-                        t.toLowerCase().includes(tagInput.toLowerCase()) &&
-                        !formData.tags.includes(t),
-                    ).length > 0 && (
-                      <div className="absolute left-0 right-16 z-10 bg-muted border border-border rounded-lg shadow-xl max-h-32 overflow-y-auto">
-                        {availableTags
-                          .filter(
-                            (t) =>
-                              t.toLowerCase().includes(tagInput.toLowerCase()) &&
-                              !formData.tags.includes(t),
-                          )
-                          .slice(0, 5)
-                          .map((tag) => (
-                            <button
-                              key={tag}
-                              type="button"
-                              onClick={() => {
-                                setFormData((prev) => ({ ...prev, tags: [...prev.tags, tag] }))
-                                setTagInput('')
-                              }}
-                              className="w-full text-left px-3 py-2 text-sm text-foreground/80 hover:bg-background/10 transition-colors"
-                            >
-                              #{tag}
-                            </button>
-                          ))}
-                      </div>
-                    )}
-                </div>
-                {formData.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {formData.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-1 bg-primary/20 text-violet-950 dark:text-primary rounded-full text-xs flex items-center gap-1.5 border border-primary/30"
-                      >
-                        #{tag}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveTag(tag)}
-                          className="hover:text-violet-800 dark:hover:text-primary/90"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
+                <TagInput
+                  value={formData.tags}
+                  onChange={(tags) => setFormData((prev) => ({ ...prev, tags }))}
+                  availableTags={availableTags}
+                />
               </div>
 
               {/* Notes */}

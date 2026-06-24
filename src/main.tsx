@@ -6,6 +6,7 @@ import App from './App.tsx'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { validateEnv } from './utils/validateEnv'
 import { initializeErrorMonitoring } from './utils/errorMonitoring'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 // Validate environment variables before app starts
 validateEnv()
@@ -16,7 +17,9 @@ initializeErrorMonitoring()
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </ThemeProvider>
   </StrictMode>,
 )

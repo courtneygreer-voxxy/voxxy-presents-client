@@ -104,7 +104,6 @@ export interface VendorApplicationFormData {
   last_name: string
   email: string
   phone: string
-  business_name?: string
   vendor_category?: string
   instagram_handle?: string
   tiktok_handle?: string
@@ -121,7 +120,6 @@ export interface VendorApplicationSubmit {
   name: string
   email: string
   phone: string
-  business_name?: string
   vendor_category?: string
   vendor_application_id: number
   subscribed?: boolean

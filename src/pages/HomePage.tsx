@@ -205,20 +205,20 @@ export default function HomePage() {
               <div className="inline-flex items-center gap-2 bg-voxxy-pink/15 border border-voxxy-pink/25 px-4 py-1.5 rounded-full mb-6">
                 <div className="w-2 h-2 rounded-full bg-green-400 shadow-glow"></div>
                 <span className="text-[13px] font-semibold text-primary">
-                  Now Live — Accepting Event Producers
+                  Now Live, Accepting Art Market Producers
                 </span>
               </div>
 
               <h1 className="mb-5 text-[52px] font-display font-bold leading-[1.1] tracking-tight text-white md:text-[56px]">
-                The Operating System for{' '}
+                Built for the people who run{' '}
                 <em className="not-italic bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] bg-clip-text text-transparent">
-                  Recurring Event Producers
+                  art markets and shows.
                 </em>
               </h1>
 
               <p className="mb-9 max-w-[500px] text-[18px] leading-relaxed text-white/68">
-                Manage vendor applications, automate communications, and grow your events — all from
-                one platform. Built for art shows, markets, and pop-ups that happen more than once.
+                The CRM for art markets, pop-ups, and recurring shows. Manage applications, automate
+                your artist communications, and grow the network you pull from show after show.
               </p>
 
               <div className="flex gap-4 flex-wrap">
@@ -230,7 +230,12 @@ export default function HomePage() {
                     page_name: 'Home',
                     is_primary_cta: true,
                   }}
-                  onClick={() => analytics.track('hero_cta_clicked', { button_text: 'Get Started', page: 'landing' })}
+                  onClick={() =>
+                    analytics.track('hero_cta_clicked', {
+                      button_text: 'Get Started',
+                      page: 'landing',
+                    })
+                  }
                   asChild
                 >
                   <Link to="/signup">
@@ -245,7 +250,12 @@ export default function HomePage() {
                     page_name: 'Home',
                     is_primary_cta: false,
                   }}
-                  onClick={() => analytics.track('hero_cta_clicked', { button_text: 'See How It Works', page: 'landing' })}
+                  onClick={() =>
+                    analytics.track('hero_cta_clicked', {
+                      button_text: 'See How It Works',
+                      page: 'landing',
+                    })
+                  }
                   asChild
                 >
                   <Link to="/features">See How It Works</Link>
@@ -288,10 +298,10 @@ export default function HomePage() {
               The Problem
             </div>
             <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-slate-950">
-              Event coordination is broken
+              Running your shows shouldn't be this hard.
             </h2>
             <p className="text-[18px] text-gray-600 max-w-[600px]">
-              The bigger your event calendar grows, the more coordination eats your time — and your
+              The bigger your show calendar grows, the more coordination eats your time — and your
               margins.
             </p>
           </div>
@@ -300,33 +310,33 @@ export default function HomePage() {
             <div className={problemCardClass}>
               <div className={problemIconClass}>📧</div>
               <h3 className="mb-3 text-[20px] font-display font-bold text-slate-950">
-                5–7 Tools, Zero Visibility
+                Your tools don't talk to each other
               </h3>
               <p className="text-[15px] leading-relaxed text-slate-600">
-                You're chasing vendors across email, text, Instagram DMs, WhatsApp, and
-                spreadsheets. Critical details get buried. Deadlines slip.
+                You're managing artists across email, DMs, spreadsheets, and text threads. Nothing
+                connects. Critical details get buried and deadlines slip through the cracks.
               </p>
             </div>
 
             <div className={problemCardClass}>
               <div className={problemIconClass}>⏱️</div>
               <h3 className="mb-3 text-[20px] font-display font-bold text-slate-950">
-                Hours of Unpaid Coordination
+                Coordination that doesn't scale
               </h3>
               <p className="text-[15px] leading-relaxed text-slate-600">
-                Every event eats hours of back-and-forth that doesn't scale. Your calendar grows,
-                but your coordination workflow stays manual.
+                Every show eats hours of back-and-forth. Your event calendar grows but your workflow
+                stays manual. Growth just means more grind.
               </p>
             </div>
 
             <div className={problemCardClass}>
               <div className={problemIconClass}>📋</div>
               <h3 className="mb-3 text-[20px] font-display font-bold text-slate-950">
-                200+ Applications, No Way to Compare
+                200+ applications, no way to compare
               </h3>
               <p className="text-[15px] leading-relaxed text-slate-600">
-                You're scrolling social profiles one by one. Great vendors get lost in the pile. By
-                application 80, you're approving on fatigue.
+                You're scrolling profiles one by one. Great artists get lost in the pile. By
+                application 80, you're approving on fatigue not fit.
               </p>
             </div>
           </div>
@@ -353,12 +363,12 @@ export default function HomePage() {
           <div className="mb-16 grid items-center gap-16 border-b border-white/10 pb-16 md:grid-cols-2">
             <div>
               <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-white">
-                Automated emails that keep vendors in the loop
+                Automated emails that keep artists in the loop
               </h3>
               <p className="mb-5 text-[16px] leading-relaxed text-white/60">
-                Application confirmations, approval notices, payment reminders, event-day details —
-                all sent automatically from one branded email thread. Vendors always know where they
-                stand. You never have to write the same email twice.
+                Application confirmations, approval notices, payment reminders, event-day details,
+                all sent automatically from one branded email thread. Artists always know where they
+                stand. You never write the same email twice.
               </p>
               <div className="flex gap-2 flex-wrap">
                 <span className="rounded-full border border-primary/20 bg-primary/15 px-3.5 py-1.5 text-[12px] font-semibold text-white/80">
@@ -384,16 +394,16 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="md:order-2">
               <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-white">
-                Vendor relationships that compound
+                Artist relationships that compound
               </h3>
               <p className="mb-5 text-[16px] leading-relaxed text-white/60">
-                Stop rebuilding your vendor list from scratch every season. Track performance,
-                notes, tags, and ratings across all your events. Your best vendors are always one
-                search away.
+                Stop rebuilding your roster from scratch every season. Track applications, notes,
+                tags, and ratings across all your shows. Your best artists are always one search
+                away.
               </p>
               <div className="flex gap-2 flex-wrap">
                 <span className="rounded-full border border-fuchsia-400/20 bg-voxxy-pink/15 px-3.5 py-1.5 text-[12px] font-semibold text-fuchsia-100">
-                  Vendor CRM
+                  Artist CRM
                 </span>
                 <span className="rounded-full border border-primary/20 bg-primary/15 px-3.5 py-1.5 text-[12px] font-semibold text-white/80">
                   Performance Tracking
@@ -452,11 +462,11 @@ export default function HomePage() {
                 1
               </div>
               <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">
-                Build your network
+                Build your roster
               </h3>
               <p className="text-[15px] text-gray-600 leading-relaxed">
-                Import vendor contacts via CSV or add them manually. Organize with categories, tags,
-                and smart lists to keep your roster ready.
+                Import artist contacts via CSV or add them manually. Organize with categories, tags,
+                and smart lists so your network is always ready to invite.
               </p>
             </div>
             <div className="text-center">
@@ -464,11 +474,11 @@ export default function HomePage() {
                 2
               </div>
               <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">
-                Launch your event
+                Launch your show
               </h3>
               <p className="text-[15px] text-gray-600 leading-relaxed">
-                Create events, open applications, and review vendors in table or focused view. Set
-                payment preferences per category.
+                Create events, open applications, and review artists in table or focused view. Set
+                payment preferences and booth categories per show.
               </p>
             </div>
             <div className="text-center">
@@ -476,58 +486,13 @@ export default function HomePage() {
                 3
               </div>
               <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">
-                Automate everything
+                Let Voxxy handle the rest
               </h3>
               <p className="text-[15px] text-gray-600 leading-relaxed">
-                Email sequences handle confirmations, reminders, and payments. Vendors access their
-                own event portal. Your CRM grows with every show.
+                Automated email sequences handle confirmations, reminders, and follow-ups. Your CRM
+                grows with every show. You stay focused on the floor.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Traction / Testimonial */}
-      <section className="py-[100px] px-6 md:px-12 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-radial from-voxxy-pink/10 via-transparent to-transparent opacity-40"></div>
-
-        <div className="container mx-auto max-w-[1200px] relative z-10">
-          <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-light mb-4">
-              Already Live
-            </div>
-            <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-white">
-              Powering events across the country
-            </h2>
-            <p className="max-w-[600px] text-[18px] text-white/60">
-              From art shows in San Francisco to touring national events — Voxxy is where producers
-              are moving their operations.
-            </p>
-          </div>
-
-          <div className="grid items-center gap-12 rounded-2xl border border-voxxy-pink/15 bg-white/8 p-10 backdrop-blur-sm md:grid-cols-2">
-            <div>
-              <p className="mb-6 text-[20px] italic leading-relaxed text-white/85">
-                "We've grown from one market every other month to two markets a month with Voxxy.
-                The automation freed us up to focus on bringing more vendors and revenue to
-                Brooklyn. Game changer."
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/10 text-[32px]">
-                  ❤️
-                </div>
-                <div>
-                  <div className="font-bold text-white">Brooklyn Hearts Club</div>
-                  <div className="text-[13px] text-white/50">Brooklyn art market series</div>
-                </div>
-              </div>
-            </div>
-            <img
-              src="/screenshots/event-photo.png"
-              alt="Vibrant art market event with vendors and attendees"
-              className="rounded-2xl shadow-xl border border-voxxy-pink/20"
-              loading="lazy"
-            />
           </div>
         </div>
       </section>
@@ -558,9 +523,9 @@ export default function HomePage() {
                   Let's talk about your events
                 </h3>
                 <p className="text-[15px] leading-relaxed text-white/60">
-                  Whether you're running 5 art markets a year or 50 pop-ups across the country, we'd
-                  love to hear what you're building. We respond to every message within 1–2 business
-                  days.
+                  Whether you run art markets, curate shows, or produce pop-ups across the country,
+                  we'd love to hear what you're building. We respond to every message within 1–2
+                  business days.
                 </p>
               </div>
 
@@ -596,6 +561,7 @@ export default function HomePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[15px] text-white transition-colors hover:text-fuchsia-300"
+                      onClick={() => analytics.track('discord_link_clicked', { page: 'landing' })}
                     >
                       Join our Discord
                     </a>
@@ -615,6 +581,7 @@ export default function HomePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[15px] text-white transition-colors hover:text-fuchsia-300"
+                      onClick={() => analytics.track('instagram_link_clicked', { page: 'landing' })}
                     >
                       @voxxypresents on Instagram
                     </a>

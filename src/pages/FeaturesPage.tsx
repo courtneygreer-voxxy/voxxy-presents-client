@@ -38,12 +38,12 @@ export default function FeaturesPage() {
             <h1 className="mb-5 text-[52px] font-display font-bold leading-[1.1] tracking-tight text-white md:text-[56px]">
               Everything you need to{' '}
               <em className="not-italic bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] bg-clip-text text-transparent">
-                run better events
+                run better shows
               </em>
             </h1>
 
             <p className="mx-auto mb-0 max-w-[600px] text-[18px] leading-relaxed text-white/65">
-              Vendor coordination, automated communications, and relationship management — all in
+              Artist coordination, automated communications, and relationship management — all in
               one platform designed for how you actually work.
             </p>
           </div>
@@ -79,12 +79,12 @@ export default function FeaturesPage() {
                 <Mail className="h-6 w-6 text-violet-700" />
               </div>
               <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-slate-950">
-                Automated vendor communication
+                Automated artist communication
               </h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 Stop writing the same emails over and over. Application confirmations, approval
                 notices, payment reminders, waitlist updates, and event-day details — all sent
-                automatically from one branded email thread. Vendors always know where they stand.
+                automatically from one branded email thread. Artists always know where they stand.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
@@ -120,18 +120,18 @@ export default function FeaturesPage() {
                 <Users className="h-6 w-6 text-violet-700" />
               </div>
               <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-slate-950">
-                Vendor relationships that compound
+                Artist relationships that compound
               </h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
-                Stop rebuilding your vendor list from scratch every season. Track performance,
-                notes, tags, and ratings across all your events. CSV import for existing lists. Your
-                best vendors are always one search away.
+                Stop rebuilding your roster from scratch every season. Track performance, notes,
+                tags, and ratings across all your shows. CSV import for existing lists. Your best
+                artists are always one search away.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
                   <span className="text-[15px] text-gray-700">
-                    Unified vendor profiles across all events
+                    Unified artist profiles across all shows
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -143,7 +143,7 @@ export default function FeaturesPage() {
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 flex-shrink-0 text-violet-700" />
                   <span className="text-[15px] text-gray-700">
-                    CSV import for existing vendor lists
+                    CSV import for existing artist lists
                   </span>
                 </div>
               </div>
