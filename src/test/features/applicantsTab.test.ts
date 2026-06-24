@@ -41,6 +41,102 @@ describe('ApplicantsTab — source-level checks', () => {
   })
 })
 
+describe('ApplicantsTab — status filter logic', () => {
+  it('Paid filter checks payment_status, not applicant.status', () => {
+    // The 'paid' filter must branch on payment_status — not status === 'paid'
+    expect(source).toContain("statusFilter === 'paid'")
+    expect(source).toContain("applicant.payment_status !== 'paid'")
+    expect(source).toContain("applicant.payment_status !== 'confirmed'")
+  })
+
+  it('Paid filter handles both payment_status values (paid and legacy confirmed)', () => {
+    const filterBlock = source.slice(
+      source.indexOf("statusFilter === 'paid'"),
+      source.indexOf("} else if (applicant.status !== statusFilter)"),
+    )
+    expect(filterBlock).toContain("payment_status !== 'paid'")
+    expect(filterBlock).toContain("payment_status !== 'confirmed'")
+  })
+
+  it('Opted Out filter covers both opted_out and cancelled statuses', () => {
+    expect(source).toContain("statusFilter === 'opted_out'")
+    expect(source).toContain("applicant.status !== 'opted_out' && applicant.status !== 'cancelled'")
+  })
+
+  it('STATUS_FILTER_OPTIONS has paid not confirmed as a filter value', () => {
+    expect(source).toContain("value: 'paid', label: 'Paid'")
+    // confirmed should not be a filter option value anymore
+    expect(source).not.toContain("value: 'confirmed', label: 'Paid'")
+  })
+
+  it('StatusFilter type includes paid and does not rely on confirmed for filtering', () => {
+    const typeBlock = source.slice(
+      source.indexOf('type StatusFilter'),
+      source.indexOf('const STATUS_FILTER_OPTIONS'),
+    )
+    expect(typeBlock).toContain("'paid'")
+    expect(typeBlock).not.toContain("'confirmed'")
+  })
+
+  it('Invited filter auto-enables showInvited when selected', () => {
+    expect(source).toContain("if (newStatus === 'invited') setShowInvited(true)")
+  })
+})
+
+describe('ApplicantsTab — status badge display', () => {
+  it('legacy status=confirmed displays as Approved (not raw string)', () => {
+    // confirmed case must fall through to approved or have its own return
+    const badgeBlock = source.slice(
+      source.indexOf('const getStatusBadge'),
+      source.indexOf('const getPaymentBadge'),
+    )
+    // confirmed should be handled (not absent), and map to Approved label
+    expect(badgeBlock).toContain("case 'confirmed'")
+    expect(badgeBlock).not.toContain("label: 'confirmed'")
+  })
+
+  it('Approved and legacy confirmed share the Approved badge', () => {
+    const badgeBlock = source.slice(
+      source.indexOf('const getStatusBadge'),
+      source.indexOf('const getPaymentBadge'),
+    )
+    // The two cases should be adjacent with no return between them
+    const approvedIdx = badgeBlock.indexOf("case 'approved'")
+    const confirmedIdx = badgeBlock.indexOf("case 'confirmed'")
+    // confirmed must appear near approved (within 100 chars)
+    expect(Math.abs(approvedIdx - confirmedIdx)).toBeLessThan(100)
+  })
+
+  it('pending status displays as New', () => {
+    expect(source).toContain("case 'pending'")
+    expect(source).toContain("label: 'New'")
+  })
+
+  it('rejected status displays as Declined', () => {
+    expect(source).toContain("case 'rejected'")
+    expect(source).toContain("label: 'Declined'")
+  })
+})
+
+describe('ApplicantsTab — ticket code', () => {
+  it('Applicant interface includes ticket_code field', () => {
+    const interfaceBlock = source.slice(
+      source.indexOf('interface Applicant'),
+      source.indexOf('interface ApplicantsTabProps'),
+    )
+    expect(interfaceBlock).toContain('ticket_code')
+  })
+
+  it('ticket_code is mapped from API submission data', () => {
+    expect(source).toContain('ticket_code: submission.ticket_code')
+  })
+
+  it('detail panel uses ticket_code with application_code as fallback', () => {
+    // The copy button and display should prefer ticket_code, falling back to application_code
+    expect(source).toContain('selectedApplicant.ticket_code || selectedApplicant.application_code')
+  })
+})
+
 describe('ApplicantsTab — category change modal', () => {
   it('contains sendCategoryEmail toggle state', () => {
     expect(source).toContain('sendCategoryEmail')
