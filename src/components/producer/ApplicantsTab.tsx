@@ -825,7 +825,10 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
   const handleFilterBarChange = (filters: ActiveFilter[]) => {
     const statusLabel = filters.find((f) => f.fieldKey === 'status')?.values[0]
     const matchedStatus = STATUS_FILTER_OPTIONS.find((o) => o.label === statusLabel)
-    setStatusFilter(matchedStatus ? matchedStatus.value : 'all')
+    const newStatus = matchedStatus ? matchedStatus.value : 'all'
+    setStatusFilter(newStatus)
+    // Auto-show invited contacts when the Invited filter is selected
+    if (newStatus === 'invited') setShowInvited(true)
 
     const categoryValue = filters.find((f) => f.fieldKey === 'category')?.values[0]
     setCategoryFilter(categoryValue ?? 'all')

@@ -16,6 +16,7 @@ interface Applicant {
   tags?: string[]
   producer_notes?: string
   created_at: string
+  ticket_code?: string
   application_code?: string
   instagram_handle?: string
   tiktok_handle?: string
@@ -72,9 +73,9 @@ const EXPORT_COLUMNS: ExportColumn[] = [
     defaultOn: false,
   },
   {
-    key: 'application_code',
+    key: 'ticket_code',
     label: 'Ticket Code',
-    getValue: (a) => a.application_code || '',
+    getValue: (a) => a.ticket_code || a.application_code || '',
     defaultOn: false,
   },
   {
