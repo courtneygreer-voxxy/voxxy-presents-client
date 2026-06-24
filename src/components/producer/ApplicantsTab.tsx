@@ -676,6 +676,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           icon: Clock,
         }
       case 'approved':
+      case 'confirmed': // legacy — confirm_payment! now sets status='approved'; treat as Approved
         return {
           label: 'Approved',
           variant: 'tintGreen' as BadgeVariant,
