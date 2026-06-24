@@ -1103,11 +1103,6 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-0.5">
                             <h4 className="text-sm text-foreground font-semibold">{app.name}</h4>
-                            {app.pricing?.booth_price != null && (
-                              <span className="text-xs font-semibold text-emerald-800 dark:text-green-400">
-                                ${app.pricing.booth_price.toFixed(0)}
-                              </span>
-                            )}
                             <span
                               className={`text-[10px] font-medium ${app.status === 'active' ? 'text-emerald-800 dark:text-green-400' : 'text-muted-foreground'}`}
                             >
@@ -1142,43 +1137,18 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                             </div>
                           )}
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                              <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">
-                                Category Name *
-                              </label>
-                              <input
-                                type="text"
-                                value={editFormData.name}
-                                onChange={(e) =>
-                                  setEditFormData({ ...editFormData, name: e.target.value })
-                                }
-                                className={inputClasses}
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">
-                                Booth Price *
-                              </label>
-                              <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60 text-sm">
-                                  $
-                                </span>
-                                <input
-                                  type="number"
-                                  min="0"
-                                  step="0.01"
-                                  value={editFormData.booth_price ?? ''}
-                                  onChange={(e) =>
-                                    setEditFormData({
-                                      ...editFormData,
-                                      booth_price: parseFloat(e.target.value) || 0,
-                                    })
-                                  }
-                                  className={`${inputClasses} pl-7`}
-                                />
-                              </div>
-                            </div>
+                          <div>
+                            <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">
+                              Category Name *
+                            </label>
+                            <input
+                              type="text"
+                              value={editFormData.name}
+                              onChange={(e) =>
+                                setEditFormData({ ...editFormData, name: e.target.value })
+                              }
+                              className={inputClasses}
+                            />
                           </div>
 
                           <div>

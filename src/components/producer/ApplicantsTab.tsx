@@ -88,6 +88,7 @@ interface Applicant {
   portfolio_images?: string[]
   producer_notes?: string
   tags?: string[]
+  ticket_code?: string
   application_code?: string
   email_unsubscribed?: boolean
   unsubscribe_status?: {
@@ -273,6 +274,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           location: submission.location,
           portfolio_images: submission.portfolio_images,
           producer_notes: submission.producer_notes,
+          ticket_code: submission.ticket_code,
           application_code: submission.application_code,
           email_unsubscribed: submission.email_unsubscribed,
           unsubscribe_status: submission.email_unsubscribed
@@ -1515,17 +1517,21 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                         <span>{formatDate(selectedApplicant.created_at)}</span>
                       </div>
                     </div>
-                    {selectedApplicant.application_code && (
+                    {(selectedApplicant.ticket_code || selectedApplicant.application_code) && (
                       <div>
-                        <p className="text-[10px] text-foreground/60 mb-1">App Code</p>
+                        <p className="text-[10px] text-foreground/60 mb-1">Ticket Code</p>
                         <div className="flex items-center gap-1.5">
                           <code className="text-xs text-primary font-mono bg-primary/10 px-2 py-0.5 rounded">
-                            {selectedApplicant.application_code}
+                            {selectedApplicant.ticket_code || selectedApplicant.application_code}
                           </code>
                           <button
                             type="button"
                             onClick={() => {
-                              navigator.clipboard.writeText(selectedApplicant.application_code!)
+                              navigator.clipboard.writeText(
+                                selectedApplicant.ticket_code ||
+                                  selectedApplicant.application_code ||
+                                  '',
+                              )
                               toast.success('Code copied')
                             }}
                             className="p-1 rounded hover:bg-background/10 text-foreground/40 hover:text-foreground transition-colors"
