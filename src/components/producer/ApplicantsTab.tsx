@@ -24,6 +24,8 @@ import {
   List,
   ChevronLeft,
   ChevronRight,
+  Download,
+  Users,
 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import {
@@ -38,6 +40,7 @@ import { EmailConfirmationDialog } from './EmailConfirmationDialog'
 import { EditVendorDetailsModal } from './EditVendorDetailsModal'
 import { Button } from '@/components/ui/button'
 import { DebugPanel } from './DebugPanel'
+import ApplicantsExportModal from './ApplicantsExportModal'
 import { Badge, type BadgeVariant } from '@/components/ui/badge'
 import {
   Select,
@@ -156,26 +159,63 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
   const [showEditVendorModal, setShowEditVendorModal] = useState(false)
 
+  // Invited contacts visibility
+  const [showInvited, setShowInvited] = useState(false)
+  const [invitedCount, setInvitedCount] = useState(0)
+
+  // Export modal
+  const [showExportModal, setShowExportModal] = useState(false)
+
   // Email notifications hook
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } =
     useEmailNotifications()
 
   useEffect(() => {
     fetchApplicants()
-  }, [eventSlug])
+  }, [eventSlug, showInvited])
 
   useEffect(() => {
     setShowEditVendorModal(false)
   }, [selectedApplicant?.id])
+
+  const fetchAllInvitations = async (slug: string): Promise<any[]> => {
+    const all: any[] = []
+    let page = 1
+    const perPage = 100
+    let hasNextPage = true
+    while (hasNextPage) {
+      const resp = await eventInvitationsApi.getByEvent(slug, page, perPage)
+      all.push(...(resp.invitations || []))
+      hasNextPage = resp.meta?.pagination?.has_next_page ?? false
+      page++
+    }
+    return all
+  }
 
   const fetchApplicants = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      // Fetch invitations (people who were invited)
-      const invitationsResponse = await eventInvitationsApi.getByEvent(eventSlug, 1, 100)
-      const invitations = invitationsResponse.invitations || []
+      // Fetch invitations — always get page 1 for count; paginate fully only when shown
+      const firstPageResp = await eventInvitationsApi.getByEvent(eventSlug, 1, 100)
+      const firstPageInvitations = firstPageResp.invitations || []
+      const pagination = firstPageResp.meta?.pagination
+      const totalInvited =
+        pagination?.total_count ??
+        (pagination?.total_pages != null
+          ? pagination.total_pages > 1
+            ? pagination.total_pages * 100
+            : firstPageInvitations.length
+          : firstPageInvitations.length)
+      setInvitedCount(totalInvited)
+
+      let invitations: any[] = []
+      if (showInvited) {
+        // Paginate through all invitation pages (fixes 100-item cap)
+        invitations = await fetchAllInvitations(eventSlug)
+      }
+      // When showInvited=false, invitations stays [] — invited contacts are hidden
 
       // Fetch all vendor applications for this event
       const applications = await vendorApplicationsApi.getByEvent(eventSlug)
@@ -694,6 +734,9 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
   // Filter applicants
   const filteredApplicants = applicants.filter((applicant) => {
+    // Hide invited contacts unless showInvited is on
+    if (!showInvited && applicant.status === 'invited') return false
+
     // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
@@ -724,7 +767,10 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
   ].sort()
 
   const hasActiveFilters =
-    statusFilter !== 'all' || categoryFilter !== 'all' || searchQuery.trim() !== ''
+    statusFilter !== 'all' ||
+    (statusFilter === 'invited' && !showInvited) ||
+    categoryFilter !== 'all' ||
+    searchQuery.trim() !== ''
 
   const clearFilters = () => {
     setStatusFilter('all')
@@ -818,65 +864,101 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
   return (
     <div className="h-full flex flex-col">
-      {/* View Mode Toggle & Header */}
-      <div className="flex items-center justify-between px-3 md:px-4 pt-3 pb-2 border-b border-border">
-        <div>
+      {/* Header row 1: Title + actions + view toggle */}
+      <div className="flex items-center justify-between px-3 md:px-4 pt-3 pb-2 border-b border-border gap-2 flex-wrap">
+        <div className="shrink-0">
           <h2 className="text-2xl font-bold text-foreground">Applicants</h2>
           <p className="text-[10px] text-foreground/60">
-            {filteredApplicants.length} total
+            {filteredApplicants.length} shown
             {statusFilter !== 'all' && ` • ${statusFilter}`}
             {categoryFilter !== 'all' && ` • ${categoryFilter}`}
+            {!showInvited && invitedCount > 0 && ` • ${invitedCount} invited hidden`}
           </p>
         </div>
-        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
-          <button
-            onClick={() => setViewMode('focused')}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-smooth ${
-              viewMode === 'focused'
-                ? 'voxxy-nav-tab-active'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-            title="Focused view"
-          >
-            <LayoutPanelLeft className="w-3.5 h-3.5" />
-            Focused
-          </button>
-          <button
-            onClick={() => {
-              setViewMode('table')
+
+        {/* Search — flex-1 in the middle */}
+        <div className="relative flex-1 min-w-[160px] max-w-xs">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-foreground/50" />
+          <input
+            type="text"
+            placeholder="Search applicants..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
               setTablePage(1)
-              clearTableSelection()
             }}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-smooth ${
-              viewMode === 'table'
-                ? 'voxxy-nav-tab-active'
-                : 'text-muted-foreground hover:text-foreground'
+            className="w-full pl-7 pr-2 py-1.5 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+          />
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Invited toggle */}
+          <button
+            onClick={() => setShowInvited((v) => !v)}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg border transition-smooth ${
+              showInvited
+                ? 'bg-primary/15 border-primary/30 text-foreground'
+                : 'border-border text-foreground/60 hover:text-foreground'
             }`}
-            title="Table view"
+            title={showInvited ? 'Hide invited contacts' : 'Show invited contacts'}
           >
-            <List className="w-3.5 h-3.5" />
-            Table
+            <Users className="w-3 h-3" />
+            {showInvited
+              ? 'Hide Invited'
+              : invitedCount > 0
+                ? `Invited (${invitedCount})`
+                : 'Invited'}
           </button>
+
+          {/* Export button */}
+          <button
+            onClick={() => setShowExportModal(true)}
+            disabled={filteredApplicants.length === 0}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg border border-border text-foreground/60 hover:text-foreground transition-smooth disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Export applicants as CSV"
+          >
+            <Download className="w-3 h-3" />
+            Export
+          </button>
+
+          {/* View mode toggle */}
+          <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('focused')}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-smooth ${
+                viewMode === 'focused'
+                  ? 'voxxy-nav-tab-active'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+              title="Focused view"
+            >
+              <LayoutPanelLeft className="w-3.5 h-3.5" />
+              Focused
+            </button>
+            <button
+              onClick={() => {
+                setViewMode('table')
+                setTablePage(1)
+                clearTableSelection()
+              }}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-smooth ${
+                viewMode === 'table'
+                  ? 'voxxy-nav-tab-active'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+              title="Table view"
+            >
+              <List className="w-3.5 h-3.5" />
+              Table
+            </button>
+          </div>
         </div>
       </div>
       {/* ── TABLE VIEW ── */}
       {viewMode === 'table' && (
         <div className="flex-1 flex flex-col overflow-hidden p-3 md:p-4 gap-3">
-          {/* Filters row (reuse same controls) */}
+          {/* Filters row */}
           <div className="flex flex-wrap gap-2 items-center">
-            <div className="relative flex-1 min-w-[160px]">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-foreground/50" />
-              <input
-                type="text"
-                placeholder="Search applicants..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value)
-                  setTablePage(1)
-                }}
-                className="w-full pl-7 pr-2 py-1.5 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
-              />
-            </div>
             <Select
               value={statusFilter}
               onValueChange={(v) => {
@@ -895,7 +977,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                   Invited
                 </SelectItem>
                 <SelectItem value="pending" className="text-xs">
-                  New (Unreviewed)
+                  New
                 </SelectItem>
                 <SelectItem value="approved" className="text-xs">
                   Approved
@@ -904,7 +986,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                   Confirmed
                 </SelectItem>
                 <SelectItem value="waitlist" className="text-xs">
-                  Waitlist
+                  Waitlisted
                 </SelectItem>
                 <SelectItem value="rejected" className="text-xs">
                   Declined
@@ -1143,18 +1225,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 </p>
               </div>
 
-              {/* Search Bar */}
-              <div className="relative mb-2">
-                <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-foreground/65 dark:text-foreground/40" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-7 pr-2 py-1.5 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
-                />
-              </div>
-
               {/* Status & Category Filters */}
               <div className="space-y-1.5">
                 <Select
@@ -1169,10 +1239,10 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       All Status
                     </SelectItem>
                     <SelectItem value="invited" className="text-xs focus:bg-background/10">
-                      Invited (No Application)
+                      Invited
                     </SelectItem>
                     <SelectItem value="pending" className="text-xs focus:bg-background/10">
-                      New (Unreviewed)
+                      New
                     </SelectItem>
                     <SelectItem value="approved" className="text-xs focus:bg-background/10">
                       Approved
@@ -1181,7 +1251,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       Confirmed
                     </SelectItem>
                     <SelectItem value="waitlist" className="text-xs focus:bg-background/10">
-                      Waitlist
+                      Waitlisted
                     </SelectItem>
                     <SelectItem value="rejected" className="text-xs focus:bg-background/10">
                       Declined
@@ -2208,6 +2278,14 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           </div>
         </div>
       )}
+      {/* Export Modal */}
+      <ApplicantsExportModal
+        open={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        applicants={filteredApplicants}
+        eventSlug={eventSlug}
+      />
+
       {/* Admin Debug Panel */}
       <DebugPanel
         title="Applicants Tab"
