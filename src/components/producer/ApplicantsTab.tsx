@@ -121,14 +121,15 @@ type StatusFilter =
 
 // Status filter values paired with their human-facing labels (used by the
 // shared SearchFilterBar, which works in terms of display labels).
+// 'opted_out' is the representative value for the merged "Opted Out" group,
+// which matches both 'opted_out' and 'cancelled' applicant statuses.
 const STATUS_FILTER_OPTIONS: { value: Exclude<StatusFilter, 'all'>; label: string }[] = [
   { value: 'invited', label: 'Invited' },
   { value: 'pending', label: 'New' },
   { value: 'approved', label: 'Approved' },
-  { value: 'confirmed', label: 'Confirmed' },
+  { value: 'confirmed', label: 'Paid' },
   { value: 'waitlist', label: 'Waitlisted' },
   { value: 'rejected', label: 'Declined' },
-  { value: 'cancelled', label: 'Cancelled' },
   { value: 'opted_out', label: 'Opted Out' },
 ]
 
@@ -682,7 +683,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
         }
       case 'confirmed':
         return {
-          label: 'Confirmed',
+          label: 'Paid',
           variant: 'tintGreenDeep' as BadgeVariant,
           icon: CheckCircle,
         }
@@ -698,12 +699,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           variant: 'tintRed' as BadgeVariant,
           icon: XCircle,
         }
+      // 'cancelled' is merged into the "Opted Out" group, so it shares its label/style.
       case 'cancelled':
-        return {
-          label: 'Cancelled',
-          variant: 'tintMuted' as BadgeVariant,
-          icon: XCircle,
-        }
       case 'opted_out':
         return {
           label: 'Opted Out',
@@ -773,7 +770,14 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     }
 
     // Status filter
-    if (statusFilter !== 'all' && applicant.status !== statusFilter) return false
+    if (statusFilter !== 'all') {
+      if (statusFilter === 'opted_out') {
+        // Merged group: "Opted Out" covers both opted_out and cancelled.
+        if (applicant.status !== 'opted_out' && applicant.status !== 'cancelled') return false
+      } else if (applicant.status !== statusFilter) {
+        return false
+      }
+    }
 
     // Category filter
     if (categoryFilter !== 'all' && applicant.vendor_category !== categoryFilter) return false
