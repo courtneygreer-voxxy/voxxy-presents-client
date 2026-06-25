@@ -224,8 +224,8 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
-        {/* Toast Notifications - Auto-dismiss after 4 seconds */}
-        <Toaster position="top-right" duration={4000} closeButton richColors theme="system" />
+        {/* Toast Notifications - Auto-dismiss after 3 seconds */}
+        <Toaster position="top-right" duration={3000} closeButton richColors theme="system" />
 
         {/* Debug Panel - Shows on all pages in development */}
         <DebugPanel />
@@ -236,6 +236,7 @@ export default function App() {
               PUBLIC ROUTES
               ========================================== */}
             <Route path="/" element={<HomePage />} />
+            <Route path="/artists" element={<ArtistLandingPage />} />
             <Route path="/features" element={<FeaturesPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/help" element={<HelpPage />} />

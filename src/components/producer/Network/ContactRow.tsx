@@ -1,5 +1,15 @@
 import { useState } from 'react'
-import { Instagram, Music2, Globe, Pencil, Trash2, MapPin, MoreVertical, MailX } from 'lucide-react'
+import {
+  Instagram,
+  Music2,
+  Globe,
+  Eye,
+  Pencil,
+  Trash2,
+  MapPin,
+  MoreVertical,
+  MailX,
+} from 'lucide-react'
 import { VendorContact } from '@/services/api'
 
 interface ContactRowProps {
@@ -8,6 +18,7 @@ interface ContactRowProps {
   onSelect: () => void
   onDelete: () => void
   onEdit: () => void
+  onView: () => void
 }
 
 export default function ContactRow({
@@ -16,6 +27,7 @@ export default function ContactRow({
   onSelect,
   onDelete,
   onEdit,
+  onView,
 }: ContactRowProps) {
   const [showMenu, setShowMenu] = useState(false)
 
@@ -208,6 +220,18 @@ export default function ContactRow({
                   top: `${(document.activeElement as HTMLElement)?.getBoundingClientRect().bottom + 4}px`,
                 }}
               >
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setShowMenu(false)
+                    onView()
+                  }}
+                  className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-foreground transition-colors hover:bg-accent/60 dark:hover:bg-background/10"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  View
+                </button>
                 <button
                   type="button"
                   onClick={(e) => {

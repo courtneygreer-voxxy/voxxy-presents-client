@@ -9,7 +9,8 @@ export default function ApplicationConfirmationPage() {
   const [eventSlug, setEventSlug] = useState('')
 
   useEffect(() => {
-    const code = searchParams.get('application_code')
+    // ticket_code is unique per registration; fall back to legacy application_code param
+    const code = searchParams.get('ticket_code') || searchParams.get('application_code')
     const event = searchParams.get('event')
 
     if (code) setApplicationCode(code)
@@ -38,12 +39,12 @@ export default function ApplicationConfirmationPage() {
           {/* Application Code */}
           {applicationCode && (
             <div className="bg-primary/10 dark:bg-primary/20/20 border border-primary/30 rounded-lg p-6 mb-8">
-              <p className="text-sm text-foreground/70 mb-2">Your Application Code</p>
+              <p className="text-sm text-foreground/70 mb-2">Your Ticket Code</p>
               <p className="text-2xl font-mono font-bold text-violet-900 dark:text-primary tracking-wider">
                 {applicationCode}
               </p>
               <p className="text-xs text-foreground/40 mt-2">
-                Save this code to track your application status
+                Save this code — it's your unique reference for this application
               </p>
             </div>
           )}

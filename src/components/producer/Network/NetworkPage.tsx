@@ -2,9 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import {
   UserPlus,
   Upload,
-  Save,
   X,
-  Filter,
   Tag,
   Plus,
   Edit2,
@@ -12,150 +10,48 @@ import {
   Users,
   Search,
   ChevronDown,
-  ChevronUp,
-  Check,
   DollarSign,
   Percent,
   Download,
+  Filter,
 } from 'lucide-react'
-import { MapPin, Tags } from 'lucide-react'
 import {
   vendorContactsApi,
   contactListsApi,
   categoriesApi,
   eventsApi,
   VendorContact,
+  ContactList,
 } from '@/services/api'
 import type { Category, CategoryFeePreference } from '@/types/category'
 import { PAYMENT_PRICE_TYPES } from '@/components/producer/CreateEventWizard/types'
 import ContactsTable from './ContactsTable'
 import AddContactModal from './AddContactModal'
 import EditContactModal from './EditContactModal'
+import ViewContactModal from './ViewContactModal'
 import { CSVUploadModal } from './CSVUploadModal'
 import ListsManagement from './Lists/ListsManagement'
-import SmartListBuilder from './Lists/SmartListBuilder'
-import { BulkActionToolbar } from './BulkActionToolbar'
+import BulkEditModal from './BulkEditModal'
 import ContactExportModal from './ContactExportModal'
-import type { ActiveFilter, FilterFieldConfig } from '@/components/shared/SearchFilterBar'
+import FilterPanel, { type FilterDraft } from './FilterPanel'
+import type { ActiveFilter } from '@/components/shared/SearchFilterBar'
+import { notify } from '@/errors/notify'
+import { getApiErrorMessage } from '@/errors/getApiErrorMessage'
+import {
+  IMPORT_BATCH_VIEW_LABEL,
+  IMPORT_TAG_COUNTS_FOOTNOTE,
+  IMPORT_TAG_COUNTS_LABEL,
+  IMPORT_WHERE_DID_THEY_GO,
+  BULK_EDIT_LABEL,
+} from './copy'
+import {
+  type ImportSession,
+  clearImportSession,
+  loadImportSession,
+  saveImportSession,
+} from './importSession'
 
 type NetworkTab = 'contacts' | 'lists' | 'categories'
-
-// Filter Dropdown Component
-function FilterDropdownButton({
-  field,
-  selectedValues,
-  onChange,
-}: {
-  field: FilterFieldConfig
-  selectedValues: string[]
-  onChange: (values: string[]) => void
-}) {
-  const [open, setOpen] = useState(false)
-  const [search, setSearch] = useState('')
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false)
-        setSearch('')
-      }
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
-  const filtered = field.options.filter((opt) => opt.toLowerCase().includes(search.toLowerCase()))
-
-  const handleToggle = (value: string) => {
-    if (selectedValues.includes(value)) {
-      onChange(selectedValues.filter((v) => v !== value))
-    } else {
-      onChange([...selectedValues, value])
-    }
-  }
-
-  const Icon = field.icon
-
-  return (
-    <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen(!open)}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-          selectedValues.length > 0
-            ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
-            : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 hover:text-foreground border border-border hover:bg-accent/60 dark:hover:bg-card/70 dark:border-white/10'
-        }`}
-      >
-        {Icon && <Icon className="w-3.5 h-3.5" />}
-        <span>{field.label}</span>
-        {selectedValues.length > 0 && (
-          <span className="flex items-center justify-center w-4 h-4 bg-primary/50 text-primary-foreground text-[10px] font-bold rounded-full">
-            {selectedValues.length}
-          </span>
-        )}
-        <ChevronDown
-          className={`w-3 h-3 text-foreground/65 dark:text-foreground/40 transition-transform ${open ? 'rotate-180' : ''}`}
-        />
-      </button>
-
-      {open && (
-        <div className="voxxy-select-surface absolute z-50 mt-1 w-56 overflow-hidden rounded-lg shadow-xl">
-          {field.options.length > 5 && (
-            <div className="p-2 border-b border-border">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={`Search ${field.label.toLowerCase()}...`}
-                className="w-full rounded border border-border bg-card/80 px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 dark:bg-background/10"
-                autoFocus
-              />
-            </div>
-          )}
-          <div className="max-h-48 overflow-y-auto p-1">
-            {filtered.length === 0 ? (
-              <p className="px-3 py-2 text-xs text-foreground/75 dark:text-muted-foreground">
-                No options found
-              </p>
-            ) : (
-              filtered.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => handleToggle(option)}
-                  className="w-full flex items-center gap-2.5 rounded px-3 py-1.5 text-xs text-foreground/90 dark:text-foreground/80 transition-colors hover:bg-accent/60 dark:hover:bg-background/10"
-                >
-                  <div
-                    className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                      selectedValues.includes(option)
-                        ? 'bg-primary/50 border-primary'
-                        : 'border-border'
-                    }`}
-                  >
-                    {selectedValues.includes(option) && (
-                      <Check className="w-2.5 h-2.5 text-foreground" strokeWidth={3} />
-                    )}
-                  </div>
-                  <span className="truncate text-left">{option}</span>
-                </button>
-              ))
-            )}
-          </div>
-          {selectedValues.length > 0 && (
-            <div className="p-1.5 border-t border-border">
-              <button
-                onClick={() => onChange([])}
-                className="w-full text-xs text-foreground/75 dark:text-muted-foreground hover:text-foreground py-1 transition-colors"
-              >
-                Clear {field.label.toLowerCase()}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
 
 interface NetworkPageProps {
   organizationId: number
@@ -184,16 +80,20 @@ export default function NetworkPage({
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedContacts, setSelectedContacts] = useState<number[]>([])
   const [editingContact, setEditingContact] = useState<VendorContact | null>(null)
+  const [viewingContact, setViewingContact] = useState<VendorContact | null>(null)
   const [actionsMenuOpen, setActionsMenuOpen] = useState(false)
 
   // Client-side filter states
   const [updatedAtRange, setUpdatedAtRange] = useState<'all' | '24h' | '48h' | '7d' | '30d'>('all')
   const [eventFilter, setEventFilter] = useState<string>('all') // 'all' | 'none' | event_id
   const [eventStatusFilter, setEventStatusFilter] = useState<string>('all') // 'all' | 'approved' | 'pending' | 'rejected' etc.
+  const [socialFilter, setSocialFilter] = useState<string[]>([]) // 'instagram' | 'tiktok' | 'website'
   const [orgEvents, setOrgEvents] = useState<{ id: number; title: string }[]>([])
   const [showExportModal, setShowExportModal] = useState(false)
-  const [showFilters, setShowFilters] = useState(false)
+  const [showBulkEditModal, setShowBulkEditModal] = useState(false)
+  const [showFilterPanel, setShowFilterPanel] = useState(false)
   const actionsMenuRef = useRef<HTMLDivElement>(null)
+  const filterMenuRef = useRef<HTMLDivElement>(null)
 
   // SearchFilterBar state
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([])
@@ -219,21 +119,9 @@ export default function NetworkPage({
     tags: string[]
   }>({ locations: [], categories: [], tags: [] })
 
-  // Inline save list state
-  const [showSaveInput, setShowSaveInput] = useState(false)
-  const [listName, setListName] = useState('')
-  const [savingList, setSavingList] = useState(false)
-
-  // Create smart list modal state
-  const [isCreatingList, setIsCreatingList] = useState(false)
-  const [createListName, setCreateListName] = useState('')
-  const [createListDescription, setCreateListDescription] = useState('')
-  const [createListFilters, setCreateListFilters] = useState<{
-    categories?: string[]
-    locations?: string[]
-    tags?: string[]
-  }>({})
-  const [savingCreateList, setSavingCreateList] = useState(false)
+  // Saved queries (smart contact lists surfaced as "queries" in the filter panel)
+  const [savedQueries, setSavedQueries] = useState<ContactList[]>([])
+  const [savingQuery, setSavingQuery] = useState(false)
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1)
@@ -248,64 +136,122 @@ export default function NetworkPage({
   // Bulk update state
   const [bulkUpdateLoading, setBulkUpdateLoading] = useState(false)
 
+  // Post-import session + saved lists (for one-click list creation)
+  const [importSession, setImportSession] = useState<ImportSession | null>(null)
+  const [viewingImportBatch, setViewingImportBatch] = useState(false)
   // Derive filter arrays from activeFilters
   const locationFilters = activeFilters.find((f) => f.fieldKey === 'location')?.values || []
   const categoryFilters = activeFilters.find((f) => f.fieldKey === 'category')?.values || []
   const tagFilters = activeFilters.find((f) => f.fieldKey === 'tags')?.values || []
-  const hasActiveFilters =
-    locationFilters.length > 0 ||
-    categoryFilters.length > 0 ||
-    tagFilters.length > 0 ||
+  const hasListableFilters =
+    locationFilters.length > 0 || categoryFilters.length > 0 || tagFilters.length > 0
+  const hasAdvancedFilters =
     updatedAtRange !== 'all' ||
     eventFilter !== 'all' ||
-    eventStatusFilter !== 'all'
+    eventStatusFilter !== 'all' ||
+    socialFilter.length > 0
+  const hasActiveFilters = hasListableFilters || hasAdvancedFilters
 
-  // Filter field config for SearchFilterBar
-  const filterFieldConfigs: FilterFieldConfig[] = [
-    {
-      key: 'category',
-      label: 'Category',
-      icon: Tag,
-      options: filterOptions.categories,
-      multi: true,
-    },
-    {
-      key: 'location',
-      label: 'Location',
-      icon: MapPin,
-      options: filterOptions.locations,
-      multi: true,
-    },
-    { key: 'tags', label: 'Tags', icon: Tags, options: filterOptions.tags, multi: true },
-  ]
+  // Number of distinct active filter dimensions (drives the Filter button badge)
+  const activeFilterCount =
+    (categoryFilters.length > 0 ? 1 : 0) +
+    (locationFilters.length > 0 ? 1 : 0) +
+    (tagFilters.length > 0 ? 1 : 0) +
+    (socialFilter.length > 0 ? 1 : 0) +
+    (updatedAtRange !== 'all' ? 1 : 0) +
+    (eventFilter !== 'all' ? 1 : 0)
 
-  // Close actions menu on outside click
+  // Close actions menu / filter panel on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (actionsMenuRef.current && !actionsMenuRef.current.contains(e.target as Node)) {
         setActionsMenuOpen(false)
+      }
+      if (filterMenuRef.current && !filterMenuRef.current.contains(e.target as Node)) {
+        setShowFilterPanel(false)
       }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  // Fetch filter options from backend on mount
-  useEffect(() => {
-    const loadFilterOptions = async () => {
-      try {
-        const options = await vendorContactsApi.getFilterOptions(organizationId)
-        setFilterOptions({
-          locations: options.locations || [],
-          categories: options.categories || [],
-          tags: options.tags || [],
-        })
-      } catch (err) {
-        console.error('Failed to load filter options:', err)
-      }
+  const refreshFilterOptions = async () => {
+    try {
+      const options = await vendorContactsApi.getFilterOptions(organizationId)
+      setFilterOptions({
+        locations: options.locations || [],
+        categories: options.categories || [],
+        tags: options.tags || [],
+      })
+    } catch (err) {
+      console.error('Failed to load filter options:', err)
     }
-    loadFilterOptions()
+  }
+
+  const loadSavedQueries = async () => {
+    try {
+      const { contact_lists } = await contactListsApi.getAll(organizationId)
+      // Filters create "queries" (smart lists); manual lists are not surfaced here.
+      setSavedQueries((contact_lists || []).filter((l) => l.list_type === 'smart'))
+    } catch (err) {
+      console.error('Failed to load saved queries:', err)
+    }
+  }
+
+  // Fetch filter options + saved queries on mount
+  useEffect(() => {
+    refreshFilterOptions()
+    loadSavedQueries()
+    const stored = loadImportSession(organizationId)
+    if (stored) setImportSession(stored)
   }, [organizationId])
+
+  const handleImportSuccess = async (session: ImportSession) => {
+    saveImportSession(organizationId, session)
+    setImportSession(session)
+    await refreshFilterOptions()
+    fetchContacts(1)
+  }
+
+  const dismissImportSession = () => {
+    clearImportSession(organizationId)
+    setImportSession(null)
+    setViewingImportBatch(false)
+  }
+
+  const viewImportUpload = () => {
+    if (!importSession) return
+    setSearchTerm('')
+    setUpdatedAtRange('all')
+    setEventFilter('all')
+    setEventStatusFilter('all')
+    setViewingManualList(null)
+
+    const tagsToFilter =
+      importSession.tags.length === 1 && importSession.primaryTag
+        ? [importSession.primaryTag]
+        : importSession.tags
+
+    const withoutListable = activeFilters.filter(
+      (f) => f.fieldKey !== 'tags' && f.fieldKey !== 'category' && f.fieldKey !== 'location',
+    )
+    if (tagsToFilter.length > 0) {
+      setActiveFilters([...withoutListable, { fieldKey: 'tags', values: tagsToFilter }])
+    } else {
+      setActiveFilters(withoutListable)
+    }
+
+    setViewingImportBatch(true)
+    setCurrentPage(1)
+  }
+
+  const clearImportBatchView = () => {
+    setViewingImportBatch(false)
+    const withoutTags = activeFilters.filter((f) => f.fieldKey !== 'tags')
+    setActiveFilters(withoutTags)
+    setCurrentPage(1)
+    fetchContacts(1)
+  }
 
   // Fetch org events for the event filter dropdown
   useEffect(() => {
@@ -464,8 +410,11 @@ export default function NetworkPage({
       await vendorContactsApi.delete(contactId)
       setContacts((prev) => prev.filter((c) => c.id !== contactId))
       setSelectedContacts((prev) => prev.filter((id) => id !== contactId))
-    } catch (err: any) {
-      alert(err.message || 'Failed to delete contact')
+    } catch (err: unknown) {
+      notify.error({
+        key: 'network.deleteContactFailed',
+        fallback: getApiErrorMessage(err),
+      })
     }
   }
 
@@ -481,7 +430,11 @@ export default function NetworkPage({
     try {
       setBulkUpdateLoading(true)
       const result = await vendorContactsApi.bulkDelete(organizationId, selectedContacts)
-      alert(result.message || `Successfully deleted ${result.deleted_count} contacts`)
+      notify.success({
+        key: 'network.bulkDeleteSuccess',
+        params: { count: result.deleted_count },
+        fallback: result.message,
+      })
       await fetchContacts(currentPage)
       try {
         const options = await vendorContactsApi.getFilterOptions(organizationId)
@@ -494,8 +447,11 @@ export default function NetworkPage({
         /* ignore */
       }
       setSelectedContacts([])
-    } catch (error: any) {
-      alert(`Failed to delete contacts: ${error.message || 'Unknown error'}`)
+    } catch (error: unknown) {
+      notify.error({
+        key: 'network.bulkDeleteFailed',
+        fallback: getApiErrorMessage(error),
+      })
     } finally {
       setBulkUpdateLoading(false)
     }
@@ -522,29 +478,73 @@ export default function NetworkPage({
         categories: categoryNames,
         category_mode: categoryMode,
       })
-      alert(result.message || `Successfully updated ${result.updated_count} contacts`)
+      notify.success({
+        key: 'network.bulkUpdateSuccess',
+        params: { count: result.updated_count },
+        fallback: result.message,
+      })
       await fetchContacts(currentPage)
       setSelectedContacts([])
-    } catch (error: any) {
-      alert(`Failed to update contacts: ${error.message || 'Unknown error'}`)
+    } catch (error: unknown) {
+      notify.error({
+        key: 'network.bulkUpdateFailed',
+        fallback: getApiErrorMessage(error),
+      })
     } finally {
       setBulkUpdateLoading(false)
     }
   }
 
-  const handleBulkLocationUpdate = async (location: string) => {
-    if (selectedContacts.length === 0) return
+  const handleBulkTags = async (tags: string[]) => {
+    if (selectedContacts.length === 0 || tags.length === 0) return
+
+    try {
+      setBulkUpdateLoading(true)
+      // Append tags without clobbering existing ones (bulkUpdate replaces the tag set).
+      await Promise.all(
+        selectedContacts.map((contactId) =>
+          Promise.all(tags.map((tag) => vendorContactsApi.addTag(contactId, tag))),
+        ),
+      )
+      notify.success({
+        key: 'network.bulkUpdateSuccess',
+        params: { count: selectedContacts.length },
+        fallback: `Added ${tags.length} tag${tags.length === 1 ? '' : 's'} to ${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'}.`,
+      })
+      await refreshFilterOptions()
+      await fetchContacts(currentPage)
+      setSelectedContacts([])
+    } catch (error: unknown) {
+      notify.error({
+        key: 'network.bulkUpdateFailed',
+        fallback: getApiErrorMessage(error),
+      })
+    } finally {
+      setBulkUpdateLoading(false)
+    }
+  }
+
+  const handleBulkLocation = async (location: string) => {
+    if (selectedContacts.length === 0 || !location.trim()) return
 
     try {
       setBulkUpdateLoading(true)
       const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
-        location,
+        location: location.trim(),
       })
-      alert(result.message || `Successfully updated ${result.updated_count} contacts`)
+      notify.success({
+        key: 'network.bulkUpdateSuccess',
+        params: { count: result.updated_count },
+        fallback: result.message,
+      })
+      await refreshFilterOptions()
       await fetchContacts(currentPage)
       setSelectedContacts([])
-    } catch (error: any) {
-      alert(`Failed to update location: ${error.message || 'Unknown error'}`)
+    } catch (error: unknown) {
+      notify.error({
+        key: 'network.bulkUpdateFailed',
+        fallback: getApiErrorMessage(error),
+      })
     } finally {
       setBulkUpdateLoading(false)
     }
@@ -560,9 +560,9 @@ export default function NetworkPage({
     setUpdatedAtRange('all')
     setEventFilter('all')
     setEventStatusFilter('all')
+    setSocialFilter([])
     setViewingManualList(null)
-    setShowSaveInput(false)
-    setListName('')
+    setViewingImportBatch(false)
   }
 
   // Apply client-side filters that the backend doesn't support
@@ -595,6 +595,17 @@ export default function NetworkPage({
       // Status filter without specific event — match any event with that status
       filtered = filtered.filter((c) =>
         (c.event_history || []).some((eh) => eh.status?.toLowerCase() === eventStatusFilter),
+      )
+    }
+    if (socialFilter.length > 0) {
+      // Match contacts that have any of the selected social platforms
+      filtered = filtered.filter((c) =>
+        socialFilter.some((s) => {
+          if (s === 'instagram') return !!c.instagram_handle
+          if (s === 'tiktok') return !!c.tiktok_handle
+          if (s === 'website') return !!c.website
+          return false
+        }),
       )
     }
     return filtered
@@ -692,7 +703,7 @@ export default function NetworkPage({
 
   const handleSaveCategory = async () => {
     if (!categoryFormData.name.trim()) {
-      alert('Category name is required')
+      notify.error({ key: 'network.categoryNameRequired' })
       return
     }
     const payload = {
@@ -712,10 +723,11 @@ export default function NetworkPage({
       setEditingCategory(null)
       setCategoryFormData({ ...emptyCategory })
       setPaymentPreferences([])
-    } catch (error: any) {
-      alert(
-        `Failed to save category: ${error.response?.data?.error || error.message || 'Please try again.'}`,
-      )
+    } catch (error: unknown) {
+      notify.error({
+        key: 'network.saveCategoryFailed',
+        fallback: getApiErrorMessage(error),
+      })
     }
   }
 
@@ -729,19 +741,21 @@ export default function NetworkPage({
         usageDetails.push(`${stats.email_templates_count} email template(s)`)
       if (stats?.scheduled_emails_count)
         usageDetails.push(`${stats.scheduled_emails_count} scheduled email(s)`)
-      alert(
-        `Cannot delete this category. It is currently being used by:\n\n${usageDetails.join('\n')}\n\nPlease remove these associations first.`,
-      )
+      notify.warning({
+        key: 'network.deleteCategoryBlocked',
+        params: { usageDetails: usageDetails.join('\n') },
+      })
       return
     }
     if (!confirm(`Are you sure you want to delete the category "${category.name}"?`)) return
     try {
       await categoriesApi.delete(category.id)
       await loadCategories()
-    } catch (error: any) {
-      alert(
-        `Failed to delete category: ${error.response?.data?.error || error.message || 'Please try again.'}`,
-      )
+    } catch (error: unknown) {
+      notify.error({
+        key: 'network.deleteCategoryFailed',
+        fallback: getApiErrorMessage(error),
+      })
     }
   }
 
@@ -750,62 +764,75 @@ export default function NetworkPage({
     onTabChange?.('contacts')
   }
 
-  const handleSaveList = async () => {
-    if (!listName.trim()) return
-    setSavingList(true)
+  // Commit a draft from the filter panel into the live (server + client) filters.
+  const handleApplyFilters = (draft: FilterDraft) => {
+    const nextActive: ActiveFilter[] = []
+    if (draft.category.length > 0) nextActive.push({ fieldKey: 'category', values: draft.category })
+    if (draft.location.length > 0) nextActive.push({ fieldKey: 'location', values: draft.location })
+    if (draft.tags.length > 0) nextActive.push({ fieldKey: 'tags', values: draft.tags })
+    setActiveFilters(nextActive)
+    setUpdatedAtRange(draft.updated as typeof updatedAtRange)
+    setEventFilter(draft.event)
+    setEventStatusFilter(draft.eventStatus)
+    setSocialFilter(draft.social)
+    setViewingManualList(null)
+    setViewingImportBatch(false)
+    setShowFilterPanel(false)
+  }
+
+  // Apply a saved query (smart list) — load its filters into the active filter set.
+  const handleApplyQuery = (query: ContactList) => {
+    const nextActive: ActiveFilter[] = []
+    const f = query.filters || {}
+    if (f.categories?.length) nextActive.push({ fieldKey: 'category', values: f.categories })
+    if (f.locations?.length) nextActive.push({ fieldKey: 'location', values: f.locations })
+    if (f.tags?.length) nextActive.push({ fieldKey: 'tags', values: f.tags })
+    setActiveFilters(nextActive)
+    setUpdatedAtRange('all')
+    setEventFilter('all')
+    setEventStatusFilter('all')
+    setSocialFilter([])
+    setViewingManualList(null)
+    setViewingImportBatch(false)
+    setShowFilterPanel(false)
+  }
+
+  // Save the current filter draft as a reusable query (smart list).
+  const handleSaveQuery = async (name: string, draft: FilterDraft) => {
+    if (!name.trim()) return
+    setSavingQuery(true)
     try {
       await contactListsApi.create(organizationId, {
-        name: listName.trim(),
+        name: name.trim(),
         list_type: 'smart',
         filters: {
-          locations: locationFilters.length > 0 ? locationFilters : undefined,
-          categories: categoryFilters.length > 0 ? categoryFilters : undefined,
-          tags: tagFilters.length > 0 ? tagFilters : undefined,
+          locations: draft.location.length > 0 ? draft.location : undefined,
+          categories: draft.category.length > 0 ? draft.category : undefined,
+          tags: draft.tags.length > 0 ? draft.tags : undefined,
         },
       })
-      setListName('')
-      setShowSaveInput(false)
-      onTabChange?.('lists')
-    } catch (err: any) {
-      alert(err.message || 'Failed to save list')
+      await loadSavedQueries()
+      notify.success({ key: 'network.saveQuerySaved', fallback: `Saved query "${name.trim()}"` })
+    } catch (err: unknown) {
+      notify.error({
+        key: 'network.saveListFailed',
+        fallback: getApiErrorMessage(err),
+      })
     } finally {
-      setSavingList(false)
+      setSavingQuery(false)
     }
   }
 
-  const handleStartCreateList = () => {
-    setIsCreatingList(true)
-    setCreateListName('')
-    setCreateListDescription('')
-    setCreateListFilters({})
-  }
-
-  const handleCancelCreateList = () => {
-    setIsCreatingList(false)
-    setCreateListName('')
-    setCreateListDescription('')
-    setCreateListFilters({})
-  }
-
-  const handleSaveCreateList = async () => {
-    if (!createListName.trim()) return
-    setSavingCreateList(true)
+  const handleDeleteQuery = async (query: ContactList) => {
+    if (!confirm(`Delete saved query "${query.name}"?`)) return
     try {
-      await contactListsApi.create(organizationId, {
-        name: createListName.trim(),
-        description: createListDescription.trim() || undefined,
-        list_type: 'smart',
-        filters: createListFilters,
+      await contactListsApi.delete(query.id)
+      await loadSavedQueries()
+    } catch (err: unknown) {
+      notify.error({
+        key: 'network.deleteListFailed',
+        fallback: getApiErrorMessage(err),
       })
-      setIsCreatingList(false)
-      setCreateListName('')
-      setCreateListDescription('')
-      setCreateListFilters({})
-      onTabChange?.('lists')
-    } catch (err: any) {
-      alert(err.message || 'Failed to create list')
-    } finally {
-      setSavingCreateList(false)
     }
   }
 
@@ -888,9 +915,8 @@ export default function NetworkPage({
           <CSVUploadModal
             open={showCSVUploadModal}
             onClose={() => setShowCSVUploadModal(false)}
-            onSuccess={() => {
-              fetchContacts()
-            }}
+            organizationId={organizationId}
+            onSuccess={handleImportSuccess}
           />
         )}
       </>
@@ -904,11 +930,9 @@ export default function NetworkPage({
       {/* Contacts Tab */}
       {activeTab === 'contacts' && (
         <>
-          {/* Search & Filter Bar with Action Buttons */}
+          {/* Search & filter bar */}
           <div className="space-y-2">
-            {/* Search Row with Action Buttons */}
             <div className="flex items-center gap-2">
-              {/* Search Input */}
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/65 dark:text-foreground/40" />
                 <input
@@ -921,7 +945,54 @@ export default function NetworkPage({
                 />
               </div>
 
-              {/* Actions dropdown */}
+              {/* Filter button + panel */}
+              <div className="relative" ref={filterMenuRef}>
+                <button
+                  onClick={() => setShowFilterPanel((p) => !p)}
+                  className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg border px-3 py-2.5 text-xs font-semibold transition-all ${
+                    activeFilterCount > 0
+                      ? 'border-primary/40 bg-primary/20 text-violet-950 dark:border-primary/30 dark:text-primary'
+                      : 'border-border bg-card/80 text-foreground hover:bg-accent/60 dark:bg-card/50 dark:text-foreground/80 dark:border-white/10'
+                  }`}
+                >
+                  <Filter className="h-3.5 w-3.5" />
+                  <span>Filter</span>
+                  {activeFilterCount > 0 && (
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary/50 text-[10px] font-bold text-primary-foreground">
+                      {activeFilterCount}
+                    </span>
+                  )}
+                  <ChevronDown
+                    className={`h-3 w-3 transition-transform ${showFilterPanel ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                <FilterPanel
+                  open={showFilterPanel}
+                  options={{
+                    categories: filterOptions.categories,
+                    locations: filterOptions.locations,
+                    tags: filterOptions.tags,
+                    events: orgEvents,
+                  }}
+                  initial={{
+                    category: categoryFilters,
+                    location: locationFilters,
+                    tags: tagFilters,
+                    social: socialFilter,
+                    updated: updatedAtRange,
+                    event: eventFilter,
+                    eventStatus: eventStatusFilter,
+                  }}
+                  savedQueries={savedQueries}
+                  savingQuery={savingQuery}
+                  onApply={handleApplyFilters}
+                  onClear={clearAllFilters}
+                  onApplyQuery={handleApplyQuery}
+                  onSaveQuery={handleSaveQuery}
+                  onDeleteQuery={handleDeleteQuery}
+                />
+              </div>
+
               <div className="relative" ref={actionsMenuRef}>
                 <button
                   onClick={() => setActionsMenuOpen((prev) => !prev)}
@@ -947,16 +1018,6 @@ export default function NetworkPage({
                     </button>
                     <button
                       onClick={() => {
-                        handleStartCreateList()
-                        setActionsMenuOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
-                    >
-                      <Filter className="w-3.5 h-3.5" />
-                      Create List
-                    </button>
-                    <button
-                      onClick={() => {
                         setShowCSVUploadModal(true)
                         setActionsMenuOpen(false)
                       }}
@@ -965,219 +1026,98 @@ export default function NetworkPage({
                       <Upload className="w-3.5 h-3.5" />
                       Import CSV
                     </button>
+                    <button
+                      onClick={() => {
+                        setShowBulkEditModal(true)
+                        setActionsMenuOpen(false)
+                      }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
+                    >
+                      <Users className="w-3.5 h-3.5" />
+                      {BULK_EDIT_LABEL}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowExportModal(true)
+                        setActionsMenuOpen(false)
+                      }}
+                      disabled={displayedContacts.length === 0}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      Export
+                    </button>
                   </div>
                 )}
               </div>
             </div>
+          </div>
 
-            {/* Filter toggle + Export */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  hasActiveFilters
-                    ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
-                    : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border hover:bg-accent/60 dark:hover:bg-card/70 dark:border-white/10'
-                }`}
-              >
-                <Filter className="w-3.5 h-3.5" />
-                Filters
-                {hasActiveFilters && (
-                  <span className="flex items-center justify-center w-4 h-4 bg-primary/50 text-primary-foreground text-[10px] font-bold rounded-full">
-                    {
-                      [
-                        categoryFilters.length > 0,
-                        locationFilters.length > 0,
-                        tagFilters.length > 0,
-                        updatedAtRange !== 'all',
-                        eventFilter !== 'all',
-                        eventStatusFilter !== 'all',
-                      ].filter(Boolean).length
-                    }
-                  </span>
+          {/* Post-import banner */}
+          {importSession && (
+            <div className="px-3 py-3 bg-primary/10 border border-primary/30 rounded-lg space-y-2">
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  You imported {importSession.created + importSession.updated} contacts
+                </p>
+                <p className="text-xs text-foreground/70 mt-1">{IMPORT_WHERE_DID_THEY_GO}</p>
+                {importSession.listsCreated.length > 0 && (
+                  <p className="text-xs text-foreground/60 mt-1">
+                    Lists created: {importSession.listsCreated.join(', ')}
+                  </p>
                 )}
-                {showFilters ? (
-                  <ChevronUp className="w-3 h-3" />
-                ) : (
-                  <ChevronDown className="w-3 h-3" />
-                )}
-              </button>
+              </div>
 
-              {hasActiveFilters && (
-                <button
-                  onClick={clearAllFilters}
-                  className="flex items-center gap-1 px-2 py-1.5 text-xs text-foreground/75 dark:text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                  Clear all
-                </button>
+              {importSession.tags.length > 0 && (
+                <div>
+                  <p className="text-[11px] font-medium text-foreground/60 mb-1">
+                    {IMPORT_TAG_COUNTS_LABEL}
+                  </p>
+                  <p className="text-xs text-foreground/80">
+                    {importSession.tags
+                      .map((tag) => `${tag}: ${importSession.tagCounts?.[tag] ?? 0}`)
+                      .join(' · ')}
+                  </p>
+                  <p className="text-[10px] text-foreground/50 mt-1">
+                    {IMPORT_TAG_COUNTS_FOOTNOTE}
+                  </p>
+                </div>
               )}
 
-              <div className="ml-auto">
+              <div className="flex flex-wrap items-center gap-2 pt-1">
                 <button
-                  onClick={() => setShowExportModal(true)}
-                  disabled={displayedContacts.length === 0}
-                  className="flex items-center gap-1.5 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs font-medium text-foreground transition-all hover:bg-accent/60 whitespace-nowrap dark:bg-card/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  type="button"
+                  onClick={viewImportUpload}
+                  className="flex items-center gap-1.5 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg transition-colors"
                 >
-                  <Download className="h-3.5 w-3.5" />
-                  <span>Export ({displayedContacts.length})</span>
+                  {IMPORT_BATCH_VIEW_LABEL}
+                </button>
+                <button
+                  type="button"
+                  onClick={dismissImportSession}
+                  className="text-xs text-foreground/60 hover:text-foreground ml-auto"
+                >
+                  Dismiss
                 </button>
               </div>
             </div>
+          )}
 
-            {/* Collapsible Filter Bar */}
-            {showFilters && (
-              <div className="flex items-center gap-2 flex-wrap pt-1">
-                {/* 1. Category */}
-                {(() => {
-                  const field = filterFieldConfigs.find((f) => f.key === 'category')
-                  if (!field) return null
-                  const selectedValues =
-                    activeFilters.find((f) => f.fieldKey === 'category')?.values || []
-                  return (
-                    <FilterDropdownButton
-                      field={field}
-                      selectedValues={selectedValues}
-                      onChange={(values) => {
-                        const existing = activeFilters.find((f) => f.fieldKey === 'category')
-                        if (existing) {
-                          if (values.length === 0)
-                            setActiveFilters(activeFilters.filter((f) => f.fieldKey !== 'category'))
-                          else
-                            setActiveFilters(
-                              activeFilters.map((f) =>
-                                f.fieldKey === 'category' ? { ...f, values } : f,
-                              ),
-                            )
-                        } else if (values.length > 0) {
-                          setActiveFilters([...activeFilters, { fieldKey: 'category', values }])
-                        }
-                      }}
-                    />
-                  )
-                })()}
-
-                {/* 2. Location */}
-                {(() => {
-                  const field = filterFieldConfigs.find((f) => f.key === 'location')
-                  if (!field) return null
-                  const selectedValues =
-                    activeFilters.find((f) => f.fieldKey === 'location')?.values || []
-                  return (
-                    <FilterDropdownButton
-                      field={field}
-                      selectedValues={selectedValues}
-                      onChange={(values) => {
-                        const existing = activeFilters.find((f) => f.fieldKey === 'location')
-                        if (existing) {
-                          if (values.length === 0)
-                            setActiveFilters(activeFilters.filter((f) => f.fieldKey !== 'location'))
-                          else
-                            setActiveFilters(
-                              activeFilters.map((f) =>
-                                f.fieldKey === 'location' ? { ...f, values } : f,
-                              ),
-                            )
-                        } else if (values.length > 0) {
-                          setActiveFilters([...activeFilters, { fieldKey: 'location', values }])
-                        }
-                      }}
-                    />
-                  )
-                })()}
-
-                {/* 3. Tags */}
-                {(() => {
-                  const field = filterFieldConfigs.find((f) => f.key === 'tags')
-                  if (!field) return null
-                  const selectedValues =
-                    activeFilters.find((f) => f.fieldKey === 'tags')?.values || []
-                  return (
-                    <FilterDropdownButton
-                      field={field}
-                      selectedValues={selectedValues}
-                      onChange={(values) => {
-                        const existing = activeFilters.find((f) => f.fieldKey === 'tags')
-                        if (existing) {
-                          if (values.length === 0)
-                            setActiveFilters(activeFilters.filter((f) => f.fieldKey !== 'tags'))
-                          else
-                            setActiveFilters(
-                              activeFilters.map((f) =>
-                                f.fieldKey === 'tags' ? { ...f, values } : f,
-                              ),
-                            )
-                        } else if (values.length > 0) {
-                          setActiveFilters([...activeFilters, { fieldKey: 'tags', values }])
-                        }
-                      }}
-                    />
-                  )
-                })()}
-
-                {/* 4. Updated */}
-                <select
-                  value={updatedAtRange}
-                  onChange={(e) => setUpdatedAtRange(e.target.value as typeof updatedAtRange)}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
-                    updatedAtRange !== 'all'
-                      ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
-                      : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border dark:border-white/10'
-                  }`}
-                >
-                  <option value="all">Updated</option>
-                  <option value="24h">Last 24h</option>
-                  <option value="48h">Last 48h</option>
-                  <option value="7d">Last 7 days</option>
-                  <option value="30d">Last 30 days</option>
-                </select>
-
-                {/* 5. Shows Attended */}
-                <select
-                  value={eventFilter}
-                  onChange={(e) => {
-                    setEventFilter(e.target.value)
-                    if (e.target.value === 'all' || e.target.value === 'none')
-                      setEventStatusFilter('all')
-                  }}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer max-w-[180px] truncate ${
-                    eventFilter !== 'all'
-                      ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
-                      : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border dark:border-white/10'
-                  }`}
-                >
-                  <option value="all">Shows Attended</option>
-                  <option value="none">No Shows</option>
-                  {orgEvents.map((ev) => (
-                    <option key={ev.id} value={String(ev.id)}>
-                      {ev.title}
-                    </option>
-                  ))}
-                </select>
-
-                {/* 6. App Status (contextual — shows when a specific show is selected) */}
-                {eventFilter !== 'all' && eventFilter !== 'none' && (
-                  <select
-                    value={eventStatusFilter}
-                    onChange={(e) => setEventStatusFilter(e.target.value)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
-                      eventStatusFilter !== 'all'
-                        ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
-                        : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border dark:border-white/10'
-                    }`}
-                  >
-                    <option value="all">App Status</option>
-                    <option value="approved">Approved</option>
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="waitlist">Waitlist</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
-                )}
-              </div>
-            )}
-          </div>
+          {/* Import batch view banner */}
+          {viewingImportBatch && importSession && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-primary/15 border border-primary/30 rounded-lg">
+              <Upload className="w-4 h-4 text-primary flex-shrink-0" />
+              <span className="text-sm text-foreground/80">Viewing this import</span>
+              <button
+                type="button"
+                onClick={clearImportBatchView}
+                className="ml-auto flex items-center gap-1 text-xs text-foreground/60 hover:text-foreground transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+                Clear
+              </button>
+            </div>
+          )}
 
           {/* Manual List Banner */}
           {viewingManualList && (
@@ -1197,50 +1137,6 @@ export default function NetworkPage({
                 <X className="w-3.5 h-3.5" />
                 Clear
               </button>
-            </div>
-          )}
-
-          {/* Save as List (when filters active) */}
-          {hasActiveFilters && (
-            <div className="flex items-center gap-2">
-              {!showSaveInput ? (
-                <button
-                  onClick={() => setShowSaveInput(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-violet-950 hover:text-violet-900 dark:text-primary dark:hover:text-primary/70 text-xs font-medium rounded-lg transition-colors border border-primary/40 dark:border-primary/30"
-                >
-                  <Save className="w-3.5 h-3.5" />
-                  Save as List
-                </button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={listName}
-                    onChange={(e) => setListName(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSaveList()}
-                    placeholder="List name..."
-                    className="w-40 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary dark:bg-background/10"
-                    autoFocus
-                  />
-                  <button
-                    onClick={handleSaveList}
-                    disabled={savingList || !listName.trim()}
-                    className="flex items-center gap-1 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg disabled:opacity-50 transition-colors"
-                  >
-                    <Save className="w-3 h-3" />
-                    {savingList ? 'Saving...' : 'Save'}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowSaveInput(false)
-                      setListName('')
-                    }}
-                    className="p-1.5 text-foreground/65 dark:text-foreground/40 hover:text-foreground transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
             </div>
           )}
 
@@ -1268,17 +1164,6 @@ export default function NetworkPage({
               </div>
             )}
 
-          {/* Bulk Action Toolbar */}
-          <BulkActionToolbar
-            selectedCount={selectedContacts.length}
-            categories={categories}
-            onCategoryUpdate={handleBulkCategoryUpdate}
-            onLocationUpdate={handleBulkLocationUpdate}
-            onDelete={handleBulkDelete}
-            onClear={() => setSelectedContacts([])}
-            loading={bulkUpdateLoading}
-          />
-
           {/* Contacts Table */}
           {displayedContacts.length > 0 && (
             <ContactsTable
@@ -1288,6 +1173,7 @@ export default function NetworkPage({
               onSelectAll={handleSelectAll}
               onDeleteContact={handleDeleteContact}
               onEditContact={handleEditContact}
+              onViewContact={setViewingContact}
               paginationMeta={paginationMeta}
               onPageChange={handlePageChange}
             />
@@ -1317,13 +1203,23 @@ export default function NetworkPage({
               }}
             />
           )}
+          {viewingContact && (
+            <ViewContactModal
+              contact={viewingContact}
+              onClose={() => setViewingContact(null)}
+              onEdit={() => {
+                const contact = viewingContact
+                setViewingContact(null)
+                handleEditContact(contact)
+              }}
+            />
+          )}
           {showCSVUploadModal && (
             <CSVUploadModal
               open={showCSVUploadModal}
               onClose={() => setShowCSVUploadModal(false)}
-              onSuccess={() => {
-                fetchContacts()
-              }}
+              organizationId={organizationId}
+              onSuccess={handleImportSuccess}
             />
           )}
           <ContactExportModal
@@ -1332,6 +1228,19 @@ export default function NetworkPage({
             contactCount={displayedContacts.length}
             organizationSlug={organizationSlug}
             fetchAllContacts={fetchAllFilteredContacts}
+          />
+          <BulkEditModal
+            open={showBulkEditModal}
+            onClose={() => setShowBulkEditModal(false)}
+            selectedCount={selectedContacts.length}
+            categories={categories}
+            availableTags={filterOptions.tags}
+            onApplyCategory={handleBulkCategoryUpdate}
+            onApplyTags={handleBulkTags}
+            onApplyLocation={handleBulkLocation}
+            onDelete={handleBulkDelete}
+            onClearSelection={() => setSelectedContacts([])}
+            loading={bulkUpdateLoading}
           />
         </>
       )}
@@ -1686,95 +1595,6 @@ export default function NetworkPage({
               >
                 {editingCategory ? 'Save Changes' : 'Add Category'}
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Create Smart List Modal */}
-      {isCreatingList && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
-            {/* Modal Header */}
-            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-primary/20 px-6 py-3 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-foreground">Create Smart List</h2>
-              <button
-                onClick={handleCancelCreateList}
-                className="text-foreground/60 hover:text-foreground transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 space-y-5">
-              {/* List Name */}
-              <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">
-                  List Name
-                </label>
-                <input
-                  type="text"
-                  value={createListName}
-                  onChange={(e) => setCreateListName(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  placeholder="List name"
-                  autoFocus
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">
-                  Description (optional)
-                </label>
-                <textarea
-                  value={createListDescription}
-                  onChange={(e) => setCreateListDescription(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all"
-                  rows={2}
-                  placeholder="Description (optional)"
-                />
-              </div>
-
-              {/* Filters */}
-              <div>
-                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">
-                  Filters
-                </label>
-                <SmartListBuilder
-                  organizationId={organizationId}
-                  filters={createListFilters}
-                  onFiltersChange={setCreateListFilters}
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={handleCancelCreateList}
-                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-border text-foreground/90 hover:bg-background/5 transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSaveCreateList}
-                  disabled={savingCreateList || !createListName.trim()}
-                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-primary/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
-                >
-                  {savingCreateList ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      Create List
-                    </>
-                  )}
-                </button>
-              </div>
             </div>
           </div>
         </div>
