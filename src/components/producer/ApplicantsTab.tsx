@@ -67,6 +67,7 @@ interface Applicant {
   registrationId?: number // Actual registration ID for API calls
   invitationId?: number // Invitation ID for email history
   business_name: string
+  affiliation?: string
   contact_name?: string
   email: string
   phone?: string
@@ -293,6 +294,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           location: submission.location,
           portfolio_images: submission.portfolio_images,
           producer_notes: submission.producer_notes,
+          affiliation: submission.affiliation,
           ticket_code: submission.ticket_code,
           application_code: submission.application_code,
           email_unsubscribed: submission.email_unsubscribed,
@@ -771,7 +773,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
         if (applicant.status !== 'opted_out' && applicant.status !== 'cancelled') return false
       } else if (statusFilter === 'paid') {
         // "Paid" filters by payment_status — a vendor can be approved+paid regardless of status value.
-        if (applicant.payment_status !== 'paid' && applicant.payment_status !== 'confirmed') return false
+        if (applicant.payment_status !== 'paid' && applicant.payment_status !== 'confirmed')
+          return false
       } else if (applicant.status !== statusFilter) {
         return false
       }
@@ -1443,6 +1446,16 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                         <Calendar className="w-3.5 h-3.5 flex-shrink-0 text-foreground/60" />
                         <span>{formatDate(selectedApplicant.created_at)}</span>
                       </div>
+                      {selectedApplicant.affiliation && (
+                        <div className="mt-3">
+                          <p className="text-[10px] text-foreground/60 mb-2">
+                            Studio/Gallery/Business Affiliation
+                          </p>
+                          <p className="text-xs text-foreground/80 whitespace-pre-wrap max-w-[55%] break-words">
+                            {selectedApplicant.affiliation}
+                          </p>
+                        </div>
+                      )}
                     </div>
                     {(selectedApplicant.ticket_code || selectedApplicant.application_code) && (
                       <div>
@@ -2218,7 +2231,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
         applicants={filteredApplicants}
         eventSlug={eventSlug}
       />
-
       {/* Admin Debug Panel */}
       <DebugPanel
         title="Applicants Tab"

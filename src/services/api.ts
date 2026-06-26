@@ -27,11 +27,6 @@ const TOKEN_KEY = 'railsAuthToken'
 export function saveAuthToken(token: string): void {
   try {
     localStorage.setItem(TOKEN_KEY, token)
-    // console.log('🔐 [AUTH DEBUG] Token saved to localStorage:', {
-    //   key: TOKEN_KEY,
-    //   tokenLength: token.length,
-    //   tokenPreview: token.substring(0, 20) + '...'
-    // })
   } catch (error) {
     console.error('Failed to save auth token:', error)
   }
@@ -40,12 +35,6 @@ export function saveAuthToken(token: string): void {
 export function getAuthToken(): string | null {
   try {
     const token = localStorage.getItem(TOKEN_KEY)
-    // console.log('🔍 [AUTH DEBUG] Token retrieved from localStorage:', {
-    //   key: TOKEN_KEY,
-    //   hasToken: !!token,
-    //   tokenLength: token?.length || 0,
-    //   tokenPreview: token ? token.substring(0, 20) + '...' : 'null'
-    // })
     return token
   } catch (error) {
     console.error('Failed to get auth token:', error)
@@ -89,28 +78,12 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
     (endpoint.startsWith('/v1/shared/users') && options?.method === 'POST') ||
     endpoint.startsWith('/v1/shared/password_reset')
 
-  // console.log('🌐 [AUTH DEBUG] Making API request:', {
-  //   method: options?.method || 'GET',
-  //   endpoint,
-  //   isPublicAuthEndpoint
-  // })
-
   if (!isPublicAuthEndpoint) {
     const token = getAuthToken()
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
-      // console.log('✅ [AUTH DEBUG] Authorization header added to request')
-    } else {
-      // console.warn('⚠️ [AUTH DEBUG] No token found - request will be unauthenticated')
     }
-  } else {
-    // console.log('ℹ️ [AUTH DEBUG] Public endpoint - skipping auth header')
   }
-
-  // console.log('📤 [AUTH DEBUG] Request headers:', {
-  //   hasAuthorization: !!headers['Authorization'],
-  //   headers: Object.keys(headers)
-  // })
 
   try {
     const response = await fetch(url, {
@@ -337,10 +310,6 @@ export const authApi = {
     console.log('🔍 Fetching current user from /me endpoint...')
 
     const token = getAuthToken()
-    // console.log('🔑 [AUTH DEBUG] Token for /me request:', {
-    //   hasToken: !!token,
-    //   tokenLength: token?.length || 0
-    // })
 
     const response = await fetch(`${API_BASE_URL.replace('/api', '')}/me`, {
       method: 'GET',
@@ -351,14 +320,11 @@ export const authApi = {
       },
     })
 
-    // console.log('📡 [AUTH DEBUG] /me response status:', response.status)
-
     if (!response.ok) {
       throw new ApiError(`Failed to get current user: ${response.statusText}`, response.status)
     }
 
     const data = await response.json()
-    // console.log('📥 Current user response:', { email: data.email, role: data.role, id: data.id })
 
     return data
   },
