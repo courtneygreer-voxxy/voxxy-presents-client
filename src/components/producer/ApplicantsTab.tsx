@@ -1446,16 +1446,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                         <Calendar className="w-3.5 h-3.5 flex-shrink-0 text-foreground/60" />
                         <span>{formatDate(selectedApplicant.created_at)}</span>
                       </div>
-                      {selectedApplicant.affiliation && (
-                        <div className="mt-3">
-                          <p className="text-[10px] text-foreground/60 mb-2">
-                            Studio/Gallery/Business Affiliation
-                          </p>
-                          <p className="text-xs text-foreground/80 whitespace-pre-wrap max-w-[55%] break-words">
-                            {selectedApplicant.affiliation}
-                          </p>
-                        </div>
-                      )}
                     </div>
                     {(selectedApplicant.ticket_code || selectedApplicant.application_code) && (
                       <div>
@@ -1481,6 +1471,22 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                           </button>
                         </div>
                       </div>
+                    )}
+                  </div>
+
+                  {/* Producer Notes */}
+                  <div className="mb-3">
+                    <p className="text-[10px] text-foreground/60 mb-2">Producer Notes</p>
+                    {selectedApplicant.producer_notes ? (
+                      <div className="px-3 py-2 rounded-lg bg-background/5 border border-border">
+                        <p className="text-xs text-foreground/80 whitespace-pre-wrap">
+                          {selectedApplicant.producer_notes}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-foreground/40 italic px-3 py-2">
+                        No notes yet. Click &quot;Edit details&quot; to add.
+                      </p>
                     )}
                   </div>
 
@@ -1525,6 +1531,15 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                     )}
                   </div>
 
+                  {selectedApplicant.affiliation && (
+                    <div className="mb-3">
+                      <p className="text-[10px] text-foreground/60 mb-2">Affiliation</p>
+                      <p className="text-xs text-foreground/80 whitespace-pre-wrap max-w-[55%] break-words">
+                        {selectedApplicant.affiliation}
+                      </p>
+                    </div>
+                  )}
+
                   {/* Tags from Network CRM */}
                   {selectedApplicant.tags && selectedApplicant.tags.length > 0 && (
                     <div className="mb-3">
@@ -1541,22 +1556,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       </div>
                     </div>
                   )}
-
-                  {/* Producer Notes */}
-                  <div className="mb-3">
-                    <p className="text-[10px] text-foreground/60 mb-2">Producer Notes</p>
-                    {selectedApplicant.producer_notes ? (
-                      <div className="px-3 py-2 rounded-lg bg-background/5 border border-border">
-                        <p className="text-xs text-foreground/80 whitespace-pre-wrap">
-                          {selectedApplicant.producer_notes}
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-foreground/40 italic px-3 py-2">
-                        No notes yet. Click &quot;Edit details&quot; to add.
-                      </p>
-                    )}
-                  </div>
                 </div>
 
                 {/* Social & Links */}
