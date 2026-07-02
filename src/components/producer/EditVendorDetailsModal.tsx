@@ -28,6 +28,7 @@ export interface EditVendorDetailsModalProps {
   initialInstagramHandle?: string
   initialTiktokHandle?: string
   initialWebsite?: string
+  initialAffiliation?: string
   /** Shown read-only — not in Rails `update_params` */
   emailReadOnly: string
   onSaved: (
@@ -41,6 +42,7 @@ export interface EditVendorDetailsModalProps {
       instagram_handle?: string
       tiktok_handle?: string
       website?: string
+      affiliation?: string
     },
   ) => void
 }
@@ -60,6 +62,7 @@ export function EditVendorDetailsModal({
   initialWebsite,
   emailReadOnly,
   onSaved,
+  initialAffiliation,
 }: EditVendorDetailsModalProps) {
   const [name, setName] = useState(initialContactName)
   const [phone, setPhone] = useState(initialPhone)

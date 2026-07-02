@@ -1957,6 +1957,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           initialWebsite={selectedApplicant.website}
           emailReadOnly={selectedApplicant.email}
           onSaved={handleEditVendorSaved}
+          initialAffiliation={selectedApplicant.affiliation}
         />
       )}
       {/* Email Notification Dialog */}
