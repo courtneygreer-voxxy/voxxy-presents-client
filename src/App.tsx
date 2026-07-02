@@ -41,6 +41,12 @@ const SignUpPage = lazy(() => import('./pages/SignUpPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
 
+// Lazy load: Artist Portal (prototype)
+const ArtistLoginPage = lazy(() => import('./pages/ArtistLoginPage'))
+const ArtistSignUpPage = lazy(() => import('./pages/ArtistSignUpPage'))
+const ArtistDashboard = lazy(() => import('./components/artist/ArtistDashboard'))
+const ArtistPublicProfilePage = lazy(() => import('./pages/ArtistPublicProfilePage'))
+
 // Lazy load: Holding Screens (load on-demand)
 const BetaPendingPage = lazy(() => import('./pages/BetaPendingPage'))
 
@@ -374,6 +380,14 @@ export default function App() {
                 </AdminRoute>
               }
             />
+
+            {/* ==========================================
+              ARTIST PORTAL (Prototype — no auth guard)
+              ========================================== */}
+            <Route path="/artist/login" element={<ArtistLoginPage />} />
+            <Route path="/artist/signup" element={<ArtistSignUpPage />} />
+            <Route path="/artist/dashboard" element={<ArtistDashboard />} />
+            <Route path="/artists/:slug" element={<ArtistPublicProfilePage />} />
 
             {/* ==========================================
               CATCH-ALL & REDIRECTS
