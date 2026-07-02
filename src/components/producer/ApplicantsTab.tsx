@@ -1474,22 +1474,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                     )}
                   </div>
 
-                  {/* Producer Notes */}
-                  <div className="mb-3">
-                    <p className="text-[10px] text-foreground/60 mb-2">Producer Notes</p>
-                    {selectedApplicant.producer_notes ? (
-                      <div className="px-3 py-2 rounded-lg bg-background/5 border border-border">
-                        <p className="text-xs text-foreground/80 whitespace-pre-wrap">
-                          {selectedApplicant.producer_notes}
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-foreground/40 italic px-3 py-2">
-                        No notes yet. Click &quot;Edit details&quot; to add.
-                      </p>
-                    )}
-                  </div>
-
                   {/* Category */}
                   <div className="mb-3">
                     <p className="text-[10px] text-foreground/60 mb-1">Category</p>
@@ -1530,7 +1514,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       </Select>
                     )}
                   </div>
-
+                  {/* Affiliation */}
                   {selectedApplicant.affiliation && (
                     <div className="mb-3">
                       <p className="text-[10px] text-foreground/60 mb-2">Affiliation</p>
@@ -1539,6 +1523,21 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       </p>
                     </div>
                   )}
+                  {/* Producer Notes */}
+                  <div className="mb-3">
+                    <p className="text-[10px] text-foreground/60 mb-2">Producer Notes</p>
+                    {selectedApplicant.producer_notes ? (
+                      <div className="px-3 py-2 rounded-lg bg-background/5 border border-border">
+                        <p className="text-xs text-foreground/80 whitespace-pre-wrap">
+                          {selectedApplicant.producer_notes}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-foreground/40 italic px-3 py-2">
+                        No notes yet. Click &quot;Edit details&quot; to add.
+                      </p>
+                    )}
+                  </div>
 
                   {/* Tags from Network CRM */}
                   {selectedApplicant.tags && selectedApplicant.tags.length > 0 && (
