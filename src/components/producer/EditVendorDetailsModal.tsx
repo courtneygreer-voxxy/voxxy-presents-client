@@ -28,6 +28,7 @@ export interface EditVendorDetailsModalProps {
   initialInstagramHandle?: string
   initialTiktokHandle?: string
   initialWebsite?: string
+  initialAffiliation?: string
   /** Shown read-only — not in Rails `update_params` */
   emailReadOnly: string
   onSaved: (
@@ -41,6 +42,7 @@ export interface EditVendorDetailsModalProps {
       instagram_handle?: string
       tiktok_handle?: string
       website?: string
+      affiliation?: string
     },
   ) => void
 }
@@ -60,6 +62,7 @@ export function EditVendorDetailsModal({
   initialWebsite,
   emailReadOnly,
   onSaved,
+  initialAffiliation,
 }: EditVendorDetailsModalProps) {
   const [name, setName] = useState(initialContactName)
   const [phone, setPhone] = useState(initialPhone)
@@ -70,6 +73,7 @@ export function EditVendorDetailsModal({
   const [instagramHandle, setInstagramHandle] = useState(initialInstagramHandle || '')
   const [tiktokHandle, setTiktokHandle] = useState(initialTiktokHandle || '')
   const [website, setWebsite] = useState(initialWebsite || '')
+  const [affiliation, setAffiliation] = useState(initialAffiliation || '')
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -84,6 +88,7 @@ export function EditVendorDetailsModal({
       setInstagramHandle(initialInstagramHandle || '')
       setTiktokHandle(initialTiktokHandle || '')
       setWebsite(initialWebsite || '')
+      setAffiliation(initialAffiliation || '')
       setFormError(null)
     }
   }, [
@@ -96,6 +101,7 @@ export function EditVendorDetailsModal({
     initialInstagramHandle,
     initialTiktokHandle,
     initialWebsite,
+    initialAffiliation,
   ])
 
   const handleAddTag = () => {
@@ -132,6 +138,7 @@ export function EditVendorDetailsModal({
         instagram_handle: instagramHandle.trim(),
         tiktok_handle: tiktokHandle.trim(),
         website: website.trim(),
+        affiliation: affiliation.trim(),
       })
       onSaved(applicantId, {
         contact_name: name.trim(),
@@ -142,6 +149,7 @@ export function EditVendorDetailsModal({
         instagram_handle: instagramHandle.trim(),
         tiktok_handle: tiktokHandle.trim(),
         website: website.trim(),
+        affiliation: affiliation.trim(),
       })
       onOpenChange(false)
     } catch (err) {
@@ -159,16 +167,16 @@ export function EditVendorDetailsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-border bg-muted text-foreground sm:max-w-md">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
+      <DialogContent className="border-border bg-muted text-foreground sm:max-w-md max-h-[85vh] overflow-hidden flex flex-col">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-foreground">Edit vendor details</DialogTitle>
             <p className="text-xs text-foreground/60 pt-1">
               Update contact info, location, tags, and producer notes. Status, category, and payment
               use their existing controls.
             </p>
           </DialogHeader>
-          <div className="space-y-3 py-2">
+          <div className="flex-1 overflow-y-auto space-y-3 py-2 pr-1">
             <div className="space-y-1.5">
               <Label htmlFor="edit-vendor-email" className="text-xs text-foreground/80">
                 Email
@@ -308,6 +316,19 @@ export function EditVendorDetailsModal({
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="edit-vendor-notes" className="text-xs text-foreground/80">
+                Affiliation
+              </Label>
+              <Textarea
+                id="edit-vendor-affiliation"
+                value={affiliation}
+                onChange={(e) => setAffiliation(e.target.value)}
+                className="bg-background/5 border-border text-xs min-h-[80px]"
+                placeholder="e.g., studio, gallery, or business affiliation"
+              />
+              <p className="text-[10px] text-foreground/50">Notes are only visible to you</p>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-vendor-notes" className="text-xs text-foreground/80">
                 Producer Notes
               </Label>
               <Textarea
@@ -325,7 +346,7 @@ export function EditVendorDetailsModal({
               </p>
             )}
           </div>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="flex-shrink-0 gap-2 sm:gap-0">
             <Button
               type="button"
               variant="outline"
