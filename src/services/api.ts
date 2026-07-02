@@ -1068,6 +1068,7 @@ export const registrationsApi = {
       instagram_handle: string
       tiktok_handle: string
       website: string
+      affiliation: string
     }>,
   ) {
     return fetchApi<any>(`/v1/presents/registrations/${registrationId}`, {
