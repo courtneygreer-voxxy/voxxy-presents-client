@@ -48,6 +48,17 @@ export default function Footer() {
                     For Artists
                   </Link>
                 </li>
+                <li>
+                  <a
+                    href="https://www.artistdirectory.net"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light"
+                    onClick={() => trackFooterLink('Artist Tool Kit')}
+                  >
+                    Artist Tool Kit
+                  </a>
+                </li>
                 {/* Voxxy Mobile link hidden until re-enabled */}
               </ul>
             </div>
@@ -133,7 +144,7 @@ export default function Footer() {
 
         {/* Copyright Section */}
         <div className="mt-10 border-t border-white/10 pt-6 text-center">
-          <p className="text-sm text-white/60">&copy; 2026 Voxxy AI, Inc. All rights reserved.</p>
+          <p className="text-sm text-white/60">&copy; 2025 Voxxy AI, Inc. All rights reserved.</p>
         </div>
       </div>
     </footer>

@@ -43,7 +43,7 @@ export default function FeaturesPage() {
             </h1>
 
             <p className="mx-auto mb-0 max-w-[600px] text-[18px] leading-relaxed text-white/65">
-              Artist coordination, automated communications, and relationship management — all in
+              Artist coordination, automated communications, and relationship management, all in
               one platform designed for how you actually work.
             </p>
           </div>
@@ -83,7 +83,7 @@ export default function FeaturesPage() {
               </h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 Stop writing the same emails over and over. Application confirmations, approval
-                notices, payment reminders, waitlist updates, and event-day details — all sent
+                notices, payment reminders, waitlist updates, and event-day details, all sent
                 automatically from one branded email thread. Artists always know where they stand.
               </p>
               <div className="space-y-3">
@@ -210,7 +210,7 @@ export default function FeaturesPage() {
               </h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 No Mailgun, no SendGrid, no developer needed. Application confirmations, approvals,
-                rejections, waitlist notifications, payment reminders, and day-of logistics — all
+                rejections, waitlist notifications, payment reminders, and day-of logistics, all
                 automated and customizable.
               </p>
               <div className="space-y-3">
@@ -257,7 +257,7 @@ export default function FeaturesPage() {
                 Trust & Safety Commitment
               </h2>
               <p className="text-[18px] text-white/60">
-                We found that our users — especially those focused on art and community — really
+                We found that our users, especially those focused on art and community, really
                 care about their data. They want privacy and a commitment that their data won't be
                 sold to third parties.
               </p>
@@ -300,7 +300,7 @@ export default function FeaturesPage() {
                     <strong className="text-white">Transparent about data usage</strong>
                     <span className="text-white/60">
                       {' '}
-                      — you always know what we do with your information
+                      so you always know what we do with your information
                     </span>
                   </div>
                 </div>

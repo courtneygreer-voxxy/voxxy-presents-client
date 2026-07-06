@@ -44,7 +44,7 @@ export default function ApplicationConfirmationPage() {
                 {applicationCode}
               </p>
               <p className="text-xs text-foreground/40 mt-2">
-                Save this code — it's your unique reference for this application
+                Save this code, it's your unique reference for this application
               </p>
             </div>
           )}

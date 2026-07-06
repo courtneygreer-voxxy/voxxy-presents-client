@@ -853,6 +853,17 @@
     background-position: top center;
   }
 
+  /* Mobile-safe variant: iOS Safari ignores background-attachment: fixed, so pages
+     taller than the 185vh paint height go white past that point. On small screens,
+     paint the gradient across the element's full height instead. Apply alongside
+     .voxxy-gradient-marketing-hero on single-gradient-container pages (e.g. /artists). */
+  @media (max-width: 767px) {
+    html.dark .voxxy-gradient-mobile-safe {
+      background-attachment: scroll;
+      background-size: 100% 100%;
+    }
+  }
+
   html.dark .voxxy-gradient-page-cool {
     background-attachment: fixed;
     background-size: 100% var(--voxxy-body-gradient-paint-height);

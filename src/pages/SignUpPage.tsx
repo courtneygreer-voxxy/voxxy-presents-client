@@ -54,7 +54,7 @@ export default function SignUpPage() {
               The OS for recurring event producers.
             </h2>
             <p className="text-lg text-white/75 max-w-md">
-              Manage artist applications, automate communications, and grow your producer network —
+              Manage artist applications, automate communications, and grow your producer network,
               all from one place.
             </p>
           </div>
