@@ -6,6 +6,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -29,13 +39,14 @@ export interface EditVendorDetailsModalProps {
   initialTiktokHandle?: string
   initialWebsite?: string
   initialAffiliation?: string
-  /** Shown read-only — not in Rails `update_params` */
-  emailReadOnly: string
+  /** Initial email value — now editable by producers */
+  initialEmail: string
   onSaved: (
     applicantId: string,
     patch: {
       contact_name: string
       phone: string
+      email?: string
       location?: string
       producer_notes?: string
       tags?: string[]
@@ -60,12 +71,13 @@ export function EditVendorDetailsModal({
   initialInstagramHandle,
   initialTiktokHandle,
   initialWebsite,
-  emailReadOnly,
+  initialEmail,
   onSaved,
   initialAffiliation,
 }: EditVendorDetailsModalProps) {
   const [name, setName] = useState(initialContactName)
   const [phone, setPhone] = useState(initialPhone)
+  const [email, setEmail] = useState(initialEmail)
   const [location, setLocation] = useState(initialLocation || '')
   const [producerNotes, setProducerNotes] = useState(initialProducerNotes || '')
   const [tags, setTags] = useState<string[]>(initialTags || [])
@@ -76,11 +88,15 @@ export function EditVendorDetailsModal({
   const [affiliation, setAffiliation] = useState(initialAffiliation || '')
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [showEmailConfirm, setShowEmailConfirm] = useState(false)
+
+  const emailChanged = email.trim().toLowerCase() !== initialEmail.trim().toLowerCase()
 
   useEffect(() => {
     if (open) {
       setName(initialContactName)
       setPhone(initialPhone || '')
+      setEmail(initialEmail)
       setLocation(initialLocation || '')
       setProducerNotes(initialProducerNotes || '')
       setTags(initialTags || [])
@@ -90,11 +106,13 @@ export function EditVendorDetailsModal({
       setWebsite(initialWebsite || '')
       setAffiliation(initialAffiliation || '')
       setFormError(null)
+      setShowEmailConfirm(false)
     }
   }, [
     open,
     initialContactName,
     initialPhone,
+    initialEmail,
     initialLocation,
     initialProducerNotes,
     initialTags,
@@ -125,11 +143,18 @@ export function EditVendorDetailsModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (emailChanged) {
+      setShowEmailConfirm(true)
+      return
+    }
+    await doSave()
+  }
+
+  const doSave = async () => {
     setFormError(null)
     setSaving(true)
     try {
-      // Send all fields to API, including empty values (to allow clearing)
-      await registrationsApi.update(registrationId, {
+      const payload: Record<string, unknown> = {
         name: name.trim(),
         phone: phone.trim(),
         location: location.trim(),
@@ -139,8 +164,12 @@ export function EditVendorDetailsModal({
         tiktok_handle: tiktokHandle.trim(),
         website: website.trim(),
         affiliation: affiliation.trim(),
-      })
-      onSaved(applicantId, {
+      }
+      if (emailChanged) {
+        payload.email = email.trim()
+      }
+      await registrationsApi.update(registrationId, payload)
+      const patch: Parameters<typeof onSaved>[1] = {
         contact_name: name.trim(),
         phone: phone.trim(),
         location: location.trim(),
@@ -150,7 +179,11 @@ export function EditVendorDetailsModal({
         tiktok_handle: tiktokHandle.trim(),
         website: website.trim(),
         affiliation: affiliation.trim(),
-      })
+      }
+      if (emailChanged) {
+        patch.email = email.trim()
+      }
+      onSaved(applicantId, patch)
       onOpenChange(false)
     } catch (err) {
       if (err instanceof ApiError && err.errors?.length) {
@@ -183,9 +216,11 @@ export function EditVendorDetailsModal({
               </Label>
               <Input
                 id="edit-vendor-email"
-                value={emailReadOnly}
-                disabled
-                className="bg-background/10 border-border text-xs opacity-80"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-background/5 border-border text-xs"
+                required
               />
             </div>
             <div className="space-y-1.5">
@@ -362,6 +397,33 @@ export function EditVendorDetailsModal({
           </DialogFooter>
         </form>
       </DialogContent>
+
+      {/* Email change confirmation dialog */}
+      <AlertDialog open={showEmailConfirm} onOpenChange={setShowEmailConfirm}>
+        <AlertDialogContent className="border-border bg-muted">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-foreground">Change applicant email?</AlertDialogTitle>
+            <AlertDialogDescription className="text-foreground/70">
+              You&apos;re changing this applicant&apos;s email from{' '}
+              <span className="font-medium text-foreground">{initialEmail}</span> to{' '}
+              <span className="font-medium text-foreground">{email.trim()}</span>.
+              All future communications for this event will go to the new address.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-border">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="voxxy-btn-solid"
+              onClick={() => {
+                setShowEmailConfirm(false)
+                doSave()
+              }}
+            >
+              Confirm change
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }
