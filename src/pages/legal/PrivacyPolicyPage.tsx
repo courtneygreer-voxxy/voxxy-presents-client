@@ -23,7 +23,7 @@ export default function PrivacyPolicyPage() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-foreground">Privacy Policy</h1>
-          <p className="text-muted-foreground italic">Last Updated: June 10, 2026</p>
+          <p className="text-muted-foreground italic">Last Updated: July 3, 2026</p>
         </div>
 
         {/* Annotation Box */}
@@ -39,8 +39,10 @@ export default function PrivacyPolicyPage() {
         <div className="space-y-4 text-foreground/80 leading-relaxed">
           <p>
             Thanks for using Voxxy! This Privacy Policy describes what information we collect and
-            how it's used and shared. Any capitalized terms not defined in this Privacy Policy have
-            the meanings set forth in our{' '}
+            how it's used and shared. It applies to the Voxxy platform and websites operated by
+            Voxxy AI, Inc., including the <strong>Voxxy Artist Directory</strong>{' '}
+            (artistdirectory.net), which is brought to you by Voxxy AI, Inc. Any capitalized terms
+            not defined in this Privacy Policy have the meanings set forth in our{' '}
             <a
               href="/legal/terms"
               className="text-slate-600 hover:text-slate-900 underline transition-colors"
@@ -169,6 +171,13 @@ export default function PrivacyPolicyPage() {
                 communications (such as support inquiries), we maintain those communications and
                 their contents so that we can resolve your inquiries or otherwise assist you.
               </p>
+              <p>
+                <strong>3.5 Subscriber Information.</strong> When you subscribe to updates through
+                one of our sites (such as the subscribe form on the Voxxy Artist Directory), we
+                collect the email address you enter so we can send you updates about new art calls,
+                resources, and related announcements. Subscriber email addresses are retained until
+                you unsubscribe or ask us to delete them.
+              </p>
             </div>
 
             <div>
@@ -184,22 +193,28 @@ export default function PrivacyPolicyPage() {
               </div>
 
               <p>
-                <strong>3.5 Usage Information.</strong> We collect information about your activity
+                <strong>3.6 Usage Information.</strong> We collect information about your activity
                 on and interaction with the Services, such as your IP address, device or browser
                 type, the webpage you visited before coming to our site, and identifiers associated
                 with your devices. This information helps us analyze how the Services are being
                 accessed and used, and to track performance.
               </p>
               <p>
-                <strong>3.6 Analytics Tools.</strong> We use the following third-party analytics and
+                <strong>3.7 Analytics Tools.</strong> We use the following third-party analytics and
                 monitoring tools:
               </p>
               <ul className="list-disc list-inside space-y-2 pl-4">
                 <li>
                   <strong>Mixpanel</strong> — Product analytics and user behavior tracking. Mixpanel
-                  may collect device information, IP addresses, browser type, and usage patterns to
-                  help us understand how our Services are used. Mixpanel's privacy policy governs
-                  their handling of this data.
+                  may collect device and browser information (such as browser type, operating
+                  system, screen size, and language), anonymous device or visitor identifiers, and
+                  usage patterns to help us understand how our Services are used. We do not collect
+                  or transmit your IP address to Mixpanel — IP collection is disabled in our
+                  analytics configuration — and we do not send personal identifiers such as your
+                  email address to Mixpanel as event properties. Where required, we can configure
+                  Mixpanel to store analytics data on EU-based servers; contact us at
+                  team@heyvoxxy.com with questions about where your data is processed. Mixpanel's
+                  privacy policy governs their handling of this data.
                 </li>
                 <li>
                   <strong>Sentry</strong> — Error monitoring and performance tracking. Sentry
@@ -215,7 +230,7 @@ export default function PrivacyPolicyPage() {
                 </li>
               </ul>
               <p>
-                <strong>3.7 Cookies and Similar Technologies.</strong> We use cookies and similar
+                <strong>3.8 Cookies and Similar Technologies.</strong> We use cookies and similar
                 technologies to remember your preferences, keep you safe, and improve the Services.
                 For detailed information about the specific cookies we use and how to manage them,
                 please see our{' '}
@@ -228,12 +243,41 @@ export default function PrivacyPolicyPage() {
                 .
               </p>
               <p>
-                <strong>3.8 Consent Before Tracking.</strong> We use a cookie consent banner on our
+                <strong>3.9 Consent Before Tracking.</strong> We use a cookie consent banner on our
                 website and landing pages. No analytics or tracking scripts (including Mixpanel,
                 Sentry analytics features, or Cloudflare analytics) will be activated until you have
                 affirmatively opted in through this consent mechanism, except for cookies that are
                 strictly necessary for the functioning of the Services (such as authentication and
-                security cookies).
+                security cookies). If you decline or ignore the banner, no analytics cookies are set
+                and analytics tools do not track your visit.
+              </p>
+              <p>
+                <strong>3.10 How to Opt Out of Analytics.</strong> You can opt out of analytics in
+                any of these ways:
+              </p>
+              <ul className="list-disc list-inside space-y-2 pl-4">
+                <li>
+                  Decline analytics in the consent banner, or later use the "Cookie Preferences"
+                  control in the site footer to withdraw your consent. Withdrawing consent stops
+                  future analytics collection; it does not affect processing that already took
+                  place based on your earlier consent.
+                </li>
+                <li>
+                  Enable a <strong>Global Privacy Control (GPC)</strong> signal in your browser or
+                  through a browser extension. Where required by law, we treat a GPC signal as an
+                  opt-out of "sale" or "sharing" for targeted purposes.
+                </li>
+                <li>Clear your browser's cookies and local storage for our sites.</li>
+              </ul>
+              <p>
+                <strong>3.11 Legal Bases for Processing (EEA/UK).</strong> If you are in the
+                European Economic Area or the United Kingdom, we rely on the following legal bases
+                under the GDPR / UK GDPR: <strong>Consent</strong> (Art. 6(1)(a)) — for analytics
+                cookies, subscriber emails, and SMS communications, which you may withdraw at any
+                time; <strong>Contractual necessity</strong> (Art. 6(1)(b)) — for setting up and
+                maintaining your Account, processing payments, and providing the Services;{' '}
+                <strong>Legitimate interests</strong> (Art. 6(1)(f)) — for maintaining and securing
+                the Services, where those interests are not overridden by your rights.
               </p>
             </div>
           </div>
@@ -467,7 +511,9 @@ export default function PrivacyPolicyPage() {
               <strong>9.5 Do Not Sell / Do Not Share.</strong> We do not sell or share your personal
               information as defined under the CCPA/CPRA. Because we do not engage in these
               activities, there is no need to submit a "Do Not Sell" request, but you may contact us
-              at any time if you have questions.
+              at any time if you have questions. We also honor <strong>Global Privacy Control
+              (GPC)</strong> signals from your browser: where required by law, we treat a GPC signal
+              as a "Do Not Sell or Share My Personal Information" request.
             </p>
             <p>
               <strong>9.6 GDPR Rights.</strong> If you are located in the European Economic Area,
@@ -499,12 +545,12 @@ export default function PrivacyPolicyPage() {
 
           <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
-              The Services are not directed at individuals under the age of 18. We do not knowingly
-              collect personal information from anyone under 18. All Account holders must be at
-              least 18 years old. If we learn that we have collected personal information from a
-              person under 18, we will take steps to delete that information promptly. If you
-              believe we have collected information from a person under 18, please contact us at
-              team@heyvoxxy.com.
+              The Services are not directed at children under the age of 16, and we do not
+              knowingly collect personal information from children under 16. All Account holders
+              must be at least 18 years old. If we learn that we have collected personal
+              information from a child under 16, we will take steps to delete that information
+              promptly. If you believe we have collected information from a child under 16, please
+              contact us at team@heyvoxxy.com.
             </p>
           </div>
         </section>
@@ -534,7 +580,7 @@ export default function PrivacyPolicyPage() {
               with applicable email marketing laws, including CAN-SPAM.
             </p>
             <p>
-              <strong>12.4 SMS / Text Messaging.</strong> Voxxy operates the <strong>Voxxy Artist Network</strong> SMS program. You can opt in to this program by texting the keyword ARTIST to (209) 713-5755, or by scanning the QR code provided on our artist opt-in pages. By opting in, you consent to receive recurring automated marketing and informational text messages from Voxxy at the mobile number you provide. Message frequency varies. Message and data rates may apply. Consent to receive SMS messages is not a condition of purchasing any goods or services. To opt out at any time, reply <strong>STOP</strong> to any message. To request help, reply <strong>HELP</strong> or contact us at team@heyvoxxy.com. Carriers are not liable for delayed or undelivered messages. Phone numbers collected for SMS communications are not sold or shared with third parties for their own marketing purposes.
+              <strong>12.4 SMS / Text Messaging.</strong> Voxxy operates the <strong>Voxxy Artist Network</strong> SMS program. You can opt in to this program by texting the keyword ARTIST to (347) 868-3150, or by scanning the QR code provided on our artist opt-in pages. By opting in, you consent to receive recurring automated marketing and informational text messages from Voxxy at the mobile number you provide. Message frequency varies. Message and data rates may apply. Consent to receive SMS messages is not a condition of purchasing any goods or services. To opt out at any time, reply <strong>STOP</strong> to any message. To request help, reply <strong>HELP</strong> or contact us at team@heyvoxxy.com. Carriers are not liable for delayed or undelivered messages. Phone numbers collected for SMS communications are not sold or shared with third parties for their own marketing purposes.
             </p>
           </div>
         </section>

@@ -67,6 +67,7 @@ interface Applicant {
   registrationId?: number // Actual registration ID for API calls
   invitationId?: number // Invitation ID for email history
   business_name: string
+  affiliation?: string
   contact_name?: string
   email: string
   phone?: string
@@ -293,6 +294,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           location: submission.location,
           portfolio_images: submission.portfolio_images,
           producer_notes: submission.producer_notes,
+          affiliation: submission.affiliation,
           ticket_code: submission.ticket_code,
           application_code: submission.application_code,
           email_unsubscribed: submission.email_unsubscribed,
@@ -771,7 +773,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
         if (applicant.status !== 'opted_out' && applicant.status !== 'cancelled') return false
       } else if (statusFilter === 'paid') {
         // "Paid" filters by payment_status — a vendor can be approved+paid regardless of status value.
-        if (applicant.payment_status !== 'paid' && applicant.payment_status !== 'confirmed') return false
+        if (applicant.payment_status !== 'paid' && applicant.payment_status !== 'confirmed')
+          return false
       } else if (applicant.status !== statusFilter) {
         return false
       }
@@ -1511,6 +1514,30 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       </Select>
                     )}
                   </div>
+                  {/* Affiliation */}
+                  {selectedApplicant.affiliation && (
+                    <div className="mb-3">
+                      <p className="text-[10px] text-foreground/60 mb-2">Affiliation</p>
+                      <p className="text-xs text-foreground/80 whitespace-pre-wrap max-w-[55%] break-words">
+                        {selectedApplicant.affiliation}
+                      </p>
+                    </div>
+                  )}
+                  {/* Producer Notes */}
+                  <div className="mb-3">
+                    <p className="text-[10px] text-foreground/60 mb-2">Producer Notes</p>
+                    {selectedApplicant.producer_notes ? (
+                      <div className="px-3 py-2 rounded-lg bg-background/5 border border-border">
+                        <p className="text-xs text-foreground/80 whitespace-pre-wrap">
+                          {selectedApplicant.producer_notes}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-foreground/40 italic px-3 py-2">
+                        No notes yet. Click &quot;Edit details&quot; to add.
+                      </p>
+                    )}
+                  </div>
 
                   {/* Tags from Network CRM */}
                   {selectedApplicant.tags && selectedApplicant.tags.length > 0 && (
@@ -1528,22 +1555,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       </div>
                     </div>
                   )}
-
-                  {/* Producer Notes */}
-                  <div className="mb-3">
-                    <p className="text-[10px] text-foreground/60 mb-2">Producer Notes</p>
-                    {selectedApplicant.producer_notes ? (
-                      <div className="px-3 py-2 rounded-lg bg-background/5 border border-border">
-                        <p className="text-xs text-foreground/80 whitespace-pre-wrap">
-                          {selectedApplicant.producer_notes}
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-foreground/40 italic px-3 py-2">
-                        No notes yet. Click &quot;Edit details&quot; to add.
-                      </p>
-                    )}
-                  </div>
                 </div>
 
                 {/* Social & Links */}
@@ -1946,6 +1957,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           initialWebsite={selectedApplicant.website}
           emailReadOnly={selectedApplicant.email}
           onSaved={handleEditVendorSaved}
+          initialAffiliation={selectedApplicant.affiliation}
         />
       )}
       {/* Email Notification Dialog */}
@@ -2218,7 +2230,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
         applicants={filteredApplicants}
         eventSlug={eventSlug}
       />
-
       {/* Admin Debug Panel */}
       <DebugPanel
         title="Applicants Tab"

@@ -42,7 +42,7 @@ export default function AboutPage() {
             </em>
           </h1>
           <p className="mx-auto mb-0 max-w-[700px] text-[18px] leading-relaxed text-white/65">
-            Voxxy exists because we believe the best communities are formed face-to-face — at art
+            Voxxy exists because we believe the best communities are formed face-to-face: at art
             markets, pop-ups, and the events that give neighborhoods their identity.
           </p>
 
@@ -77,13 +77,13 @@ export default function AboutPage() {
                 that gathering in real life matters.
               </p>
               <p className="text-[16px] text-gray-700 leading-relaxed">
-                We started Voxxy because we saw these organizers drowning in coordination work —
-                juggling spreadsheets, manual emails, endless follow-ups, and disconnected tools —
+                We started Voxxy because we saw these organizers drowning in coordination work,
+                juggling spreadsheets, manual emails, endless follow-ups, and disconnected tools,
                 instead of doing what they do best: curating experiences that bring people together.
               </p>
               <p className="text-[16px] text-gray-700 leading-relaxed">
                 Our background is in community organizing, tech, and events. We've been on both
-                sides — producing events and building the tools that power them. Voxxy is the
+                sides, producing events and building the tools that power them. Voxxy is the
                 platform we wished we had.
               </p>
             </div>
@@ -139,14 +139,14 @@ export default function AboutPage() {
               </h4>
               <p className="text-[15px] text-gray-700 leading-relaxed">
                 We're committed to supporting underrepresented communities in events and tech.
-                That's not a talking point — it's our founding story.
+                That's not a talking point. It's our founding story.
               </p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
               <h4 className="mb-2 text-[18px] font-bold text-slate-950">🛠️ Built by Producers</h4>
               <p className="text-[15px] text-gray-700 leading-relaxed">
-                We produce events alongside our customers. We don't just build tools — we use them
+                We produce events alongside our customers. We don't just build tools, we use them
                 every week.
               </p>
             </div>
@@ -184,21 +184,29 @@ export default function AboutPage() {
             </p>
             <p>
               We want you to feel safe here. Safe with your data. Safe with your art. Trust is not a
-              feature for us — it is the foundation. If anything ever makes you feel unsafe, we want
+              feature for us, it is the foundation. If anything ever makes you feel unsafe, we want
               to know. Reach out and we will build toward something better together.
             </p>
           </div>
 
-          {/* Voxxy AI, Inc. callout */}
-          <div className="my-10 rounded-2xl border border-white/10 bg-white/6 p-8 backdrop-blur-sm">
-            <p className="text-[16px] leading-relaxed text-white/70">
-              You might notice our legal entity is{' '}
-              <strong className="text-white">Voxxy AI, Inc.</strong> We will be honest with you
-              about that. Early in our journey, AI was central to our product vision. After deep
-              learning and harder conversations with our community, we stripped it out. We found no
-              value in it for artists and found mostly harm. Changing a legal name is expensive and
-              slow, but our values moved faster than our paperwork.
-            </p>
+          {/* Voxxy AI, Inc. callout — gradient-framed to stand out from surrounding copy */}
+          <div className="my-10 rounded-2xl bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] p-[1.5px] shadow-[0_18px_48px_rgba(101,26,233,0.35)]">
+            <div className="rounded-[calc(1rem-1.5px)] bg-[#1d1131]/95 p-8 backdrop-blur-sm">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-voxxy-pink">
+                A Note on Our Name
+              </p>
+              <p className="text-[16px] leading-relaxed text-white/80">
+                You might notice our legal entity is{' '}
+                <strong className="text-white">Voxxy AI, Inc.</strong> We will be honest with you
+                about that. Early in our journey, AI was central to our product vision. After deep
+                learning and harder conversations with our community, we stripped it out. We found
+                no value in it for artists and found mostly harm.{' '}
+                <strong className="text-white">
+                  Changing a legal name is expensive and slow, but our values moved faster than our
+                  paperwork.
+                </strong>
+              </p>
+            </div>
           </div>
 
           <div className="space-y-6 text-[16px] leading-relaxed text-white/70">

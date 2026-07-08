@@ -55,7 +55,7 @@ export default function HelpPage() {
         "Voxxy is designed to replace disconnected event tools with one unified platform. We're building integrations with popular ticketing platforms - reach out to discuss your specific needs.",
     },
     {
-      question: "I'm an artist/vendor — is Voxxy free for me?",
+      question: "I'm an artist/vendor. Is Voxxy free for me?",
       answer:
         "Yes! Voxxy is completely free for artists and vendors. You'll receive a vendor portal to manage applications, view event details, and communicate with producers.",
     },
@@ -114,7 +114,7 @@ export default function HelpPage() {
                 </CardTitle>
                 <p className="text-[15px] text-gray-600 mb-6 leading-relaxed">
                   Reach our team directly for questions about your account, event setup, or anything
-                  else. We respond within 1–2 business days.
+                  else. We respond within 1-2 business days.
                 </p>
                 <a
                   href="mailto:team@heyvoxxy.com"
