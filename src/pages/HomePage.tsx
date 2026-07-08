@@ -301,7 +301,7 @@ export default function HomePage() {
               Running your shows shouldn't be this hard.
             </h2>
             <p className="text-[18px] text-gray-600 max-w-[600px]">
-              The bigger your show calendar grows, the more coordination eats your time — and your
+              The bigger your show calendar grows, the more coordination eats your time and your
               margins.
             </p>
           </div>
@@ -524,7 +524,7 @@ export default function HomePage() {
                 </h3>
                 <p className="text-[15px] leading-relaxed text-white/60">
                   Whether you run art markets, curate shows, or produce pop-ups across the country,
-                  we'd love to hear what you're building. We respond to every message within 1–2
+                  we'd love to hear what you're building. We respond to every message within 1-2
                   business days.
                 </p>
               </div>
@@ -554,16 +554,18 @@ export default function HomePage() {
                   </div>
                   <div>
                     <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">
-                      COMMUNITY
+                      NEWSLETTER
                     </div>
                     <a
-                      href="https://discord.gg/voxxypresents"
+                      href="https://artistdirectory.net"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[15px] text-white transition-colors hover:text-fuchsia-300"
-                      onClick={() => analytics.track('discord_link_clicked', { page: 'landing' })}
+                      onClick={() =>
+                        analytics.track('newsletter_link_clicked', { page: 'landing' })
+                      }
                     >
-                      Join our Discord
+                      Join our Newsletter
                     </a>
                   </div>
                 </div>
@@ -577,13 +579,13 @@ export default function HomePage() {
                       SOCIAL
                     </div>
                     <a
-                      href="https://instagram.com/voxxypresents"
+                      href="https://instagram.com/heyvoxxy"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[15px] text-white transition-colors hover:text-fuchsia-300"
                       onClick={() => analytics.track('instagram_link_clicked', { page: 'landing' })}
                     >
-                      @voxxypresents on Instagram
+                      @heyvoxxy on Instagram
                     </a>
                   </div>
                 </div>
@@ -640,7 +642,7 @@ export default function HomePage() {
                     {/* Message */}
                     <textarea
                       id="message"
-                      placeholder="Tell us about your events — what do you produce, how often, and what's your biggest headache right now?"
+                      placeholder="Tell us about your events. What do you produce, how often, and what's your biggest headache right now?"
                       value={formData.message}
                       onChange={(e) => handleInputChange('message', e.target.value)}
                       required

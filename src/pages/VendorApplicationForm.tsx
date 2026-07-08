@@ -66,8 +66,6 @@ export default function VendorApplicationForm() {
   // Supports both namespaced format (org-slug-id/event-slug-id) and legacy (event-slug)
   const { slug, applicationId } = useParams<{ slug: string; applicationId: string }>()
 
-  console.log('🔍 [VendorApplicationForm] Route params:', { slug, applicationId })
-
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [event, setEvent] = useState<Event | null>(null)

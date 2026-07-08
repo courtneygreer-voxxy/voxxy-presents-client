@@ -72,22 +72,25 @@ export default function ArtistLandingPage() {
   }, [])
 
   return (
-    <div className="dark voxxy-public-page voxxy-gradient-marketing-hero flex min-h-screen flex-col overflow-hidden">
+    <div className="dark voxxy-public-page voxxy-gradient-marketing-hero voxxy-gradient-mobile-safe flex min-h-screen flex-col">
       <Navigation activePage="home" />
 
       {/* ── Main split layout ── */}
-      {/* Fills the viewport between nav and footer */}
-      <main className="flex flex-1 items-center justify-center px-6 pt-24 pb-8 md:px-12 md:pt-28">
+      {/* Centers between nav and footer on desktop; flows naturally on mobile so the footer stays reachable */}
+      <main className="flex flex-1 justify-center px-6 pt-24 pb-8 md:items-center md:px-12 md:pt-28">
         <div className="container mx-auto max-w-[1200px]">
           <div className="grid items-stretch gap-12 md:grid-cols-2 md:gap-16">
             {/* ── LEFT: Demo visual ── */}
             <div className="flex items-center justify-center">
-              {/* Mobile app screenshot — fills column to match right side height */}
-              <div className="relative w-full">
+              {/* Mobile app screenshot fills the column to match right side height */}
+              {/* NOTE: artvoximage.png has a light gradient baked into its canvas (not transparent).
+                  The radial mask below fades its edges into the dark page background as a stopgap;
+                  swap in a transparent-background export to remove the mask entirely. */}
+              <div className="relative w-full animate-hero-float motion-reduce:animate-none">
                 <img
                   src="/screenshots/artvoximage.png"
                   alt="Voxxy app showing artist profile, portfolio, and event opportunities"
-                  className="w-full drop-shadow-[0_24px_56px_rgba(101,26,233,0.35)]"
+                  className="w-full drop-shadow-[0_24px_56px_rgba(101,26,233,0.35)] [mask-image:radial-gradient(ellipse_72%_72%_at_center,black_58%,transparent_96%)] [-webkit-mask-image:radial-gradient(ellipse_72%_72%_at_center,black_58%,transparent_96%)]"
                   loading="eager"
                 />
               </div>
@@ -114,7 +117,7 @@ export default function ArtistLandingPage() {
                 isn't your work, it's that they can't find you yet.
               </p>
 
-              {/* Outcome lines — stacked, no bullets, no pipes */}
+              {/* Outcome lines: stacked, no bullets, no pipes */}
               <ul className="mb-9 space-y-3" aria-label="Benefits">
                 <li className="text-[15px] font-medium leading-snug text-white/80">
                   Opportunities come to you, stop chasing.
@@ -127,14 +130,14 @@ export default function ArtistLandingPage() {
                 </li>
               </ul>
 
-              {/* Primary CTA */}
+              {/* Primary CTA: opens the SMS opt-in flow, no visible phone number */}
               <a
-                href="sms:+12097135755?&body=ARTIST"
+                href="sms:+13478683150?&body=ARTIST"
                 onClick={handleCTAClick}
                 className="mb-4 inline-flex items-center justify-center rounded-xl voxxy-btn-brand px-7 py-4 text-[16px] font-bold text-white shadow-md shadow-primary/25 transition-all hover:brightness-105 hover:shadow-lg active:scale-[0.98]"
-                aria-label="Text ARTIST to (209) 713-5755 to join the Voxxy Artist Network"
+                aria-label="Opt in by text to join the Voxxy Artist Network mobile waitlist"
               >
-                Text ARTIST to (209) 713-5755
+                Opt In: Join the Mobile Waitlist
               </a>
 
               {/* TCPA consent disclosure */}
@@ -164,7 +167,7 @@ export default function ArtistLandingPage() {
               </p>
 
               {/* QR secondary CTA */}
-              <div className="flex items-center gap-5">
+              <div className="mb-7 flex items-center gap-5">
                 <div className="flex flex-col items-center gap-2">
                   <p className="text-[12px] text-white/50">Or scan to join</p>
                   {/* QR CODE: qr-code-text.png */}
@@ -180,6 +183,17 @@ export default function ArtistLandingPage() {
                   Scan with your phone camera to text us instantly.
                 </p>
               </div>
+
+              {/* Artist Directory click-out */}
+              <a
+                href="https://www.artistdirectory.net"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => analytics.track('artist_directory_link_clicked', { source })}
+                className="text-[14px] font-medium text-white/60 underline underline-offset-4 transition-colors hover:text-white"
+              >
+                See more resources to grow your career at the Artist Directory →
+              </a>
             </div>
           </div>
         </div>

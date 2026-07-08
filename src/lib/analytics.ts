@@ -14,6 +14,8 @@ if (MIXPANEL_TOKEN && isProductionEnvironment) {
     track_pageview: false,
     persistence: 'localStorage',
     api_host: 'https://api.mixpanel.com',
+    // Do not record visitor IP addresses (per Privacy Policy §3.7)
+    ip: false,
   })
 }
 
