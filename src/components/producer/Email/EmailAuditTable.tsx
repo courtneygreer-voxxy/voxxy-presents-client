@@ -29,6 +29,7 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
 import { Badge, type BadgeVariant } from '@/components/ui/badge'
+import { TABLE_HEADER_CLASSES, TABLE_ROW_CLASSES } from '@/components/shared/tableStyles'
 
 export type SortColumn =
   | 'sent_at'
@@ -155,19 +156,20 @@ export function EmailAuditTable({
     </button>
   )
 
-  // 8 columns: Date | Recipient | Email | Email Name | Category | Status | Details | Action
+  // 9 columns: Date | First Name | Last Name | Email | Email Name | Category | Status | Details | Action
   const gridCols =
-    'grid-cols-[100px_minmax(60px,0.8fr)_minmax(80px,1fr)_minmax(80px,1fr)_minmax(50px,0.7fr)_100px_minmax(80px,1.2fr)_36px]'
+    'grid-cols-[100px_minmax(50px,0.7fr)_minmax(50px,0.7fr)_minmax(80px,1fr)_minmax(80px,1fr)_minmax(50px,0.7fr)_100px_minmax(80px,1.2fr)_36px]'
 
   return (
     <div className="voxxy-table-shell overflow-x-auto">
       {/* Table Header */}
       <div className="voxxy-table-header">
         <div
-          className={`voxxy-table-header-row grid ${gridCols} min-w-[800px] items-center gap-2 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide`}
+          className={`voxxy-table-header-row grid ${gridCols} min-w-[800px] px-4 py-2 ${TABLE_HEADER_CLASSES}`}
         >
           {col('sent_at', 'Date Sent')}
-          {col('recipient_name', 'Recipient')}
+          {col('recipient_name', 'First Name')}
+          <div>Last Name</div>
           {col('recipient_email', 'Email')}
           {col('email_name', 'Email Name')}
           {col('category', 'Category')}
@@ -182,7 +184,7 @@ export function EmailAuditTable({
         {entries.map((entry) => (
           <div
             key={entry.id}
-            className={`voxxy-table-row voxxy-table-row-hover grid ${gridCols} min-w-[800px] items-center gap-2 px-4 py-1.5`}
+            className={`voxxy-table-row voxxy-table-row-hover grid ${gridCols} min-w-[800px] px-4 py-1.5 ${TABLE_ROW_CLASSES}`}
           >
             {/* Date Sent */}
             <div className="text-[11px] text-foreground/80">
@@ -197,12 +199,17 @@ export function EmailAuditTable({
               )}
             </div>
 
-            {/* Recipient Name */}
+            {/* First Name */}
             <div
               className="text-[11px] text-foreground/80 truncate"
               title={entry.recipient_name || 'Unknown'}
             >
-              {entry.recipient_name || <span className="text-muted-foreground">Unknown</span>}
+              {entry.recipient_name ? entry.recipient_name.split(' ')[0] : <span className="text-muted-foreground">Unknown</span>}
+            </div>
+
+            {/* Last Name */}
+            <div className="text-[11px] text-foreground/80 truncate">
+              {entry.recipient_name ? entry.recipient_name.split(' ').slice(1).join(' ') : ''}
             </div>
 
             {/* Email Address */}

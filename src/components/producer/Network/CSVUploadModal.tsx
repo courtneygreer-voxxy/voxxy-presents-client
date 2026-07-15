@@ -91,15 +91,12 @@ export function CSVUploadModal({
   const requiredHeaders = ['name', 'email']
   const optionalHeaders = [
     'phone',
-    'business_name',
+    'affiliation',
     'instagram_handle',
     'tiktok_handle',
     'website',
     'location',
     'tags',
-    'eventbrite_email',
-    'venmo_handle',
-    'paypal_email',
   ]
   const hiddenPreviewColumns = ['notes', 'featured', 'status', 'job_title', 'job title']
 

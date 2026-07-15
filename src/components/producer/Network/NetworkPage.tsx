@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   UserPlus,
   Upload,
@@ -132,6 +132,10 @@ export default function NetworkPage({
     total_count: 0,
     total_pages: 1,
   })
+
+  // Sort state
+  const [sortField, setSortField] = useState<'last_name' | 'first_name' | 'email' | null>(null)
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
 
   // Bulk update state
   const [bulkUpdateLoading, setBulkUpdateLoading] = useState(false)
@@ -305,6 +309,8 @@ export default function NetworkPage({
         tags: tagFilters.length > 0 ? tagFilters : undefined,
         page: page,
         per_page: perPage,
+        sort: sortField || undefined,
+        order: sortField ? sortOrder : undefined,
       })
 
       let contactsData = response?.vendor_contacts || []
@@ -375,11 +381,30 @@ export default function NetworkPage({
     fetchContacts(1)
   }
 
-  const handleSelectContact = (contactId: number) => {
+  const handleSort = useCallback((field: 'last_name' | 'first_name' | 'email' | null) => {
+    setSortField((prev) => {
+      if (prev === field) {
+        setSortOrder((o) => (o === 'asc' ? 'desc' : 'asc'))
+        return prev
+      }
+      setSortOrder('asc')
+      return field
+    })
+  }, [])
+
+  // Re-fetch when sort changes
+  useEffect(() => {
+    if (sortField) {
+      setCurrentPage(1)
+      fetchContacts(1)
+    }
+  }, [sortField, sortOrder])
+
+  const handleSelectContact = useCallback((contactId: number) => {
     setSelectedContacts((prev) =>
       prev.includes(contactId) ? prev.filter((id) => id !== contactId) : [...prev, contactId],
     )
-  }
+  }, [])
 
   const handleSelectAll = async () => {
     const currentPageIds = contacts.map((c) => c.id)
@@ -403,7 +428,7 @@ export default function NetworkPage({
     }
   }
 
-  const handleDeleteContact = async (contactId: number) => {
+  const handleDeleteContact = useCallback(async (contactId: number) => {
     if (!confirm('Are you sure you want to remove this contact from your network?')) return
 
     try {
@@ -416,7 +441,7 @@ export default function NetworkPage({
         fallback: getApiErrorMessage(err),
       })
     }
-  }
+  }, [])
 
   const handleBulkDelete = async () => {
     if (selectedContacts.length === 0) return
@@ -638,7 +663,7 @@ export default function NetworkPage({
   }
 
   // Fetch full contact details before opening edit modal
-  const handleEditContact = async (contact: VendorContact) => {
+  const handleEditContact = useCallback(async (contact: VendorContact) => {
     try {
       // Fetch full contact with event history and change history
       const fullContact = await vendorContactsApi.getById(contact.id)
@@ -648,7 +673,7 @@ export default function NetworkPage({
       // Fallback to partial contact if fetch fails
       setEditingContact(contact)
     }
-  }
+  }, [])
 
   const emptyCategory = {
     name: '',
@@ -1176,6 +1201,9 @@ export default function NetworkPage({
               onViewContact={setViewingContact}
               paginationMeta={paginationMeta}
               onPageChange={handlePageChange}
+              sortField={sortField}
+              sortOrder={sortOrder}
+              onSort={handleSort}
             />
           )}
 

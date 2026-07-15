@@ -5,8 +5,8 @@ import { triggerCsvDownload } from './Network/contactsCsvExport'
 
 interface Applicant {
   id: string
-  business_name: string
   contact_name?: string
+  affiliation?: string
   email: string
   phone?: string
   vendor_category: string
@@ -17,7 +17,6 @@ interface Applicant {
   producer_notes?: string
   created_at: string
   ticket_code?: string
-  application_code?: string
   instagram_handle?: string
   tiktok_handle?: string
   website?: string
@@ -33,9 +32,9 @@ interface ExportColumn {
 const EXPORT_COLUMNS: ExportColumn[] = [
   { key: 'contact_name', label: 'Name', getValue: (a) => a.contact_name || '', defaultOn: true },
   {
-    key: 'business_name',
-    label: 'Business Name',
-    getValue: (a) => a.business_name || '',
+    key: 'affiliation',
+    label: 'Affiliation',
+    getValue: (a) => a.affiliation || '',
     defaultOn: true,
   },
   { key: 'email', label: 'Email', getValue: (a) => a.email || '', defaultOn: true },
@@ -75,7 +74,7 @@ const EXPORT_COLUMNS: ExportColumn[] = [
   {
     key: 'ticket_code',
     label: 'Ticket Code',
-    getValue: (a) => a.ticket_code || a.application_code || '',
+    getValue: (a) => a.ticket_code || '',
     defaultOn: false,
   },
   {

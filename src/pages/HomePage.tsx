@@ -188,7 +188,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="dark voxxy-public-page relative min-h-screen overflow-hidden voxxy-gradient-marketing-hero">
+    <div className="dark voxxy-public-page relative min-h-screen overflow-hidden voxxy-gradient-marketing-hero voxxy-gradient-mobile-safe">
       <Navigation activePage="home" />
 
       {/* Hero Section */}

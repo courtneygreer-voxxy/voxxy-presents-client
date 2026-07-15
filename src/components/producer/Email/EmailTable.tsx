@@ -3,6 +3,7 @@ import { ChevronUp, ChevronDown, ChevronsUpDown, HelpCircle } from 'lucide-react
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { ScheduledEmail, AuditFilters } from '@/types/email'
 import EmailRow from './EmailRow'
+import { TABLE_HEADER_CLASSES } from '@/components/shared/tableStyles'
 
 type SortColumn =
   | 'name'
@@ -121,7 +122,7 @@ export default function EmailTable({
     <div className="voxxy-table-shell">
       {/* Table Header */}
       <div className="voxxy-table-header">
-        <div className="voxxy-table-header-row grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] items-center gap-3 px-4 py-2 text-xs font-semibold uppercase tracking-wide">
+        <div className={`voxxy-table-header-row grid grid-cols-[minmax(180px,1.2fr),minmax(200px,1.5fr),minmax(120px,0.9fr),minmax(110px,0.9fr),minmax(80px,0.7fr),70px,80px,minmax(90px,0.8fr),50px] px-4 py-2 ${TABLE_HEADER_CLASSES}`}>
           {col('name', 'Email Name')}
           <div className="flex items-center gap-1">Subject</div>
           {col('scheduled_for', 'Scheduled')}

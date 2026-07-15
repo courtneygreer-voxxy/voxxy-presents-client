@@ -224,7 +224,7 @@ export default function GoLiveInvitationEditor({
     const search = searchTerm.toLowerCase()
     return (
       contact.contact_name.toLowerCase().includes(search) ||
-      contact.business_name?.toLowerCase().includes(search) ||
+      contact.affiliation?.toLowerCase().includes(search) ||
       contact.email.toLowerCase().includes(search) ||
       contact.tags?.some((tag) => tag.toLowerCase().includes(search))
     )
@@ -822,10 +822,10 @@ export default function GoLiveInvitationEditor({
                       )}
                     </div>
 
-                    {/* Business */}
+                    {/* Affiliation */}
                     <div className="min-w-0">
                       <span className="text-foreground/60 truncate block">
-                        {contact.business_name || '\u2014'}
+                        {contact.affiliation || '\u2014'}
                       </span>
                     </div>
 

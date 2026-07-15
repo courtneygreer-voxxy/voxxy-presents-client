@@ -173,7 +173,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
         emailMap.set(email, {
           id: `reg-${submission.id}`,
-          businessName: submission.business_name,
+          businessName: submission.affiliation,
           contactName: submission.contact_name || submission.name,
           email: submission.email,
           phone: submission.phone,
@@ -219,8 +219,8 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
           emailMap.set(email, {
             id: `inv-${invitation.id}`,
-            businessName: contact.business_name || contact.name,
-            contactName: contact.name,
+            businessName: contact.affiliation || contact.name,
+            contactName: contact.name || contact.contact_name,
             email: contact.email,
             phone: contact.phone,
             instagram: contact.instagram_handle,

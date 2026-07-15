@@ -1,6 +1,10 @@
 import { VendorContact } from '@/services/api'
 import ContactRow from './ContactRow'
 import Pagination from './Pagination'
+import { TableSortHeader, type SortOrder } from '@/components/shared/TableSortHeader'
+import { TABLE_HEADER_CLASSES } from '@/components/shared/tableStyles'
+
+type SortField = 'last_name' | 'first_name' | 'email' | null
 
 interface ContactsTableProps {
   contacts: VendorContact[]
@@ -17,6 +21,9 @@ interface ContactsTableProps {
     total_pages: number
   }
   onPageChange: (page: number) => void
+  sortField?: SortField
+  sortOrder?: SortOrder
+  onSort?: (field: SortField) => void
 }
 
 export default function ContactsTable({
@@ -29,14 +36,17 @@ export default function ContactsTable({
   onViewContact,
   paginationMeta,
   onPageChange,
+  sortField,
+  sortOrder,
+  onSort,
 }: ContactsTableProps) {
   const allSelected = contacts.length > 0 && selectedContacts.length === contacts.length
 
   return (
     <div className="voxxy-table-shell">
-      {/* Table Header - Condensed view for all screen sizes */}
+      {/* Table Header */}
       <div className="voxxy-table-header">
-        <div className="voxxy-table-header-row grid grid-cols-[28px,minmax(120px,1fr),minmax(100px,1fr),minmax(120px,1fr),100px,100px,90px,70px,minmax(80px,1fr),60px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide">
+        <div className={`voxxy-table-header-row grid grid-cols-[28px,minmax(90px,1fr),minmax(80px,0.8fr),minmax(110px,1.2fr),minmax(90px,1fr),90px,90px,80px,60px,minmax(70px,0.8fr),50px] px-2 py-1 ${TABLE_HEADER_CLASSES}`}>
           <div className="flex items-center justify-center">
             <input
               type="checkbox"
@@ -46,9 +56,16 @@ export default function ContactsTable({
               title={allSelected ? 'Deselect all' : 'Select all'}
             />
           </div>
-          <div>Name</div>
-          <div>Business</div>
-          <div>Email</div>
+          <div>
+            <TableSortHeader label="Last Name" field="last_name" currentSort={sortField} currentOrder={sortOrder} onSort={onSort} />
+          </div>
+          <div>
+            <TableSortHeader label="First Name" field="first_name" currentSort={sortField} currentOrder={sortOrder} onSort={onSort} />
+          </div>
+          <div>
+            <TableSortHeader label="Email" field="email" currentSort={sortField} currentOrder={sortOrder} onSort={onSort} />
+          </div>
+          <div>Affiliation</div>
           <div>Location</div>
           <div>Phone</div>
           <div>Category</div>
