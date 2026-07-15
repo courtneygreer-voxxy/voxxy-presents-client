@@ -719,7 +719,7 @@ export function EmailEditorPage({
       if (
         !eventData &&
         !varName.match(
-          /\[firstName\]|\[lastName\]|\[fullName\]|\[greetingName\]|\[businessName\]|\[email\]|\[vendorCategory\]|\[boothNumber\]|\[applicationDate\]|\[installDate\]|\[installTime\]|\[installStartTime\]|\[installEndTime\]/,
+          /\[firstName\]|\[lastName\]|\[fullName\]|\[greetingName\]|\[businessName\]|\[affiliation\]|\[ticketCode\]|\[email\]|\[vendorCategory\]|\[boothNumber\]|\[applicationDate\]|\[installDate\]|\[installTime\]|\[installStartTime\]|\[installEndTime\]/,
         )
       ) {
         return varName // No event data, return as-is
