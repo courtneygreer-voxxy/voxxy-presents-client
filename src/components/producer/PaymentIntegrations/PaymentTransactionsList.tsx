@@ -245,7 +245,7 @@ export default function PaymentTransactionsList({
                               {transaction.vendor_contact.name}
                             </p>
                             <p className="text-xs text-foreground/60">
-                              {transaction.vendor_contact.business_name}
+                              {(transaction.vendor_contact as any).affiliation || transaction.vendor_contact.business_name}
                             </p>
                             {transaction.registration?.vendor_fee_paid && (
                               <p className="text-xs text-green-400 mt-1 flex items-center gap-1">

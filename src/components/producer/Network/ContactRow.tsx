@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import {
   Instagram,
   Music2,
@@ -11,6 +11,17 @@ import {
   MailX,
 } from 'lucide-react'
 import { VendorContact } from '@/services/api'
+import { TABLE_ROW_CLASSES } from '@/components/shared/tableStyles'
+
+const getCategoryColor = (category: string) => {
+  const colors: Record<string, string> = {
+    Artist: 'bg-primary/20 text-violet-950 dark:text-primary border-primary/30',
+    'Table Vendor': 'bg-blue-500/20 text-blue-950 dark:text-blue-300 border-blue-500/30',
+    Sponsor: 'bg-amber-500/20 text-amber-950 dark:text-amber-300 border-amber-500/30',
+    'Food & Beverage': 'bg-green-500/20 text-emerald-900 dark:text-green-300 border-green-500/30',
+  }
+  return colors[category] || 'bg-background/10 text-foreground/70 border-border'
+}
 
 interface ContactRowProps {
   contact: VendorContact
@@ -21,7 +32,7 @@ interface ContactRowProps {
   onView: () => void
 }
 
-export default function ContactRow({
+export default memo(function ContactRow({
   contact,
   isSelected,
   onSelect,
@@ -31,22 +42,12 @@ export default function ContactRow({
 }: ContactRowProps) {
   const [showMenu, setShowMenu] = useState(false)
 
-  const getCategoryColor = (category: string) => {
-    const colors: Record<string, string> = {
-      Artist: 'bg-primary/20 text-violet-950 dark:text-primary border-primary/30',
-      'Table Vendor': 'bg-blue-500/20 text-blue-950 dark:text-blue-300 border-blue-500/30',
-      Sponsor: 'bg-amber-500/20 text-amber-950 dark:text-amber-300 border-amber-500/30',
-      'Food & Beverage': 'bg-green-500/20 text-emerald-900 dark:text-green-300 border-green-500/30',
-    }
-    return colors[category] || 'bg-background/10 text-foreground/70 border-border'
-  }
-
   const isUnsubscribed = contact.unsubscribe_status?.is_unsubscribed
 
   return (
     <div className="voxxy-table-row voxxy-table-row-hover last:border-0">
       <div
-        className={`grid grid-cols-[28px,minmax(120px,1fr),minmax(100px,1fr),minmax(120px,1fr),100px,100px,90px,70px,minmax(80px,1fr),60px] gap-2 px-2 py-2 items-center text-[11px] ${isUnsubscribed ? 'opacity-60' : ''}`}
+        className={`grid grid-cols-[28px,minmax(90px,1fr),minmax(80px,0.8fr),minmax(110px,1.2fr),minmax(90px,1fr),90px,90px,80px,60px,minmax(70px,0.8fr),50px] px-2 py-2 ${TABLE_ROW_CLASSES} ${isUnsubscribed ? 'opacity-60' : ''}`}
       >
         <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
           <input
@@ -57,9 +58,10 @@ export default function ContactRow({
           />
         </div>
 
+        {/* Last Name */}
         <div className="min-w-0">
           <div className="font-semibold text-foreground truncate flex items-center gap-1">
-            {contact.contact_name}
+            {contact.last_name || '—'}
             {isUnsubscribed && (
               <span className="px-1 py-0.5 text-[8px] bg-red-500/20 text-red-950 dark:text-red-400 border border-red-500/30 rounded flex-shrink-0">
                 UNSUB
@@ -68,11 +70,12 @@ export default function ContactRow({
           </div>
         </div>
 
+        {/* First Name */}
         <div className="min-w-0">
-          <div className="text-foreground/70 truncate">{contact.business_name || '—'}</div>
+          <span className="text-foreground truncate block">{contact.first_name || '—'}</span>
         </div>
 
-        {/* Email — fixed 140px, truncated */}
+        {/* Email */}
         <div className="min-w-0">
           <div className="flex items-center gap-1">
             <a
@@ -92,6 +95,11 @@ export default function ContactRow({
               </div>
             )}
           </div>
+        </div>
+
+        {/* Affiliation */}
+        <div className="min-w-0">
+          <span className="text-foreground/60 truncate block">{contact.affiliation || '—'}</span>
         </div>
 
         <div className="min-w-0">
@@ -263,4 +271,4 @@ export default function ContactRow({
       </div>
     </div>
   )
-}
+})

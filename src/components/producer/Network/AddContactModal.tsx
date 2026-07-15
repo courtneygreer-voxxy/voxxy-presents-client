@@ -53,17 +53,15 @@ export default function AddContactModal({
   }, [organizationId])
 
   const [formData, setFormData] = useState({
-    contact_name: '',
-    business_name: '',
+    first_name: '',
+    last_name: '',
     email: '',
     phone: '',
     location: '',
     instagram_handle: '',
     tiktok_handle: '',
     website: '',
-    eventbrite_email: '',
-    venmo_handle: '',
-    paypal_email: '',
+    affiliation: '',
     categories: [] as string[],
     tags: [] as string[],
     notes: '',
@@ -72,8 +70,8 @@ export default function AddContactModal({
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.contact_name.trim()) {
-      newErrors.contact_name = 'Full name is required'
+    if (!formData.first_name.trim()) {
+      newErrors.first_name = 'First name is required'
     }
 
     if (!formData.email.trim()) {
@@ -122,18 +120,15 @@ export default function AddContactModal({
     setIsSubmitting(true)
     try {
       const newContact = await vendorContactsApi.create(organizationId, {
-        contact_name: formData.contact_name,
-        business_name: formData.business_name || undefined,
+        first_name: formData.first_name,
+        last_name: formData.last_name || undefined,
         email: formData.email,
         phone: formData.phone || undefined,
         location: formData.location || undefined,
         instagram_handle: formData.instagram_handle || undefined,
         tiktok_handle: formData.tiktok_handle || undefined,
         website: formData.website || undefined,
-        // TODO: Backend migration needed - these will be silently dropped until then
-        eventbrite_email: formData.eventbrite_email || undefined,
-        venmo_handle: formData.venmo_handle || undefined,
-        paypal_email: formData.paypal_email || undefined,
+        affiliation: formData.affiliation || undefined,
         categories: formData.categories,
         tags: formData.tags,
         notes: formData.notes || undefined,
@@ -161,7 +156,7 @@ export default function AddContactModal({
         } else if (lower.includes('phone')) {
           newErrors.phone = msg
         } else if (lower.includes('name')) {
-          newErrors.contact_name = msg
+          newErrors.first_name = msg
         } else if (lower.includes('website') || lower.includes('url')) {
           newErrors.website = msg
         } else if (lower.includes('instagram')) {
@@ -214,41 +209,41 @@ export default function AddContactModal({
         {!isSubmitting && !showSuccess && (
           <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
             <div className="flex-1 overflow-y-auto p-5 space-y-3">
-              {/* Row 1: Full Name, Business Name, Email */}
+              {/* Row 1: First Name, Last Name, Email */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <label
-                    htmlFor="contact_name"
+                    htmlFor="first_name"
                     className="block text-xs font-medium text-foreground/70 mb-1"
                   >
-                    Full Name <span className="text-red-400">*</span>
+                    First Name <span className="text-red-400">*</span>
                   </label>
                   <input
-                    id="contact_name"
+                    id="first_name"
                     type="text"
-                    value={formData.contact_name}
-                    onChange={(e) => handleChange('contact_name', e.target.value)}
-                    placeholder="John Smith"
-                    className={contactFieldClass('contact_name')}
+                    value={formData.first_name}
+                    onChange={(e) => handleChange('first_name', e.target.value)}
+                    placeholder="John"
+                    className={contactFieldClass('first_name')}
                   />
-                  {errors.contact_name && (
-                    <p className="mt-1 text-xs text-red-400">{errors.contact_name}</p>
+                  {errors.first_name && (
+                    <p className="mt-1 text-xs text-red-400">{errors.first_name}</p>
                   )}
                 </div>
 
                 <div>
                   <label
-                    htmlFor="business_name"
+                    htmlFor="last_name"
                     className="block text-xs font-medium text-foreground/70 mb-1"
                   >
-                    Business Name
+                    Last Name
                   </label>
                   <input
-                    id="business_name"
+                    id="last_name"
                     type="text"
-                    value={formData.business_name}
-                    onChange={(e) => handleChange('business_name', e.target.value)}
-                    placeholder="Smith's Ceramics"
+                    value={formData.last_name}
+                    onChange={(e) => handleChange('last_name', e.target.value)}
+                    placeholder="Smith"
                     className={contactFieldClass()}
                   />
                 </div>
@@ -272,8 +267,8 @@ export default function AddContactModal({
                 </div>
               </div>
 
-              {/* Row 2: Phone, Location */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* Row 2: Phone, Location, Affiliation */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <label
                     htmlFor="phone"
@@ -305,6 +300,23 @@ export default function AddContactModal({
                     value={formData.location}
                     onChange={(e) => handleChange('location', e.target.value)}
                     placeholder="Search city, state, zip..."
+                    className={contactFieldClass()}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="affiliation"
+                    className="block text-xs font-medium text-foreground/70 mb-1"
+                  >
+                    Affiliation
+                  </label>
+                  <input
+                    id="affiliation"
+                    type="text"
+                    value={formData.affiliation}
+                    onChange={(e) => handleChange('affiliation', e.target.value)}
+                    placeholder="Business or group name"
                     className={contactFieldClass()}
                   />
                 </div>
@@ -368,59 +380,6 @@ export default function AddContactModal({
                     className={contactFieldClass('website')}
                   />
                   {errors.website && <p className="mt-1 text-xs text-red-400">{errors.website}</p>}
-                </div>
-              </div>
-
-              {/* Row 4: Payment Information */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                  <label
-                    htmlFor="eventbrite_email"
-                    className="block text-xs font-medium text-foreground/70 mb-1"
-                  >
-                    Eventbrite Email
-                  </label>
-                  <input
-                    id="eventbrite_email"
-                    type="email"
-                    value={formData.eventbrite_email}
-                    onChange={(e) => handleChange('eventbrite_email', e.target.value)}
-                    placeholder="artist@email.com"
-                    className={contactFieldClass()}
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="venmo_handle"
-                    className="block text-xs font-medium text-foreground/70 mb-1"
-                  >
-                    Venmo Handle
-                  </label>
-                  <input
-                    id="venmo_handle"
-                    type="text"
-                    value={formData.venmo_handle}
-                    onChange={(e) => handleChange('venmo_handle', e.target.value)}
-                    placeholder="@username"
-                    className={contactFieldClass()}
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="paypal_email"
-                    className="block text-xs font-medium text-foreground/70 mb-1"
-                  >
-                    PayPal Email
-                  </label>
-                  <input
-                    id="paypal_email"
-                    type="email"
-                    value={formData.paypal_email}
-                    onChange={(e) => handleChange('paypal_email', e.target.value)}
-                    className={contactFieldClass()}
-                  />
                 </div>
               </div>
 

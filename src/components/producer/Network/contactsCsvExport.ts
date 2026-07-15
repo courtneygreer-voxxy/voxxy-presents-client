@@ -10,11 +10,12 @@ export interface ExportColumn {
 }
 
 export const EXPORT_COLUMNS: ExportColumn[] = [
-  { key: 'name', label: 'Name', getValue: (c) => c.contact_name || '', defaultOn: true },
+  { key: 'first_name', label: 'First Name', getValue: (c) => c.first_name || '', defaultOn: true },
+  { key: 'last_name', label: 'Last Name', getValue: (c) => c.last_name || '', defaultOn: true },
   {
-    key: 'business_name',
-    label: 'Business Name',
-    getValue: (c) => c.business_name || '',
+    key: 'affiliation',
+    label: 'Affiliation',
+    getValue: (c) => c.affiliation || '',
     defaultOn: true,
   },
   { key: 'email', label: 'Email', getValue: (c) => c.email || '', defaultOn: true },
@@ -70,14 +71,6 @@ export const EXPORT_COLUMNS: ExportColumn[] = [
     key: 'created_at',
     label: 'Created At',
     getValue: (c) => formatIsoForCsv(c.created_at),
-    defaultOn: false,
-  },
-  { key: 'venmo', label: 'Venmo', getValue: (c) => c.venmo_handle || '', defaultOn: false },
-  { key: 'paypal', label: 'PayPal', getValue: (c) => c.paypal_email || '', defaultOn: false },
-  {
-    key: 'eventbrite_email',
-    label: 'Eventbrite Email',
-    getValue: (c) => c.eventbrite_email || '',
     defaultOn: false,
   },
   {

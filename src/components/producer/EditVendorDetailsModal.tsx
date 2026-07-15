@@ -19,7 +19,7 @@ export interface EditVendorDetailsModalProps {
   /** Local applicant row id (e.g. reg-123) for state updates */
   applicantId: string
   registrationId: number
-  /** Maps to Rails registration `name` (contact name) */
+  /** Maps to Rails registration `name` (contact name) — will be split into first/last */
   initialContactName: string
   initialPhone: string
   initialLocation?: string
@@ -64,7 +64,9 @@ export function EditVendorDetailsModal({
   onSaved,
   initialAffiliation,
 }: EditVendorDetailsModalProps) {
-  const [name, setName] = useState(initialContactName)
+  const nameParts = initialContactName.split(' ', 2)
+  const [firstName, setFirstName] = useState(nameParts[0] || '')
+  const [lastName, setLastName] = useState(nameParts[1] || '')
   const [phone, setPhone] = useState(initialPhone)
   const [location, setLocation] = useState(initialLocation || '')
   const [producerNotes, setProducerNotes] = useState(initialProducerNotes || '')
@@ -79,7 +81,9 @@ export function EditVendorDetailsModal({
 
   useEffect(() => {
     if (open) {
-      setName(initialContactName)
+      const parts = initialContactName.split(' ', 2)
+      setFirstName(parts[0] || '')
+      setLastName(parts[1] || '')
       setPhone(initialPhone || '')
       setLocation(initialLocation || '')
       setProducerNotes(initialProducerNotes || '')
@@ -129,8 +133,9 @@ export function EditVendorDetailsModal({
     setSaving(true)
     try {
       // Send all fields to API, including empty values (to allow clearing)
+      const fullName = [firstName.trim(), lastName.trim()].filter(Boolean).join(' ')
       await registrationsApi.update(registrationId, {
-        name: name.trim(),
+        name: fullName,
         phone: phone.trim(),
         location: location.trim(),
         producer_notes: producerNotes.trim(),
@@ -141,7 +146,7 @@ export function EditVendorDetailsModal({
         affiliation: affiliation.trim(),
       })
       onSaved(applicantId, {
-        contact_name: name.trim(),
+        contact_name: fullName,
         phone: phone.trim(),
         location: location.trim(),
         producer_notes: producerNotes.trim(),
@@ -188,18 +193,32 @@ export function EditVendorDetailsModal({
                 className="bg-background/10 border-border text-xs opacity-80"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="edit-vendor-name" className="text-xs text-foreground/80">
-                Contact name
-              </Label>
-              <Input
-                id="edit-vendor-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="bg-background/5 border-border text-xs"
-                autoComplete="name"
-                required
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-vendor-first-name" className="text-xs text-foreground/80">
+                  First Name *
+                </Label>
+                <Input
+                  id="edit-vendor-first-name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="bg-background/5 border-border text-xs"
+                  autoComplete="given-name"
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-vendor-last-name" className="text-xs text-foreground/80">
+                  Last Name
+                </Label>
+                <Input
+                  id="edit-vendor-last-name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="bg-background/5 border-border text-xs"
+                  autoComplete="family-name"
+                />
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="edit-vendor-phone" className="text-xs text-foreground/80">
@@ -356,7 +375,7 @@ export function EditVendorDetailsModal({
             >
               Cancel
             </Button>
-            <Button type="submit" className="voxxy-btn-solid" disabled={saving || !name.trim()}>
+            <Button type="submit" className="voxxy-btn-solid" disabled={saving || !firstName.trim()}>
               {saving ? 'Saving…' : 'Save'}
             </Button>
           </DialogFooter>

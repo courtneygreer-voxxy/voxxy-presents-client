@@ -44,17 +44,15 @@ export default function EditContactModal({
   }, [organizationId])
 
   const [formData, setFormData] = useState({
-    contact_name: contact.contact_name,
-    business_name: contact.business_name || '',
+    first_name: contact.first_name || '',
+    last_name: contact.last_name || '',
     email: contact.email,
     phone: contact.phone || '',
     location: contact.location || '',
     instagram_handle: contact.instagram_handle || '',
     tiktok_handle: contact.tiktok_handle || '',
     website: contact.website || '',
-    eventbrite_email: contact.eventbrite_email || '',
-    venmo_handle: contact.venmo_handle || '',
-    paypal_email: contact.paypal_email || '',
+    affiliation: contact.affiliation || '',
     categories: contact.categories || [],
     tags: contact.tags || [],
     notes: contact.notes || '',
@@ -63,8 +61,8 @@ export default function EditContactModal({
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.contact_name.trim()) {
-      newErrors.contact_name = 'Contact name is required'
+    if (!formData.first_name.trim()) {
+      newErrors.first_name = 'First name is required'
     }
 
     if (!formData.email.trim()) {
@@ -112,18 +110,15 @@ export default function EditContactModal({
     setIsSubmitting(true)
     try {
       const updatedContact = await vendorContactsApi.update(contact.id, {
-        contact_name: formData.contact_name,
-        business_name: formData.business_name || undefined,
+        first_name: formData.first_name,
+        last_name: formData.last_name || undefined,
         email: formData.email,
         phone: formData.phone || undefined,
         location: formData.location || undefined,
         instagram_handle: formData.instagram_handle || undefined,
         tiktok_handle: formData.tiktok_handle || undefined,
         website: formData.website || undefined,
-        // TODO: Backend migration needed - these will be silently dropped until then
-        eventbrite_email: formData.eventbrite_email || undefined,
-        venmo_handle: formData.venmo_handle || undefined,
-        paypal_email: formData.paypal_email || undefined,
+        affiliation: formData.affiliation || undefined,
         categories: formData.categories,
         tags: formData.tags,
         notes: formData.notes || undefined,
@@ -145,7 +140,7 @@ export default function EditContactModal({
         <div className="voxxy-gradient-modal-header px-5 py-3 flex items-center justify-between border-b border-primary/20 flex-shrink-0 rounded-t-xl">
           <div>
             <h2 className="text-sm font-semibold text-foreground">Edit Contact</h2>
-            <p className="text-foreground/50 text-[11px] mt-0.5">{contact.contact_name}</p>
+            <p className="text-foreground/50 text-[11px] mt-0.5">{contact.first_name} {contact.last_name}</p>
           </div>
           <button
             onClick={onClose}
@@ -158,41 +153,41 @@ export default function EditContactModal({
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
           <div className="flex-1 overflow-y-auto p-5 space-y-3">
-            {/* Row 1: Full Name, Business Name, Email */}
+            {/* Row 1: First Name, Last Name, Email */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <label
-                  htmlFor="contact_name"
+                  htmlFor="first_name"
                   className="block text-xs font-medium text-foreground/70 mb-1"
                 >
-                  Full Name <span className="text-red-400">*</span>
+                  First Name <span className="text-red-400">*</span>
                 </label>
                 <input
-                  id="contact_name"
+                  id="first_name"
                   type="text"
-                  value={formData.contact_name}
-                  onChange={(e) => handleChange('contact_name', e.target.value)}
+                  value={formData.first_name}
+                  onChange={(e) => handleChange('first_name', e.target.value)}
                   className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
-                    errors.contact_name ? 'border-red-500' : 'border-border'
+                    errors.first_name ? 'border-red-500' : 'border-border'
                   } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
                 />
-                {errors.contact_name && (
-                  <p className="mt-1 text-xs text-red-400">{errors.contact_name}</p>
+                {errors.first_name && (
+                  <p className="mt-1 text-xs text-red-400">{errors.first_name}</p>
                 )}
               </div>
 
               <div>
                 <label
-                  htmlFor="business_name"
+                  htmlFor="last_name"
                   className="block text-xs font-medium text-foreground/70 mb-1"
                 >
-                  Business Name
+                  Last Name
                 </label>
                 <input
-                  id="business_name"
+                  id="last_name"
                   type="text"
-                  value={formData.business_name}
-                  onChange={(e) => handleChange('business_name', e.target.value)}
+                  value={formData.last_name}
+                  onChange={(e) => handleChange('last_name', e.target.value)}
                   className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
               </div>
@@ -217,8 +212,8 @@ export default function EditContactModal({
               </div>
             </div>
 
-            {/* Row 2: Phone, Location */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* Row 2: Phone, Location, Affiliation */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <label
                   htmlFor="phone"
@@ -248,6 +243,23 @@ export default function EditContactModal({
                   value={formData.location}
                   onChange={(e) => handleChange('location', e.target.value)}
                   placeholder="City, State, ZIP"
+                  className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="affiliation"
+                  className="block text-xs font-medium text-foreground/70 mb-1"
+                >
+                  Affiliation
+                </label>
+                <input
+                  id="affiliation"
+                  type="text"
+                  value={formData.affiliation}
+                  onChange={(e) => handleChange('affiliation', e.target.value)}
+                  placeholder="Business or group name"
                   className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
               </div>
@@ -307,60 +319,6 @@ export default function EditContactModal({
                   } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
                 />
                 {errors.website && <p className="mt-1 text-xs text-red-400">{errors.website}</p>}
-              </div>
-            </div>
-
-            {/* Payment Information */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div>
-                <label
-                  htmlFor="eventbrite_email"
-                  className="block text-xs font-medium text-foreground/70 mb-1"
-                >
-                  Eventbrite Email
-                </label>
-                <input
-                  id="eventbrite_email"
-                  type="email"
-                  value={formData.eventbrite_email}
-                  onChange={(e) => handleChange('eventbrite_email', e.target.value)}
-                  placeholder="artist@email.com"
-                  className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="venmo_handle"
-                  className="block text-xs font-medium text-foreground/70 mb-1"
-                >
-                  Venmo Handle
-                </label>
-                <input
-                  id="venmo_handle"
-                  type="text"
-                  value={formData.venmo_handle}
-                  onChange={(e) => handleChange('venmo_handle', e.target.value)}
-                  placeholder="@username"
-                  className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="paypal_email"
-                  className="block text-xs font-medium text-foreground/70 mb-1"
-                >
-                  PayPal Email
-                </label>
-                <input
-                  id="paypal_email"
-                  type="email"
-                  value={formData.paypal_email}
-                  onChange={(e) => handleChange('paypal_email', e.target.value)}
-                  placeholder="artist@paypal.com"
-                  className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                />
               </div>
             </div>
 
