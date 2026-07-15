@@ -2277,6 +2277,7 @@ export interface BulkImportOptions {
   updateExisting?: boolean
   tags?: string[]
   validateOnly?: boolean
+  columnMapping?: Record<string, string>
 }
 
 export interface ContactList {
@@ -2802,6 +2803,10 @@ export const vendorContactsApi = {
 
     if (options.tags && options.tags.length > 0) {
       formData.append('tags', JSON.stringify(options.tags))
+    }
+
+    if (options.columnMapping) {
+      formData.append('column_mapping', JSON.stringify(options.columnMapping))
     }
 
     console.log(
