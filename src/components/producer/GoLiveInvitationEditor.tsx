@@ -719,7 +719,7 @@ export default function GoLiveInvitationEditor({
                   <ChevronDown className="w-3 h-3 opacity-30" />
                 )}
               </button>
-              <div>Business</div>
+              <div>Affiliation</div>
               <button
                 type="button"
                 onClick={() => handleSort('email')}

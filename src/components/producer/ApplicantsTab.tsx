@@ -2067,11 +2067,13 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             {/* Vendor Info */}
             <div className="bg-background/5 rounded-lg p-3 space-y-1">
               <p className="text-sm text-foreground font-medium">
-                {pendingStatusChange.applicant.contact_name || pendingStatusChange.applicant.affiliation || pendingStatusChange.applicant.email}
-              </p>
-              <p className="text-xs text-foreground/60">
                 {pendingStatusChange.applicant.contact_name || pendingStatusChange.applicant.email}
               </p>
+              {pendingStatusChange.applicant.affiliation && (
+                <p className="text-xs text-foreground/60">
+                  {pendingStatusChange.applicant.affiliation}
+                </p>
+              )}
               <p className="text-xs text-primary">
                 {pendingStatusChange.applicant.vendor_category}
               </p>

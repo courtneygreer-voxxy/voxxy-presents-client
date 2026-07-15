@@ -28,7 +28,7 @@ import { Badge, type BadgeVariant } from '@/components/ui/badge'
 // Unified invite row interface
 interface InviteRow {
   id: string
-  businessName: string
+  affiliation: string
   contactName?: string
   email: string
   phone?: string
@@ -173,7 +173,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
         emailMap.set(email, {
           id: `reg-${submission.id}`,
-          businessName: submission.affiliation,
+          affiliation: submission.affiliation,
           contactName: submission.contact_name || submission.name,
           email: submission.email,
           phone: submission.phone,
@@ -219,7 +219,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
           emailMap.set(email, {
             id: `inv-${invitation.id}`,
-            businessName: contact.affiliation || contact.name,
+            affiliation: contact.affiliation || contact.name,
             contactName: contact.name || contact.contact_name,
             email: contact.email,
             phone: contact.phone,
@@ -503,7 +503,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       const matches =
-        row.businessName?.toLowerCase().includes(query) ||
+        row.affiliation?.toLowerCase().includes(query) ||
         row.contactName?.toLowerCase().includes(query) ||
         row.email?.toLowerCase().includes(query) ||
         row.category?.toLowerCase().includes(query) ||
@@ -671,7 +671,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
           <div className="grid grid-cols-[auto_2fr_1fr_1fr_1fr_1fr_1fr] gap-3 px-3 py-2 bg-background/5 border-b border-border">
             <div className="w-6" /> {/* Expand icon */}
             <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">
-              Business Name
+              Affiliation
             </div>
             <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">
               Category
@@ -719,7 +719,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-foreground font-medium">
-                        {row.businessName}
+                        {row.affiliation}
                       </span>
                       {row.isReturning && (
                         <Star className="w-3 h-3 text-yellow-400" fill="currentColor" />

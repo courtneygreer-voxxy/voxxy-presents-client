@@ -33,12 +33,3 @@ export const TABLE_HEADER_CLASSES =
 
 /** Body row: text size, alignment, gap */
 export const TABLE_ROW_CLASSES = 'items-center gap-2 text-[11px]'
-
-/** Cell text: default body text style */
-export const TABLE_CELL_TEXT = 'text-[11px]'
-
-/** Cell text: muted / secondary value */
-export const TABLE_CELL_MUTED = 'text-[11px] text-foreground/60'
-
-/** Truncated cell wrapper */
-export const TABLE_CELL_TRUNCATE = 'min-w-0 truncate'
