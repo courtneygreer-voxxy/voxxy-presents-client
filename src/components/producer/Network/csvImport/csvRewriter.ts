@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import type { ImportRow, ColumnMapping } from './types'
-import { RECOGNIZED_FIELD_KEYS } from './constants'
+import { RECOGNIZED_FIELD_KEYS, MERGE_FIELDS } from './constants'
 
 /**
  * Build the file + column_mapping to send to the server.
@@ -35,6 +35,11 @@ export function prepareSubmission(
   const activeFields = RECOGNIZED_FIELD_KEYS.filter((key) =>
     mappings.some((m) => m.mappedTo === key),
   )
+  // If name was merged from first_name+last_name, ensure it's included
+  const hasMerge = mappings.some((m) => m.mappedTo !== null && MERGE_FIELDS[m.mappedTo!])
+  if (hasMerge && !activeFields.includes('name')) {
+    activeFields.unshift('name')
+  }
 
   const csvData = activeRows.map((row) => {
     const obj: Record<string, string> = {}

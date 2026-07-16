@@ -9,6 +9,7 @@ interface StepReviewListsProps {
   importResult: BulkImportResult
   discoveredTags: string[]
   listDrafts: ListDraft[]
+  errorMessage?: string
   onUpdateDraft: (index: number, changes: Partial<ListDraft>) => void
   onCreateLists: () => void
   onSkipLists: () => void
@@ -18,6 +19,7 @@ export function StepReviewLists({
   importResult,
   discoveredTags,
   listDrafts,
+  errorMessage,
   onUpdateDraft,
   onCreateLists,
   onSkipLists,
@@ -36,6 +38,13 @@ export function StepReviewLists({
           You can also save filters later from All Contacts.
         </p>
       </div>
+
+      {errorMessage && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-3.5 w-3.5" />
+          <AlertDescription className="text-xs">{errorMessage}</AlertDescription>
+        </Alert>
+      )}
 
       <p className="text-[11px] text-foreground/50 text-center">
         All contacts land in All Contacts. Tags are labels — lists are smart filters saved for later.

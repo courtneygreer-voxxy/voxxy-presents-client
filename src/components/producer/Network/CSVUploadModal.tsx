@@ -353,6 +353,7 @@ export function CSVUploadModal({
             importResult={state.importResult}
             discoveredTags={discoveredTags}
             listDrafts={state.listDrafts}
+            errorMessage={state.errorMessage}
             onUpdateDraft={(idx, changes) =>
               dispatch({ type: 'UPDATE_LIST_DRAFT', index: idx, changes })
             }
