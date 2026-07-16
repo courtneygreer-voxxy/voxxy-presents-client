@@ -5,12 +5,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { CheckCircle2, AlertCircle } from 'lucide-react'
 import type { BulkImportResult } from '@/services/api'
 import type { ListDraft } from './types'
-import {
-  CONTACTS_ALWAYS_IN_ALL,
-  LISTS_FROM_TAGS,
-  TAGS_ARE_LABELS,
-} from '../copy'
-
 interface StepReviewListsProps {
   importResult: BulkImportResult
   discoveredTags: string[]
@@ -43,36 +37,24 @@ export function StepReviewLists({
         </p>
       </div>
 
-      <ul className="text-xs text-foreground/70 space-y-1 list-disc list-inside bg-background/5 rounded-lg p-3 border border-border">
-        <li>{CONTACTS_ALWAYS_IN_ALL}</li>
-        <li>{TAGS_ARE_LABELS}</li>
-        <li>{LISTS_FROM_TAGS}</li>
-      </ul>
-
-      <p className="text-xs text-foreground/80 text-center">
-        You just imported: <strong>{importedTotal}</strong> contact
-        {importedTotal === 1 ? '' : 's'}
-        {updated > 0 && (
-          <span className="text-foreground/60">
-            {' '}
-            ({created} created, {updated} updated)
-          </span>
+      <p className="text-[11px] text-foreground/50 text-center">
+        All contacts land in All Contacts. Tags are labels — lists are smart filters saved for later.
+        {discoveredTags.length > 0 && (
+          <> Tags found: <span className="text-foreground/70">{discoveredTags.join(', ')}</span>.</>
         )}
       </p>
 
-      {discoveredTags.length > 0 && (
-        <div>
-          <p className="text-[11px] font-medium text-foreground/70 mb-2">
-            New or updated tags found:{' '}
-            <span className="font-normal text-foreground/80">{discoveredTags.join(', ')}</span>
-          </p>
-        </div>
-      )}
+      <p className="text-xs text-foreground/80 text-center">
+        Imported: <strong>{importedTotal}</strong> contact{importedTotal === 1 ? '' : 's'}
+        {updated > 0 && (
+          <span className="text-foreground/60"> ({created} created, {updated} updated)</span>
+        )}
+      </p>
 
       {listDrafts.length > 0 && (
         <div className="space-y-2">
           <p className="text-[11px] font-medium text-foreground/70">Create lists from tags</p>
-          <div className="space-y-2 max-h-48 overflow-y-auto border border-border rounded-lg p-2">
+          <div className="space-y-2 max-h-72 overflow-y-auto border border-border rounded-lg p-2">
             {listDrafts.map((draft, index) => (
               <div
                 key={draft.tag}

@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState } from 'react'
 import Papa from 'papaparse'
 import {
   Dialog,
@@ -7,6 +7,16 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Loader2 } from 'lucide-react'
 import { vendorContactsApi, contactListsApi } from '@/services/api'
 
@@ -14,7 +24,7 @@ import { useImportState } from './csvImport/useImportState'
 import { autoDetectMappings, buildImportRows } from './csvImport/columnMapping'
 import { validateAllRows, revalidateRow } from './csvImport/clientValidation'
 import { prepareSubmission } from './csvImport/csvRewriter'
-import { RECOGNIZED_FIELD_KEYS } from './csvImport/constants'
+import { RECOGNIZED_FIELD_KEYS, MERGE_FIELDS } from './csvImport/constants'
 import type { CSVUploadModalProps } from './csvImport/types'
 
 import { StepUpload } from './csvImport/StepUpload'
@@ -40,25 +50,36 @@ export function CSVUploadModal({
 }: CSVUploadModalProps) {
   const { state, dispatch, reset } = useImportState()
 
+  // Use importRows (canonical field keys) when available, rawRows as fallback
+  const tagSourceRows = state.importRows.length > 0
+    ? (state.importRows as unknown as Record<string, string>[])
+    : state.rawRows
+
   const discoveredTags = useMemo(
-    () => discoverTagsFromRows(state.rawRows, parseTagsFromValue(state.bulkTags)),
-    [state.rawRows, state.bulkTags],
+    () => discoverTagsFromRows(tagSourceRows, parseTagsFromValue(state.bulkTags)),
+    [tagSourceRows, state.bulkTags],
   )
 
   const primaryTag = getPrimaryTag(state.bulkTags)
 
   const tagCounts = useMemo(
-    () => countTagsFromRows(state.rawRows, parseTagsFromValue(state.bulkTags)),
-    [state.rawRows, state.bulkTags],
+    () => countTagsFromRows(tagSourceRows, parseTagsFromValue(state.bulkTags)),
+    [tagSourceRows, state.bulkTags],
   )
 
-  const visibleFields = useMemo(
-    () =>
-      state.columnMappings
-        .filter((m) => m.mappedTo !== null && RECOGNIZED_FIELD_KEYS.includes(m.mappedTo!))
-        .map((m) => m.mappedTo!),
-    [state.columnMappings],
-  )
+  const visibleFields = useMemo(() => {
+    const fields = state.columnMappings
+      .filter((m) => m.mappedTo !== null && RECOGNIZED_FIELD_KEYS.includes(m.mappedTo!))
+      .map((m) => m.mappedTo!)
+    // If name was created via merge (first_name+last_name), ensure it appears
+    const hasMerge = state.columnMappings.some(
+      (m) => m.mappedTo !== null && MERGE_FIELDS[m.mappedTo!] !== undefined,
+    )
+    if (hasMerge && !fields.includes('name')) {
+      fields.unshift('name')
+    }
+    return fields
+  }, [state.columnMappings])
 
   // ─── Handlers ────────────────────────────────────────────────────
 
@@ -104,8 +125,8 @@ export function CSVUploadModal({
 
       // Re-validate the edited row
       const updatedRow = { ...state.importRows[rowIndex], [fieldKey]: value }
-      const { errors, status } = revalidateRow(updatedRow)
-      dispatch({ type: 'UPDATE_ROW_ERRORS', rowIndex, errors, status })
+      const { errors, warnings, status } = revalidateRow(updatedRow)
+      dispatch({ type: 'UPDATE_ROW_ERRORS', rowIndex, errors, warnings, status })
     },
     [state.importRows, dispatch],
   )
@@ -227,9 +248,28 @@ export function CSVUploadModal({
     }
   }, [state.listDrafts, organizationId, finishImport, dispatch])
 
+  const [confirmExitOpen, setConfirmExitOpen] = useState(false)
+
+  // Steps where the user has meaningful work in progress that would be lost on close.
+  const SAFE_TO_EXIT_STEPS = new Set(['idle', 'review_lists', 'creating_lists'])
+  const hasActiveWork = !SAFE_TO_EXIT_STEPS.has(state.step)
+
   const handleClose = () => {
     reset()
     onClose()
+  }
+
+  const handleAttemptClose = (requestedOpen: boolean) => {
+    if (!requestedOpen && hasActiveWork) {
+      setConfirmExitOpen(true)
+      return
+    }
+    if (!requestedOpen) handleClose()
+  }
+
+  const handleConfirmExit = () => {
+    setConfirmExitOpen(false)
+    handleClose()
   }
 
   // ─── Render ──────────────────────────────────────────────────────
@@ -252,8 +292,8 @@ export function CSVUploadModal({
             fileName={state.file?.name ?? ''}
             totalRows={state.rawRows.length}
             mappings={state.columnMappings}
-            onUpdateMapping={(idx, mappedTo) =>
-              dispatch({ type: 'UPDATE_COLUMN_MAPPING', index: idx, mappedTo })
+            onAssignField={(fieldKey, csvHeader) =>
+              dispatch({ type: 'ASSIGN_FIELD', fieldKey, csvHeader })
             }
             onConfirm={handleConfirmMappings}
             onBack={reset}
@@ -292,7 +332,7 @@ export function CSVUploadModal({
             result={state.validationResult}
             discoveredTags={discoveredTags}
             onImport={handleImport}
-            onBack={handleConfirmMappings}
+            onBack={() => dispatch({ type: 'GO_TO_PREVIEW' })}
           />
         ) : null
 
@@ -335,18 +375,49 @@ export function CSVUploadModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="voxxy-modal-surface max-h-[85vh] w-[95vw] max-w-5xl overflow-y-auto p-5">
-        <DialogHeader className="mb-2">
-          <DialogTitle className="text-base text-foreground">
-            Import Contacts from CSV
-          </DialogTitle>
-          <DialogDescription className="text-foreground/60 text-xs">
-            Upload a CSV file to bulk import vendor contacts into All Contacts
-          </DialogDescription>
-        </DialogHeader>
-        <div>{renderStep()}</div>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={open} onOpenChange={handleAttemptClose}>
+        <DialogContent
+          className="voxxy-modal-surface voxxy-modal-workspace"
+          onInteractOutside={(e) => {
+            if (hasActiveWork) e.preventDefault()
+          }}
+          onEscapeKeyDown={(e) => {
+            if (hasActiveWork) e.preventDefault()
+          }}
+        >
+          <DialogHeader className="mb-2">
+            <DialogTitle className="text-base text-foreground">
+              Import Contacts from CSV
+            </DialogTitle>
+            <DialogDescription className="text-foreground/60 text-xs">
+              Upload a CSV file to bulk import vendor contacts into All Contacts
+            </DialogDescription>
+          </DialogHeader>
+          <div>{renderStep()}</div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={confirmExitOpen} onOpenChange={setConfirmExitOpen}>
+        <AlertDialogContent className="voxxy-modal-surface max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-base">Leave import?</AlertDialogTitle>
+            <AlertDialogDescription className="text-xs">
+              Your progress will be lost — the uploaded file and any edits you've made won't be
+              saved.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="text-xs h-8">Stay</AlertDialogCancel>
+            <AlertDialogAction
+              className="text-xs h-8 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleConfirmExit}
+            >
+              Leave anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }

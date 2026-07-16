@@ -11,7 +11,10 @@ export interface ColumnMapping {
 export interface ImportRow {
   _originalIndex: number
   _skipped: boolean
+  /** Blocking issues (missing Name/Email) — row cannot be imported until fixed or skipped */
   _errors: Record<string, string[]>
+  /** Non-blocking formatting issues — row can still be imported as-is */
+  _warnings: Record<string, string[]>
   _status: 'valid' | 'warning' | 'error'
   [fieldKey: string]: unknown
 }
@@ -54,10 +57,11 @@ export type ImportAction =
   | { type: 'FILE_PARSED'; file: File; headers: string[]; rows: Record<string, string>[] }
   | { type: 'SET_COLUMN_MAPPINGS'; mappings: ColumnMapping[] }
   | { type: 'UPDATE_COLUMN_MAPPING'; index: number; mappedTo: string | null }
+  | { type: 'ASSIGN_FIELD'; fieldKey: string; csvHeader: string | null }
   | { type: 'CONFIRM_MAPPINGS'; importRows: ImportRow[] }
   | { type: 'EDIT_CELL'; rowIndex: number; fieldKey: string; value: string }
   | { type: 'TOGGLE_ROW_SKIP'; rowIndex: number }
-  | { type: 'UPDATE_ROW_ERRORS'; rowIndex: number; errors: Record<string, string[]>; status: ImportRow['_status'] }
+  | { type: 'UPDATE_ROW_ERRORS'; rowIndex: number; errors: Record<string, string[]>; warnings: Record<string, string[]>; status: ImportRow['_status'] }
   | { type: 'SET_BULK_TAGS'; tags: string }
   | { type: 'SET_SKIP_DUPLICATES'; value: boolean }
   | { type: 'SET_UPDATE_EXISTING'; value: boolean }
@@ -67,6 +71,7 @@ export type ImportAction =
   | { type: 'UPLOAD_COMPLETE'; result: BulkImportResult }
   | { type: 'SET_LIST_DRAFTS'; drafts: ListDraft[] }
   | { type: 'UPDATE_LIST_DRAFT'; index: number; changes: Partial<ListDraft> }
+  | { type: 'GO_TO_PREVIEW' }
   | { type: 'ERROR'; message: string }
   | { type: 'RESET' }
 

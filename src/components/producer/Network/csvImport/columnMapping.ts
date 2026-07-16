@@ -118,6 +118,7 @@ export function buildImportRows(
       _originalIndex: idx + 2, // 1-indexed + header row
       _skipped: false,
       _errors: {},
+      _warnings: {},
       _status: 'valid',
     }
 
@@ -130,8 +131,10 @@ export function buildImportRows(
 
     // Handle first_name + last_name → name merge
     if (Object.keys(mergeHeaders).length > 0) {
-      const mergeConfig = Object.values(MERGE_FIELDS)[0]
-      if (mergeConfig && !headerToField.has('name')) {
+      // Find the merge config that matches our actual headers
+      const matchingNorm = Object.keys(mergeHeaders).find((n) => MERGE_FIELDS[n])
+      const mergeConfig = matchingNorm ? MERGE_FIELDS[matchingNorm] : null
+      if (mergeConfig && ![...headerToField.values()].includes('name')) {
         const parts = mergeConfig.parts
           .map((part) => {
             const csvH = mergeHeaders[part]

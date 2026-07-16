@@ -33,12 +33,28 @@ function importReducer(state: ImportState, action: ImportAction): ImportState {
     case 'SET_COLUMN_MAPPINGS':
       return {
         ...state,
+        step: 'column_mapping',
         columnMappings: action.mappings,
       }
 
     case 'UPDATE_COLUMN_MAPPING': {
       const mappings = [...state.columnMappings]
       mappings[action.index] = { ...mappings[action.index], mappedTo: action.mappedTo, confidence: 'exact' }
+      return { ...state, columnMappings: mappings }
+    }
+
+    case 'ASSIGN_FIELD': {
+      // Field-anchored mapping: a field can only be fed by one CSV column at a
+      // time, so reassigning it first frees up whatever column it used to claim.
+      const mappings = state.columnMappings.map((m) => {
+        if (m.mappedTo === action.fieldKey && m.csvHeader !== action.csvHeader) {
+          return { ...m, mappedTo: null, confidence: 'none' as const }
+        }
+        if (action.csvHeader && m.csvHeader === action.csvHeader) {
+          return { ...m, mappedTo: action.fieldKey, confidence: 'exact' as const }
+        }
+        return m
+      })
       return { ...state, columnMappings: mappings }
     }
 
@@ -73,6 +89,7 @@ function importReducer(state: ImportState, action: ImportAction): ImportState {
       rows[action.rowIndex] = {
         ...rows[action.rowIndex],
         _errors: action.errors,
+        _warnings: action.warnings,
         _status: action.status,
       }
       return { ...state, importRows: rows }
@@ -108,8 +125,16 @@ function importReducer(state: ImportState, action: ImportAction): ImportState {
       return { ...state, listDrafts: drafts }
     }
 
-    case 'ERROR':
-      return { ...state, step: 'idle', errorMessage: action.message }
+    case 'GO_TO_PREVIEW':
+      return { ...state, step: 'preview_editing' }
+
+    case 'ERROR': {
+      // If contacts are already imported, stay on review_lists so user can retry
+      const errorStep = state.step === 'review_lists' || state.step === 'creating_lists'
+        ? 'review_lists'
+        : 'idle'
+      return { ...state, step: errorStep, errorMessage: action.message }
+    }
 
     case 'RESET':
       return initialState

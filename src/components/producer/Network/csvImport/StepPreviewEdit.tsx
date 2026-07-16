@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { AlertCircle, ArrowDown } from 'lucide-react'
 import type { ImportRow } from './types'
-import { FIELD_LABELS } from './constants'
 import { VirtualizedImportTable } from './VirtualizedImportTable'
 import { PRIMARY_TAG_HELPER } from '../copy'
 
@@ -35,23 +34,29 @@ export function StepPreviewEdit({
 
   const stats = useMemo(() => {
     let valid = 0
-    let errors = 0
+    let warningRowCount = 0
     let skipped = 0
     let errorRowCount = 0
+    let firstError = -1
 
-    for (const row of rows) {
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i]
       if (row._skipped) {
         skipped++
         continue
       }
       if (row._status === 'error') {
-        errors += Object.values(row._errors).reduce((sum, arr) => sum + arr.length, 0)
         errorRowCount++
+        if (firstError === -1) firstError = i
+      } else if (row._status === 'warning') {
+        warningRowCount++
       } else {
         valid++
       }
     }
-    return { valid, errors, errorRowCount, skipped, total: rows.length }
+    // Anything not blocking and not skipped can be imported
+    const importable = valid + warningRowCount
+    return { valid, warningRowCount, errorRowCount, skipped, importable, total: rows.length, firstErrorIndex: firstError }
   }, [rows])
 
   const jumpToNextError = () => {
@@ -61,16 +66,20 @@ export function StepPreviewEdit({
   return (
     <div className="space-y-3">
       {/* File + stats bar */}
-      <div className="flex items-center justify-between px-3 py-2 bg-background/5 border border-primary/20 rounded-lg text-[11px]">
-        <span className="text-foreground/90">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 bg-background/5 border border-primary/20 rounded-lg text-[11px]">
+        <span className="text-foreground/90 truncate max-w-[40%]">
           <strong>{fileName}</strong>
         </span>
-        <div className="flex items-center gap-3 text-foreground/70">
+        <div className="flex items-center gap-3 text-foreground/70 flex-wrap">
           <span className="text-green-400">{stats.valid} valid</span>
+          {stats.warningRowCount > 0 && (
+            <span className="text-yellow-400">
+              {stats.warningRowCount} warning{stats.warningRowCount !== 1 ? 's' : ''}
+            </span>
+          )}
           {stats.errorRowCount > 0 && (
             <span className="text-red-400">
-              {stats.errors} error{stats.errors !== 1 ? 's' : ''} in {stats.errorRowCount} row
-              {stats.errorRowCount !== 1 ? 's' : ''}
+              {stats.errorRowCount} blocking
             </span>
           )}
           {stats.skipped > 0 && (
@@ -86,14 +95,18 @@ export function StepPreviewEdit({
           className="flex items-center gap-1.5 text-[11px] text-red-400 hover:text-red-300 transition-colors"
         >
           <ArrowDown className="h-3 w-3" />
-          Jump to first error
+          Jump to first blocking error
         </button>
       )}
 
-      {/* Click-to-edit hint */}
+      {/* Severity legend + click-to-edit hint */}
       <p className="text-[10px] text-foreground/40">
-        Click any cell to edit. Check &quot;Skip&quot; to exclude a row.{' '}
-        {visibleFields.map((f) => FIELD_LABELS[f] || f).join(', ')}
+        Click any cell to edit · Check &quot;Skip&quot; to exclude a row · Hover a cell{' '}
+        <span className="text-red-400/80">●</span> or{' '}
+        <span className="text-yellow-400/80">●</span> to see its issue.{' '}
+        <span className="text-red-400/80">Red</span> = missing Name/Email (must fix or skip).{' '}
+        <span className="text-yellow-400/80">Yellow</span> = formatting issue (row will be
+        skipped on import unless fixed).
       </p>
 
       {/* Virtualized table */}
@@ -103,6 +116,7 @@ export function StepPreviewEdit({
         onEditCell={onEditCell}
         onToggleSkip={onToggleSkip}
         errorRowRef={errorRowRef}
+        firstErrorIndex={stats.firstErrorIndex}
       />
 
       {/* Bulk tags */}
@@ -142,9 +156,9 @@ export function StepPreviewEdit({
           onClick={onValidate}
           size="sm"
           className="text-xs h-8"
-          disabled={stats.valid === 0}
+          disabled={stats.importable === 0}
         >
-          Validate {stats.valid} Contact{stats.valid !== 1 ? 's' : ''}
+          Validate {stats.importable} Contact{stats.importable !== 1 ? 's' : ''}
         </Button>
       </div>
     </div>

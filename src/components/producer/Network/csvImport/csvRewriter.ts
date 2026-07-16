@@ -22,7 +22,8 @@ export function prepareSubmission(
     }
   }
 
-  if (!cellsEdited) {
+  const hasSkippedRows = importRows.some((r) => r._skipped)
+  if (!cellsEdited && !hasSkippedRows) {
     return {
       file: originalFile,
       columnMapping: Object.keys(columnMapping).length > 0 ? columnMapping : null,

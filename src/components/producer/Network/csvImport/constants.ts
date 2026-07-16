@@ -11,7 +11,10 @@ export interface FieldDefinition {
 
 export const RECOGNIZED_FIELDS: FieldDefinition[] = [
   { key: 'name', label: 'Name', required: true },
-  { key: 'email', label: 'Email', required: false },
+  // Email is required on import even though the backend allows it blank —
+  // it's the unique identifier used to match/de-dupe existing contacts and
+  // the only way to actually reach an imported contact.
+  { key: 'email', label: 'Email', required: true },
   { key: 'phone', label: 'Phone', required: false },
   { key: 'affiliation', label: 'Affiliation', required: false },
   { key: 'instagram_handle', label: 'Instagram', required: false },

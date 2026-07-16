@@ -1,5 +1,6 @@
+import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
 import { CheckCircle2, AlertCircle, Download } from 'lucide-react'
 import type { BulkImportResult } from '@/services/api'
 import { downloadErrorReport } from '@/utils/csvTemplateGenerator'
@@ -9,6 +10,37 @@ interface StepValidationResultProps {
   discoveredTags: string[]
   onImport: () => void
   onBack: () => void
+}
+
+const MAX_ERRORS_SHOWN = 20
+
+function StatRow({
+  icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: ReactNode
+  label: string
+  value: number
+  tone: 'green' | 'blue' | 'yellow' | 'red'
+}) {
+  const toneClass = {
+    green: 'text-green-400',
+    blue: 'text-blue-400',
+    yellow: 'text-yellow-400',
+    red: 'text-red-400',
+  }[tone]
+
+  return (
+    <div className="flex items-center justify-between gap-2 px-3 py-2">
+      <span className="flex items-center gap-2 text-xs text-foreground/80 min-w-0">
+        <span className={toneClass}>{icon}</span>
+        <span className="truncate">{label}</span>
+      </span>
+      <span className={`text-xs font-semibold shrink-0 ${toneClass}`}>{value}</span>
+    </div>
+  )
 }
 
 export function StepValidationResult({
@@ -37,66 +69,71 @@ export function StepValidationResult({
       </div>
 
       {discoveredTags.length > 0 && (
-        <p className="text-xs text-foreground/70 text-center">
-          Tags found in this file:{' '}
-          <span className="text-foreground">{discoveredTags.join(', ')}</span>
+        <p className="text-xs text-foreground/70 text-center truncate">
+          Tags found in this file: <span className="text-foreground">{discoveredTags.join(', ')}</span>
         </p>
       )}
 
-      <div className="grid grid-cols-2 gap-2">
+      {/* Clean one-line-per-stat summary */}
+      <div className="rounded-lg border border-border divide-y divide-border">
         {wouldCreate > 0 && (
-          <div className="border border-green-500/30 bg-green-500/10 rounded-lg p-2.5 text-center">
-            <div className="text-lg font-bold text-green-400">{wouldCreate}</div>
-            <div className="text-[11px] text-foreground/60">Will be created</div>
-          </div>
+          <StatRow icon={<CheckCircle2 className="h-3.5 w-3.5" />} label="Will be created" value={wouldCreate} tone="green" />
         )}
         {wouldUpdate > 0 && (
-          <div className="border border-blue-500/30 bg-blue-500/10 rounded-lg p-2.5 text-center">
-            <div className="text-lg font-bold text-blue-400">{wouldUpdate}</div>
-            <div className="text-[11px] text-foreground/60">Will be updated</div>
-          </div>
+          <StatRow icon={<CheckCircle2 className="h-3.5 w-3.5" />} label="Will be updated" value={wouldUpdate} tone="blue" />
         )}
         {wouldSkip > 0 && (
-          <div className="border border-yellow-500/30 bg-yellow-500/10 rounded-lg p-2.5 text-center">
-            <div className="text-lg font-bold text-yellow-400">{wouldSkip}</div>
-            <div className="text-[11px] text-foreground/60">Duplicates (skipped)</div>
-          </div>
+          <StatRow icon={<AlertCircle className="h-3.5 w-3.5" />} label="Duplicates (skipped)" value={wouldSkip} tone="yellow" />
         )}
         {failed > 0 && (
-          <div className="border border-red-500/30 bg-red-500/10 rounded-lg p-2.5 text-center">
-            <div className="text-lg font-bold text-red-400">{failed}</div>
-            <div className="text-[11px] text-foreground/60">Invalid rows</div>
-          </div>
+          <StatRow icon={<AlertCircle className="h-3.5 w-3.5" />} label="Invalid rows (skipped)" value={failed} tone="red" />
         )}
       </div>
 
+      {/* Error list — one line per row, truncated with hover for the full message */}
       {hasErrors && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-3.5 w-3.5" />
-          <AlertDescription>
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium">
-                {result.errors.length} row(s) have errors and will be skipped:
-              </p>
-              <div className="max-h-24 overflow-y-auto text-[11px] space-y-0.5">
-                {result.errors.slice(0, 5).map((error, idx) => (
-                  <div key={idx}>
-                    Row {error.row}: {error.message}
-                  </div>
-                ))}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => downloadErrorReport(result.errors)}
-                className="mt-1 h-7 text-[11px]"
-              >
-                <Download className="h-3 w-3 mr-1.5" />
-                Download Error Report
-              </Button>
-            </div>
-          </AlertDescription>
-        </Alert>
+        <div className="rounded-lg border border-red-500/30 bg-red-500/5 overflow-hidden">
+          <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-red-500/20">
+            <span className="text-xs font-medium text-red-300 truncate">
+              {result.errors.length} row{result.errors.length !== 1 ? 's' : ''} have errors
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => downloadErrorReport(result.errors)}
+              className="h-6 px-2 text-[10px] shrink-0"
+            >
+              <Download className="h-3 w-3 mr-1" />
+              Download
+            </Button>
+          </div>
+          <TooltipProvider delayDuration={150}>
+            <ul className="max-h-28 overflow-y-auto divide-y divide-red-500/10">
+              {result.errors.slice(0, MAX_ERRORS_SHOWN).map((error, idx) => (
+                <li key={idx} className="flex items-center gap-2 px-3 py-1.5 text-[11px] min-w-0">
+                  <span className="shrink-0 text-red-400/70 font-mono text-[10px]">Row {error.row}</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="truncate text-red-200 cursor-default">{error.message}</span>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="top"
+                      align="start"
+                      className="max-w-xs bg-red-950 border-red-500/40 text-red-100"
+                    >
+                      {error.message}
+                    </TooltipContent>
+                  </Tooltip>
+                </li>
+              ))}
+            </ul>
+          </TooltipProvider>
+          {result.errors.length > MAX_ERRORS_SHOWN && (
+            <p className="px-3 py-1 text-[10px] text-foreground/40 border-t border-red-500/10">
+              +{result.errors.length - MAX_ERRORS_SHOWN} more — download the report for the full list
+            </p>
+          )}
+        </div>
       )}
 
       <div className="flex justify-between pt-1">
