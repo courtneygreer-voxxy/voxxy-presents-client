@@ -130,18 +130,16 @@ export function buildImportRows(
     }
 
     // Handle first_name + last_name → name merge
-    if (Object.keys(mergeHeaders).length > 0) {
-      // Find the merge config that matches our actual headers
-      const matchingNorm = Object.keys(mergeHeaders).find((n) => MERGE_FIELDS[n])
-      const mergeConfig = matchingNorm ? MERGE_FIELDS[matchingNorm] : null
-      if (mergeConfig && ![...headerToField.values()].includes('name')) {
-        const parts = mergeConfig.parts
-          .map((part) => {
-            const csvH = mergeHeaders[part]
-            return csvH ? (raw[csvH]?.trim() ?? '') : ''
-          })
-          .filter(Boolean)
-        row.name = parts.join(' ')
+    // Collect ALL merge-source values regardless of naming convention
+    // (handles mixed cases like `firstname` + `last_name`)
+    if (Object.keys(mergeHeaders).length > 0 && ![...headerToField.values()].includes('name')) {
+      const nameParts: string[] = []
+      for (const csvHeader of Object.values(mergeHeaders)) {
+        const val = raw[csvHeader]?.trim()
+        if (val) nameParts.push(val)
+      }
+      if (nameParts.length > 0) {
+        row.name = nameParts.join(' ')
       }
     }
 

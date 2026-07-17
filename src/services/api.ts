@@ -2270,6 +2270,11 @@ export interface BulkImportResult {
     field: string
     message: string
   }>
+  warnings?: Array<{
+    row: number
+    field: string
+    message: string
+  }>
 }
 
 export interface BulkImportOptions {

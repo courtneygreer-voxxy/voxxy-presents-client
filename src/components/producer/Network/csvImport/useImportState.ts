@@ -129,10 +129,17 @@ function importReducer(state: ImportState, action: ImportAction): ImportState {
       return { ...state, step: 'preview_editing' }
 
     case 'ERROR': {
-      // If contacts are already imported, stay on review_lists so user can retry
-      const errorStep = state.step === 'review_lists' || state.step === 'creating_lists'
-        ? 'review_lists'
-        : 'idle'
+      // Return to the last safe step instead of losing all progress
+      let errorStep: typeof state.step
+      if (state.step === 'review_lists' || state.step === 'creating_lists') {
+        errorStep = 'review_lists'     // contacts already imported, retry lists
+      } else if (state.step === 'uploading') {
+        errorStep = 'validated'         // import failed, let user retry
+      } else if (state.step === 'server_validating') {
+        errorStep = 'preview_editing'   // validation failed, back to preview
+      } else {
+        errorStep = 'idle'
+      }
       return { ...state, step: errorStep, errorMessage: action.message }
     }
 

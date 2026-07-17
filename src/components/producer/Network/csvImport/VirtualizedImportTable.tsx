@@ -13,19 +13,25 @@ interface VirtualizedImportTableProps {
   visibleFields: string[]
   onEditCell: (rowIndex: number, fieldKey: string, value: string) => void
   onToggleSkip: (rowIndex: number) => void
-  errorRowRef?: React.MutableRefObject<HTMLDivElement | null>
-  firstErrorIndex?: number
 }
 
 const ROW_HEIGHT = 32
+
+/** Narrower min for compact fields, wider for name/notes */
+const WIDE_FIELDS = new Set(['name', 'email', 'notes', 'location'])
+
+function buildColumnTemplate(visibleFields: string[]): string {
+  const cols = visibleFields.map((f) =>
+    WIDE_FIELDS.has(f) ? 'minmax(130px, 2fr)' : 'minmax(90px, 1fr)',
+  )
+  return `40px 36px ${cols.join(' ')}`
+}
 
 export function VirtualizedImportTable({
   rows,
   visibleFields,
   onEditCell,
   onToggleSkip,
-  errorRowRef,
-  firstErrorIndex = -1,
 }: VirtualizedImportTableProps) {
   const parentRef = useRef<HTMLDivElement>(null)
 
@@ -44,9 +50,9 @@ export function VirtualizedImportTable({
       >
         {/* Sticky header */}
         <div
-          className={`sticky top-0 z-10 grid bg-primary/10 border-b border-primary/20 ${TABLE_HEADER_CLASSES}`}
+          className={`sticky top-0 z-10 grid bg-background border-b border-primary/20 backdrop-blur-md ${TABLE_HEADER_CLASSES}`}
           style={{
-            gridTemplateColumns: `40px 36px ${visibleFields.map(() => 'minmax(120px, 1fr)').join(' ')}`,
+            gridTemplateColumns: buildColumnTemplate(visibleFields),
           }}
         >
           <div className="px-1 text-center text-foreground/50">#</div>
@@ -70,12 +76,10 @@ export function VirtualizedImportTable({
             const isSkipped = row._skipped
             const isError = row._status === 'error'
             const isWarning = row._status === 'warning'
-            const isFirstError = isError && virtualRow.index === firstErrorIndex
 
             return (
               <div
                 key={virtualRow.index}
-                ref={isFirstError && errorRowRef ? (el) => { errorRowRef.current = el } : undefined}
                 className={`grid items-center text-[11px] border-b border-primary/10 ${
                   isSkipped
                     ? 'opacity-40 line-through'
@@ -92,7 +96,7 @@ export function VirtualizedImportTable({
                   width: '100%',
                   height: `${virtualRow.size}px`,
                   transform: `translateY(${virtualRow.start}px)`,
-                  gridTemplateColumns: `40px 36px ${visibleFields.map(() => 'minmax(120px, 1fr)').join(' ')}`,
+                  gridTemplateColumns: buildColumnTemplate(visibleFields),
                 }}
               >
                 {/* Row number — hover shows every issue for this row */}
@@ -135,7 +139,7 @@ export function VirtualizedImportTable({
                         {Object.keys(row._warnings).length > 0 && (
                           <>
                             <p className="text-[11px] font-medium mb-1 text-yellow-200">
-                              Warnings (row will be skipped on import unless fixed):
+                              Warnings (will still import — consider fixing):
                             </p>
                             <ul className="text-[11px] space-y-0.5 list-disc list-inside">
                               {Object.entries(row._warnings).flatMap(([field, msgs]) =>

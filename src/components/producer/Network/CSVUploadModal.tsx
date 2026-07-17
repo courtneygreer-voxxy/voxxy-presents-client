@@ -307,6 +307,7 @@ export function CSVUploadModal({
             rows={state.importRows}
             visibleFields={visibleFields}
             bulkTags={state.bulkTags}
+            errorMessage={state.errorMessage}
             onEditCell={handleEditCell}
             onToggleSkip={(idx) => dispatch({ type: 'TOGGLE_ROW_SKIP', rowIndex: idx })}
             onSetBulkTags={(tags) => dispatch({ type: 'SET_BULK_TAGS', tags })}
@@ -330,7 +331,7 @@ export function CSVUploadModal({
         return state.validationResult ? (
           <StepValidationResult
             result={state.validationResult}
-            discoveredTags={discoveredTags}
+            errorMessage={state.errorMessage}
             onImport={handleImport}
             onBack={() => dispatch({ type: 'GO_TO_PREVIEW' })}
           />

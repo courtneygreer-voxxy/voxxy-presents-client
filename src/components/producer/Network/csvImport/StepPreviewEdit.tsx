@@ -1,17 +1,21 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { AlertCircle, ArrowDown } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertCircle } from 'lucide-react'
 import type { ImportRow } from './types'
 import { VirtualizedImportTable } from './VirtualizedImportTable'
 import { PRIMARY_TAG_HELPER } from '../copy'
+
+type RowFilter = 'all' | 'errors' | 'warnings'
 
 interface StepPreviewEditProps {
   fileName: string
   rows: ImportRow[]
   visibleFields: string[]
   bulkTags: string
+  errorMessage?: string
   onEditCell: (rowIndex: number, fieldKey: string, value: string) => void
   onToggleSkip: (rowIndex: number) => void
   onSetBulkTags: (tags: string) => void
@@ -24,80 +28,98 @@ export function StepPreviewEdit({
   rows,
   visibleFields,
   bulkTags,
+  errorMessage,
   onEditCell,
   onToggleSkip,
   onSetBulkTags,
   onValidate,
   onBack,
 }: StepPreviewEditProps) {
-  const errorRowRef = useRef<HTMLDivElement | null>(null)
+  const [filter, setFilter] = useState<RowFilter>('all')
 
   const stats = useMemo(() => {
     let valid = 0
     let warningRowCount = 0
     let skipped = 0
     let errorRowCount = 0
-    let firstError = -1
 
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i]
-      if (row._skipped) {
-        skipped++
-        continue
-      }
-      if (row._status === 'error') {
-        errorRowCount++
-        if (firstError === -1) firstError = i
-      } else if (row._status === 'warning') {
-        warningRowCount++
-      } else {
-        valid++
-      }
+    for (const row of rows) {
+      if (row._skipped) { skipped++; continue }
+      if (row._status === 'error') errorRowCount++
+      else if (row._status === 'warning') warningRowCount++
+      else valid++
     }
-    // Anything not blocking and not skipped can be imported
     const importable = valid + warningRowCount
-    return { valid, warningRowCount, errorRowCount, skipped, importable, total: rows.length, firstErrorIndex: firstError }
+    return { valid, warningRowCount, errorRowCount, skipped, importable, total: rows.length }
   }, [rows])
 
-  const jumpToNextError = () => {
-    errorRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }
+  // Build filtered view with source-index mapping so callbacks target the right row
+  const filteredView = useMemo(() => {
+    if (filter === 'all') return rows.map((row, i) => ({ row, sourceIndex: i }))
+    return rows.reduce<{ row: ImportRow; sourceIndex: number }[]>((acc, row, i) => {
+      if (row._skipped) return acc
+      if (filter === 'errors' && row._status === 'error') acc.push({ row, sourceIndex: i })
+      if (filter === 'warnings' && row._status === 'warning') acc.push({ row, sourceIndex: i })
+      return acc
+    }, [])
+  }, [rows, filter])
+
+  const displayRows = useMemo(() => filteredView.map((f) => f.row), [filteredView])
 
   return (
     <div className="space-y-3">
-      {/* File + stats bar */}
+      {errorMessage && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-3.5 w-3.5" />
+          <AlertDescription className="text-xs">{errorMessage}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* File + filter bar */}
       <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 bg-background/5 border border-primary/20 rounded-lg text-[11px]">
         <span className="text-foreground/90 truncate max-w-[40%]">
           <strong>{fileName}</strong>
         </span>
-        <div className="flex items-center gap-3 text-foreground/70 flex-wrap">
-          <span className="text-green-400">{stats.valid} valid</span>
-          {stats.warningRowCount > 0 && (
-            <span className="text-yellow-400">
-              {stats.warningRowCount} warning{stats.warningRowCount !== 1 ? 's' : ''}
-            </span>
-          )}
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setFilter('all')}
+            className={`px-2 py-0.5 rounded-full transition-colors ${
+              filter === 'all'
+                ? 'bg-foreground/15 text-foreground'
+                : 'text-foreground/50 hover:text-foreground/70'
+            }`}
+          >
+            All {stats.total}
+          </button>
           {stats.errorRowCount > 0 && (
-            <span className="text-red-400">
+            <button
+              onClick={() => setFilter(filter === 'errors' ? 'all' : 'errors')}
+              className={`px-2 py-0.5 rounded-full transition-colors ${
+                filter === 'errors'
+                  ? 'bg-red-500/20 text-red-300'
+                  : 'text-red-400/70 hover:text-red-400'
+              }`}
+            >
               {stats.errorRowCount} blocking
-            </span>
+            </button>
+          )}
+          {stats.warningRowCount > 0 && (
+            <button
+              onClick={() => setFilter(filter === 'warnings' ? 'all' : 'warnings')}
+              className={`px-2 py-0.5 rounded-full transition-colors ${
+                filter === 'warnings'
+                  ? 'bg-yellow-500/20 text-yellow-300'
+                  : 'text-yellow-400/70 hover:text-yellow-400'
+              }`}
+            >
+              {stats.warningRowCount} warning{stats.warningRowCount !== 1 ? 's' : ''}
+            </button>
           )}
           {stats.skipped > 0 && (
-            <span className="text-foreground/50">{stats.skipped} skipped</span>
+            <span className="text-foreground/40 pl-1">{stats.skipped} skipped</span>
           )}
         </div>
       </div>
-
-      {/* Error jump */}
-      {stats.errorRowCount > 0 && (
-        <button
-          onClick={jumpToNextError}
-          className="flex items-center gap-1.5 text-[11px] text-red-400 hover:text-red-300 transition-colors"
-        >
-          <ArrowDown className="h-3 w-3" />
-          Jump to first blocking error
-        </button>
-      )}
 
       {/* Severity legend + click-to-edit hint */}
       <p className="text-[10px] text-foreground/40">
@@ -105,18 +127,19 @@ export function StepPreviewEdit({
         <span className="text-red-400/80">●</span> or{' '}
         <span className="text-yellow-400/80">●</span> to see its issue.{' '}
         <span className="text-red-400/80">Red</span> = missing Name/Email (must fix or skip).{' '}
-        <span className="text-yellow-400/80">Yellow</span> = formatting issue (row will be
-        skipped on import unless fixed).
+        <span className="text-yellow-400/80">Yellow</span> = formatting issue (will still import).
       </p>
 
       {/* Virtualized table */}
       <VirtualizedImportTable
-        rows={rows}
+        rows={displayRows}
         visibleFields={visibleFields}
-        onEditCell={onEditCell}
-        onToggleSkip={onToggleSkip}
-        errorRowRef={errorRowRef}
-        firstErrorIndex={stats.firstErrorIndex}
+        onEditCell={(filteredIdx, field, value) =>
+          onEditCell(filteredView[filteredIdx].sourceIndex, field, value)
+        }
+        onToggleSkip={(filteredIdx) =>
+          onToggleSkip(filteredView[filteredIdx].sourceIndex)
+        }
       />
 
       {/* Bulk tags */}

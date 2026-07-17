@@ -1,38 +1,55 @@
 import type { ImportRow } from './types'
+import { validateEmail } from '@/utils/validation'
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+// Lenient phone format check: allows digits, dashes, parens, dots, spaces, +.
+// Intentionally different from validatePhone() in utils/validation.ts which
+// enforces US 10-digit format — CSV imports may contain international numbers.
 const PHONE_REGEX = /^[0-9\-().\s+]+$/
-const SOCIAL_HANDLE_REGEX = /^[a-z0-9._]+$/i
+const SOCIAL_HANDLE_REGEX = /^[a-z0-9._]+$/
 const MAX_SOCIAL_HANDLE_LENGTH = 30
 const MAX_AFFILIATION_LENGTH = 5000
 
 /**
- * Producers often paste a full profile URL (e.g. "instagram.com/foo") into the
- * Instagram/TikTok handle field instead of the bare handle. The backend
- * (VendorContactFieldRules#extract_handle_from_url) strips the host and
- * accepts just the username — mirror that here so client-side validation
- * doesn't flag something the server will happily accept.
+ * Normalize a social handle the same way the backend does:
+ *   1. Extract handle from Instagram/TikTok profile URL (if pasted)
+ *   2. Strip leading @
+ *   3. Lowercase
+ *
+ * Mirrors VendorContactFieldRules.normalize_social_handle so the frontend
+ * validation matches what the backend will actually store.
  */
-function extractHandleFromUrl(cleaned: string): string {
+function normalizeSocialHandle(raw: string): string {
+  let cleaned = raw.trim()
+  if (!cleaned) return ''
+
+  // Extract handle from profile URL (same regexes as backend extract_handle_from_url)
   const igMatch = cleaned.match(/^(?:https?:\/\/)?(?:www\.)?instagram\.com\/@?([^/?#]+)/i)
-  if (igMatch) return igMatch[1]
+  if (igMatch) return igMatch[1].toLowerCase()
 
   const ttMatch = cleaned.match(/^(?:https?:\/\/)?(?:www\.)?tiktok\.com\/@?([^/?#]+)/i)
-  if (ttMatch) return ttMatch[1]
+  if (ttMatch) return ttMatch[1].toLowerCase()
 
+  // Strip @ prefix, lowercase
+  cleaned = cleaned.replace(/^@/, '').trim().toLowerCase()
   return cleaned
 }
 
+/**
+ * Only warn if the NORMALIZED handle is still invalid — don't warn about
+ * URLs, @-prefixes, or casing that we auto-clean on import.
+ */
 function socialHandleError(raw: string): string | null {
-  const cleaned = extractHandleFromUrl(raw.trim()).replace(/^@/, '')
-  if (cleaned.includes(' ')) {
-    return 'Must not contain spaces (letters, numbers, periods, and underscores only)'
+  const normalized = normalizeSocialHandle(raw)
+  if (!normalized) return null
+
+  if (normalized.includes(' ')) {
+    return 'Handle contains spaces'
   }
-  if (!SOCIAL_HANDLE_REGEX.test(cleaned)) {
-    return 'Letters, numbers, periods, and underscores only'
+  if (!SOCIAL_HANDLE_REGEX.test(normalized)) {
+    return 'Handle has characters we can\'t auto-fix (only letters, numbers, periods, underscores)'
   }
-  if (cleaned.length > MAX_SOCIAL_HANDLE_LENGTH) {
-    return `Max ${MAX_SOCIAL_HANDLE_LENGTH} characters`
+  if (normalized.length > MAX_SOCIAL_HANDLE_LENGTH) {
+    return `Handle is too long (max ${MAX_SOCIAL_HANDLE_LENGTH} characters)`
   }
   return null
 }
@@ -61,9 +78,8 @@ function websiteError(raw: string): string | null {
 export interface RowValidation {
   /** Blocking: row cannot be imported until fixed or skipped (missing Name/Email only) */
   errors: Record<string, string[]>
-  /** Non-blocking in the preview: formatting issues the producer may fix inline.
-   *  Note: the server's validate_row still rejects these — rows left unfixed will
-   *  appear in the "Invalid rows (skipped)" count at the validation step. */
+  /** Non-blocking: formatting issues the producer may fix inline.
+   *  The server also treats these as warnings — rows import even if unfixed. */
   warnings: Record<string, string[]>
 }
 
@@ -74,9 +90,8 @@ export interface RowValidation {
  * it) and a missing Email (our unique identifier for matching/de-duping).
  * Everything else — format nitpicks on phone, socials, website, location,
  * affiliation length — is a warning: we surface it so the producer can clean
- * their data inline. Rows left with warnings will be rejected by the backend's
- * validate_row and appear in the "Invalid rows (skipped)" count at the
- * validation step — they are not silently imported with bad data.
+ * their data inline. The backend also treats these as warnings, so rows with
+ * only warnings will still import successfully.
  */
 export function validateRow(row: ImportRow): RowValidation {
   const errors: Record<string, string[]> = {}
@@ -101,7 +116,7 @@ export function validateRow(row: ImportRow): RowValidation {
 
   // ── Warnings ───────────────────────────────────────────────────────
 
-  if (email && !EMAIL_REGEX.test(email)) {
+  if (email && !validateEmail(email)) {
     add(warnings, 'email', 'Email format looks invalid')
   }
 
