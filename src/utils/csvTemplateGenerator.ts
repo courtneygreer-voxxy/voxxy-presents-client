@@ -10,9 +10,6 @@ export function generateCSVTemplate(): string {
     'location',
     'tags',
     'notes',
-    'eventbrite_email',
-    'venmo_handle',
-    'paypal_email',
   ]
 
   const exampleRows = [
@@ -27,9 +24,6 @@ export function generateCSVTemplate(): string {
       location: 'San Francisco, CA',
       tags: 'art,local',
       notes: 'Met at Spring Market 2024',
-      eventbrite_email: 'sarah@ceramics.com',
-      venmo_handle: '@sarahceramics',
-      paypal_email: '',
     },
     {
       name: 'John Davidson',
@@ -42,9 +36,6 @@ export function generateCSVTemplate(): string {
       location: 'Oakland, CA',
       tags: 'food,catering',
       notes: 'Interested in summer events',
-      eventbrite_email: '',
-      venmo_handle: '',
-      paypal_email: 'john@paypal.com',
     },
   ]
 
