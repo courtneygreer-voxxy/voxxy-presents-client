@@ -33,8 +33,8 @@
  *    - Event: [eventName], [eventDate], [eventTime], [eventLocation], [eventVenue],
  *             [eventDescription], [applicationDeadline], [boothPrice], [categoryPrice], [paymentDueDate]
  *    - Organization: [organizationName], [organizationEmail]
- *    - Vendor: [firstName], [lastName], [fullName], [businessName], [email],
- *              [vendorCategory], [boothNumber], [applicationDate]
+ *    - Vendor: [firstName], [lastName], [fullName], [affiliation], [ticketCode],
+ *              [email], [vendorCategory], [boothNumber], [applicationDate]
  *    - Install: [installDate], [installTime], [installStartTime], [installEndTime]
  *    - Links: [paymentLink], [eventLink], [bulletinLink], [dashboardLink], [unsubscribeLink]
  *

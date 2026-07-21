@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { TABLE_ROW_CLASSES } from '@/components/shared/tableStyles'
 import { format } from 'date-fns'
 import {
   MoreVertical,
@@ -209,7 +210,7 @@ export default function EmailRow({
   }
 
   return (
-    <div className="voxxy-table-row voxxy-table-row-hover grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] items-center gap-3 px-4 py-1.5 text-xs last:border-0">
+    <div className={`voxxy-table-row voxxy-table-row-hover grid grid-cols-[minmax(180px,1.2fr),minmax(200px,1.5fr),minmax(120px,0.9fr),minmax(110px,0.9fr),minmax(80px,0.7fr),70px,80px,minmax(90px,0.8fr),50px] px-4 py-1.5 ${TABLE_ROW_CLASSES} last:border-0`}>
       {/* Email Name */}
       <div className="flex items-center gap-2 min-w-0">
         {email.overdue && email.overdue_message && (

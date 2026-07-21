@@ -27,7 +27,7 @@ export default function AboutPage() {
   }, [])
 
   return (
-    <div className="relative min-h-screen overflow-hidden voxxy-gradient-marketing-hero">
+    <div className="relative min-h-screen overflow-hidden voxxy-gradient-marketing-hero voxxy-gradient-mobile-safe">
       <Navigation activePage="about" />
 
       {/* Hero Section */}

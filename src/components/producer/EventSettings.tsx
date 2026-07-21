@@ -535,7 +535,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
         const csvRow = {
           name: inv.contact_name || inv.name || '',
           email: inv.contact_email || inv.email || '',
-          business_name: inv.business_name || '',
+          affiliation: inv.affiliation || '',
           category: inv.vendor_category || '',
           status: 'Invited',
           invited_at: inv.created_at ? new Date(inv.created_at).toLocaleDateString() : '',
@@ -554,7 +554,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
         const csvRow = {
           name: reg.name || '',
           email: reg.email || '',
-          business_name: reg.business_name || '',
+          affiliation: reg.affiliation || '',
           category: reg.vendor_category || '',
           status: 'Applied',
           invited_at: '',
@@ -574,10 +574,10 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
           .map((row) => ({
             name: !row.name,
             email: !row.email,
-            business_name: !row.business_name,
+            affiliation: !row.affiliation,
             category: !row.category,
           }))
-          .filter((row) => row.name || row.email || row.business_name || row.category).length,
+          .filter((row) => row.name || row.email || row.affiliation || row.category).length,
       })
 
       // Convert to CSV
@@ -589,7 +589,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
       const headers = [
         'Name',
         'Email',
-        'Business Name',
+        'Affiliation',
         'Category',
         'Status',
         'Invited At',
@@ -604,7 +604,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
           [
             `"${row.name}"`,
             `"${row.email}"`,
-            `"${row.business_name}"`,
+            `"${row.affiliation}"`,
             `"${row.category}"`,
             `"${row.status}"`,
             `"${row.invited_at}"`,
@@ -674,7 +674,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
   }
 
   return (
-    <div className="px-3 md:px-4 max-w-6xl mx-auto space-y-4">
+    <div className="px-3 md:px-4 space-y-4">
       {/* Accordion Sections */}
       <div className={sectionShell}>
         <Accordion type="multiple" defaultValue={['event-status', 'event-details']}>

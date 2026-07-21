@@ -719,7 +719,7 @@ export function EmailEditorPage({
       if (
         !eventData &&
         !varName.match(
-          /\[firstName\]|\[lastName\]|\[fullName\]|\[greetingName\]|\[businessName\]|\[email\]|\[vendorCategory\]|\[boothNumber\]|\[applicationDate\]|\[installDate\]|\[installTime\]|\[installStartTime\]|\[installEndTime\]/,
+          /\[firstName\]|\[lastName\]|\[fullName\]|\[greetingName\]|\[businessName\]|\[affiliation\]|\[ticketCode\]|\[email\]|\[vendorCategory\]|\[boothNumber\]|\[applicationDate\]|\[installDate\]|\[installTime\]|\[installStartTime\]|\[installEndTime\]/,
         )
       ) {
         return varName // No event data, return as-is
@@ -761,8 +761,10 @@ export function EmailEditorPage({
       if (varName === '[firstName]') return 'John'
       if (varName === '[lastName]') return 'Doe'
       if (varName === '[fullName]') return 'John Doe'
-      if (varName === '[greetingName]') return 'John'
+      if (varName === '[greetingName]') return 'John Doe'
       if (varName === '[businessName]') return 'Sample Business'
+      if (varName === '[affiliation]') return 'Maya Chen Art'
+      if (varName === '[ticketCode]') return 'TIX-2026-A3F8K'
       if (varName === '[email]') return 'vendor@example.com'
       if (varName === '[vendorCategory]') return 'Food Vendor'
       if (varName === '[boothNumber]') return 'A-12'

@@ -41,7 +41,7 @@ export default function ViewContactModal({ contact, onClose, onEdit }: ViewConta
   }, [contact.id])
 
   const hasSocial = full.instagram_handle || full.tiktok_handle || full.website
-  const hasPayment = full.eventbrite_email || full.venmo_handle || full.paypal_email
+  const hasAffiliation = !!full.affiliation
 
   return (
     <div
@@ -54,9 +54,11 @@ export default function ViewContactModal({ contact, onClose, onEdit }: ViewConta
         {/* Header */}
         <div className="voxxy-gradient-modal-header px-5 py-3 flex items-center justify-between border-b border-primary/20 flex-shrink-0 rounded-t-xl">
           <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-foreground truncate">{full.contact_name}</h2>
-            {full.business_name ? (
-              <p className="text-foreground/50 text-[11px] mt-0.5 truncate">{full.business_name}</p>
+            <h2 className="text-sm font-semibold text-foreground truncate">
+              {full.last_name ? `${full.first_name} ${full.last_name}` : full.contact_name}
+            </h2>
+            {full.affiliation ? (
+              <p className="text-foreground/50 text-[11px] mt-0.5 truncate">{full.affiliation}</p>
             ) : null}
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -202,13 +204,9 @@ export default function ViewContactModal({ contact, onClose, onEdit }: ViewConta
             </Field>
           )}
 
-          {/* Payment */}
-          {hasPayment && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {full.eventbrite_email && <Field label="Eventbrite">{full.eventbrite_email}</Field>}
-              {full.venmo_handle && <Field label="Venmo">{full.venmo_handle}</Field>}
-              {full.paypal_email && <Field label="PayPal">{full.paypal_email}</Field>}
-            </div>
+          {/* Affiliation */}
+          {hasAffiliation && (
+            <Field label="Affiliation">{full.affiliation}</Field>
           )}
 
           {/* Notes */}

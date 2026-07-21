@@ -80,6 +80,7 @@
     "@radix-ui/react-toggle-group": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.0",
     "@sentry/react": "^10.40.0",
+    "@tanstack/react-virtual": "^3.14.6",
     "@tiptap/extension-link": "^2.11.4",
     "@tiptap/pm": "^2.11.4",
     "@tiptap/react": "^2.11.4",

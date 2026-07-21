@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Building2,
   Mail,
@@ -47,6 +47,8 @@ import {
   type FilterFieldConfig,
   type ActiveFilter,
 } from '@/components/shared/SearchFilterBar'
+import { TableSortHeader, createSortHandler, type SortOrder } from '@/components/shared/TableSortHeader'
+import { TABLE_HEADER_CLASSES, TABLE_ROW_CLASSES } from '@/components/shared/tableStyles'
 import {
   Select,
   SelectContent,
@@ -66,7 +68,6 @@ interface Applicant {
   id: string // Changed to string to support "inv-X" and "reg-X" format
   registrationId?: number // Actual registration ID for API calls
   invitationId?: number // Invitation ID for email history
-  business_name: string
   affiliation?: string
   contact_name?: string
   email: string
@@ -95,7 +96,6 @@ interface Applicant {
   producer_notes?: string
   tags?: string[]
   ticket_code?: string
-  application_code?: string
   email_unsubscribed?: boolean
   unsubscribe_status?: {
     is_unsubscribed: boolean
@@ -186,6 +186,12 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
   // Export modal
   const [showExportModal, setShowExportModal] = useState(false)
+
+  // Table sorting
+  type ApplicantSortField = 'last_name' | 'first_name' | 'affiliation' | 'email' | 'vendor_category' | 'status' | null
+  const [sortField, setSortField] = useState<ApplicantSortField>(null)
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
+  const handleSort = useCallback(createSortHandler(setSortField, setSortOrder), [])
 
   // Email notifications hook
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } =
@@ -278,7 +284,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
         emailMap.set(email, {
           id: `reg-${submission.id}`,
           registrationId: submission.id,
-          business_name: submission.business_name,
           contact_name: submission.contact_name || submission.name,
           email: submission.email,
           phone: submission.phone,
@@ -296,7 +301,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           producer_notes: submission.producer_notes,
           affiliation: submission.affiliation,
           ticket_code: submission.ticket_code,
-          application_code: submission.application_code,
           email_unsubscribed: submission.email_unsubscribed,
           unsubscribe_status: submission.email_unsubscribed
             ? {
@@ -340,8 +344,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           emailMap.set(email, {
             id: `inv-${invitation.id}`,
             invitationId: invitation.id,
-            business_name: contact.business_name || contact.name,
-            contact_name: contact.name,
+            affiliation: contact.affiliation,
+            contact_name: contact.name || contact.contact_name,
             email: contact.email,
             phone: contact.phone,
             instagram_handle: contact.instagram_handle,
@@ -754,13 +758,11 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
-      // Guard every field: business_name (and others) can be null now that
-      // business name was removed from the application form. Calling
-      // .toLowerCase() on a null field throws during render and trips the
-      // ErrorBoundary (see Sentry REACT-FRONT-END-8).
+      // Guard every field: some can be null. Calling
+      // .toLowerCase() on a null field throws during render.
       const matches =
-        applicant.business_name?.toLowerCase().includes(query) ||
         applicant.contact_name?.toLowerCase().includes(query) ||
+        applicant.affiliation?.toLowerCase().includes(query) ||
         applicant.email?.toLowerCase().includes(query) ||
         applicant.vendor_category?.toLowerCase().includes(query)
       if (!matches) return false
@@ -876,9 +878,39 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
   }
 
   const TABLE_PAGE_SIZE = 100
-  const totalTablePages = Math.max(1, Math.ceil(filteredApplicants.length / TABLE_PAGE_SIZE))
+
+  // Sort filtered applicants when a sort field is active
+  const sortedApplicants = sortField
+    ? [...filteredApplicants].sort((a, b) => {
+        const mult = sortOrder === 'asc' ? 1 : -1
+        let aVal = ''
+        let bVal = ''
+        if (sortField === 'last_name') {
+          aVal = (a.contact_name || '').split(' ').slice(1).join(' ')
+          bVal = (b.contact_name || '').split(' ').slice(1).join(' ')
+        } else if (sortField === 'first_name') {
+          aVal = (a.contact_name || '').split(' ')[0] || ''
+          bVal = (b.contact_name || '').split(' ')[0] || ''
+        } else if (sortField === 'affiliation') {
+          aVal = a.affiliation || ''
+          bVal = b.affiliation || ''
+        } else if (sortField === 'email') {
+          aVal = a.email || ''
+          bVal = b.email || ''
+        } else if (sortField === 'vendor_category') {
+          aVal = a.vendor_category || ''
+          bVal = b.vendor_category || ''
+        } else if (sortField === 'status') {
+          aVal = a.status || ''
+          bVal = b.status || ''
+        }
+        return aVal.localeCompare(bVal) * mult
+      })
+    : filteredApplicants
+
+  const totalTablePages = Math.max(1, Math.ceil(sortedApplicants.length / TABLE_PAGE_SIZE))
   const tableStart = (tablePage - 1) * TABLE_PAGE_SIZE
-  const tablePageApplicants = filteredApplicants.slice(tableStart, tableStart + TABLE_PAGE_SIZE)
+  const tablePageApplicants = sortedApplicants.slice(tableStart, tableStart + TABLE_PAGE_SIZE)
   const currentPageIds = new Set(tablePageApplicants.map((a) => a.id))
   const allCurrentPageSelected =
     tablePageApplicants.length > 0 &&
@@ -1050,7 +1082,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             <div className="voxxy-table-shell">
               <table className="w-full text-xs">
                 <thead className="voxxy-table-header">
-                  <tr className="voxxy-table-header-row">
+                  <tr className={`voxxy-table-header-row ${TABLE_HEADER_CLASSES}`}>
                     <th className="px-3 py-2.5 text-left w-8">
                       <input
                         type="checkbox"
@@ -1059,11 +1091,24 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                         className="rounded border-border accent-primary"
                       />
                     </th>
-                    <th className="px-3 py-2.5 text-left font-medium">Name</th>
-                    <th className="px-3 py-2.5 text-left font-medium">Business</th>
-                    <th className="px-3 py-2.5 text-left font-medium">Email</th>
-                    <th className="px-3 py-2.5 text-left font-medium">Category</th>
-                    <th className="px-3 py-2.5 text-left font-medium">Status</th>
+                    <th className="px-3 py-2.5 text-left">
+                      <TableSortHeader label="First Name" field="first_name" currentSort={sortField} currentOrder={sortOrder} onSort={handleSort} />
+                    </th>
+                    <th className="px-3 py-2.5 text-left">
+                      <TableSortHeader label="Last Name" field="last_name" currentSort={sortField} currentOrder={sortOrder} onSort={handleSort} />
+                    </th>
+                    <th className="px-3 py-2.5 text-left">
+                      <TableSortHeader label="Email" field="email" currentSort={sortField} currentOrder={sortOrder} onSort={handleSort} />
+                    </th>
+                    <th className="px-3 py-2.5 text-left">
+                      <TableSortHeader label="Category" field="vendor_category" currentSort={sortField} currentOrder={sortOrder} onSort={handleSort} />
+                    </th>
+                    <th className="px-3 py-2.5 text-left">
+                      <TableSortHeader label="Affiliation" field="affiliation" currentSort={sortField} currentOrder={sortOrder} onSort={handleSort} />
+                    </th>
+                    <th className="px-3 py-2.5 text-left">
+                      <TableSortHeader label="Status" field="status" currentSort={sortField} currentOrder={sortOrder} onSort={handleSort} />
+                    </th>
                     <th className="px-3 py-2.5 text-left font-medium">Payment</th>
                     <th className="px-3 py-2.5 text-left font-medium">Actions</th>
                   </tr>
@@ -1071,7 +1116,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 <tbody>
                   {tablePageApplicants.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="px-3 py-12 text-center text-foreground/50">
+                      <td colSpan={9} className="px-3 py-12 text-center text-foreground/50">
                         {hasActiveFilters ? 'No matches found' : 'No applicants yet'}
                       </td>
                     </tr>
@@ -1090,13 +1135,13 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                             />
                           </td>
                           <td className="px-3 py-2">
-                            <div className="font-medium text-foreground truncate max-w-[140px]">
-                              {applicant.contact_name || '—'}
+                            <div className="font-medium text-foreground truncate max-w-[120px]">
+                              {(applicant.contact_name || '').split(' ')[0] || '—'}
                             </div>
                           </td>
                           <td className="px-3 py-2">
-                            <div className="text-foreground/70 truncate max-w-[130px]">
-                              {applicant.business_name || '—'}
+                            <div className="text-foreground truncate max-w-[120px]">
+                              {(() => { const parts = (applicant.contact_name || '').split(' '); return parts.slice(1).join(' ') || '—' })()}
                             </div>
                           </td>
                           <td className="px-3 py-2">
@@ -1118,6 +1163,11 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                             ) : (
                               <span className="text-foreground/40">—</span>
                             )}
+                          </td>
+                          <td className="px-3 py-2">
+                            <div className="text-foreground/70 truncate max-w-[130px]">
+                              {applicant.affiliation || '—'}
+                            </div>
                           </td>
                           <td className="px-3 py-2">
                             <Badge
@@ -1210,14 +1260,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           <div className="w-80 border-r border-border flex flex-col">
             {/* List Header */}
             <div className="px-3 md:px-4 pb-3 border-b border-border">
-              <div className="mb-2">
-                <p className="text-[10px] text-foreground/85 dark:text-foreground/60">
-                  {filteredApplicants.length} total
-                  {statusFilter !== 'all' && ` • ${statusFilter}`}
-                  {categoryFilter !== 'all' && ` • ${categoryFilter}`}
-                </p>
-              </div>
-
               {/* Status & Category Filters */}
               <SearchFilterBar
                 variant="button"
@@ -1259,7 +1301,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                         <div className="flex items-start justify-between mb-1">
                           <div className="flex items-center gap-1 flex-1 min-w-0">
                             <h3 className="text-xs font-semibold text-foreground truncate">
-                              {applicant.contact_name || applicant.business_name}
+                              {applicant.contact_name || applicant.affiliation || applicant.email}
                             </h3>
                             {applicant.is_returning && (
                               <Star
@@ -1280,9 +1322,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                           </Badge>
                         </div>
                         <p className="text-[10px] text-foreground/60 truncate mb-1.5">
-                          {applicant.contact_name
-                            ? applicant.business_name || applicant.email
-                            : applicant.email}
+                          {applicant.affiliation || applicant.email}
                         </p>
                         <div className="flex flex-wrap items-center gap-1">
                           {applicant.status !== 'invited' && (
@@ -1341,7 +1381,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h2 className="text-lg font-bold text-foreground">
-                          {selectedApplicant.contact_name || selectedApplicant.business_name}
+                          {selectedApplicant.contact_name || selectedApplicant.affiliation || selectedApplicant.email}
                         </h2>
                         {selectedApplicant.is_returning && (
                           <Badge
@@ -1378,9 +1418,9 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                             </Badge>
                           )}
                       </div>
-                      {selectedApplicant.contact_name && selectedApplicant.business_name && (
+                      {selectedApplicant.affiliation && (
                         <p className="text-sm text-foreground/80 mb-2">
-                          {selectedApplicant.business_name}
+                          {selectedApplicant.affiliation}
                         </p>
                       )}
                       <Badge
@@ -1447,21 +1487,17 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                         <span>{formatDate(selectedApplicant.created_at)}</span>
                       </div>
                     </div>
-                    {(selectedApplicant.ticket_code || selectedApplicant.application_code) && (
+                    {selectedApplicant.ticket_code && (
                       <div>
                         <p className="text-[10px] text-foreground/60 mb-1">Ticket Code</p>
                         <div className="flex items-center gap-1.5">
                           <code className="text-xs text-primary font-mono bg-primary/10 px-2 py-0.5 rounded">
-                            {selectedApplicant.ticket_code || selectedApplicant.application_code}
+                            {selectedApplicant.ticket_code}
                           </code>
                           <button
                             type="button"
                             onClick={() => {
-                              navigator.clipboard.writeText(
-                                selectedApplicant.ticket_code ||
-                                  selectedApplicant.application_code ||
-                                  '',
-                              )
+                              navigator.clipboard.writeText(selectedApplicant.ticket_code || '')
                               toast.success('Code copied')
                             }}
                             className="p-1 rounded hover:bg-background/10 text-foreground/40 hover:text-foreground transition-colors"
@@ -1946,7 +1982,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           applicantId={selectedApplicant.id}
           registrationId={selectedApplicant.registrationId}
           initialContactName={
-            selectedApplicant.contact_name || selectedApplicant.business_name || ''
+            selectedApplicant.contact_name || selectedApplicant.affiliation || ''
           }
           initialPhone={selectedApplicant.phone || ''}
           initialLocation={selectedApplicant.location}
@@ -2031,11 +2067,13 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             {/* Vendor Info */}
             <div className="bg-background/5 rounded-lg p-3 space-y-1">
               <p className="text-sm text-foreground font-medium">
-                {pendingStatusChange.applicant.business_name}
-              </p>
-              <p className="text-xs text-foreground/60">
                 {pendingStatusChange.applicant.contact_name || pendingStatusChange.applicant.email}
               </p>
+              {pendingStatusChange.applicant.affiliation && (
+                <p className="text-xs text-foreground/60">
+                  {pendingStatusChange.applicant.affiliation}
+                </p>
+              )}
               <p className="text-xs text-primary">
                 {pendingStatusChange.applicant.vendor_category}
               </p>
@@ -2101,7 +2139,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             {/* Category Change Info */}
             <div className="bg-background/5 rounded-lg p-3 space-y-2">
               <p className="text-sm text-foreground font-medium">
-                {pendingCategoryChange.applicant.business_name}
+                {pendingCategoryChange.applicant.contact_name || pendingCategoryChange.applicant.affiliation || pendingCategoryChange.applicant.email}
               </p>
               <div className="flex items-center gap-2 text-xs">
                 <Badge variant="tintRed" className="rounded px-2 py-1 line-through">
@@ -2175,7 +2213,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             {/* Payment Change Info */}
             <div className="bg-background/5 rounded-lg p-3 space-y-2">
               <p className="text-sm text-foreground font-medium">
-                {pendingPaymentChange.applicant.business_name}
+                {pendingPaymentChange.applicant.contact_name || pendingPaymentChange.applicant.affiliation || pendingPaymentChange.applicant.email}
               </p>
               <div className="flex items-center gap-2 text-xs">
                 <DollarSign className="w-4 h-4 text-foreground/60" />

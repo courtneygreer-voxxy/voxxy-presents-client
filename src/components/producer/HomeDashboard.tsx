@@ -330,10 +330,10 @@ export default function HomeDashboard({
       {/* Main Grid: Left Column (Stats/Emails/Bulletins) + Right Column (Event Details) */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Left Column - Vendor Stats (when live) or Go Live Card (when not live), then Emails & Bulletins */}
-        <div className="lg:col-span-3 space-y-4">
+        <div className="lg:col-span-3 flex flex-col gap-4">
           {isLive ? (
             /* Vendor Stats Cards - 4 in a row when LIVE */
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 shrink-0">
               {/* Applied */}
               <div className={`${commandPanelClass} p-3.5`}>
                 <div className="flex items-center gap-2">
@@ -444,11 +444,13 @@ export default function HomeDashboard({
             </div>
           ) : (
             /* Go Live Card - Show when event is NOT live */
-            <GoLiveCard event={event} onGoLive={handleRefresh} organizationId={organizationId} />
+            <div className="shrink-0">
+              <GoLiveCard event={event} onGoLive={handleRefresh} organizationId={organizationId} />
+            </div>
           )}
 
           {/* Upcoming Emails */}
-          <div className={`${commandPanelClass} p-3.5`}>
+          <div className={`${commandPanelClass} p-3.5 shrink-0`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-primary dark:text-primary" />
@@ -487,7 +489,7 @@ export default function HomeDashboard({
           </div>
 
           {/* Bulletin Board */}
-          <div className={`${commandPanelClass} p-3.5`}>
+          <div className={`${commandPanelClass} p-3.5 flex-1 flex flex-col`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Megaphone className="w-4 h-4 text-primary dark:text-primary" />

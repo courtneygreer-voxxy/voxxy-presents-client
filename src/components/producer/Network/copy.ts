@@ -11,13 +11,8 @@ export const LISTS_FROM_TAGS =
 
 export const IMPORT_BATCH_VIEW_LABEL = 'View contacts from this upload'
 
-export const IMPORT_TAG_COUNTS_LABEL = 'In this file'
-
 export const IMPORT_WHERE_DID_THEY_GO =
-  'Contacts are in All Contacts; tags label them; lists are optional saved filters.'
-
-export const IMPORT_TAG_COUNTS_FOOTNOTE =
-  'Counts above are from your file; skipped or duplicate rows may not appear.'
+  'Your contacts are now in the table below.'
 
 export const SAVE_AS_LIST_LABEL = 'Save as List'
 
