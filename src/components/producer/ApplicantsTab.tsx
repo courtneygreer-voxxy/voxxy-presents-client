@@ -1092,10 +1092,10 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       />
                     </th>
                     <th className="px-3 py-2.5 text-left">
-                      <TableSortHeader label="Last Name" field="last_name" currentSort={sortField} currentOrder={sortOrder} onSort={handleSort} />
+                      <TableSortHeader label="First Name" field="first_name" currentSort={sortField} currentOrder={sortOrder} onSort={handleSort} />
                     </th>
                     <th className="px-3 py-2.5 text-left">
-                      <TableSortHeader label="First Name" field="first_name" currentSort={sortField} currentOrder={sortOrder} onSort={handleSort} />
+                      <TableSortHeader label="Last Name" field="last_name" currentSort={sortField} currentOrder={sortOrder} onSort={handleSort} />
                     </th>
                     <th className="px-3 py-2.5 text-left">
                       <TableSortHeader label="Email" field="email" currentSort={sortField} currentOrder={sortOrder} onSort={handleSort} />
@@ -1136,12 +1136,12 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                           </td>
                           <td className="px-3 py-2">
                             <div className="font-medium text-foreground truncate max-w-[120px]">
-                              {(() => { const parts = (applicant.contact_name || '').split(' '); return parts.slice(1).join(' ') || '—' })()}
+                              {(applicant.contact_name || '').split(' ')[0] || '—'}
                             </div>
                           </td>
                           <td className="px-3 py-2">
                             <div className="text-foreground truncate max-w-[120px]">
-                              {(applicant.contact_name || '').split(' ')[0] || '—'}
+                              {(() => { const parts = (applicant.contact_name || '').split(' '); return parts.slice(1).join(' ') || '—' })()}
                             </div>
                           </td>
                           <td className="px-3 py-2">

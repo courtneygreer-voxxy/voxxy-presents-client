@@ -1,6 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { CheckCircle2, AlertCircle } from 'lucide-react'
 import type { BulkImportResult } from '@/services/api'
@@ -15,13 +13,11 @@ interface StepReviewListsProps {
   onSkipLists: () => void
 }
 
+const MAX_VISIBLE_ERRORS = 5
+
 export function StepReviewLists({
   importResult,
-  discoveredTags,
-  listDrafts,
   errorMessage,
-  onUpdateDraft,
-  onCreateLists,
   onSkipLists,
 }: StepReviewListsProps) {
   const created = importResult.summary.created ?? 0
@@ -32,10 +28,9 @@ export function StepReviewLists({
     <div className="space-y-4">
       <div className="text-center py-1">
         <CheckCircle2 className="h-7 w-7 text-green-400 mx-auto mb-2" />
-        <h3 className="text-sm font-semibold text-foreground">Review & Create Lists</h3>
-        <p className="text-xs text-foreground/60 mt-1">Contacts imported successfully</p>
-        <p className="text-[11px] text-foreground/50 mt-1">
-          You can also save filters later from All Contacts.
+        <h3 className="text-sm font-semibold text-foreground">Import Complete</h3>
+        <p className="text-xs text-foreground/60 mt-1">
+          Your contacts are ready in the Network tab.
         </p>
       </div>
 
@@ -46,13 +41,6 @@ export function StepReviewLists({
         </Alert>
       )}
 
-      <p className="text-[11px] text-foreground/50 text-center">
-        All contacts land in All Contacts. Tags are labels — lists are smart filters saved for later.
-        {discoveredTags.length > 0 && (
-          <> Tags found: <span className="text-foreground/70">{discoveredTags.join(', ')}</span>.</>
-        )}
-      </p>
-
       <p className="text-xs text-foreground/80 text-center">
         Imported: <strong>{importedTotal}</strong> contact{importedTotal === 1 ? '' : 's'}
         {updated > 0 && (
@@ -60,61 +48,30 @@ export function StepReviewLists({
         )}
       </p>
 
-      {listDrafts.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-[11px] font-medium text-foreground/70">Create lists from tags</p>
-          <div className="space-y-2 max-h-72 overflow-y-auto border border-border rounded-lg p-2">
-            {listDrafts.map((draft, index) => (
-              <div
-                key={draft.tag}
-                className="flex items-start gap-2 p-2 rounded-md bg-background/5"
-              >
-                <Checkbox
-                  id={`list-draft-${draft.tag}`}
-                  checked={draft.checked}
-                  onCheckedChange={(checked) =>
-                    onUpdateDraft(index, { checked: !!checked })
-                  }
-                  className="mt-1"
-                />
-                <div className="flex-1 min-w-0">
-                  <label
-                    htmlFor={`list-draft-${draft.tag}`}
-                    className="text-[11px] text-foreground/80 block mb-1 cursor-pointer"
-                  >
-                    Create a list &lsquo;{draft.name}&rsquo; (tag = {draft.tag})
-                  </label>
-                  <Input
-                    value={draft.name}
-                    onChange={(e) => onUpdateDraft(index, { name: e.target.value })}
-                    className="h-7 text-xs"
-                    disabled={!draft.checked}
-                    aria-label={`List name for tag ${draft.tag}`}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {importResult.errors.length > 0 && (
         <Alert variant="destructive">
           <AlertCircle className="h-3.5 w-3.5" />
-          <AlertDescription className="text-[11px]">
-            {importResult.errors.length} row(s) had errors during import.
+          <AlertDescription className="text-[11px] space-y-1">
+            <p className="font-medium">{importResult.errors.length} row(s) had errors during import:</p>
+            <ul className="list-disc pl-4 space-y-0.5">
+              {importResult.errors.slice(0, MAX_VISIBLE_ERRORS).map((err, i) => (
+                <li key={i}>
+                  Row {err.row}: {err.field} — {err.message}
+                </li>
+              ))}
+            </ul>
+            {importResult.errors.length > MAX_VISIBLE_ERRORS && (
+              <p className="text-foreground/60">
+                and {importResult.errors.length - MAX_VISIBLE_ERRORS} more
+              </p>
+            )}
           </AlertDescription>
         </Alert>
       )}
 
-      <div className="flex justify-between pt-1">
-        <Button variant="outline" onClick={onSkipLists} size="sm" className="text-xs h-8">
-          Skip for now
-        </Button>
-        <Button onClick={onCreateLists} size="sm" className="text-xs h-8">
-          {listDrafts.some((d) => d.checked)
-            ? 'Create lists & finish'
-            : 'Finish'}
+      <div className="flex justify-center pt-1">
+        <Button onClick={onSkipLists} size="sm" className="text-xs h-8">
+          Done
         </Button>
       </div>
     </div>

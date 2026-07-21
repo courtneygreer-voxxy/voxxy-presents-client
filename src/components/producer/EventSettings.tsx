@@ -674,7 +674,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
   }
 
   return (
-    <div className="px-3 md:px-4 max-w-6xl mx-auto space-y-4">
+    <div className="px-3 md:px-4 space-y-4">
       {/* Accordion Sections */}
       <div className={sectionShell}>
         <Accordion type="multiple" defaultValue={['event-status', 'event-details']}>

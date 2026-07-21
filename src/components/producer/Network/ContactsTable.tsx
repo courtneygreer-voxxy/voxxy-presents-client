@@ -46,7 +46,7 @@ export default function ContactsTable({
     <div className="voxxy-table-shell">
       {/* Table Header */}
       <div className="voxxy-table-header">
-        <div className={`voxxy-table-header-row grid grid-cols-[28px,minmax(90px,1fr),minmax(80px,0.8fr),minmax(110px,1.2fr),minmax(90px,1fr),90px,90px,80px,60px,minmax(70px,0.8fr),50px] px-2 py-1 ${TABLE_HEADER_CLASSES}`}>
+        <div className={`voxxy-table-header-row grid grid-cols-[28px,minmax(80px,0.8fr),minmax(90px,1fr),minmax(110px,1.2fr),minmax(90px,1fr),90px,90px,80px,60px,minmax(70px,0.8fr),50px] px-2 py-1 ${TABLE_HEADER_CLASSES}`}>
           <div className="flex items-center justify-center">
             <input
               type="checkbox"
@@ -57,10 +57,10 @@ export default function ContactsTable({
             />
           </div>
           <div>
-            <TableSortHeader label="Last Name" field="last_name" currentSort={sortField} currentOrder={sortOrder} onSort={onSort} />
+            <TableSortHeader label="First Name" field="first_name" currentSort={sortField} currentOrder={sortOrder} onSort={onSort} />
           </div>
           <div>
-            <TableSortHeader label="First Name" field="first_name" currentSort={sortField} currentOrder={sortOrder} onSort={onSort} />
+            <TableSortHeader label="Last Name" field="last_name" currentSort={sortField} currentOrder={sortOrder} onSort={onSort} />
           </div>
           <div>
             <TableSortHeader label="Email" field="email" currentSort={sortField} currentOrder={sortOrder} onSort={onSort} />

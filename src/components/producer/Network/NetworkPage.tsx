@@ -39,9 +39,6 @@ import { notify } from '@/errors/notify'
 import { getApiErrorMessage } from '@/errors/getApiErrorMessage'
 import {
   IMPORT_BATCH_VIEW_LABEL,
-  IMPORT_TAG_COUNTS_FOOTNOTE,
-  IMPORT_TAG_COUNTS_LABEL,
-  IMPORT_WHERE_DID_THEY_GO,
   BULK_EDIT_LABEL,
 } from './copy'
 import {
@@ -1078,55 +1075,6 @@ export default function NetworkPage({
             </div>
           </div>
 
-          {/* Post-import banner */}
-          {importSession && (
-            <div className="px-3 py-3 bg-primary/10 border border-primary/30 rounded-lg space-y-2">
-              <div>
-                <p className="text-sm font-semibold text-foreground">
-                  You imported {importSession.created + importSession.updated} contacts
-                </p>
-                <p className="text-xs text-foreground/70 mt-1">{IMPORT_WHERE_DID_THEY_GO}</p>
-                {importSession.listsCreated.length > 0 && (
-                  <p className="text-xs text-foreground/60 mt-1">
-                    Lists created: {importSession.listsCreated.join(', ')}
-                  </p>
-                )}
-              </div>
-
-              {importSession.tags.length > 0 && (
-                <div>
-                  <p className="text-[11px] font-medium text-foreground/60 mb-1">
-                    {IMPORT_TAG_COUNTS_LABEL}
-                  </p>
-                  <p className="text-xs text-foreground/80">
-                    {importSession.tags
-                      .map((tag) => `${tag}: ${importSession.tagCounts?.[tag] ?? 0}`)
-                      .join(' · ')}
-                  </p>
-                  <p className="text-[10px] text-foreground/50 mt-1">
-                    {IMPORT_TAG_COUNTS_FOOTNOTE}
-                  </p>
-                </div>
-              )}
-
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={viewImportUpload}
-                  className="flex items-center gap-1.5 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg transition-colors"
-                >
-                  {IMPORT_BATCH_VIEW_LABEL}
-                </button>
-                <button
-                  type="button"
-                  onClick={dismissImportSession}
-                  className="text-xs text-foreground/60 hover:text-foreground ml-auto"
-                >
-                  Dismiss
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Import batch view banner */}
           {viewingImportBatch && importSession && (

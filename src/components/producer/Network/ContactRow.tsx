@@ -47,7 +47,7 @@ export default memo(function ContactRow({
   return (
     <div className="voxxy-table-row voxxy-table-row-hover last:border-0">
       <div
-        className={`grid grid-cols-[28px,minmax(90px,1fr),minmax(80px,0.8fr),minmax(110px,1.2fr),minmax(90px,1fr),90px,90px,80px,60px,minmax(70px,0.8fr),50px] px-2 py-2 ${TABLE_ROW_CLASSES} ${isUnsubscribed ? 'opacity-60' : ''}`}
+        className={`grid grid-cols-[28px,minmax(80px,0.8fr),minmax(90px,1fr),minmax(110px,1.2fr),minmax(90px,1fr),90px,90px,80px,60px,minmax(70px,0.8fr),50px] px-2 py-2 ${TABLE_ROW_CLASSES} ${isUnsubscribed ? 'opacity-60' : ''}`}
       >
         <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
           <input
@@ -58,9 +58,14 @@ export default memo(function ContactRow({
           />
         </div>
 
+        {/* First Name */}
+        <div className="min-w-0">
+          <span className="font-semibold text-foreground truncate block">{contact.first_name || '—'}</span>
+        </div>
+
         {/* Last Name */}
         <div className="min-w-0">
-          <div className="font-semibold text-foreground truncate flex items-center gap-1">
+          <div className="text-foreground truncate flex items-center gap-1">
             {contact.last_name || '—'}
             {isUnsubscribed && (
               <span className="px-1 py-0.5 text-[8px] bg-red-500/20 text-red-950 dark:text-red-400 border border-red-500/30 rounded flex-shrink-0">
@@ -68,11 +73,6 @@ export default memo(function ContactRow({
               </span>
             )}
           </div>
-        </div>
-
-        {/* First Name */}
-        <div className="min-w-0">
-          <span className="text-foreground truncate block">{contact.first_name || '—'}</span>
         </div>
 
         {/* Email */}
