@@ -1,5 +1,5 @@
 import type { ColumnMapping, ImportRow } from './types'
-import { RECOGNIZED_FIELD_KEYS, HEADER_ALIASES, MERGE_FIELDS } from './constants'
+import { RECOGNIZED_FIELD_KEYS, HEADER_ALIASES } from './constants'
 
 /**
  * Normalize a CSV header for matching: lowercase, trim, replace spaces with underscores.
@@ -53,15 +53,7 @@ export function autoDetectMappings(
       continue
     }
 
-    // 3. Merge field (first_name, last_name → name)
-    const mergeField = MERGE_FIELDS[normalized]
-    if (mergeField && !claimed.has(mergeField.target)) {
-      // Don't claim yet — let both parts map. We'll merge in buildImportRows.
-      mappings.push({ csvHeader: header, mappedTo: normalized, confidence: 'alias', sampleValues: samples })
-      continue
-    }
-
-    // 4. Fuzzy substring match
+    // 3. Fuzzy substring match
     const fuzzyMatch = RECOGNIZED_FIELD_KEYS.find(
       (key) => !claimed.has(key) && (normalized.includes(key) || key.includes(normalized)),
     )
@@ -71,13 +63,13 @@ export function autoDetectMappings(
       continue
     }
 
-    // 5. Alias target already claimed or no match
+    // 4. Alias target already claimed or no match
     if (aliasTarget && claimed.has(aliasTarget)) {
       mappings.push({ csvHeader: header, mappedTo: null, confidence: 'none', sampleValues: samples })
       continue
     }
 
-    // 6. No match
+    // 5. No match
     mappings.push({ csvHeader: header, mappedTo: null, confidence: 'none', sampleValues: samples })
   }
 
@@ -86,7 +78,8 @@ export function autoDetectMappings(
 
 /**
  * Convert raw CSV rows + column mappings into ImportRows with mapped field keys.
- * Handles first_name + last_name merge into name.
+ * First name and last name are kept as separate columns; they're only joined
+ * into a single `name` at submission time (see csvRewriter).
  */
 export function buildImportRows(
   rawRows: Record<string, string>[],
@@ -96,21 +89,6 @@ export function buildImportRows(
   const headerToField = new Map<string, string>()
   for (const m of mappings) {
     if (m.mappedTo) headerToField.set(m.csvHeader, m.mappedTo)
-  }
-
-  // Check for first_name/last_name merge
-  const hasMerge = mappings.some((m) => {
-    const norm = normalizeHeader(m.csvHeader)
-    return MERGE_FIELDS[norm] !== undefined
-  })
-  const mergeHeaders: Record<string, string> = {}
-  if (hasMerge) {
-    for (const m of mappings) {
-      const norm = normalizeHeader(m.csvHeader)
-      if (MERGE_FIELDS[norm]) {
-        mergeHeaders[norm] = m.csvHeader
-      }
-    }
   }
 
   return rawRows.map((raw, idx) => {
@@ -123,24 +101,7 @@ export function buildImportRows(
     }
 
     for (const [csvHeader, fieldKey] of headerToField) {
-      const norm = normalizeHeader(csvHeader)
-      // Skip merge-source fields (they'll be combined into 'name')
-      if (MERGE_FIELDS[norm]) continue
       row[fieldKey] = raw[csvHeader]?.trim() ?? ''
-    }
-
-    // Handle first_name + last_name → name merge
-    // Collect ALL merge-source values regardless of naming convention
-    // (handles mixed cases like `firstname` + `last_name`)
-    if (Object.keys(mergeHeaders).length > 0 && ![...headerToField.values()].includes('name')) {
-      const nameParts: string[] = []
-      for (const csvHeader of Object.values(mergeHeaders)) {
-        const val = raw[csvHeader]?.trim()
-        if (val) nameParts.push(val)
-      }
-      if (nameParts.length > 0) {
-        row.name = nameParts.join(' ')
-      }
     }
 
     return row
@@ -148,21 +109,9 @@ export function buildImportRows(
 }
 
 /**
- * Check if the required 'name' field is mapped (either directly or via merge fields).
+ * Check if the name requirement is satisfied — either a single Full Name column
+ * or a First Name column is mapped. (Last name alone is not sufficient.)
  */
 export function isNameMapped(mappings: ColumnMapping[]): boolean {
-  // Direct name mapping
-  if (mappings.some((m) => m.mappedTo === 'name')) return true
-
-  // Merged via first_name + last_name
-  const mergeNorms = mappings
-    .filter((m) => m.mappedTo !== null)
-    .map((m) => normalizeHeader(m.csvHeader))
-  const hasFirstName = mergeNorms.some(
-    (n) => n === 'first_name' || n === 'firstname',
-  )
-  const hasLastName = mergeNorms.some(
-    (n) => n === 'last_name' || n === 'lastname',
-  )
-  return hasFirstName || hasLastName
+  return mappings.some((m) => m.mappedTo === 'name' || m.mappedTo === 'first_name')
 }

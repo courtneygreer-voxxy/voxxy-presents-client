@@ -35,7 +35,7 @@ describe('autoDetectMappings', () => {
     expect(mappings[1]).toMatchObject({ mappedTo: 'email', confidence: 'alias' })
   })
 
-  it('maps first_name/last_name as merge fields', () => {
+  it('exact-matches first_name/last_name to their own fields', () => {
     const mappings = autoDetectMappings(['first_name', 'last_name', 'email'], [
       { first_name: 'Alice', last_name: 'Smith', email: 'a@b.com' },
     ])
@@ -45,14 +45,14 @@ describe('autoDetectMappings', () => {
     expect(ln?.mappedTo).toBe('last_name')
   })
 
-  it('maps firstname/lastname (no underscore) as merge fields', () => {
+  it('aliases firstname/lastname (no underscore) to first_name/last_name', () => {
     const mappings = autoDetectMappings(['firstname', 'lastname', 'email'], [
       { firstname: 'Alice', lastname: 'Smith', email: 'a@b.com' },
     ])
     const fn = mappings.find((m) => m.csvHeader === 'firstname')
     const ln = mappings.find((m) => m.csvHeader === 'lastname')
-    expect(fn?.mappedTo).toBe('firstname')
-    expect(ln?.mappedTo).toBe('lastname')
+    expect(fn?.mappedTo).toBe('first_name')
+    expect(ln?.mappedTo).toBe('last_name')
   })
 
   it('sets unmapped columns to null with confidence none', () => {
@@ -103,55 +103,47 @@ describe('buildImportRows', () => {
     expect(rows[0]._status).toBe('valid')
   })
 
-  it('merges first_name + last_name into name', () => {
+  it('keeps first_name and last_name as separate columns (no merge)', () => {
     const mappings: ColumnMapping[] = [
-      { csvHeader: 'first_name', mappedTo: 'first_name', confidence: 'alias', sampleValues: [] },
-      { csvHeader: 'last_name', mappedTo: 'last_name', confidence: 'alias', sampleValues: [] },
+      { csvHeader: 'first_name', mappedTo: 'first_name', confidence: 'exact', sampleValues: [] },
+      { csvHeader: 'last_name', mappedTo: 'last_name', confidence: 'exact', sampleValues: [] },
       { csvHeader: 'email', mappedTo: 'email', confidence: 'exact', sampleValues: [] },
     ]
     const rawRows = [{ first_name: 'Alice', last_name: 'Smith', email: 'a@b.com' }]
 
     const rows = buildImportRows(rawRows, mappings)
 
-    expect(rows[0].name).toBe('Alice Smith')
+    expect(rows[0].first_name).toBe('Alice')
+    expect(rows[0].last_name).toBe('Smith')
+    // name is NOT merged at this stage — it's joined only at submission
+    expect(rows[0].name).toBeUndefined()
   })
 
-  it('merges firstname + lastname (no underscore) into name', () => {
+  it('keeps a first_name-only file as a first_name column', () => {
     const mappings: ColumnMapping[] = [
-      { csvHeader: 'firstname', mappedTo: 'firstname', confidence: 'alias', sampleValues: [] },
-      { csvHeader: 'lastname', mappedTo: 'lastname', confidence: 'alias', sampleValues: [] },
-      { csvHeader: 'email', mappedTo: 'email', confidence: 'exact', sampleValues: [] },
-    ]
-    const rawRows = [{ firstname: 'Alice', lastname: 'Smith', email: 'a@b.com' }]
-
-    const rows = buildImportRows(rawRows, mappings)
-
-    expect(rows[0].name).toBe('Alice Smith')
-  })
-
-  it('handles first_name only (no last_name)', () => {
-    const mappings: ColumnMapping[] = [
-      { csvHeader: 'first_name', mappedTo: 'first_name', confidence: 'alias', sampleValues: [] },
+      { csvHeader: 'first_name', mappedTo: 'first_name', confidence: 'exact', sampleValues: [] },
       { csvHeader: 'email', mappedTo: 'email', confidence: 'exact', sampleValues: [] },
     ]
     const rawRows = [{ first_name: 'Alice', email: 'a@b.com' }]
 
     const rows = buildImportRows(rawRows, mappings)
 
-    expect(rows[0].name).toBe('Alice')
+    expect(rows[0].first_name).toBe('Alice')
+    expect(rows[0].name).toBeUndefined()
   })
 
-  it('does not overwrite direct name mapping with merge', () => {
+  it('keeps a direct Full Name mapping alongside first_name', () => {
     const mappings: ColumnMapping[] = [
       { csvHeader: 'Name', mappedTo: 'name', confidence: 'exact', sampleValues: [] },
-      { csvHeader: 'first_name', mappedTo: 'first_name', confidence: 'alias', sampleValues: [] },
+      { csvHeader: 'first_name', mappedTo: 'first_name', confidence: 'exact', sampleValues: [] },
       { csvHeader: 'email', mappedTo: 'email', confidence: 'exact', sampleValues: [] },
     ]
-    const rawRows = [{ Name: 'Direct Name', first_name: 'Merged', email: 'a@b.com' }]
+    const rawRows = [{ Name: 'Direct Name', first_name: 'First', email: 'a@b.com' }]
 
     const rows = buildImportRows(rawRows, mappings)
 
     expect(rows[0].name).toBe('Direct Name')
+    expect(rows[0].first_name).toBe('First')
   })
 
   it('skips unmapped columns', () => {
@@ -189,18 +181,19 @@ describe('isNameMapped', () => {
     expect(isNameMapped(mappings)).toBe(true)
   })
 
-  it('returns true when first_name is mapped (merge)', () => {
+  it('returns true when first_name is mapped', () => {
     const mappings: ColumnMapping[] = [
-      { csvHeader: 'first_name', mappedTo: 'first_name', confidence: 'alias', sampleValues: [] },
+      { csvHeader: 'first_name', mappedTo: 'first_name', confidence: 'exact', sampleValues: [] },
     ]
     expect(isNameMapped(mappings)).toBe(true)
   })
 
-  it('returns true when lastname (no underscore) is mapped', () => {
+  it('returns false when only last_name is mapped (last name alone is insufficient)', () => {
     const mappings: ColumnMapping[] = [
-      { csvHeader: 'lastname', mappedTo: 'lastname', confidence: 'alias', sampleValues: [] },
+      { csvHeader: 'last_name', mappedTo: 'last_name', confidence: 'exact', sampleValues: [] },
+      { csvHeader: 'email', mappedTo: 'email', confidence: 'exact', sampleValues: [] },
     ]
-    expect(isNameMapped(mappings)).toBe(true)
+    expect(isNameMapped(mappings)).toBe(false)
   })
 
   it('returns false when no name-related field is mapped', () => {

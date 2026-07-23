@@ -126,7 +126,7 @@ export function StepPreviewEdit({
         Click any cell to edit · Check &quot;Skip&quot; to exclude a row · Hover a cell{' '}
         <span className="text-red-400/80">●</span> or{' '}
         <span className="text-yellow-400/80">●</span> to see its issue.{' '}
-        <span className="text-red-400/80">Red</span> = missing Name/Email (must fix or skip).{' '}
+        <span className="text-red-400/80">Red</span> = missing First Name/Email (must fix or skip).{' '}
         <span className="text-yellow-400/80">Yellow</span> = formatting issue (will still import).
       </p>
 
