@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { ChevronUp, ChevronDown, ChevronsUpDown, HelpCircle } from 'lucide-react'
+import { ChevronUp, ChevronDown, HelpCircle } from 'lucide-react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { ScheduledEmail, AuditFilters } from '@/types/email'
 import EmailRow from './EmailRow'
 import { TABLE_HEADER_CLASSES } from '@/components/shared/tableStyles'
+import { TableSortHeader } from '@/components/shared/TableSortHeader'
 
 type SortColumn =
   | 'name'
@@ -29,24 +30,6 @@ interface EmailTableProps {
   sortColumn?: SortColumn | null
   sortDirection?: SortDirection
   onSort?: (column: SortColumn) => void
-}
-
-function SortIcon({
-  column,
-  sortColumn,
-  sortDirection,
-}: {
-  column: SortColumn
-  sortColumn?: SortColumn | null
-  sortDirection?: SortDirection
-}) {
-  if (sortColumn !== column)
-    return <ChevronsUpDown className="h-3 w-3 text-foreground/45 dark:text-foreground/40" />
-  return sortDirection === 'asc' ? (
-    <ChevronUp className="h-3 w-3 text-violet-700 dark:text-primary" />
-  ) : (
-    <ChevronDown className="h-3 w-3 text-violet-700 dark:text-primary" />
-  )
 }
 
 // Check if email is a system email (matches backend SYSTEM_TRIGGERS)
@@ -92,27 +75,19 @@ export default function EmailTable({
     )
   }
 
-  const col = (column: SortColumn, label: string, className?: string, title?: string) => {
-    // Only show sort icons if onSort is provided (scheduled emails table)
-    if (!onSort) {
-      return (
-        <div className={`flex items-center gap-1 ${className ?? ''}`} title={title}>
-          {label}
-        </div>
-      )
-    }
-
-    return (
-      <button
-        onClick={() => onSort(column)}
-        className={`flex items-center gap-1 hover:text-foreground transition-colors ${sortColumn === column ? 'text-foreground' : ''} ${className ?? ''}`}
-        title={title}
-      >
-        {label}
-        <SortIcon column={column} sortColumn={sortColumn} sortDirection={sortDirection} />
-      </button>
-    )
-  }
+  // Sortable header cell via the universal TableSortHeader (onSort omitted →
+  // renders a static, non-sortable label).
+  const col = (column: SortColumn, label: string, className?: string, title?: string) => (
+    <TableSortHeader
+      label={label}
+      field={column}
+      currentSort={sortColumn}
+      currentOrder={sortDirection}
+      onSort={onSort}
+      className={className}
+      title={title}
+    />
+  )
 
   // Group emails into system and reminders
   const systemEmails = emails.filter((email) => isSystemEmail(email.trigger_type))

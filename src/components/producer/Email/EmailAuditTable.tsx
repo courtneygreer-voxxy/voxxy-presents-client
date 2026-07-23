@@ -12,16 +12,11 @@
  * 8. Action (vertical ellipsis dropdown, only for failed deliveries)
  */
 
-import {
-  ChevronUp,
-  ChevronDown,
-  ChevronsUpDown,
-  MoreVertical,
-  MessageCircleQuestion,
-} from 'lucide-react'
+import { MoreVertical, MessageCircleQuestion } from 'lucide-react'
 import { format } from 'date-fns'
 import type { AuditEntry } from '@/types/email'
 import { DELIVERY_STATUS_CONFIGS } from '@/types/email'
+import { TableSortHeader } from '@/components/shared/TableSortHeader'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -46,23 +41,6 @@ interface EmailAuditTableProps {
   sortDirection?: SortDirection
   onSort?: (column: SortColumn) => void
   onContactSupport?: (entry: AuditEntry) => void
-}
-
-function SortIcon({
-  column,
-  sortColumn,
-  sortDirection,
-}: {
-  column: SortColumn
-  sortColumn?: SortColumn | null
-  sortDirection?: SortDirection
-}) {
-  if (sortColumn !== column) return <ChevronsUpDown className="w-3 h-3 opacity-40" />
-  return sortDirection === 'asc' ? (
-    <ChevronUp className="w-3 h-3 text-primary" />
-  ) : (
-    <ChevronDown className="w-3 h-3 text-primary" />
-  )
 }
 
 const STATUS_COLOR_VARIANT: Record<
@@ -147,13 +125,13 @@ export function EmailAuditTable({
   }
 
   const col = (column: SortColumn, label: string) => (
-    <button
-      onClick={() => onSort?.(column)}
-      className={`flex items-center gap-1 hover:text-foreground transition-colors ${sortColumn === column ? 'text-foreground' : ''}`}
-    >
-      {label}
-      <SortIcon column={column} sortColumn={sortColumn} sortDirection={sortDirection} />
-    </button>
+    <TableSortHeader
+      label={label}
+      field={column}
+      currentSort={sortColumn}
+      currentOrder={sortDirection}
+      onSort={onSort}
+    />
   )
 
   // 9 columns: Date | First Name | Last Name | Email | Email Name | Category | Status | Details | Action
