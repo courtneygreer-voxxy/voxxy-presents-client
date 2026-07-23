@@ -32,15 +32,12 @@ import ViewContactModal from './ViewContactModal'
 import { CSVUploadModal } from './CSVUploadModal'
 import ListsManagement from './Lists/ListsManagement'
 import BulkEditModal from './BulkEditModal'
+import SelectionActionBar from './SelectionActionBar'
 import ContactExportModal from './ContactExportModal'
 import FilterPanel, { type FilterDraft } from './FilterPanel'
 import type { ActiveFilter } from '@/components/shared/SearchFilterBar'
 import { notify } from '@/errors/notify'
 import { getApiErrorMessage } from '@/errors/getApiErrorMessage'
-import {
-  IMPORT_BATCH_VIEW_LABEL,
-  BULK_EDIT_LABEL,
-} from './copy'
 import {
   type ImportSession,
   clearImportSession,
@@ -1050,16 +1047,6 @@ export default function NetworkPage({
                     </button>
                     <button
                       onClick={() => {
-                        setShowBulkEditModal(true)
-                        setActionsMenuOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
-                    >
-                      <Users className="w-3.5 h-3.5" />
-                      {BULK_EDIT_LABEL}
-                    </button>
-                    <button
-                      onClick={() => {
                         setShowExportModal(true)
                         setActionsMenuOpen(false)
                       }}
@@ -1136,6 +1123,15 @@ export default function NetworkPage({
                 </button>
               </div>
             )}
+
+          {/* Selection action bar — appears when rows are selected */}
+          <SelectionActionBar
+            count={selectedContacts.length}
+            onEdit={() => setShowBulkEditModal(true)}
+            onDelete={handleBulkDelete}
+            onClear={() => setSelectedContacts([])}
+            loading={bulkUpdateLoading}
+          />
 
           {/* Contacts Table */}
           {displayedContacts.length > 0 && (
