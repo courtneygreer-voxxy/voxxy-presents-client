@@ -10,11 +10,17 @@ export interface FieldDefinition {
 }
 
 export const RECOGNIZED_FIELDS: FieldDefinition[] = [
-  { key: 'name', label: 'Name', required: true },
-  // Email is required on import even though the backend allows it blank —
-  // it's the unique identifier used to match/de-dupe existing contacts and
-  // the only way to actually reach an imported contact.
+  // Most spreadsheets keep first and last name in separate columns, so we keep
+  // them separate through mapping + preview and only join them into a single
+  // `name` at submission time. First name is required; last name is optional.
+  { key: 'first_name', label: 'First Name', required: true },
+  { key: 'last_name', label: 'Last Name', required: false },
+  // Email is required — it's the unique identifier used to match/de-dupe
+  // existing contacts and the only way to actually reach an imported contact.
   { key: 'email', label: 'Email', required: true },
+  // Fallback for files that keep the whole name in one column. Either this OR
+  // First Name satisfies the name requirement.
+  { key: 'name', label: 'Full Name', required: false },
   { key: 'phone', label: 'Phone', required: false },
   { key: 'affiliation', label: 'Affiliation', required: false },
   { key: 'instagram_handle', label: 'Instagram', required: false },
@@ -24,6 +30,9 @@ export const RECOGNIZED_FIELDS: FieldDefinition[] = [
   { key: 'tags', label: 'Tags', required: false },
   { key: 'notes', label: 'Notes', required: false },
 ]
+
+/** Name-part fields that are joined into the canonical `name` at submission. */
+export const NAME_PART_KEYS = ['first_name', 'last_name'] as const
 
 /** All recognized field keys */
 export const RECOGNIZED_FIELD_KEYS = RECOGNIZED_FIELDS.map((f) => f.key)
@@ -38,8 +47,24 @@ export const FIELD_LABELS: Record<string, string> = Object.fromEntries(
  * Covers common variations, legacy field names, and abbreviations.
  */
 export const HEADER_ALIASES: Record<string, string> = {
-  // Name
+  // First name
+  firstname: 'first_name',
+  fname: 'first_name',
+  first: 'first_name',
+  given_name: 'first_name',
+  givenname: 'first_name',
+
+  // Last name
+  lastname: 'last_name',
+  lname: 'last_name',
+  last: 'last_name',
+  surname: 'last_name',
+  family_name: 'last_name',
+  familyname: 'last_name',
+
+  // Full name (single-column fallback)
   full_name: 'name',
+  fullname: 'name',
   contact_name: 'name',
   vendor_name: 'name',
   vendor: 'name',
@@ -109,15 +134,4 @@ export const HEADER_ALIASES: Record<string, string> = {
   comments: 'notes',
   comment: 'notes',
   description: 'notes',
-}
-
-/**
- * Fields that should be merged if both appear in the CSV
- * (e.g., first_name + last_name → name)
- */
-export const MERGE_FIELDS: Record<string, { target: string; parts: string[] }> = {
-  first_name: { target: 'name', parts: ['first_name', 'last_name'] },
-  last_name: { target: 'name', parts: ['first_name', 'last_name'] },
-  firstname: { target: 'name', parts: ['firstname', 'lastname'] },
-  lastname: { target: 'name', parts: ['firstname', 'lastname'] },
 }

@@ -24,7 +24,7 @@ import { useImportState } from './csvImport/useImportState'
 import { autoDetectMappings, buildImportRows } from './csvImport/columnMapping'
 import { validateAllRows, revalidateRow } from './csvImport/clientValidation'
 import { prepareSubmission } from './csvImport/csvRewriter'
-import { RECOGNIZED_FIELD_KEYS, MERGE_FIELDS } from './csvImport/constants'
+import { RECOGNIZED_FIELD_KEYS } from './csvImport/constants'
 import type { CSVUploadModalProps } from './csvImport/types'
 
 import { StepUpload } from './csvImport/StepUpload'
@@ -68,17 +68,11 @@ export function CSVUploadModal({
   )
 
   const visibleFields = useMemo(() => {
-    const fields = state.columnMappings
+    // Mapped recognized fields, including first_name/last_name which now stay
+    // as separate preview columns (joined into `name` only at submission).
+    return state.columnMappings
       .filter((m) => m.mappedTo !== null && RECOGNIZED_FIELD_KEYS.includes(m.mappedTo!))
       .map((m) => m.mappedTo!)
-    // If name was created via merge (first_name+last_name), ensure it appears
-    const hasMerge = state.columnMappings.some(
-      (m) => m.mappedTo !== null && MERGE_FIELDS[m.mappedTo!] !== undefined,
-    )
-    if (hasMerge && !fields.includes('name')) {
-      fields.unshift('name')
-    }
-    return fields
   }, [state.columnMappings])
 
   // ─── Handlers ────────────────────────────────────────────────────
