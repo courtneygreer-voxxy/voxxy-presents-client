@@ -6,7 +6,7 @@ function makeMapping(csvHeader: string, mappedTo: string | null): ColumnMapping 
   return { csvHeader, mappedTo, confidence: 'exact', sampleValues: [] }
 }
 
-function makeRow(overrides: Partial<ImportRow> & { name: string; email: string }): ImportRow {
+function makeRow(overrides: Partial<ImportRow> & { email: string }): ImportRow {
   return {
     _originalIndex: 2,
     _skipped: false,
@@ -112,23 +112,53 @@ describe('prepareSubmission', () => {
     })
   })
 
-  describe('merge fields', () => {
-    it('includes name column when first_name/last_name merge is active', async () => {
-      const mergeMappings: ColumnMapping[] = [
+  describe('first/last name joined at submit', () => {
+    const nameParts: ColumnMapping[] = [
+      makeMapping('first_name', 'first_name'),
+      makeMapping('last_name', 'last_name'),
+      makeMapping('Email', 'email'),
+    ]
+
+    it('reconstructs and joins first_name + last_name into a canonical name column', async () => {
+      const rows = [makeRow({ first_name: 'Alice', last_name: 'Smith', email: 'alice@test.com' })]
+
+      const result = prepareSubmission(makeFile(), nameParts, rows, false)
+
+      // Presence of name parts forces reconstruction even without edits/skips
+      expect(result.columnMapping).toBeNull()
+
+      const text = await readFileText(result.file)
+      expect(text).toContain('name')
+      expect(text).not.toContain('first_name')
+      expect(text).not.toContain('last_name')
+      expect(text).toContain('Alice Smith')
+    })
+
+    it('joins first name only when last name is absent', async () => {
+      const rows = [makeRow({ first_name: 'Alice', last_name: '', email: 'alice@test.com' })]
+
+      const result = prepareSubmission(makeFile(), nameParts, rows, false)
+
+      const text = await readFileText(result.file)
+      expect(text).toContain('Alice')
+      expect(text).not.toContain('Alice ') // no trailing space from empty last name
+    })
+
+    it('prefers an explicit Full Name over first/last when both present', async () => {
+      const mixed: ColumnMapping[] = [
+        makeMapping('Name', 'name'),
         makeMapping('first_name', 'first_name'),
-        makeMapping('last_name', 'last_name'),
         makeMapping('Email', 'email'),
       ]
       const rows = [
-        makeRow({ name: 'Alice Smith', email: 'alice@test.com' }),
+        makeRow({ name: 'Explicit Name', first_name: 'Ignored', email: 'alice@test.com' }),
       ]
 
-      const result = prepareSubmission(makeFile(), mergeMappings, rows, true)
+      const result = prepareSubmission(makeFile(), mixed, rows, false)
 
       const text = await readFileText(result.file)
-      // Should have name column even though no mapping targets 'name' directly
-      expect(text).toContain('name')
-      expect(text).toContain('Alice Smith')
+      expect(text).toContain('Explicit Name')
+      expect(text).not.toContain('Ignored')
     })
   })
 

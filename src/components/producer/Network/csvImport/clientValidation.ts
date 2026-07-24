@@ -86,12 +86,14 @@ export interface RowValidation {
 /**
  * Validate a single import row.
  *
- * Severity model: the ONLY blocking errors are a missing Name (DB hard-requires
- * it) and a missing Email (our unique identifier for matching/de-duping).
- * Everything else — format nitpicks on phone, socials, website, location,
- * affiliation length — is a warning: we surface it so the producer can clean
- * their data inline. The backend also treats these as warnings, so rows with
- * only warnings will still import successfully.
+ * Severity model: the ONLY blocking errors are a missing first name (a single
+ * Full Name column also satisfies this) and a missing Email (our unique
+ * identifier for matching/de-duping). Everything else — format nitpicks on
+ * phone, socials, website, location, affiliation length — is a warning: we
+ * surface it so the producer can clean their data inline. The backend also
+ * treats these as warnings, so rows with only warnings still import.
+ * Duplicate emails are a hard error, but those are only known server-side and
+ * are surfaced at the validation step.
  */
 export function validateRow(row: ImportRow): RowValidation {
   const errors: Record<string, string[]> = {}
@@ -104,9 +106,15 @@ export function validateRow(row: ImportRow): RowValidation {
 
   // ── Blocking errors ────────────────────────────────────────────────
 
-  const name = String(row.name ?? '').trim()
-  if (!name) {
-    add(errors, 'name', 'Name is required')
+  // First name is required. Files may provide either separate first/last name
+  // columns or a single Full Name column, so the requirement is satisfied by
+  // either. Attach the error to whichever name column is present in the row so
+  // the offending cell highlights.
+  const firstName = String(row.first_name ?? '').trim()
+  const fullName = String(row.name ?? '').trim()
+  if (!firstName && !fullName) {
+    const field = row.first_name !== undefined ? 'first_name' : 'name'
+    add(errors, field, 'First name is required')
   }
 
   const email = String(row.email ?? '').trim()

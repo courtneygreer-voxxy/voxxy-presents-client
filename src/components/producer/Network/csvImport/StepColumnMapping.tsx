@@ -47,7 +47,8 @@ export function StepColumnMapping({
       {!nameMapped && (
         <div className="flex items-center gap-2 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-lg">
           <span className="text-xs text-red-300">
-            <strong>Name</strong> is required. Choose a CSV column for it below to continue.
+            <strong>First Name</strong> is required (or map a single Full Name column). Choose a CSV
+            column for it below to continue.
           </span>
         </div>
       )}

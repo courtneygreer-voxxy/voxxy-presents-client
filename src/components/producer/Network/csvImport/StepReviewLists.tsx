@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { CheckCircle2, AlertCircle } from 'lucide-react'
@@ -15,6 +16,17 @@ interface StepReviewListsProps {
 
 const MAX_VISIBLE_ERRORS = 5
 
+/** Group {row, field, message}[] by message with counts, most frequent first. */
+function groupByMessage(items: Array<{ row: number; field: string; message: string }>) {
+  const counts = new Map<string, number>()
+  for (const item of items) {
+    counts.set(item.message, (counts.get(item.message) ?? 0) + 1)
+  }
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([message, count]) => ({ message, count }))
+}
+
 export function StepReviewLists({
   importResult,
   errorMessage,
@@ -22,7 +34,12 @@ export function StepReviewLists({
 }: StepReviewListsProps) {
   const created = importResult.summary.created ?? 0
   const updated = importResult.summary.updated ?? 0
+  const failed = importResult.summary.failed ?? 0
   const importedTotal = created + updated
+  const groupedWarnings = useMemo(
+    () => groupByMessage(importResult.warnings ?? []),
+    [importResult.warnings],
+  )
 
   return (
     <div className="space-y-4">
@@ -46,7 +63,26 @@ export function StepReviewLists({
         {updated > 0 && (
           <span className="text-foreground/60"> ({created} created, {updated} updated)</span>
         )}
+        {failed > 0 && (
+          <span className="text-red-400/80"> · {failed} not imported</span>
+        )}
       </p>
+
+      {groupedWarnings.length > 0 && (
+        <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 px-4 py-3">
+          <p className="text-xs font-medium text-yellow-300 mb-2">
+            Formatting cleaned up on import
+          </p>
+          <div className="space-y-1.5">
+            {groupedWarnings.map(({ message, count }) => (
+              <div key={message} className="flex justify-between gap-3 text-xs">
+                <span className="text-yellow-200/70 truncate">{message}</span>
+                <span className="text-yellow-400 font-medium shrink-0">{count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {importResult.errors.length > 0 && (
         <Alert variant="destructive">

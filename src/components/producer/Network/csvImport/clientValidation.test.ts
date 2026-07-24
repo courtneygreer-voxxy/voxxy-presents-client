@@ -19,9 +19,9 @@ function makeRow(overrides: Partial<ImportRow> = {}): ImportRow {
 
 describe('validateRow', () => {
   describe('blocking errors', () => {
-    it('returns error when name is missing', () => {
+    it('returns error when the single Full Name column is missing', () => {
       const result = validateRow(makeRow({ name: '' }))
-      expect(result.errors.name).toContain('Name is required')
+      expect(result.errors.name).toContain('First name is required')
     })
 
     it('returns error when email is missing', () => {
@@ -37,6 +37,29 @@ describe('validateRow', () => {
 
     it('returns no errors for valid row', () => {
       const result = validateRow(makeRow())
+      expect(Object.keys(result.errors)).toHaveLength(0)
+    })
+  })
+
+  describe('first/last name columns', () => {
+    it('is valid when first_name is present and there is no Full Name column', () => {
+      const result = validateRow(
+        makeRow({ name: undefined, first_name: 'Alice', last_name: 'Smith' }),
+      )
+      expect(Object.keys(result.errors)).toHaveLength(0)
+    })
+
+    it('blocks on the first_name cell when a first_name column is present but blank', () => {
+      const result = validateRow(
+        makeRow({ name: undefined, first_name: '', last_name: 'Smith' }),
+      )
+      expect(result.errors.first_name).toContain('First name is required')
+      // The error targets the visible first_name cell, not a phantom name cell
+      expect(result.errors.name).toBeUndefined()
+    })
+
+    it('is valid with first name only (last name optional)', () => {
+      const result = validateRow(makeRow({ name: undefined, first_name: 'Alice' }))
       expect(Object.keys(result.errors)).toHaveLength(0)
     })
   })
@@ -200,7 +223,7 @@ describe('revalidateRow', () => {
   it('returns errors, warnings, and computed status', () => {
     const result = revalidateRow(makeRow({ name: '' }))
 
-    expect(result.errors.name).toContain('Name is required')
+    expect(result.errors.name).toContain('First name is required')
     expect(result.status).toBe('error')
   })
 

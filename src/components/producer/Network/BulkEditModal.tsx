@@ -67,12 +67,12 @@ export default function BulkEditModal({
 
   return (
     <div
-      className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="voxxy-overlay-scrim fixed inset-0 z-50 flex justify-end"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="voxxy-modal-surface w-full max-w-md rounded-xl overflow-hidden">
+      <div className="voxxy-modal-surface flex h-full w-full max-w-md flex-col overflow-hidden shadow-2xl sm:max-w-lg">
         <div className="voxxy-gradient-modal-header flex items-center justify-between border-b border-primary/20 px-5 py-3">
           <div>
             <h2 className="text-base font-semibold text-foreground">{BULK_EDIT_LABEL}</h2>
@@ -91,7 +91,7 @@ export default function BulkEditModal({
           </button>
         </div>
 
-        <div className="p-5 space-y-4">
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {!hasSelection ? (
             <p className="text-sm text-foreground/70">{BULK_EDIT_EMPTY_HINT}</p>
           ) : (
