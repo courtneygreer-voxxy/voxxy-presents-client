@@ -10,7 +10,7 @@ interface VendorApplication {
 
 interface Submission {
   id: number
-  business_name: string
+  affiliation?: string
   contact_name?: string
   vendor_category: string
   email: string
@@ -231,10 +231,10 @@ export default function ViewApplicationSubmissions({
                   >
                     <td className="px-6 py-4">
                       <p className="text-foreground font-medium">
-                        {submission.contact_name || submission.business_name}
+                        {submission.contact_name || submission.affiliation || submission.email}
                       </p>
-                      {submission.business_name && submission.contact_name && (
-                        <p className="text-foreground/60 text-xs">{submission.business_name}</p>
+                      {submission.affiliation && submission.contact_name && (
+                        <p className="text-foreground/60 text-xs">{submission.affiliation}</p>
                       )}
                     </td>
                     <td className="px-6 py-4">

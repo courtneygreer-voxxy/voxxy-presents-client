@@ -62,7 +62,7 @@ export default function RecipientsModal({
           .map((inv) => ({
             email: inv.vendor_contact!.email,
             name: inv.vendor_contact!.name,
-            organization: inv.vendor_contact!.business_name || inv.vendor_contact!.name,
+            organization: (inv.vendor_contact as any)?.affiliation || inv.vendor_contact!.name,
           }))
 
         setRecipientsData({

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   UserPlus,
   Upload,
@@ -32,18 +32,12 @@ import ViewContactModal from './ViewContactModal'
 import { CSVUploadModal } from './CSVUploadModal'
 import ListsManagement from './Lists/ListsManagement'
 import BulkEditModal from './BulkEditModal'
+import SelectionActionBar from './SelectionActionBar'
 import ContactExportModal from './ContactExportModal'
 import FilterPanel, { type FilterDraft } from './FilterPanel'
 import type { ActiveFilter } from '@/components/shared/SearchFilterBar'
 import { notify } from '@/errors/notify'
 import { getApiErrorMessage } from '@/errors/getApiErrorMessage'
-import {
-  IMPORT_BATCH_VIEW_LABEL,
-  IMPORT_TAG_COUNTS_FOOTNOTE,
-  IMPORT_TAG_COUNTS_LABEL,
-  IMPORT_WHERE_DID_THEY_GO,
-  BULK_EDIT_LABEL,
-} from './copy'
 import {
   type ImportSession,
   clearImportSession,
@@ -132,6 +126,10 @@ export default function NetworkPage({
     total_count: 0,
     total_pages: 1,
   })
+
+  // Sort state
+  const [sortField, setSortField] = useState<'last_name' | 'first_name' | 'email' | null>(null)
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
 
   // Bulk update state
   const [bulkUpdateLoading, setBulkUpdateLoading] = useState(false)
@@ -305,6 +303,8 @@ export default function NetworkPage({
         tags: tagFilters.length > 0 ? tagFilters : undefined,
         page: page,
         per_page: perPage,
+        sort: sortField || undefined,
+        order: sortField ? sortOrder : undefined,
       })
 
       let contactsData = response?.vendor_contacts || []
@@ -375,11 +375,30 @@ export default function NetworkPage({
     fetchContacts(1)
   }
 
-  const handleSelectContact = (contactId: number) => {
+  const handleSort = useCallback((field: 'last_name' | 'first_name' | 'email' | null) => {
+    setSortField((prev) => {
+      if (prev === field) {
+        setSortOrder((o) => (o === 'asc' ? 'desc' : 'asc'))
+        return prev
+      }
+      setSortOrder('asc')
+      return field
+    })
+  }, [])
+
+  // Re-fetch when sort changes
+  useEffect(() => {
+    if (sortField) {
+      setCurrentPage(1)
+      fetchContacts(1)
+    }
+  }, [sortField, sortOrder])
+
+  const handleSelectContact = useCallback((contactId: number) => {
     setSelectedContacts((prev) =>
       prev.includes(contactId) ? prev.filter((id) => id !== contactId) : [...prev, contactId],
     )
-  }
+  }, [])
 
   const handleSelectAll = async () => {
     const currentPageIds = contacts.map((c) => c.id)
@@ -403,7 +422,7 @@ export default function NetworkPage({
     }
   }
 
-  const handleDeleteContact = async (contactId: number) => {
+  const handleDeleteContact = useCallback(async (contactId: number) => {
     if (!confirm('Are you sure you want to remove this contact from your network?')) return
 
     try {
@@ -416,7 +435,7 @@ export default function NetworkPage({
         fallback: getApiErrorMessage(err),
       })
     }
-  }
+  }, [])
 
   const handleBulkDelete = async () => {
     if (selectedContacts.length === 0) return
@@ -638,7 +657,7 @@ export default function NetworkPage({
   }
 
   // Fetch full contact details before opening edit modal
-  const handleEditContact = async (contact: VendorContact) => {
+  const handleEditContact = useCallback(async (contact: VendorContact) => {
     try {
       // Fetch full contact with event history and change history
       const fullContact = await vendorContactsApi.getById(contact.id)
@@ -648,7 +667,7 @@ export default function NetworkPage({
       // Fallback to partial contact if fetch fails
       setEditingContact(contact)
     }
-  }
+  }, [])
 
   const emptyCategory = {
     name: '',
@@ -1028,16 +1047,6 @@ export default function NetworkPage({
                     </button>
                     <button
                       onClick={() => {
-                        setShowBulkEditModal(true)
-                        setActionsMenuOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
-                    >
-                      <Users className="w-3.5 h-3.5" />
-                      {BULK_EDIT_LABEL}
-                    </button>
-                    <button
-                      onClick={() => {
                         setShowExportModal(true)
                         setActionsMenuOpen(false)
                       }}
@@ -1053,55 +1062,6 @@ export default function NetworkPage({
             </div>
           </div>
 
-          {/* Post-import banner */}
-          {importSession && (
-            <div className="px-3 py-3 bg-primary/10 border border-primary/30 rounded-lg space-y-2">
-              <div>
-                <p className="text-sm font-semibold text-foreground">
-                  You imported {importSession.created + importSession.updated} contacts
-                </p>
-                <p className="text-xs text-foreground/70 mt-1">{IMPORT_WHERE_DID_THEY_GO}</p>
-                {importSession.listsCreated.length > 0 && (
-                  <p className="text-xs text-foreground/60 mt-1">
-                    Lists created: {importSession.listsCreated.join(', ')}
-                  </p>
-                )}
-              </div>
-
-              {importSession.tags.length > 0 && (
-                <div>
-                  <p className="text-[11px] font-medium text-foreground/60 mb-1">
-                    {IMPORT_TAG_COUNTS_LABEL}
-                  </p>
-                  <p className="text-xs text-foreground/80">
-                    {importSession.tags
-                      .map((tag) => `${tag}: ${importSession.tagCounts?.[tag] ?? 0}`)
-                      .join(' · ')}
-                  </p>
-                  <p className="text-[10px] text-foreground/50 mt-1">
-                    {IMPORT_TAG_COUNTS_FOOTNOTE}
-                  </p>
-                </div>
-              )}
-
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={viewImportUpload}
-                  className="flex items-center gap-1.5 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg transition-colors"
-                >
-                  {IMPORT_BATCH_VIEW_LABEL}
-                </button>
-                <button
-                  type="button"
-                  onClick={dismissImportSession}
-                  className="text-xs text-foreground/60 hover:text-foreground ml-auto"
-                >
-                  Dismiss
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Import batch view banner */}
           {viewingImportBatch && importSession && (
@@ -1164,6 +1124,15 @@ export default function NetworkPage({
               </div>
             )}
 
+          {/* Selection action bar — appears when rows are selected */}
+          <SelectionActionBar
+            count={selectedContacts.length}
+            onEdit={() => setShowBulkEditModal(true)}
+            onDelete={handleBulkDelete}
+            onClear={() => setSelectedContacts([])}
+            loading={bulkUpdateLoading}
+          />
+
           {/* Contacts Table */}
           {displayedContacts.length > 0 && (
             <ContactsTable
@@ -1176,6 +1145,9 @@ export default function NetworkPage({
               onViewContact={setViewingContact}
               paginationMeta={paginationMeta}
               onPageChange={handlePageChange}
+              sortField={sortField}
+              sortOrder={sortOrder}
+              onSort={handleSort}
             />
           )}
 

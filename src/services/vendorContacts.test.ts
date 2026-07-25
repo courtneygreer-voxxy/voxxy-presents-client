@@ -87,7 +87,7 @@ describe('vendorContactsApi.create - 422 error handling', () => {
     await vendorContactsApi.create(42, {
       contact_name: 'John Doe',
       email: 'john@example.com',
-      business_name: 'John Co',
+      affiliation: 'John Co',
       contact_type: 'vendor',
       source: 'manual',
     })
@@ -97,10 +97,12 @@ describe('vendorContactsApi.create - 422 error handling', () => {
     expect(url).toContain('/v1/presents/vendor_contacts')
     expect(options.method).toBe('POST')
 
+    // The API takes discrete name parts and `affiliation`; `name` and
+    // `business_name` are no longer part of the create payload.
     const body = JSON.parse(options.body)
-    expect(body.vendor_contact.name).toBe('John Doe')
+    expect(body.vendor_contact.first_name).toBe('John Doe')
     expect(body.vendor_contact.email).toBe('john@example.com')
-    expect(body.vendor_contact.business_name).toBe('John Co')
+    expect(body.vendor_contact.affiliation).toBe('John Co')
   })
 })
 

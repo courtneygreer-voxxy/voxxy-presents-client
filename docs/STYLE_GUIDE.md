@@ -187,6 +187,32 @@ All Voxxy-specific utility classes are defined in `@layer components` inside `sr
 | `.voxxy-table-row`        | Data row with bottom border.                                                                                                                                       |
 | `.voxxy-table-row-hover`  | Hover state for data rows. In dark mode uses `--voxxy-grad-hover-row-hover`.                                                                                       |
 
+### Sortable column headers
+
+Use the universal `TableSortHeader` for **every** sortable column so the sort
+affordance looks and behaves the same across all producer tables. Do not embed
+custom sort chevrons in header labels or roll a per-table `SortIcon`.
+
+```tsx
+import { TableSortHeader, createSortHandler, type SortOrder } from '@/components/shared/TableSortHeader'
+
+const [sortField, setSortField] = useState<'first_name' | 'email' | null>(null)
+const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
+const handleSort = useCallback(createSortHandler(setSortField, setSortOrder), [])
+
+<TableSortHeader label="Email" field="email" currentSort={sortField} currentOrder={sortOrder} onSort={handleSort} />
+```
+
+- **Idle** columns show a muted `ChevronsUpDown` by default (visible affordance —
+  users can tell the column is sortable). Pass `showIdleIcon={false}` only in
+  rare, space-constrained cases.
+- **Active** column shows `ChevronUp` (asc) / `ChevronDown` (desc) in the accent
+  color, and the label text is emphasized.
+- Omit `onSort` to render a **static** header cell — lets non-sortable columns
+  sit in the same layout without a special case.
+- Use `className` for alignment (`justify-center`, `justify-end`) and `title`
+  for a tooltip. Pair with `createSortHandler` for the standard toggle.
+
 ### Hover effects
 
 | Class                | Description                                           |

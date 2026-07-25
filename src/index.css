@@ -632,6 +632,20 @@
     box-shadow: var(--voxxy-dark-inset-line-strong), var(--voxxy-dark-modal-shadow);
   }
 
+  /**
+   * Large workspace modals — multi-step flows with tables, editors, or complex
+   * content that need near-fullscreen real estate (CSV import, bulk editors, etc.).
+   * Always combine with voxxy-modal-surface for the surface treatment.
+   * !important on sizing is required to beat Radix DialogContent's built-in max-w-lg.
+   */
+  .voxxy-modal-workspace {
+    width: 90vw !important;
+    max-width: 90vw !important;
+    max-height: 92vh !important;
+    overflow-y: auto;
+    padding: 1.25rem;
+  }
+
   .voxxy-overlay-scrim {
     background-color: hsl(255 20% 35% / 0.2);
     backdrop-filter: blur(6px);

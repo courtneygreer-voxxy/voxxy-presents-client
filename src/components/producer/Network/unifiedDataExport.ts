@@ -102,7 +102,7 @@ function contactTypeLabel(c: VendorContact): string {
 
 export function buildRecordsFromContacts(contacts: VendorContact[]): DataExportRecord[] {
   return contacts.map((c) => {
-    const title = c.contact_name || c.business_name || c.email || `Contact #${c.id}`
+    const title = c.contact_name || c.email || `Contact #${c.id}`
     const unsubscribed = !!c.unsubscribe_status?.is_unsubscribed
     const typeOnly = contactTypeLabel(c)
     const statusStr = unsubscribed ? `${typeOnly} · Unsubscribed` : typeOnly
@@ -175,7 +175,7 @@ export function buildRecordsFromSubmissions(inputs: SubmissionExportInput[]): Da
     const rid = s.id
     if (rid === undefined || rid === null) continue
     const recordId = String(rid)
-    const business = String(s.business_name ?? s.name ?? 'Vendor')
+    const business = String(s.name ?? s.affiliation ?? 'Vendor')
     const email = String(s.email ?? '')
     const secondary = [email, eventSlug, vendorApplicationName].filter(Boolean).join(' · ')
 
