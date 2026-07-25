@@ -722,6 +722,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     patch: {
       contact_name: string
       phone: string
+      email?: string
       location?: string
       producer_notes?: string
       tags?: string[]
@@ -1991,7 +1992,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           initialInstagramHandle={selectedApplicant.instagram_handle}
           initialTiktokHandle={selectedApplicant.tiktok_handle}
           initialWebsite={selectedApplicant.website}
-          emailReadOnly={selectedApplicant.email}
+          initialEmail={selectedApplicant.email}
           onSaved={handleEditVendorSaved}
           initialAffiliation={selectedApplicant.affiliation}
         />
