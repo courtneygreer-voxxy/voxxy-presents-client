@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { X } from 'lucide-react'
 import { registrationsApi, ApiError } from '@/services/api'
+import { splitName, joinName } from '@/utils/nameParts'
 
 export interface EditVendorDetailsModalProps {
   open: boolean
@@ -64,9 +65,9 @@ export function EditVendorDetailsModal({
   onSaved,
   initialAffiliation,
 }: EditVendorDetailsModalProps) {
-  const nameParts = initialContactName.split(' ', 2)
-  const [firstName, setFirstName] = useState(nameParts[0] || '')
-  const [lastName, setLastName] = useState(nameParts[1] || '')
+  const nameParts = splitName(initialContactName)
+  const [firstName, setFirstName] = useState(nameParts.firstName)
+  const [lastName, setLastName] = useState(nameParts.lastName)
   const [phone, setPhone] = useState(initialPhone)
   const [location, setLocation] = useState(initialLocation || '')
   const [producerNotes, setProducerNotes] = useState(initialProducerNotes || '')
@@ -81,9 +82,9 @@ export function EditVendorDetailsModal({
 
   useEffect(() => {
     if (open) {
-      const parts = initialContactName.split(' ', 2)
-      setFirstName(parts[0] || '')
-      setLastName(parts[1] || '')
+      const parts = splitName(initialContactName)
+      setFirstName(parts.firstName)
+      setLastName(parts.lastName)
       setPhone(initialPhone || '')
       setLocation(initialLocation || '')
       setProducerNotes(initialProducerNotes || '')
@@ -133,7 +134,7 @@ export function EditVendorDetailsModal({
     setSaving(true)
     try {
       // Send all fields to API, including empty values (to allow clearing)
-      const fullName = [firstName.trim(), lastName.trim()].filter(Boolean).join(' ')
+      const fullName = joinName(firstName, lastName)
       await registrationsApi.update(registrationId, {
         name: fullName,
         phone: phone.trim(),
