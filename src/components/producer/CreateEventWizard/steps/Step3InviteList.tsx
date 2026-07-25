@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   Users,
   Search,
-  Building2,
   Mail,
   Phone,
   MapPin,
@@ -14,6 +13,7 @@ import {
 import { WizardStepProps } from '../types'
 import { vendorContactsApi, contactListsApi, VendorContact, ContactList } from '@/services/api'
 import { DebugPanel } from '../../DebugPanel'
+import { TABLE_HEADER_CLASSES, TABLE_ROW_CLASSES } from '@/components/shared/tableStyles'
 
 interface Step3InviteListProps extends WizardStepProps {
   organizationId: number
@@ -387,7 +387,7 @@ export default function Step3InviteList({
     const search = searchTerm.toLowerCase()
     return (
       contact.contact_name.toLowerCase().includes(search) ||
-      contact.business_name?.toLowerCase().includes(search) ||
+      contact.affiliation?.toLowerCase().includes(search) ||
       contact.email.toLowerCase().includes(search)
     )
   })
@@ -591,7 +591,7 @@ export default function Step3InviteList({
               <div className="overflow-x-auto">
                 {/* Table Header */}
                 <div className="voxxy-table-header">
-                  <div className="voxxy-table-header-row grid min-w-[1050px] grid-cols-[20px,72px,150px,140px,90px,165px,100px,120px,85px,55px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide">
+                  <div className={`voxxy-table-header-row grid min-w-[1100px] grid-cols-[20px,72px,110px,100px,130px,165px,100px,110px,85px,55px,90px] px-2 py-1 ${TABLE_HEADER_CLASSES}`}>
                     <div className="flex items-center justify-center">
                       <input
                         type="checkbox"
@@ -604,14 +604,15 @@ export default function Step3InviteList({
                       />
                     </div>
                     <div>Status</div>
-                    <div>Name</div>
-                    <div>Business</div>
-                    <div>Category</div>
+                    <div>First Name</div>
+                    <div>Last Name</div>
+                    <div>Affiliation</div>
                     <div>Email</div>
                     <div>Phone</div>
                     <div>Location</div>
                     <div>Tags</div>
                     <div>Social</div>
+                    <div>Category</div>
                   </div>
                 </div>
 
@@ -633,7 +634,7 @@ export default function Step3InviteList({
                     return (
                       <div
                         key={contact.id}
-                        className={`voxxy-table-row voxxy-table-row-hover grid min-w-[1050px] grid-cols-[20px,72px,150px,140px,90px,165px,100px,120px,85px,55px] items-center gap-2 px-2 py-1 text-[11px] ${bgClass}`}
+                        className={`voxxy-table-row voxxy-table-row-hover grid min-w-[1100px] grid-cols-[20px,72px,110px,100px,130px,165px,100px,110px,85px,55px,90px] px-2 py-1 ${TABLE_ROW_CLASSES} ${bgClass}`}
                       >
                         {/* Checkbox */}
                         <div className="flex items-center justify-center">
@@ -665,26 +666,23 @@ export default function Step3InviteList({
                           )}
                         </div>
 
-                        {/* Name */}
+                        {/* First Name */}
                         <div className="flex items-center gap-1">
-                          <span className="text-foreground truncate">{contact.contact_name}</span>
+                          <span className="text-foreground truncate">{(contact.contact_name || '').split(' ')[0] || '—'}</span>
                         </div>
 
-                        {/* Business */}
+                        {/* Last Name */}
+                        <div className="flex items-center gap-1">
+                          <span className="text-foreground truncate">{(contact.contact_name || '').split(' ').slice(1).join(' ') || '—'}</span>
+                        </div>
+
+                        {/* Affiliation */}
                         <div className="flex items-center gap-0.5 text-foreground/60 truncate">
-                          {contact.business_name && (
-                            <>
-                              <Building2 className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate">{contact.business_name}</span>
-                            </>
+                          {contact.affiliation ? (
+                            <span className="truncate">{contact.affiliation}</span>
+                          ) : (
+                            <span className="text-foreground/40">—</span>
                           )}
-                        </div>
-
-                        {/* Category */}
-                        <div>
-                          <span className="px-1 py-0.5 bg-background/10 text-foreground/60 rounded text-[10px]">
-                            {contact.contact_type}
-                          </span>
                         </div>
 
                         {/* Email */}
@@ -758,6 +756,13 @@ export default function Step3InviteList({
                               🔗
                             </a>
                           )}
+                        </div>
+
+                        {/* Category */}
+                        <div>
+                          <span className="px-1 py-0.5 bg-background/10 text-foreground/60 rounded text-[10px]">
+                            {contact.contact_type}
+                          </span>
                         </div>
                       </div>
                     )

@@ -8,7 +8,6 @@ import {
   AlertTriangle,
   Plus,
   ChevronDown,
-  ChevronUp,
   ChevronLeft,
   ChevronRight,
   Filter,
@@ -16,6 +15,7 @@ import {
 
 const PAGE_SIZE = 50
 import { vendorContactsApi, contactListsApi, VendorContact, ContactList } from '@/services/api'
+import { TableSortHeader } from '@/components/shared/TableSortHeader'
 
 interface GoLiveInvitationEditorProps {
   event: any
@@ -224,7 +224,7 @@ export default function GoLiveInvitationEditor({
     const search = searchTerm.toLowerCase()
     return (
       contact.contact_name.toLowerCase().includes(search) ||
-      contact.business_name?.toLowerCase().includes(search) ||
+      contact.affiliation?.toLowerCase().includes(search) ||
       contact.email.toLowerCase().includes(search) ||
       contact.tags?.some((tag) => tag.toLowerCase().includes(search))
     )
@@ -703,39 +703,21 @@ export default function GoLiveInvitationEditor({
                   className="w-3.5 h-3.5 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
                 />
               </div>
-              <button
-                type="button"
-                onClick={() => handleSort('name')}
-                className="flex items-center gap-1 hover:text-foreground transition-colors text-left"
-              >
-                Name
-                {sortColumn === 'name' ? (
-                  sortDirection === 'asc' ? (
-                    <ChevronUp className="w-3 h-3" />
-                  ) : (
-                    <ChevronDown className="w-3 h-3" />
-                  )
-                ) : (
-                  <ChevronDown className="w-3 h-3 opacity-30" />
-                )}
-              </button>
-              <div>Business</div>
-              <button
-                type="button"
-                onClick={() => handleSort('email')}
-                className="flex items-center gap-1 hover:text-foreground transition-colors text-left"
-              >
-                Email
-                {sortColumn === 'email' ? (
-                  sortDirection === 'asc' ? (
-                    <ChevronUp className="w-3 h-3" />
-                  ) : (
-                    <ChevronDown className="w-3 h-3" />
-                  )
-                ) : (
-                  <ChevronDown className="w-3 h-3 opacity-30" />
-                )}
-              </button>
+              <TableSortHeader
+                label="Name"
+                field="name"
+                currentSort={sortColumn}
+                currentOrder={sortDirection}
+                onSort={handleSort}
+              />
+              <div>Affiliation</div>
+              <TableSortHeader
+                label="Email"
+                field="email"
+                currentSort={sortColumn}
+                currentOrder={sortDirection}
+                onSort={handleSort}
+              />
               <div>Type</div>
             </div>
           </div>
@@ -822,10 +804,10 @@ export default function GoLiveInvitationEditor({
                       )}
                     </div>
 
-                    {/* Business */}
+                    {/* Affiliation */}
                     <div className="min-w-0">
                       <span className="text-foreground/60 truncate block">
-                        {contact.business_name || '\u2014'}
+                        {contact.affiliation || '\u2014'}
                       </span>
                     </div>
 

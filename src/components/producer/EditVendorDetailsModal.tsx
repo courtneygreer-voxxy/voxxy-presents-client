@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { X } from 'lucide-react'
 import { registrationsApi, ApiError } from '@/services/api'
+import { splitName, joinName } from '@/utils/nameParts'
 
 export interface EditVendorDetailsModalProps {
   open: boolean
@@ -29,7 +30,7 @@ export interface EditVendorDetailsModalProps {
   /** Local applicant row id (e.g. reg-123) for state updates */
   applicantId: string
   registrationId: number
-  /** Maps to Rails registration `name` (contact name) */
+  /** Maps to Rails registration `name` (contact name) — will be split into first/last */
   initialContactName: string
   initialPhone: string
   initialLocation?: string
@@ -75,7 +76,9 @@ export function EditVendorDetailsModal({
   onSaved,
   initialAffiliation,
 }: EditVendorDetailsModalProps) {
-  const [name, setName] = useState(initialContactName)
+  const nameParts = splitName(initialContactName)
+  const [firstName, setFirstName] = useState(nameParts.firstName)
+  const [lastName, setLastName] = useState(nameParts.lastName)
   const [phone, setPhone] = useState(initialPhone)
   const [email, setEmail] = useState(initialEmail)
   const [location, setLocation] = useState(initialLocation || '')
@@ -94,7 +97,9 @@ export function EditVendorDetailsModal({
 
   useEffect(() => {
     if (open) {
-      setName(initialContactName)
+      const parts = splitName(initialContactName)
+      setFirstName(parts.firstName)
+      setLastName(parts.lastName)
       setPhone(initialPhone || '')
       setEmail(initialEmail)
       setLocation(initialLocation || '')
@@ -154,8 +159,9 @@ export function EditVendorDetailsModal({
     setFormError(null)
     setSaving(true)
     try {
+      const fullName = joinName(firstName, lastName)
       const payload: Record<string, unknown> = {
-        name: name.trim(),
+        name: fullName,
         phone: phone.trim(),
         location: location.trim(),
         producer_notes: producerNotes.trim(),
@@ -170,7 +176,7 @@ export function EditVendorDetailsModal({
       }
       await registrationsApi.update(registrationId, payload)
       const patch: Parameters<typeof onSaved>[1] = {
-        contact_name: name.trim(),
+        contact_name: fullName,
         phone: phone.trim(),
         location: location.trim(),
         producer_notes: producerNotes.trim(),
@@ -223,18 +229,32 @@ export function EditVendorDetailsModal({
                 required
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="edit-vendor-name" className="text-xs text-foreground/80">
-                Contact name
-              </Label>
-              <Input
-                id="edit-vendor-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="bg-background/5 border-border text-xs"
-                autoComplete="name"
-                required
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-vendor-first-name" className="text-xs text-foreground/80">
+                  First Name *
+                </Label>
+                <Input
+                  id="edit-vendor-first-name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="bg-background/5 border-border text-xs"
+                  autoComplete="given-name"
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-vendor-last-name" className="text-xs text-foreground/80">
+                  Last Name
+                </Label>
+                <Input
+                  id="edit-vendor-last-name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="bg-background/5 border-border text-xs"
+                  autoComplete="family-name"
+                />
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="edit-vendor-phone" className="text-xs text-foreground/80">
@@ -391,7 +411,7 @@ export function EditVendorDetailsModal({
             >
               Cancel
             </Button>
-            <Button type="submit" className="voxxy-btn-solid" disabled={saving || !name.trim()}>
+            <Button type="submit" className="voxxy-btn-solid" disabled={saving || !firstName.trim()}>
               {saving ? 'Saving…' : 'Save'}
             </Button>
           </DialogFooter>

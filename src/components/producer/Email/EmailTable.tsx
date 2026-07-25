@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import { ChevronUp, ChevronDown, ChevronsUpDown, HelpCircle } from 'lucide-react'
+import { ChevronUp, ChevronDown, HelpCircle } from 'lucide-react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { ScheduledEmail, AuditFilters } from '@/types/email'
 import EmailRow from './EmailRow'
+import { TABLE_HEADER_CLASSES } from '@/components/shared/tableStyles'
+import { TableSortHeader } from '@/components/shared/TableSortHeader'
 
 type SortColumn =
   | 'name'
@@ -28,24 +30,6 @@ interface EmailTableProps {
   sortColumn?: SortColumn | null
   sortDirection?: SortDirection
   onSort?: (column: SortColumn) => void
-}
-
-function SortIcon({
-  column,
-  sortColumn,
-  sortDirection,
-}: {
-  column: SortColumn
-  sortColumn?: SortColumn | null
-  sortDirection?: SortDirection
-}) {
-  if (sortColumn !== column)
-    return <ChevronsUpDown className="h-3 w-3 text-foreground/45 dark:text-foreground/40" />
-  return sortDirection === 'asc' ? (
-    <ChevronUp className="h-3 w-3 text-violet-700 dark:text-primary" />
-  ) : (
-    <ChevronDown className="h-3 w-3 text-violet-700 dark:text-primary" />
-  )
 }
 
 // Check if email is a system email (matches backend SYSTEM_TRIGGERS)
@@ -91,27 +75,19 @@ export default function EmailTable({
     )
   }
 
-  const col = (column: SortColumn, label: string, className?: string, title?: string) => {
-    // Only show sort icons if onSort is provided (scheduled emails table)
-    if (!onSort) {
-      return (
-        <div className={`flex items-center gap-1 ${className ?? ''}`} title={title}>
-          {label}
-        </div>
-      )
-    }
-
-    return (
-      <button
-        onClick={() => onSort(column)}
-        className={`flex items-center gap-1 hover:text-foreground transition-colors ${sortColumn === column ? 'text-foreground' : ''} ${className ?? ''}`}
-        title={title}
-      >
-        {label}
-        <SortIcon column={column} sortColumn={sortColumn} sortDirection={sortDirection} />
-      </button>
-    )
-  }
+  // Sortable header cell via the universal TableSortHeader (onSort omitted →
+  // renders a static, non-sortable label).
+  const col = (column: SortColumn, label: string, className?: string, title?: string) => (
+    <TableSortHeader
+      label={label}
+      field={column}
+      currentSort={sortColumn}
+      currentOrder={sortDirection}
+      onSort={onSort}
+      className={className}
+      title={title}
+    />
+  )
 
   // Group emails into system and reminders
   const systemEmails = emails.filter((email) => isSystemEmail(email.trigger_type))
@@ -121,7 +97,7 @@ export default function EmailTable({
     <div className="voxxy-table-shell">
       {/* Table Header */}
       <div className="voxxy-table-header">
-        <div className="voxxy-table-header-row grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] items-center gap-3 px-4 py-2 text-xs font-semibold uppercase tracking-wide">
+        <div className={`voxxy-table-header-row grid grid-cols-[minmax(180px,1.2fr),minmax(200px,1.5fr),minmax(120px,0.9fr),minmax(110px,0.9fr),minmax(80px,0.7fr),70px,80px,minmax(90px,0.8fr),50px] px-4 py-2 ${TABLE_HEADER_CLASSES}`}>
           {col('name', 'Email Name')}
           <div className="flex items-center gap-1">Subject</div>
           {col('scheduled_for', 'Scheduled')}

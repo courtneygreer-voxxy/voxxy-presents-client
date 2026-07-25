@@ -2188,7 +2188,9 @@ export interface VendorContact {
   id: number
   organization_id: number
   contact_name: string
-  business_name?: string
+  first_name: string
+  last_name: string
+  name?: string // Legacy single name field
   job_title?: string
   email: string
   phone?: string
@@ -2208,10 +2210,7 @@ export interface VendorContact {
   tiktok_handle?: string
   website?: string
   featured?: boolean
-  // Payment information (TODO: Backend migration needed for these fields)
-  eventbrite_email?: string
-  venmo_handle?: string
-  paypal_email?: string
+  affiliation?: string
   created_at: string
   updated_at: string
   unsubscribe_status?: {
@@ -2271,6 +2270,11 @@ export interface BulkImportResult {
     field: string
     message: string
   }>
+  warnings?: Array<{
+    row: number
+    field: string
+    message: string
+  }>
 }
 
 export interface BulkImportOptions {
@@ -2278,6 +2282,7 @@ export interface BulkImportOptions {
   updateExisting?: boolean
   tags?: string[]
   validateOnly?: boolean
+  columnMapping?: Record<string, string>
 }
 
 export interface ContactList {
@@ -2313,7 +2318,9 @@ function mapVendorContactFromApi(contact: any): VendorContact {
     id: contact.id,
     organization_id: contact.organization_id,
     contact_name: contact.contact_name || contact.contact_info?.name || '',
-    business_name: contact.business_name || contact.contact_info?.business_name || undefined,
+    first_name: contact.first_name || '',
+    last_name: contact.last_name || '',
+    affiliation: contact.affiliation || undefined,
     job_title: contact.job_title || contact.contact_info?.job_title || undefined,
     email: contact.email || contact.contact_info?.email || '',
     phone: contact.phone || contact.contact_info?.phone || undefined,
@@ -2493,8 +2500,10 @@ export const vendorContactsApi = {
   async create(
     organizationId: number,
     data: {
-      contact_name: string
-      business_name?: string
+      contact_name?: string
+      first_name?: string
+      last_name?: string
+      affiliation?: string
       job_title?: string
       email: string
       phone?: string
@@ -2510,10 +2519,6 @@ export const vendorContactsApi = {
       tiktok_handle?: string
       website?: string
       featured?: boolean
-      // TODO: Backend migration needed - silently dropped until then
-      eventbrite_email?: string
-      venmo_handle?: string
-      paypal_email?: string
     },
   ): Promise<VendorContact> {
     // Backend expects FLAT structure for create (not nested)
@@ -2521,10 +2526,11 @@ export const vendorContactsApi = {
       organization_id: organizationId,
       vendor_id: data.vendor_id,
       registration_id: data.registration_id,
-      name: data.contact_name,
+      first_name: data.first_name || data.contact_name,
+      last_name: data.last_name,
       email: data.email,
       phone: data.phone,
-      business_name: data.business_name,
+      affiliation: data.affiliation,
       job_title: data.job_title,
       location: data.location,
       contact_type: data.contact_type || 'vendor',
@@ -2554,7 +2560,9 @@ export const vendorContactsApi = {
       organization_id: contact.organization_id,
       // Try flat structure first, fall back to nested
       contact_name: contact.contact_name || contact.contact_info?.name || '',
-      business_name: contact.business_name || contact.contact_info?.business_name || undefined,
+      first_name: contact.first_name || '',
+      last_name: contact.last_name || '',
+      affiliation: contact.affiliation || undefined,
       job_title: contact.job_title || contact.contact_info?.job_title || undefined,
       email: contact.email || contact.contact_info?.email || '',
       phone: contact.phone || contact.contact_info?.phone || undefined,
@@ -2596,9 +2604,11 @@ export const vendorContactsApi = {
 
     // Map frontend field names to backend's flat field names
     if (data.contact_name !== undefined) backendData.name = data.contact_name
+    if (data.first_name !== undefined) backendData.first_name = data.first_name
+    if (data.last_name !== undefined) backendData.last_name = data.last_name
     if (data.email !== undefined) backendData.email = data.email
     if (data.phone !== undefined) backendData.phone = data.phone
-    if (data.business_name !== undefined) backendData.business_name = data.business_name
+    if (data.affiliation !== undefined) backendData.affiliation = data.affiliation
     if (data.job_title !== undefined) backendData.job_title = data.job_title
     if (data.location !== undefined) backendData.location = data.location
     if (data.contact_type !== undefined) backendData.contact_type = data.contact_type
@@ -2626,7 +2636,9 @@ export const vendorContactsApi = {
       organization_id: contact.organization_id,
       // Try flat structure first, fall back to nested
       contact_name: contact.contact_name || contact.contact_info?.name || '',
-      business_name: contact.business_name || contact.contact_info?.business_name || undefined,
+      first_name: contact.first_name || '',
+      last_name: contact.last_name || '',
+      affiliation: contact.affiliation || undefined,
       job_title: contact.job_title || contact.contact_info?.job_title || undefined,
       email: contact.email || contact.contact_info?.email || '',
       phone: contact.phone || contact.contact_info?.phone || undefined,
@@ -2796,6 +2808,10 @@ export const vendorContactsApi = {
 
     if (options.tags && options.tags.length > 0) {
       formData.append('tags', JSON.stringify(options.tags))
+    }
+
+    if (options.columnMapping) {
+      formData.append('column_mapping', JSON.stringify(options.columnMapping))
     }
 
     console.log(

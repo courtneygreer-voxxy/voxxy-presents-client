@@ -116,7 +116,7 @@ export default function UnsubscribePage() {
   }
 
   const pageShell =
-    'dark voxxy-public-page relative min-h-screen voxxy-gradient-marketing-hero flex items-center justify-center p-4'
+    'dark voxxy-public-page relative min-h-screen voxxy-gradient-marketing-hero voxxy-gradient-mobile-safe flex items-center justify-center p-4'
   const cardShell = 'voxxy-contact-form-shell p-0 overflow-hidden text-white'
   const contextRow = 'bg-white/5 rounded-lg p-4 border border-white/12'
 

@@ -77,7 +77,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
   const [viewState, setViewState] = useState<ViewState>({ view: 'table' })
 
   // Auto-refresh state
-  const [autoRefresh, setAutoRefresh] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null)
 
@@ -162,14 +161,14 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
   // Auto-refresh delivery stats every 30 seconds (only on table view)
   useEffect(() => {
-    if (!autoRefresh || viewState.view !== 'table') return
+    if (viewState.view !== 'table') return
 
     const interval = setInterval(() => {
       loadEmails(true) // Silent refresh
-    }, 30000) // 30 seconds
+    }, 30000)
 
     return () => clearInterval(interval)
-  }, [autoRefresh, viewState.view, eventSlug])
+  }, [viewState.view, eventSlug])
 
   const loadEmails = async (silent = false) => {
     if (!silent) {
@@ -733,22 +732,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
-            <label
-              className="flex items-center gap-1.5 cursor-pointer"
-              title="Auto-refresh every 30s"
-            >
-              <div className="relative">
-                <input
-                  type="checkbox"
-                  checked={autoRefresh}
-                  onChange={(e) => setAutoRefresh(e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-8 h-4 bg-background/10 rounded-full peer-checked:bg-violet-400 dark:peer-checked:bg-primary transition-all"></div>
-                <div className="absolute left-0.5 top-0.5 w-3 h-3 bg-background rounded-full transition-transform peer-checked:translate-x-4"></div>
-              </div>
-              <span className="text-[10px] text-foreground/50">Auto</span>
-            </label>
           </div>
         </div>
       </div>

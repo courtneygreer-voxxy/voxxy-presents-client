@@ -151,9 +151,9 @@ export default function BulkEmailModal({
                       </p>
                       <p className="text-xs text-foreground/60 truncate">{contact.email}</p>
                     </div>
-                    {contact.business_name && (
+                    {contact.affiliation && (
                       <span className="text-xs text-foreground/40 ml-2">
-                        {contact.business_name}
+                        {contact.affiliation}
                       </span>
                     )}
                   </div>
