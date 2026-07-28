@@ -27,20 +27,21 @@ import { toast } from 'sonner'
 interface GoogleSheetsSyncProps {
   organizationId: number
   eventSlug: string
-  registrations?: Array<{ id: number; name?: string; email?: string; phone?: string }>
   onSyncComplete?: () => void
 }
 
 export default function GoogleSheetsSync({
   organizationId,
   eventSlug,
-  registrations = [],
   onSyncComplete,
 }: GoogleSheetsSyncProps) {
   // Connection state
   const [connectionStatus, setConnectionStatus] =
     useState<GoogleSheetsConnectionStatus | null>(null)
   const [loading, setLoading] = useState(true)
+
+  // Sync errors refresh trigger
+  const [syncVersion, setSyncVersion] = useState(0)
 
   // Config state
   const [config, setConfig] = useState<PaymentSyncConfig | null>(null)
@@ -320,6 +321,7 @@ export default function GoogleSheetsSync({
       toast.success(
         `Sync complete: ${synced} updated, ${errCount} errors, ${skipped} skipped`,
       )
+      setSyncVersion((v) => v + 1)
       onSyncComplete?.()
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Sync failed'
@@ -640,7 +642,7 @@ export default function GoogleSheetsSync({
           {config && (
             <SyncErrorsPanel
               eventSlug={eventSlug}
-              registrations={registrations}
+              refreshTrigger={syncVersion}
               onErrorsChange={onSyncComplete}
             />
           )}

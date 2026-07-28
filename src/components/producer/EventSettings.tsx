@@ -1450,18 +1450,9 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                     Your n8n workflow will detect the correct event without any manual
                     configuration.
                   </p>
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      window.location.href = '/dashboard/settings'
-                    }}
-                    className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg voxxy-btn-cta transition-all"
-                  >
-                    <Webhook className="h-4 w-4" />
-                    Configure Webhook in Settings
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
+                  <p className="text-xs text-muted-foreground italic">
+                    Webhook configuration is managed at the organization level.
+                  </p>
                 </div>
 
                 {applications.length > 0 && (

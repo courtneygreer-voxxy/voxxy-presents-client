@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { AlertTriangle, CheckCircle2, X, Loader2, Search, User } from 'lucide-react'
 import { paymentSyncErrorsApi } from '@/services/googleSheetsApi'
+import { registrationsApi } from '@/services/api'
 import type { PaymentSyncError } from '@/types/googleSheets'
 
 interface Registration {
@@ -12,16 +13,17 @@ interface Registration {
 
 interface SyncErrorsPanelProps {
   eventSlug: string
-  registrations: Registration[]
+  refreshTrigger?: number
   onErrorsChange?: () => void
 }
 
 export default function SyncErrorsPanel({
   eventSlug,
-  registrations,
+  refreshTrigger = 0,
   onErrorsChange,
 }: SyncErrorsPanelProps) {
   const [errors, setErrors] = useState<PaymentSyncError[]>([])
+  const [registrations, setRegistrations] = useState<Registration[]>([])
   const [loading, setLoading] = useState(true)
   const [matchingErrorId, setMatchingErrorId] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -29,12 +31,22 @@ export default function SyncErrorsPanel({
 
   useEffect(() => {
     loadErrors()
-  }, [eventSlug])
+  }, [eventSlug, refreshTrigger])
 
   const loadErrors = async () => {
     try {
-      const data = await paymentSyncErrorsApi.list(eventSlug, false)
-      setErrors(data)
+      const [errorsData, regsData] = await Promise.all([
+        paymentSyncErrorsApi.list(eventSlug, false),
+        registrationsApi.getByEvent(eventSlug),
+      ])
+      setErrors(errorsData)
+      const regList = (regsData?.vendor_registrations || []).map((r: any) => ({
+        id: r.id,
+        name: r.name || r.first_name,
+        email: r.email,
+        phone: r.phone,
+      }))
+      setRegistrations(regList)
     } catch (err) {
       console.error('Failed to load sync errors:', err)
     } finally {
