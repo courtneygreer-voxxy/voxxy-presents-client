@@ -35,11 +35,16 @@ export default function SyncErrorsPanel({
 
   const loadErrors = async () => {
     try {
-      const [errorsData, regsData] = await Promise.all([
-        paymentSyncErrorsApi.list(eventSlug, false),
-        registrationsApi.getByEvent(eventSlug),
-      ])
-      setErrors(errorsData)
+      const data = await paymentSyncErrorsApi.list(eventSlug, false)
+      setErrors(data)
+    } catch (err) {
+      console.error('Failed to load sync errors:', err)
+    } finally {
+      setLoading(false)
+    }
+
+    try {
+      const regsData = await registrationsApi.getByEvent(eventSlug)
       const regList = (regsData?.vendor_registrations || []).map((r: any) => ({
         id: r.id,
         name: r.name || r.first_name,
@@ -48,9 +53,7 @@ export default function SyncErrorsPanel({
       }))
       setRegistrations(regList)
     } catch (err) {
-      console.error('Failed to load sync errors:', err)
-    } finally {
-      setLoading(false)
+      console.error('Failed to load registrations:', err)
     }
   }
 
