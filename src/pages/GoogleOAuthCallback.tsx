@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { googleSheetsOauthApi } from '@/services/googleSheetsApi'
@@ -8,8 +8,11 @@ export default function GoogleOAuthCallback() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
+  const exchangedRef = useRef(false)
 
   useEffect(() => {
+    if (exchangedRef.current) return
+    exchangedRef.current = true
     const code = searchParams.get('code')
     const errorParam = searchParams.get('error')
 

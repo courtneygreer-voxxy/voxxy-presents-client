@@ -21,17 +21,20 @@ import type {
   SyncResult,
 } from '@/types/googleSheets'
 import { autoDetectColumns } from './columnAutoDetect'
+import SyncErrorsPanel from './SyncErrorsPanel'
 import { toast } from 'sonner'
 
 interface GoogleSheetsSyncProps {
   organizationId: number
   eventSlug: string
+  registrations?: Array<{ id: number; name?: string; email?: string; phone?: string }>
   onSyncComplete?: () => void
 }
 
 export default function GoogleSheetsSync({
   organizationId,
   eventSlug,
+  registrations = [],
   onSyncComplete,
 }: GoogleSheetsSyncProps) {
   // Connection state
@@ -172,7 +175,8 @@ export default function GoogleSheetsSync({
         )
         setHeaders(metadata.headers || [])
 
-        if (metadata.headers?.length > 0) {
+        // Only auto-detect if no config exists (don't overwrite manual mappings)
+        if (!config && metadata.headers?.length > 0) {
           applyAutoDetect(metadata.headers)
         }
 
@@ -183,7 +187,7 @@ export default function GoogleSheetsSync({
         setFetchingMetadata(false)
       }
     },
-    [organizationId, sheetUrl],
+    [organizationId, sheetUrl, config],
   )
 
   const handleConnect = async () => {
@@ -246,6 +250,9 @@ export default function GoogleSheetsSync({
 
   const handleSheetUrlChange = (url: string) => {
     setSheetUrl(url)
+    setSheetTabName('')
+    setHeaders([])
+    setTabs([])
     setDirty(true)
     if (url.includes('docs.google.com/spreadsheets')) {
       fetchMetadata(url)
@@ -274,10 +281,10 @@ export default function GoogleSheetsSync({
     try {
       const data = {
         sheet_url: sheetUrl,
-        sheet_tab_name: sheetTabName || undefined,
-        email_column: emailColumn || undefined,
-        phone_column: phoneColumn || undefined,
-        ticket_code_column: ticketCodeColumn || undefined,
+        sheet_tab_name: sheetTabName || null,
+        email_column: emailColumn || null,
+        phone_column: phoneColumn || null,
+        ticket_code_column: ticketCodeColumn || null,
         paid_status_column: paidStatusColumn,
         paid_value: paidValue || 'TRUE',
         active: true,
@@ -627,6 +634,15 @@ export default function GoogleSheetsSync({
                   `, ${lastSyncResult.results.skipped} skipped`}
               </span>
             </div>
+          )}
+
+          {/* Sync errors — manual resolution panel */}
+          {config && (
+            <SyncErrorsPanel
+              eventSlug={eventSlug}
+              registrations={registrations}
+              onErrorsChange={onSyncComplete}
+            />
           )}
         </div>
       )}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   Calendar,
   Users,
@@ -175,6 +175,7 @@ interface PresentsAnalytics {
 type CommandCenterTab = 'details' | 'applicants' | 'emails' | 'settings'
 
 export default function ProducerDashboard() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [activeNav, setActiveNav] = useState<NavItem>('events')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [eventsView, setEventsView] = useState<EventsView>('empty')
@@ -367,6 +368,29 @@ export default function ProducerDashboard() {
       }
     }
   }, [loadingOrg, loadingEvents, organization, events.length])
+
+  // Handle deep-link query params (e.g., after Google OAuth redirect)
+  const deepLinkHandledRef = useRef(false)
+  useEffect(() => {
+    if (deepLinkHandledRef.current || loadingOrg || loadingEvents || events.length === 0) return
+
+    const tabParam = searchParams.get('tab')
+    const eventParam = searchParams.get('event')
+
+    if (tabParam && eventParam) {
+      deepLinkHandledRef.current = true
+      const matchedEvent = events.find((e) => e.slug === eventParam)
+      if (matchedEvent) {
+        setSelectedEvent(matchedEvent)
+        setEventsView('command-center')
+        if (tabParam === 'settings' || tabParam === 'applicants' || tabParam === 'emails' || tabParam === 'details') {
+          setCommandCenterTab(tabParam as CommandCenterTab)
+        }
+      }
+      // Clear query params from URL
+      setSearchParams({}, { replace: true })
+    }
+  }, [loadingOrg, loadingEvents, events, searchParams, setSearchParams])
 
   // Load admin data when admin tab is active
   useEffect(() => {

@@ -1529,7 +1529,6 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
             </AccordionContent>
           </AccordionItem>
 
->>>>>>> e5beb3c (feat: Google Sheets payment sync — OAuth flow, sync UI, column auto-detect)
           {/* Event Links Section */}
           <AccordionItem value="links" className="border-border border-b-0">
             <AccordionTrigger className={triggerHoverClass}>

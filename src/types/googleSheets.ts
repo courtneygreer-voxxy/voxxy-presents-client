@@ -28,20 +28,20 @@ export interface PaymentSyncConfig {
 export interface CreatePaymentSyncConfigRequest {
   sheet_url?: string
   sheet_id?: string
-  sheet_tab_name?: string
-  email_column?: string
-  phone_column?: string
-  ticket_code_column?: string
+  sheet_tab_name?: string | null
+  email_column?: string | null
+  phone_column?: string | null
+  ticket_code_column?: string | null
   paid_status_column: string
   paid_value?: string
   active?: boolean
 }
 
 export interface UpdatePaymentSyncConfigRequest {
-  sheet_tab_name?: string
-  email_column?: string
-  phone_column?: string
-  ticket_code_column?: string
+  sheet_tab_name?: string | null
+  email_column?: string | null
+  phone_column?: string | null
+  ticket_code_column?: string | null
   paid_status_column?: string
   paid_value?: string
   active?: boolean

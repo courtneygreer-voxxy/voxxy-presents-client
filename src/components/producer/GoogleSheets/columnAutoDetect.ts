@@ -54,12 +54,15 @@ export interface AutoDetectResult {
 }
 
 function tryMatch(
-  header: string,
+  _header: string,
   norm: string,
   patterns: string[],
 ): boolean {
+  // Exact match (after normalization)
   if (patterns.includes(norm)) return true
-  if (patterns.some((p) => norm.includes(p) || p.includes(norm))) return true
+  // Substring match — only if the pattern is long enough to avoid false positives
+  // (e.g., "tel" matching "Hotel", "ref" matching "preferred")
+  if (patterns.some((p) => p.length >= 5 && (norm.includes(p) || p.includes(norm)))) return true
   return false
 }
 
