@@ -43,9 +43,9 @@ export default function GoogleOAuthCallback() {
         const returnSlug = localStorage.getItem('gsheets_return_slug')
         localStorage.removeItem('gsheets_return_slug')
         if (returnSlug) {
-          navigate(`/dashboard?tab=settings&event=${returnSlug}&gsheets=connected`, { replace: true })
+          navigate(`/dashboard/events/${returnSlug}/settings`, { replace: true })
         } else {
-          navigate('/dashboard', { replace: true })
+          navigate('/dashboard/events', { replace: true })
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to connect Google Sheets'
