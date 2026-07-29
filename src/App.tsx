@@ -355,7 +355,8 @@ export default function App() {
             <Route path="/profile" element={<RoleBasedDashboardRedirect />} />
 
             {/* Unified Dashboard - Protected (verified + paid producers/admins only) */}
-            <Route path="/dashboard" element={<ProtectedDashboard />} />
+            {/* Wildcard: sub-views are routed inside Dashboard (/dashboard/events/:slug/... etc.) */}
+            <Route path="/dashboard/*" element={<ProtectedDashboard />} />
 
             {/* 404 - Redirect to home */}
             <Route path="*" element={<Navigate to="/" replace />} />
