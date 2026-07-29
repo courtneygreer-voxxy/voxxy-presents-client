@@ -871,7 +871,7 @@ export default function ProducerDashboard() {
 
     if (eventsView === 'create') {
       // While the event is being created we stay on /dashboard/events/new with a loading screen
-      if (loadingCommandCenter) {
+      if (loadingCommandCenter && creatingEventTitle) {
         return <LoadingCommandCenter eventName={creatingEventTitle} progress={creationProgress} />
       }
       return (
