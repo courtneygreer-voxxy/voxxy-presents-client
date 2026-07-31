@@ -45,7 +45,6 @@ const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
 const BetaPendingPage = lazy(() => import('./pages/BetaPendingPage'))
 
 // Lazy load: Payment Pages (load on-demand)
-const PaymentOnboardingPage = lazy(() => import('./pages/PaymentOnboardingPage'))
 const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'))
 const PaymentCanceledPage = lazy(() => import('./pages/PaymentCanceledPage'))
 
@@ -145,11 +144,11 @@ function RoleBasedDashboardRedirect() {
     }
     // V4.0: Check subscription_active instead of legacy paid field
     if (isProducer && !isPaid) {
-      console.log('💳 Producer without active subscription, redirecting to payment onboarding')
+      console.log('💳 Producer without active subscription, redirecting to pending')
       console.log('   - Role:', role)
       console.log('   - Subscription Active:', userProfile.subscription_active)
       console.log('   - Subscription Status:', userProfile.subscription_status)
-      return <Navigate to="/payment/onboarding" replace />
+      return <Navigate to="/pending" replace />
     }
   }
 
@@ -311,7 +310,6 @@ export default function App() {
             <Route path="/google/callback" element={<GoogleOAuthCallback />} />
 
             {/* Payment Flow */}
-            <Route path="/payment/onboarding" element={<PaymentOnboardingPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
             <Route path="/payment/canceled" element={<PaymentCanceledPage />} />
 

@@ -66,7 +66,7 @@ export default function ResetPasswordPage() {
       await authApi.resetPasswordWithToken(token, password)
       setSuccess(true)
       // Redirect to login after 3 seconds
-      setTimeout(() => navigate('/login/club-owner'), 3000)
+      setTimeout(() => navigate('/login'), 3000)
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message)
@@ -288,7 +288,7 @@ export default function ResetPasswordPage() {
 
                     {/* Sign In Button */}
                     <Button
-                      onClick={() => navigate('/login/club-owner')}
+                      onClick={() => navigate('/login')}
                       className="w-full voxxy-btn-cta font-semibold shadow-md dark:shadow-[0_0_20px_rgba(236,72,153,0.5)]"
                     >
                       Go to Sign In

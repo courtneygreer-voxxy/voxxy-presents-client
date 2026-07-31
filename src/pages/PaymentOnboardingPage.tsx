@@ -69,7 +69,7 @@ export default function PaymentOnboardingPage() {
     {
       icon: Zap,
       title: 'Payment Integration',
-      description: 'Sync with Eventbrite and track vendor payments',
+      description: 'Track and sync vendor payments',
     },
     {
       icon: CreditCard,
@@ -116,7 +116,7 @@ export default function PaymentOnboardingPage() {
                 Producer Monthly Plan
               </CardTitle>
               <div className="flex items-baseline justify-center gap-2 pt-4">
-                <span className="text-6xl font-bold text-foreground">$80</span>
+                <span className="text-6xl font-bold text-foreground">$40</span>
                 <span className="text-xl text-muted-foreground">/month</span>
               </div>
               <CardDescription className="text-lg pt-2">
@@ -215,7 +215,7 @@ export default function PaymentOnboardingPage() {
           <div className="grid md:grid-cols-3 gap-4">
             <Card className="bg-background/5 backdrop-blur-sm border border-border">
               <CardContent className="pt-6 text-center">
-                <div className="text-2xl font-bold text-foreground mb-1">$80/mo</div>
+                <div className="text-2xl font-bold text-foreground mb-1">$40/mo</div>
                 <div className="text-sm text-muted-foreground">Transparent Pricing</div>
               </CardContent>
             </Card>

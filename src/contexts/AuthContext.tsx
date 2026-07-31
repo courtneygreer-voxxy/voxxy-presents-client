@@ -25,6 +25,9 @@ interface User {
   subscription_status?: string | null // 'active', 'inactive', 'past_due', 'canceled'
   subscription_display_status?: string // Human-readable status
   requires_payment?: boolean // True if user needs to pay (producers only)
+  // Grace period (temporary access without subscription)
+  in_grace_period?: boolean
+  grace_period_days_remaining?: number | null
 }
 
 interface SignUpData {
@@ -79,6 +82,10 @@ interface AuthContextType {
   isPaid: boolean // True if user has active subscription (replaces legacy paid check)
   requiresPayment: boolean // True if user needs to pay
   hasActiveSubscription: boolean // True if subscription_active
+
+  // Grace period helpers
+  inGracePeriod: boolean
+  gracePeriodDaysRemaining: number | null
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -365,6 +372,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const requiresPayment = userProfile?.requires_payment ?? false
   const isPaid = hasActiveSubscription // New: based on subscription_active, not legacy paid field
 
+  // Grace period helpers
+  const inGracePeriod = userProfile?.in_grace_period ?? false
+  const gracePeriodDaysRemaining = userProfile?.grace_period_days_remaining ?? null
+
   const value: AuthContextType = {
     currentUser,
     userProfile,
@@ -389,6 +400,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isPaid,
     requiresPayment,
     hasActiveSubscription,
+    // Grace period
+    inGracePeriod,
+    gracePeriodDaysRemaining,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
