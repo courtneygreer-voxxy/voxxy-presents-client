@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams, useLocation, Navigate } from 'react-router-dom'
+import { analytics as analyticsClient } from '@/lib/analytics'
 import {
   Calendar,
   Users,
@@ -174,14 +175,75 @@ interface PresentsAnalytics {
 
 type CommandCenterTab = 'details' | 'applicants' | 'emails' | 'settings'
 
+// URL structure: /dashboard/<section>[/...]
+//   /dashboard/events                     → events list (or empty state)
+//   /dashboard/events/new                 → create event wizard
+//   /dashboard/events/:slug               → command center (Home tab)
+//   /dashboard/events/:slug/applicants    → command center (Applicants tab)
+//   /dashboard/events/:slug/emails        → command center (Mail tab)
+//   /dashboard/events/:slug/settings      → command center (Settings tab)
+//   /dashboard/events/:slug/edit          → edit event form
+//   /dashboard/network[/lists|/categories]→ network page tabs
+//   /dashboard/emails                     → email templates
+//   /dashboard/settings                   → account settings
+//   /dashboard/admin                      → admin panel (admins only)
+const SECTION_TO_NAV: Record<string, NavItem> = {
+  events: 'events',
+  network: 'network',
+  emails: 'email-templates',
+  settings: 'settings',
+  admin: 'admin',
+}
+
+const COMMAND_CENTER_TABS: CommandCenterTab[] = ['details', 'applicants', 'emails', 'settings']
+
+const navPath = (nav: NavItem): string => {
+  const sectionForNav = Object.entries(SECTION_TO_NAV).find(([, v]) => v === nav)?.[0] ?? 'events'
+  return `/dashboard/${sectionForNav}`
+}
+
+const commandCenterPath = (slug: string, tab: CommandCenterTab = 'details'): string =>
+  tab === 'details' ? `/dashboard/events/${slug}` : `/dashboard/events/${slug}/${tab}`
+
 export default function ProducerDashboard() {
-  const [activeNav, setActiveNav] = useState<NavItem>('events')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const location = useLocation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [eventsView, setEventsView] = useState<EventsView>('empty')
   const [organization, setOrganization] = useState<Organization | null>(null)
   const [events, setEvents] = useState<Event[]>([])
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
-  const [commandCenterTab, setCommandCenterTab] = useState<CommandCenterTab>('details')
+
+  // ---- Navigation state derived from the URL (single source of truth) ----
+  // pathSegments: ['dashboard', section?, ...rest]
+  const pathSegments = location.pathname.split('/').filter(Boolean)
+  const section = pathSegments[1]
+  const activeNav: NavItem = SECTION_TO_NAV[section] ?? 'events'
+  const eventSlugParam = section === 'events' ? pathSegments[2] : undefined
+  const eventSubPage = section === 'events' ? pathSegments[3] : undefined
+
+  const selectedEvent: Event | null =
+    eventSlugParam && eventSlugParam !== 'new'
+      ? (events.find((e) => e.slug === eventSlugParam) ?? null)
+      : null
+
+  let eventsView: EventsView
+  if (!eventSlugParam) {
+    eventsView = events.length > 0 ? 'list' : 'empty'
+  } else if (eventSlugParam === 'new') {
+    eventsView = 'create'
+  } else if (eventSubPage === 'edit') {
+    eventsView = 'edit'
+  } else {
+    eventsView = 'command-center'
+  }
+
+  const commandCenterTab: CommandCenterTab = COMMAND_CENTER_TABS.includes(
+    eventSubPage as CommandCenterTab,
+  )
+    ? (eventSubPage as CommandCenterTab)
+    : 'details'
+
+  // Title shown on the create-event loading screen (event has no slug/URL yet)
+  const [creatingEventTitle, setCreatingEventTitle] = useState('')
 
   // Events page controls state
   const [eventsSearchTerm, setEventsSearchTerm] = useState('')
@@ -191,7 +253,10 @@ export default function ProducerDashboard() {
 
   // Network page controls state
   type NetworkTab = 'contacts' | 'lists' | 'categories'
-  const [networkTab, setNetworkTab] = useState<NetworkTab>('contacts')
+  const networkTab: NetworkTab =
+    section === 'network' && (pathSegments[2] === 'lists' || pathSegments[2] === 'categories')
+      ? pathSegments[2]
+      : 'contacts'
   const [networkShowAddModal, setNetworkShowAddModal] = useState(false)
   const [networkShowCSVModal, setNetworkShowCSVModal] = useState(false)
 
@@ -218,6 +283,30 @@ export default function ProducerDashboard() {
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } =
     useEmailNotifications()
   const [guidebookOpen, setGuidebookOpen] = useState(false)
+
+  // Track each dashboard screen as a Mixpanel page view (no-op outside production)
+  useEffect(() => {
+    // Skip transient URLs that immediately redirect (e.g. bare /dashboard)
+    if (!section || !SECTION_TO_NAV[section]) return
+
+    let pageName = 'Dashboard: Events'
+    if (section === 'events') {
+      if (eventSlugParam === 'new') pageName = 'Dashboard: Create Event'
+      else if (eventSubPage === 'edit') pageName = 'Dashboard: Edit Event'
+      else if (eventSlugParam) pageName = `Dashboard: Command Center — ${commandCenterTab}`
+    } else if (section === 'network') {
+      pageName = `Dashboard: Network — ${networkTab}`
+    } else if (section === 'emails') {
+      pageName = 'Dashboard: Email Templates'
+    } else if (section === 'settings') {
+      pageName = 'Dashboard: Settings'
+    } else if (section === 'admin') {
+      pageName = 'Dashboard: Admin'
+    }
+
+    analyticsClient.trackPageView({ page_name: pageName, page_url: location.pathname })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname])
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -368,6 +457,29 @@ export default function ProducerDashboard() {
     }
   }, [loadingOrg, loadingEvents, organization, events.length])
 
+  // Legacy deep-link support: translate old ?tab=&event= query params (e.g. from
+  // pre-routing OAuth redirects or bookmarks) into the new URL structure
+  const deepLinkHandledRef = useRef(false)
+  useEffect(() => {
+    if (deepLinkHandledRef.current || loadingOrg || loadingEvents || events.length === 0) return
+
+    const tabParam = searchParams.get('tab')
+    const eventParam = searchParams.get('event')
+
+    if (tabParam && eventParam) {
+      deepLinkHandledRef.current = true
+      const matchedEvent = events.find((e) => e.slug === eventParam)
+      if (matchedEvent) {
+        const tab = COMMAND_CENTER_TABS.includes(tabParam as CommandCenterTab)
+          ? (tabParam as CommandCenterTab)
+          : 'details'
+        navigate(commandCenterPath(matchedEvent.slug, tab), { replace: true })
+      } else {
+        setSearchParams({}, { replace: true })
+      }
+    }
+  }, [loadingOrg, loadingEvents, events, searchParams, setSearchParams, navigate])
+
   // Load admin data when admin tab is active
   useEffect(() => {
     if (activeNav === 'admin' && isAdmin) {
@@ -385,15 +497,7 @@ export default function ProducerDashboard() {
       console.log('Fetched events:', fetchedEvents)
       console.log('Number of events:', fetchedEvents.length)
       setEvents(fetchedEvents)
-
-      // Set view based on whether there are events
-      if (fetchedEvents.length === 0) {
-        console.log('No events found, setting view to empty')
-        setEventsView('empty')
-      } else {
-        console.log('Events found, setting view to list')
-        setEventsView('list')
-      }
+      // Note: list vs empty view is derived from the URL + events.length
     } catch (err) {
       console.error('Failed to fetch events:', err)
       setError('Failed to load events')
@@ -449,20 +553,10 @@ export default function ProducerDashboard() {
       return
     }
 
-    // Prepare temporary event object for loading state
-    const tempEvent: Event = {
-      id: 0,
-      slug: '',
-      title: wizardState.eventDetails.title,
-      description: wizardState.eventDetails.description,
-      event_date: wizardState.eventDetails.event_date,
-    }
-
     try {
-      // Show loading state immediately
-      setSelectedEvent(tempEvent)
+      // Show loading state immediately (stays on /dashboard/events/new until the event exists)
+      setCreatingEventTitle(wizardState.eventDetails.title)
       setLoadingCommandCenter(true)
-      setEventsView('command-center')
       setCreationProgress('Creating your event...')
 
       // Ensure we have an email template ID - fetch default if not set
@@ -613,29 +707,25 @@ export default function ProducerDashboard() {
       // Note: Scheduled emails are created in "paused" state
       // They will be activated when event goes live
 
-      // Step 4: Refresh events list and prepare to show Command Center
+      // Step 4: Refresh events list and navigate to the new event's Command Center
       setCreationProgress('Loading Command Center...')
       const refreshedEvents = await eventsApi.getByOrganization(organization.slug)
       setEvents(refreshedEvents)
 
-      // Find the newly created event in the refreshed list
-      const createdEvent = refreshedEvents.find((e: Event) => e.slug === newEvent.slug)
-
-      if (createdEvent) {
-        setSelectedEvent(createdEvent)
-      }
+      navigate(commandCenterPath(newEvent.slug))
 
       // Turn off loading to reveal Command Center
       setTimeout(() => {
         setLoadingCommandCenter(false)
         setCreationProgress('')
+        setCreatingEventTitle('')
       }, 500) // Small delay for smooth transition
     } catch (err) {
       console.error('Failed to create event:', err)
-      // Reset states on error
+      // Reset states on error (URL is still /dashboard/events/new, so the wizard stays visible)
       setLoadingCommandCenter(false)
       setCreationProgress('')
-      setEventsView('create')
+      setCreatingEventTitle('')
       throw err // Re-throw to let wizard handle the error
     }
   }
@@ -662,8 +752,7 @@ export default function ProducerDashboard() {
       await fetchEvents(organization.slug)
 
       // Navigate back to list
-      setEventsView('list')
-      setSelectedEvent(null)
+      navigate('/dashboard/events')
     } catch (err) {
       console.error('Failed to update event:', err)
       throw err
@@ -685,9 +774,8 @@ export default function ProducerDashboard() {
       // Refresh events list
       await fetchEvents(organization.slug)
 
-      // Navigate back to list
-      setEventsView(events.length > 1 ? 'list' : 'empty')
-      setSelectedEvent(null)
+      // Navigate back to list (empty state derives automatically if no events remain)
+      navigate('/dashboard/events')
     } catch (err) {
       console.error('Failed to delete event:', err)
       throw err
@@ -702,20 +790,15 @@ export default function ProducerDashboard() {
 
     try {
       const updatedEvent = await eventsApi.getById(selectedEvent.slug)
-      setSelectedEvent(updatedEvent)
-      // Update the events array cache to prevent stale data when navigating back
+      // selectedEvent is derived from the events array, so updating the array updates it
       setEvents((prevEvents) =>
         prevEvents.map((e) => (e.slug === updatedEvent.slug ? updatedEvent : e)),
       )
     } catch (err) {
       console.error('Failed to refetch event:', err)
-      // Fallback: refresh entire events list
+      // Fallback: refresh entire events list (selectedEvent re-derives from it)
       if (organization) {
         await fetchEvents(organization.slug)
-        const refreshedEvent = events.find((e) => e.slug === selectedEvent.slug)
-        if (refreshedEvent) {
-          setSelectedEvent(refreshedEvent)
-        }
       }
     }
   }
@@ -783,13 +866,17 @@ export default function ProducerDashboard() {
     }
 
     if (eventsView === 'empty') {
-      return <EventsEmptyState onCreateEvent={() => setEventsView('create')} />
+      return <EventsEmptyState onCreateEvent={() => navigate('/dashboard/events/new')} />
     }
 
     if (eventsView === 'create') {
+      // While the event is being created we stay on /dashboard/events/new with a loading screen
+      if (loadingCommandCenter && creatingEventTitle) {
+        return <LoadingCommandCenter eventName={creatingEventTitle} progress={creationProgress} />
+      }
       return (
         <CreateEventWizard
-          onCancel={() => setEventsView(events.length > 0 ? 'list' : 'empty')}
+          onCancel={() => navigate('/dashboard/events')}
           onSubmit={handleCreateEvent}
           organizationId={organization?.id || 0}
         />
@@ -800,17 +887,14 @@ export default function ProducerDashboard() {
       return (
         <EditEventForm
           event={selectedEvent}
-          onCancel={() => {
-            setEventsView('list')
-            setSelectedEvent(null)
-          }}
+          onCancel={() => navigate('/dashboard/events')}
           onUpdate={handleUpdateEvent}
           onDelete={handleDeleteEvent}
         />
       )
     }
 
-    if (eventsView === 'command-center') {
+    if (eventsView === 'command-center' || eventsView === 'edit') {
       if (loadingCommandCenter && selectedEvent) {
         return <LoadingCommandCenter eventName={selectedEvent.title} progress={creationProgress} />
       }
@@ -845,23 +929,35 @@ export default function ProducerDashboard() {
             event={selectedEvent}
             organizationId={organization.id}
             activeTab={commandCenterTab}
-            onTabChange={setCommandCenterTab}
-            onBack={() => {
-              setEventsView('list')
-              setSelectedEvent(null)
-              setCommandCenterTab('details') // Reset to default tab when leaving
-            }}
+            onTabChange={(tab: CommandCenterTab) =>
+              navigate(commandCenterPath(selectedEvent.slug, tab))
+            }
+            onBack={() => navigate('/dashboard/events')}
             onUpdateEvent={handleUpdateEvent}
             onDeleteEvent={async (eventSlug: string) => {
               await handleDeleteEvent(eventSlug)
-              setEventsView('list')
-              setSelectedEvent(null)
-              setCommandCenterTab('details') // Reset to default tab
             }}
             onRefreshEvent={handleRefreshEvent}
           />
         )
       }
+
+      // URL points at an event slug that doesn't exist (deleted, typo, or wrong account)
+      return (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <p className="text-sm text-foreground/60 mb-3">
+              Event not found. It may have been deleted or the link is incorrect.
+            </p>
+            <button
+              onClick={() => navigate('/dashboard/events')}
+              className="px-3 py-1.5 text-sm rounded-lg voxxy-btn-solid transition-smooth"
+            >
+              Back to Events
+            </button>
+          </div>
+        </div>
+      )
     }
 
     return (
@@ -871,20 +967,18 @@ export default function ProducerDashboard() {
         statusFilter={eventsStatusFilter}
         showPastEvents={eventsShowPast}
         sortBy={eventsSortBy}
-        onCreateEvent={() => setEventsView('create')}
+        onCreateEvent={() => navigate('/dashboard/events/new')}
         onEditEvent={(slug) => {
           const event = events.find((e) => e.slug === slug)
           if (event) {
-            setSelectedEvent(event)
-            setEventsView('edit')
+            navigate(`/dashboard/events/${event.slug}/edit`)
           }
         }}
         onCommandCenter={(slug) => {
           const event = events.find((e) => e.slug === slug)
           if (event) {
-            setSelectedEvent(event)
             setLoadingCommandCenter(true)
-            setEventsView('command-center')
+            navigate(commandCenterPath(event.slug))
 
             // Simulate loading delay
             setTimeout(() => {
@@ -896,6 +990,17 @@ export default function ProducerDashboard() {
         isAdmin={isAdmin}
       />
     )
+  }
+
+  // Canonicalize URLs: bare /dashboard and unknown sections go to the events list.
+  // Preserve the query string so legacy ?tab=&event= deep links still resolve.
+  if (!section || !SECTION_TO_NAV[section]) {
+    return <Navigate to={{ pathname: '/dashboard/events', search: location.search }} replace />
+  }
+
+  // Admin section is admin-only
+  if (section === 'admin' && !authLoading && !isAdmin) {
+    return <Navigate to="/dashboard/events" replace />
   }
 
   return (
@@ -946,9 +1051,7 @@ export default function ProducerDashboard() {
             <>
               <button
                 onClick={() => {
-                  setEventsView('list')
-                  setSelectedEvent(null)
-                  setCommandCenterTab('details')
+                  navigate('/dashboard/events')
                   setIsMobileMenuOpen(false)
                 }}
                 className="voxxy-hover-row w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-smooth border border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent hover:border-ring/40 mb-2"
@@ -971,7 +1074,9 @@ export default function ProducerDashboard() {
                   <button
                     key={tab.id}
                     onClick={() => {
-                      setCommandCenterTab(tab.id)
+                      if (selectedEvent) {
+                        navigate(commandCenterPath(selectedEvent.slug, tab.id))
+                      }
                       setIsMobileMenuOpen(false)
                     }}
                     className={`
@@ -1001,13 +1106,8 @@ export default function ProducerDashboard() {
                   key={item.id}
                   data-onboarding={`nav-${item.id}`}
                   onClick={() => {
-                    setActiveNav(item.id)
+                    navigate(navPath(item.id))
                     setIsMobileMenuOpen(false)
-                    // Reset to appropriate events view when clicking Events nav
-                    if (item.id === 'events' && eventsView !== 'list' && eventsView !== 'empty') {
-                      setEventsView(events.length > 0 ? 'list' : 'empty')
-                      setSelectedEvent(null)
-                    }
                   }}
                   className={`
                     w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg
@@ -1101,7 +1201,7 @@ export default function ProducerDashboard() {
               {/* Events List - Create New Event Button */}
               {activeNav === 'events' && eventsView === 'list' && (
                 <button
-                  onClick={() => setEventsView('create')}
+                  onClick={() => navigate('/dashboard/events/new')}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:shadow-primary/30 transition-smooth text-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -1212,7 +1312,11 @@ export default function ProducerDashboard() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setNetworkTab(tab.id)}
+                    onClick={() =>
+                      navigate(
+                        tab.id === 'contacts' ? '/dashboard/network' : `/dashboard/network/${tab.id}`,
+                      )
+                    }
                     className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium transition-all relative ${
                       networkTab === tab.id
                         ? 'text-sidebar-foreground'
@@ -1238,7 +1342,7 @@ export default function ProducerDashboard() {
         >
           {activeNav === 'settings' ? (
             <SettingsPage
-              onBack={() => setActiveNav('events')}
+              onBack={() => navigate('/dashboard/events')}
               onStartGuide={() => setGuidebookOpen(true)}
             />
           ) : activeNav === 'events' ? (
@@ -1254,7 +1358,9 @@ export default function ProducerDashboard() {
                   setShowAddModal={setNetworkShowAddModal}
                   showCSVUploadModal={networkShowCSVModal}
                   setShowCSVUploadModal={setNetworkShowCSVModal}
-                  onTabChange={setNetworkTab}
+                  onTabChange={(tab: NetworkTab) =>
+                    navigate(tab === 'contacts' ? '/dashboard/network' : `/dashboard/network/${tab}`)
+                  }
                 />
               ) : (
                 <div className="flex items-center justify-center py-8">
