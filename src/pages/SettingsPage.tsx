@@ -469,7 +469,7 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
                             Subscription Active
                           </h4>
                           <p className="text-xs text-muted-foreground mb-3">
-                            You have an active Producer Monthly subscription ($80/month)
+                            You have an active Producer Monthly subscription ($40/month)
                           </p>
                           <button
                             onClick={handleManageBilling}

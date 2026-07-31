@@ -23,8 +23,11 @@ import {
   Upload,
   UserPlus,
   HelpCircle,
+  AlertCircle,
+  ArrowRight,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { stripeService } from '@/services/stripeService'
 import {
   eventsApi,
   organizationsApi,
@@ -278,7 +281,15 @@ export default function ProducerDashboard() {
   const [expandedUserId, setExpandedUserId] = useState<number | null>(null)
   const [expandedAnalyticsSection, setExpandedAnalyticsSection] = useState<string | null>(null)
 
-  const { userProfile, isAuthenticated, loading: authLoading, signOut, isAdmin } = useAuth()
+  const {
+    userProfile,
+    isAuthenticated,
+    loading: authLoading,
+    signOut,
+    isAdmin,
+    inGracePeriod,
+    gracePeriodDaysRemaining,
+  } = useAuth()
   const navigate = useNavigate()
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } =
     useEmailNotifications()
@@ -1334,6 +1345,31 @@ export default function ProducerDashboard() {
             </div>
           )}
         </header>
+
+        {/* Grace Period Banner */}
+        {inGracePeriod && (
+          <div className="bg-amber-500/15 border-b border-amber-400/30 px-4 py-3">
+            <div className="flex items-center justify-between max-w-7xl mx-auto">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                <p className="text-sm text-amber-700 dark:text-amber-300">
+                  Your trial expires in{' '}
+                  <span className="font-semibold">
+                    {gracePeriodDaysRemaining ?? 0} day{gracePeriodDaysRemaining !== 1 ? 's' : ''}
+                  </span>{' '}
+                  — subscribe to keep access
+                </p>
+              </div>
+              <button
+                onClick={() => stripeService.redirectToCheckout()}
+                className="inline-flex items-center gap-1.5 rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 transition-colors"
+              >
+                Subscribe Now
+                <ArrowRight className="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Main Content */}
         <main
