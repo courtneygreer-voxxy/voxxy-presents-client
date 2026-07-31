@@ -131,14 +131,15 @@ export default function GoogleSheetsSync({
           organizationId,
           url,
           undefined,
-          tabOverride || sheetTabName || undefined,
+          tabOverride !== undefined ? tabOverride || undefined : sheetTabName || undefined,
         )
 
         if (fetchUrlRef.current !== url) return
 
         setTabs(metadata.tabs || [])
         setHeaders(metadata.headers || [])
-        if (!sheetTabName && metadata.tabs?.length > 0) {
+        const effectiveTab = tabOverride !== undefined ? tabOverride : sheetTabName
+        if (!effectiveTab && metadata.tabs?.length > 0) {
           setSheetTabName(metadata.tabs[0])
         }
 
@@ -256,7 +257,7 @@ export default function GoogleSheetsSync({
     setTabs([])
     setDirty(true)
     if (url.includes('docs.google.com/spreadsheets')) {
-      fetchMetadata(url)
+      fetchMetadata(url, '')
     }
   }
 
