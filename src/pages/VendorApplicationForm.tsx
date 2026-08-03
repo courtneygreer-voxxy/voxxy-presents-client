@@ -877,7 +877,17 @@ export default function VendorApplicationForm() {
                     By checking this box, I consent to receive recurring promotional SMS messages
                     from Voxxy AI, Inc. at the phone number provided, including event announcements
                     and special offers. Consent is not a condition of purchase. Max 4 msgs/month.
-                    Reply STOP to cancel.
+                    Message &amp; data rates may apply. Reply STOP to cancel or HELP for assistance.
+                    See our{' '}
+                    <a
+                      href="https://www.voxxypresents.com/legal/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-violet-800 hover:text-violet-950 dark:text-primary dark:hover:text-primary/70 underline transition-colors"
+                    >
+                      Privacy Policy
+                    </a>
+                    .
                   </label>
                 </div>
               </div>
