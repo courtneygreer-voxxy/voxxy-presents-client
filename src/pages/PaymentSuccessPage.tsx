@@ -1,48 +1,62 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle, Loader2, Sparkles, ArrowRight } from 'lucide-react'
+import { CheckCircle, Loader2, Sparkles, ArrowRight, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/AuthContext'
 import { useForceTheme } from '@/hooks/useForceTheme'
+
+const MAX_POLLS = 5
+const POLL_INTERVAL_MS = 2000
 
 export default function PaymentSuccessPage() {
   useForceTheme('dark')
   const [searchParams] = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const navigate = useNavigate()
-  const { refreshUserProfile } = useAuth()
+  const { refreshUserProfile, isPaid } = useAuth()
   const [isRefreshing, setIsRefreshing] = useState(true)
+  const [showManualCheck, setShowManualCheck] = useState(false)
   const [countdown, setCountdown] = useState(3)
 
-  useEffect(() => {
-    // Refresh user profile to get updated payment status
-    const refreshProfile = async () => {
+  const pollSubscriptionStatus = useCallback(async () => {
+    for (let attempt = 1; attempt <= MAX_POLLS; attempt++) {
       try {
         await refreshUserProfile()
+        // isPaid will update reactively via AuthContext
+        // We check after a brief delay to let state propagate
+        await new Promise((resolve) => setTimeout(resolve, 200))
         setIsRefreshing(false)
-
-        // Clear guidebook flag so it shows for new paying users
-        try {
-          localStorage.removeItem('voxxy_guidebook_seen')
-          console.log('✅ Cleared guidebook flag for new user onboarding')
-        } catch {
-          // localStorage not available
-        }
+        return
       } catch (error) {
-        console.error('Failed to refresh profile:', error)
-        setIsRefreshing(false)
+        console.error(`Poll attempt ${attempt} failed:`, error)
+      }
+
+      if (attempt < MAX_POLLS) {
+        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS))
       }
     }
 
-    refreshProfile()
+    // All polls exhausted — show manual check button
+    setShowManualCheck(true)
+    setIsRefreshing(false)
   }, [refreshUserProfile])
 
+  // On mount, refresh profile and clear guidebook flag
   useEffect(() => {
-    if (isRefreshing) return
+    try {
+      localStorage.removeItem('voxxy_guidebook_seen')
+    } catch {
+      // localStorage not available
+    }
+    pollSubscriptionStatus()
+  }, [pollSubscriptionStatus])
 
-    // Start countdown
+  // Once isPaid becomes true, start the countdown to redirect
+  useEffect(() => {
+    if (!isPaid || isRefreshing) return
+
     const interval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -55,7 +69,13 @@ export default function PaymentSuccessPage() {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [isRefreshing, navigate])
+  }, [isPaid, isRefreshing, navigate])
+
+  const handleManualCheck = async () => {
+    setShowManualCheck(false)
+    setIsRefreshing(true)
+    await pollSubscriptionStatus()
+  }
 
   const handleGoToDashboard = () => {
     navigate('/dashboard')
@@ -142,8 +162,18 @@ export default function PaymentSuccessPage() {
                   <div className="flex flex-col items-center gap-3 py-4">
                     <Loader2 className="h-8 w-8 text-green-400 animate-spin" />
                     <p className="text-foreground/80 dark:text-muted-foreground text-sm">
-                      Setting up your account...
+                      Confirming your subscription...
                     </p>
+                  </div>
+                ) : showManualCheck && !isPaid ? (
+                  <div className="flex flex-col items-center gap-3 py-4">
+                    <p className="text-foreground/80 dark:text-muted-foreground text-sm">
+                      Still confirming your payment. This can take a moment.
+                    </p>
+                    <Button onClick={handleManualCheck} className="voxxy-btn-cta-pink" size="lg">
+                      <RefreshCw className="mr-2 h-5 w-5" />
+                      Check Status
+                    </Button>
                   </div>
                 ) : (
                   <>

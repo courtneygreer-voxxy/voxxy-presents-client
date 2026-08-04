@@ -97,6 +97,8 @@ export default function VendorApplicationForm() {
     agreed_to_terms: false,
     subscribed: true,
     affiliation: '',
+    sms_transactional_consent: false,
+    sms_marketing_consent: false,
   })
 
   useEffect(() => {
@@ -338,6 +340,8 @@ export default function VendorApplicationForm() {
             website: buildWebsiteUrl(formData.website),
             note_to_host: formData.note_to_host,
             affiliation: formData.affiliation,
+            sms_transactional_consent: formData.sms_transactional_consent,
+            sms_marketing_consent: formData.sms_marketing_consent,
           })
         },
         {
@@ -821,6 +825,69 @@ export default function VendorApplicationForm() {
                     <p className="text-foreground/60 text-[10px] mt-0.5">
                       Your information will be shared with the event organizer for this application.
                     </p>
+                  </label>
+                </div>
+
+                {/* SMS Transactional Consent */}
+                <div className="flex items-start gap-2.5">
+                  <input
+                    type="checkbox"
+                    id="sms_transactional_consent"
+                    checked={formData.sms_transactional_consent}
+                    onChange={(e) =>
+                      setFormData({ ...formData, sms_transactional_consent: e.target.checked })
+                    }
+                    className="mt-0.5 w-4 h-4 rounded border-border bg-background/10 text-primary focus:ring-primary"
+                  />
+                  <label
+                    htmlFor="sms_transactional_consent"
+                    className="text-xs text-foreground/90 dark:text-foreground/80"
+                  >
+                    By checking this box, I consent to receive recurring SMS messages from Voxxy
+                    AI, Inc. to the phone number provided, including event reminders and application
+                    updates. Message &amp; data rates may apply. Message frequency varies. Reply STOP
+                    to cancel or HELP for assistance. See our{' '}
+                    <a
+                      href="https://www.voxxypresents.com/legal/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-violet-800 hover:text-violet-950 dark:text-primary dark:hover:text-primary/70 underline transition-colors"
+                    >
+                      Privacy Policy
+                    </a>
+                    .
+                  </label>
+                </div>
+
+                {/* SMS Marketing Consent */}
+                <div className="flex items-start gap-2.5">
+                  <input
+                    type="checkbox"
+                    id="sms_marketing_consent"
+                    checked={formData.sms_marketing_consent}
+                    onChange={(e) =>
+                      setFormData({ ...formData, sms_marketing_consent: e.target.checked })
+                    }
+                    className="mt-0.5 w-4 h-4 rounded border-border bg-background/10 text-primary focus:ring-primary"
+                  />
+                  <label
+                    htmlFor="sms_marketing_consent"
+                    className="text-xs text-foreground/90 dark:text-foreground/80"
+                  >
+                    By checking this box, I consent to receive recurring promotional SMS messages
+                    from Voxxy AI, Inc. at the phone number provided, including event announcements
+                    and special offers. Consent is not a condition of purchase. Max 4 msgs/month.
+                    Message &amp; data rates may apply. Reply STOP to cancel or HELP for assistance.
+                    See our{' '}
+                    <a
+                      href="https://www.voxxypresents.com/legal/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-violet-800 hover:text-violet-950 dark:text-primary dark:hover:text-primary/70 underline transition-colors"
+                    >
+                      Privacy Policy
+                    </a>
+                    .
                   </label>
                 </div>
               </div>

@@ -192,7 +192,7 @@ export default function ForgotPasswordPage() {
                         Remembered your password?
                       </p>
                       <button
-                        onClick={() => navigate('/login/club-owner')}
+                        onClick={() => navigate('/login')}
                         className="voxxy-auth-link text-sm font-medium transition-colors"
                         disabled={loading}
                       >

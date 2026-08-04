@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Check, ArrowRight } from 'lucide-react'
+import { Check, ArrowRight, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { usePageTracking } from '@/hooks/usePageTracking'
 import { useSectionTracking } from '@/hooks/useSectionTracking'
@@ -12,14 +12,12 @@ import { useForceTheme } from '@/hooks/useForceTheme'
 export default function PricingPage() {
   useForceTheme('dark')
 
-  // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
   usePageTracking('Pricing')
 
-  // Section tracking
   const { sectionRef: pricingCardRef } = useSectionTracking({
     pageName: 'Pricing',
     sectionName: 'Pricing Cards',
@@ -29,136 +27,99 @@ export default function PricingPage() {
     <div className="relative min-h-screen overflow-hidden voxxy-gradient-marketing-hero voxxy-gradient-mobile-safe">
       <Navigation activePage="pricing" />
 
-      {/* Hero Section */}
-      <section className="relative pt-[140px] pb-20 px-6 md:px-12">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h1 className="mb-5 text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl">
-            Simple,{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#cc30e8] to-[#9054e3]">
-              Transparent Pricing
-            </span>
-          </h1>
-
-          <p className="mx-auto mb-0 max-w-3xl text-xl leading-relaxed text-white/65">
-            Choose the plan that fits your show schedule.
-          </p>
-
-          {/* Divider */}
-          <div className="mt-9 flex items-center justify-center">
-            <div className="h-px w-24 bg-gradient-to-r from-transparent to-voxxy-pink/40"></div>
-            <div className="mx-4 w-2 h-2 rounded-full bg-voxxy-pink/40"></div>
-            <div className="h-px w-24 bg-gradient-to-l from-transparent to-voxxy-pink/40"></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Cards */}
-      <section ref={pricingCardRef} className="relative z-10 bg-[#faf9fc] py-24">
-        <div className="container mx-auto max-w-6xl px-6 md:px-12">
-          <div className="grid md:grid-cols-3 gap-8 items-stretch">
-            {/* Starter Plan */}
-            <Card className="marketing-card pricing-card flex flex-col border-2 border-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-              <CardHeader className="text-center pb-6">
-                <CardTitle className="mb-2 text-2xl font-bold text-slate-950">Starter</CardTitle>
-                <div className="mb-2 text-4xl font-bold text-slate-950">$80</div>
-                <CardDescription className="text-slate-600">per month</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6 flex-grow flex flex-col">
-                <div className="flex-grow">
-                  <ul className="space-y-3 min-h-[180px]">
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Up to 10 shows per year</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>10k artist contacts</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>$ Marketplace Add ons</span>
-                    </li>
-                  </ul>
-                </div>
-                <Link
-                  to="/#contact"
-                  className="voxxy-btn-cta w-full inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold transition-all"
-                >
-                  Request Access
-                </Link>
-              </CardContent>
-            </Card>
-
-            {/* Growth Plan */}
-            <Card className="marketing-card-accent pricing-card relative flex flex-col border-2 border-voxxy-pink transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <Badge className="border border-violet-300 bg-violet-200 px-4 py-1 text-sm text-slate-950">
-                  Most Popular
+      {/* Split Pricing Section */}
+      <section ref={pricingCardRef} className="relative pt-[140px] pb-24 px-6 md:px-12">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left Side - Copy */}
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <Badge className="border border-violet-400/30 bg-violet-500/20 px-4 py-1.5 text-sm font-medium text-white">
+                  <Sparkles className="h-3.5 w-3.5 mr-2" />
+                  Limited Time Offer
                 </Badge>
+                <h1 className="text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl">
+                  One plan.{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#cc30e8] to-[#9054e3]">
+                    Everything included.
+                  </span>
+                </h1>
+                <p className="text-xl leading-relaxed text-white/70 max-w-lg">
+                  Get full access to every feature for a flat monthly rate. No tiers, no upsells, no
+                  surprises.
+                </p>
               </div>
-              <CardHeader className="text-center pb-6 pt-8">
-                <CardTitle className="mb-2 text-2xl font-bold text-slate-950">Growth</CardTitle>
-                <div className="mb-2 text-4xl font-bold text-slate-950">$160</div>
-                <CardDescription className="text-slate-600">per month</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6 flex-grow flex flex-col">
-                <div className="flex-grow">
-                  <ul className="space-y-3 min-h-[180px]">
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Up to 50 shows per year</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>50k artist contacts</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>$ Marketplace Add ons</span>
-                    </li>
-                  </ul>
-                </div>
-                <Link
-                  to="/#contact"
-                  className="voxxy-btn-cta w-full inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold transition-all"
-                >
-                  Request Access
-                </Link>
-              </CardContent>
-            </Card>
 
-            {/* Pro Plan */}
-            <Card className="marketing-card pricing-card flex flex-col border-2 border-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-              <CardHeader className="text-center pb-6">
-                <CardTitle className="mb-2 text-2xl font-bold text-slate-950">Pro</CardTitle>
-                <div className="mb-2 text-4xl font-bold text-slate-950">$400</div>
-                <CardDescription className="text-slate-600">per month</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6 flex-grow flex flex-col">
-                <div className="flex-grow">
-                  <ul className="space-y-3 min-h-[180px]">
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Unlimited shows</span>
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-white/50 uppercase tracking-wider">
+                  What you get
+                </p>
+                <ul className="space-y-3">
+                  {[
+                    'Unlimited events',
+                    'Unlimited artist contacts',
+                    'Automated email campaigns',
+                    'Vendor management & applications',
+                    'Analytics & payment tracking',
+                  ].map((feature) => (
+                    <li key={feature} className="flex items-center gap-3 text-white/80">
+                      <Check className="h-5 w-5 text-voxxy-pink flex-shrink-0" />
+                      <span>{feature}</span>
                     </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Unlimited artist contacts</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>$ Marketplace Add ons</span>
-                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Right Side - Pricing Card */}
+            <div className="flex justify-center lg:justify-end">
+              <Card className="w-full max-w-sm bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 shadow-[0_0_60px_rgba(144,84,227,0.2)] overflow-hidden">
+                <CardContent className="p-8 space-y-8">
+                  <div className="text-center space-y-2">
+                    <p className="text-sm font-medium text-voxxy-pink uppercase tracking-wider">
+                      Producer Plan
+                    </p>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-6xl font-bold text-white">$40</span>
+                      <span className="text-lg text-white/50">/mo</span>
+                    </div>
+                    <p className="text-sm text-white/60">
+                      Special pricing for early customers
+                    </p>
+                  </div>
+
+                  <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+                  <ul className="space-y-3">
+                    {[
+                      'Full platform access',
+                      'No event limits',
+                      'No contact limits',
+                      'Cancel anytime',
+                    ].map((item) => (
+                      <li key={item} className="flex items-center gap-3 text-sm text-white/80">
+                        <div className="h-5 w-5 rounded-full bg-voxxy-pink/20 flex items-center justify-center flex-shrink-0">
+                          <Check className="h-3 w-3 text-voxxy-pink" />
+                        </div>
+                        <span>{item}</span>
+                      </li>
+                    ))}
                   </ul>
-                </div>
-                <Link
-                  to="/#contact"
-                  className="voxxy-btn-cta w-full inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold transition-all"
-                >
-                  Request Access
-                </Link>
-              </CardContent>
-            </Card>
+
+                  <Link
+                    to="/signup"
+                    className="voxxy-btn-cta w-full inline-flex items-center justify-center rounded-lg px-5 py-3.5 text-sm font-semibold transition-all"
+                  >
+                    Get Started
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+
+                  <p className="text-center text-xs text-white/40">
+                    Secure payment via Stripe. Cancel anytime.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </section>
@@ -171,10 +132,10 @@ export default function PricingPage() {
             Join the producers scaling their art markets and shows with Voxxy.
           </p>
           <Link
-            to="/#contact"
+            to="/signup"
             className="voxxy-btn-brand inline-flex items-center justify-center rounded-lg px-8 py-4 text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl"
           >
-            Request Access
+            Get Started
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </div>

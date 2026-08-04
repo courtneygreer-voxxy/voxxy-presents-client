@@ -114,6 +114,8 @@ export interface VendorApplicationFormData {
   agreed_to_terms: boolean
   subscribed: boolean
   affiliation?: string
+  sms_transactional_consent: boolean
+  sms_marketing_consent: boolean
 }
 
 export interface VendorApplicationSubmit {
@@ -127,6 +129,7 @@ export interface VendorApplicationSubmit {
   tiktok_handle?: string
   website?: string
   note_to_host?: string
-  //to-do: backend change to accept this
   affiliation?: string
+  sms_transactional_consent?: boolean
+  sms_marketing_consent?: boolean
 }

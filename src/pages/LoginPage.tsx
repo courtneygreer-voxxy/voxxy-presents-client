@@ -306,11 +306,11 @@ export default function LoginPage() {
                     <p className="text-muted-foreground text-sm">
                       Don't have an account?{' '}
                       <button
-                        onClick={() => navigate('/contact')}
+                        onClick={() => navigate('/signup')}
                         className="text-pink-400 hover:text-pink-300 font-medium transition-colors"
                         disabled={isSubmitting}
                       >
-                        Request beta access
+                        Sign up
                       </button>
                     </p>
                   </div>

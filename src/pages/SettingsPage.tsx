@@ -180,10 +180,21 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
     try {
       const { url } = await stripeService.createBillingPortalSession()
       window.open(url, '_blank')
-      setIsLoadingBilling(false)
-    } catch (error) {
-      console.error('Failed to open billing portal:', error)
-      alert('Failed to open billing portal. Please try again or contact support.')
+    } catch (error: any) {
+      // No Stripe customer yet (legacy account) — redirect to checkout to set up billing
+      if (error?.status === 404) {
+        try {
+          await stripeService.redirectToCheckout()
+          return
+        } catch (checkoutError) {
+          console.error('Failed to redirect to checkout:', checkoutError)
+          alert('Unable to set up billing. Please try again or contact support.')
+        }
+      } else {
+        console.error('Failed to open billing portal:', error)
+        alert('Failed to open billing portal. Please try again or contact support.')
+      }
+    } finally {
       setIsLoadingBilling(false)
     }
   }
@@ -469,7 +480,7 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
                             Subscription Active
                           </h4>
                           <p className="text-xs text-muted-foreground mb-3">
-                            You have an active Producer Monthly subscription ($80/month)
+                            You have an active Producer Monthly subscription ($40/month)
                           </p>
                           <button
                             onClick={handleManageBilling}
