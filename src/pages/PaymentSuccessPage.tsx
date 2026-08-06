@@ -28,6 +28,8 @@ export default function PaymentSuccessPage() {
         if (status.subscription_active) {
           // Subscription is active — refresh the user profile so AuthContext picks it up
           await refreshUserProfile()
+          // Brief delay to let React state propagate (isPaid updates via AuthContext)
+          await new Promise((resolve) => setTimeout(resolve, 300))
           setIsRefreshing(false)
           return
         }
@@ -186,7 +188,7 @@ export default function PaymentSuccessPage() {
                       Check Again
                     </Button>
                     <p className="text-xs text-foreground/60 dark:text-muted-foreground">
-                      If this persists, contact support at help@heyvoxxy.com
+                      If this persists, contact support at team@heyvoxxy.com
                     </p>
                   </div>
                 ) : (
