@@ -1,19 +1,18 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle, Loader2, Sparkles, ArrowRight, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/AuthContext'
+import { stripeService } from '@/services/stripeService'
 import { useForceTheme } from '@/hooks/useForceTheme'
 
-const MAX_POLLS = 5
+const MAX_POLLS = 15
 const POLL_INTERVAL_MS = 2000
 
 export default function PaymentSuccessPage() {
   useForceTheme('dark')
-  const [searchParams] = useSearchParams()
-  const sessionId = searchParams.get('session_id')
   const navigate = useNavigate()
   const { refreshUserProfile, isPaid } = useAuth()
   const [isRefreshing, setIsRefreshing] = useState(true)
@@ -23,12 +22,17 @@ export default function PaymentSuccessPage() {
   const pollSubscriptionStatus = useCallback(async () => {
     for (let attempt = 1; attempt <= MAX_POLLS; attempt++) {
       try {
-        await refreshUserProfile()
-        // isPaid will update reactively via AuthContext
-        // We check after a brief delay to let state propagate
-        await new Promise((resolve) => setTimeout(resolve, 200))
-        setIsRefreshing(false)
-        return
+        // Check subscription status directly from the Stripe endpoint
+        const status = await stripeService.getSubscriptionStatus()
+
+        if (status.subscription_active) {
+          // Subscription is active — refresh the user profile so AuthContext picks it up
+          await refreshUserProfile()
+          // Brief delay to let React state propagate (isPaid updates via AuthContext)
+          await new Promise((resolve) => setTimeout(resolve, 300))
+          setIsRefreshing(false)
+          return
+        }
       } catch (error) {
         console.error(`Poll attempt ${attempt} failed:`, error)
       }
@@ -91,7 +95,6 @@ export default function PaymentSuccessPage() {
 
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-2xl space-y-8">
-          {/* Success Card */}
           <Card className="bg-background/10 backdrop-blur-md border-2 border-green-400/30 shadow-2xl">
             <CardHeader className="text-center pb-6 space-y-4">
               {/* Success Icon */}
@@ -106,74 +109,87 @@ export default function PaymentSuccessPage() {
                 className="mx-auto w-fit gap-2 px-4 py-2 text-sm font-medium"
               >
                 <Sparkles className="h-4 w-4" />
-                Payment Successful
+                {isPaid ? 'Payment Confirmed' : 'Payment Received'}
               </Badge>
 
               <CardTitle className="text-4xl font-bold text-foreground">
-                Welcome to Voxxy!
+                {isPaid ? 'Welcome to Voxxy!' : 'Activating Your Account'}
               </CardTitle>
 
               <CardDescription className="text-lg text-foreground/85 dark:text-gray-200">
-                Your producer account is now active
+                {isPaid
+                  ? 'Your producer account is now active'
+                  : 'Your payment was received — setting up your account now'}
               </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-6">
-              {/* Confirmation Message */}
-              <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-6 text-center space-y-2">
-                <p className="text-foreground font-semibold text-lg">🎉 Payment Confirmed!</p>
-                <p className="text-foreground/85 dark:text-muted-foreground">
-                  You now have full access to all producer features. Time to create something
-                  amazing!
-                </p>
-                {sessionId && (
-                  <p className="text-xs text-foreground/75 dark:text-muted-foreground pt-2 font-mono">
-                    Session: {sessionId.substring(0, 20)}...
+              {isPaid ? (
+                <>
+                  {/* Confirmation Message — only shown when actually active */}
+                  <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-6 text-center space-y-2">
+                    <p className="text-foreground font-semibold text-lg">Payment Confirmed!</p>
+                    <p className="text-foreground/85 dark:text-muted-foreground">
+                      You now have full access to all producer features. Time to create something
+                      amazing!
+                    </p>
+                  </div>
+
+                  {/* What's Next */}
+                  <div className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-6 space-y-4">
+                    <h3 className="font-semibold text-foreground text-lg mb-3">What's Next?</h3>
+                    <ul className="space-y-3 text-sm text-foreground/85 dark:text-muted-foreground">
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+                        <span>Create your first event and set up vendor applications</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+                        <span>Build your vendor network and send invitations</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+                        <span>Configure automated email sequences for applicants</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+                        <span>Track payments and manage your event budget</span>
+                      </li>
+                    </ul>
+                  </div>
+                </>
+              ) : (
+                /* Activating state — payment received but not yet confirmed */
+                <div className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-6 text-center space-y-3">
+                  <p className="text-foreground/85 dark:text-muted-foreground">
+                    Your payment has been processed. We're activating your producer account — this
+                    usually takes just a few seconds.
                   </p>
-                )}
-              </div>
+                </div>
+              )}
 
-              {/* What's Next */}
-              <div className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-6 space-y-4">
-                <h3 className="font-semibold text-foreground text-lg mb-3">What's Next?</h3>
-                <ul className="space-y-3 text-sm text-foreground/85 dark:text-muted-foreground">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
-                    <span>Create your first event and set up vendor applications</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
-                    <span>Build your vendor network and send invitations</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
-                    <span>Configure automated email sequences for applicants</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
-                    <span>Track payments and manage your event budget</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Redirect Notice */}
+              {/* Action area */}
               <div className="text-center space-y-4 pt-4">
                 {isRefreshing ? (
                   <div className="flex flex-col items-center gap-3 py-4">
                     <Loader2 className="h-8 w-8 text-green-400 animate-spin" />
                     <p className="text-foreground/80 dark:text-muted-foreground text-sm">
-                      Confirming your subscription...
+                      Activating your account...
                     </p>
                   </div>
                 ) : showManualCheck && !isPaid ? (
                   <div className="flex flex-col items-center gap-3 py-4">
                     <p className="text-foreground/80 dark:text-muted-foreground text-sm">
-                      Still confirming your payment. This can take a moment.
+                      Taking longer than expected. Your payment was received — activation may take
+                      another moment.
                     </p>
                     <Button onClick={handleManualCheck} className="voxxy-btn-cta-pink" size="lg">
                       <RefreshCw className="mr-2 h-5 w-5" />
-                      Check Status
+                      Check Again
                     </Button>
+                    <p className="text-xs text-foreground/60 dark:text-muted-foreground">
+                      If this persists, contact support at team@heyvoxxy.com
+                    </p>
                   </div>
                 ) : (
                   <>
@@ -191,7 +207,7 @@ export default function PaymentSuccessPage() {
               {/* Receipt Notice */}
               <div className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4 mt-6">
                 <p className="text-sm text-foreground/82 dark:text-muted-foreground text-center">
-                  📧 A receipt has been sent to your email
+                  A receipt has been sent to your email
                 </p>
                 <p className="text-xs text-foreground/78 dark:text-muted-foreground text-center mt-1">
                   You can manage your subscription anytime from your dashboard settings
