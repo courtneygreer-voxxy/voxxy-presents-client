@@ -4,6 +4,7 @@ import { useTheme } from '@/contexts/ThemeContext'
 import { authApi, organizationsApi } from '@/services/api'
 import { stripeService } from '@/services/stripeService'
 import {
+  AlertCircle,
   AlertTriangle,
   User,
   Building2,
@@ -118,6 +119,7 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
   const [isSaving, setIsSaving] = useState(false)
   const [showDeleteWarning, setShowDeleteWarning] = useState(false)
   const [isLoadingBilling, setIsLoadingBilling] = useState(false)
+  const [billingError, setBillingError] = useState<string | null>(null)
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false)
   const [isResettingPassword, setIsResettingPassword] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
@@ -177,23 +179,37 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
 
   const handleManageBilling = async () => {
     setIsLoadingBilling(true)
+    setBillingError(null)
     try {
       const { url } = await stripeService.createBillingPortalSession()
       window.open(url, '_blank')
     } catch (error: any) {
-      // No Stripe customer yet (legacy account) — redirect to checkout to set up billing
-      if (error?.status === 404) {
+      // No Stripe customer yet or stale customer ID — redirect to checkout
+      if (error?.status === 404 || error?.status === 422) {
         try {
           await stripeService.redirectToCheckout()
           return
         } catch (checkoutError) {
           console.error('Failed to redirect to checkout:', checkoutError)
-          alert('Unable to set up billing. Please try again or contact support.')
+          setBillingError('Unable to set up billing. Please try again or contact team@heyvoxxy.com.')
         }
       } else {
         console.error('Failed to open billing portal:', error)
-        alert('Failed to open billing portal. Please try again or contact support.')
+        setBillingError('Unable to open billing portal. Please try again or contact team@heyvoxxy.com.')
       }
+    } finally {
+      setIsLoadingBilling(false)
+    }
+  }
+
+  const handleSetUpBilling = async () => {
+    setIsLoadingBilling(true)
+    setBillingError(null)
+    try {
+      await stripeService.redirectToCheckout()
+    } catch (error) {
+      console.error('Failed to redirect to checkout:', error)
+      setBillingError('Unable to start checkout. Please try again or contact team@heyvoxxy.com.')
     } finally {
       setIsLoadingBilling(false)
     }
@@ -461,51 +477,130 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
                 </div>
               </div>
 
-              {/* Billing Management - Only for paid producers */}
-              {(userProfile?.role === 'venue_owner' || userProfile?.role === 'producer') &&
-                userProfile?.subscription_active && (
+              {/* Billing Management - For all producers */}
+              {(userProfile?.role === 'venue_owner' || userProfile?.role === 'producer') && (
                   <div
                     className={cn(
                       'rounded-lg border border-border bg-gradient-to-br from-primary/[0.06] via-muted/40 to-accent/[0.08] p-4',
-                      'dark:border-violet-400/45 dark:from-violet-950/50 dark:via-primary/15/35 dark:to-voxxy-pink/10 dark:backdrop-blur-sm',
+                      userProfile?.in_grace_period
+                        ? 'dark:border-amber-400/45 dark:from-amber-950/30 dark:via-primary/15/35 dark:to-amber-500/10 dark:backdrop-blur-sm'
+                        : !userProfile?.subscription_active
+                          ? 'dark:border-red-400/35 dark:from-red-950/20 dark:via-primary/15/35 dark:to-red-500/10 dark:backdrop-blur-sm'
+                          : 'dark:border-violet-400/45 dark:from-violet-950/50 dark:via-primary/15/35 dark:to-voxxy-pink/10 dark:backdrop-blur-sm',
                     )}
                   >
                     <div className="flex flex-1 items-start justify-between gap-4">
                       <div className="flex flex-1 items-start gap-3">
                         <div className={cn(innerGlassWell, 'p-2')}>
-                          <CreditCard className="h-4 w-4 text-primary dark:text-violet-400" />
+                          <CreditCard className={cn(
+                            'h-4 w-4',
+                            userProfile?.in_grace_period
+                              ? 'text-amber-500'
+                              : !userProfile?.subscription_active
+                                ? 'text-red-400'
+                                : 'text-primary dark:text-violet-400',
+                          )} />
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-sm font-semibold text-foreground mb-1">
-                            Subscription Active
-                          </h4>
-                          <p className="text-xs text-muted-foreground mb-3">
-                            You have an active Producer Monthly subscription ($40/month)
-                          </p>
-                          <button
-                            onClick={handleManageBilling}
-                            disabled={isLoadingBilling}
-                            className="voxxy-btn-cta inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            {isLoadingBilling ? (
-                              <>
-                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                Opening...
-                              </>
-                            ) : (
-                              <>
-                                <CreditCard className="w-3.5 h-3.5" />
-                                Manage Billing
-                                <ExternalLink className="w-3 h-3" />
-                              </>
-                            )}
-                          </button>
+                          {userProfile?.subscription_active && !userProfile?.in_grace_period ? (
+                            <>
+                              <h4 className="text-sm font-semibold text-foreground mb-1">
+                                Subscription Active
+                              </h4>
+                              <p className="text-xs text-muted-foreground mb-3">
+                                {userProfile?.subscription_display_status || 'Your subscription is active'}
+                              </p>
+                              <button
+                                onClick={handleManageBilling}
+                                disabled={isLoadingBilling}
+                                className="voxxy-btn-cta inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {isLoadingBilling ? (
+                                  <>
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    Opening...
+                                  </>
+                                ) : (
+                                  <>
+                                    <CreditCard className="w-3.5 h-3.5" />
+                                    Manage Billing
+                                    <ExternalLink className="w-3 h-3" />
+                                  </>
+                                )}
+                              </button>
+                            </>
+                          ) : userProfile?.in_grace_period ? (
+                            <>
+                              <h4 className="text-sm font-semibold text-foreground mb-1">
+                                Trial Access
+                              </h4>
+                              <p className="text-xs text-muted-foreground mb-3">
+                                Your trial access expires in{' '}
+                                <span className="font-semibold text-amber-600 dark:text-amber-400">
+                                  {userProfile?.grace_period_days_remaining ?? 0} day{userProfile?.grace_period_days_remaining !== 1 ? 's' : ''}
+                                </span>
+                                . Subscribe to keep access to all producer features.
+                              </p>
+                              <button
+                                onClick={handleSetUpBilling}
+                                disabled={isLoadingBilling}
+                                className="voxxy-btn-cta-pink inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {isLoadingBilling ? (
+                                  <>
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    Loading...
+                                  </>
+                                ) : (
+                                  <>
+                                    <CreditCard className="w-3.5 h-3.5" />
+                                    Subscribe Now
+                                  </>
+                                )}
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <h4 className="text-sm font-semibold text-foreground mb-1">
+                                Set Up Billing
+                              </h4>
+                              <p className="text-xs text-muted-foreground mb-3">
+                                Subscribe to access all producer features.
+                              </p>
+                              <button
+                                onClick={handleSetUpBilling}
+                                disabled={isLoadingBilling}
+                                className="voxxy-btn-cta-pink inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {isLoadingBilling ? (
+                                  <>
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    Loading...
+                                  </>
+                                ) : (
+                                  <>
+                                    <CreditCard className="w-3.5 h-3.5" />
+                                    Set Up Billing
+                                  </>
+                                )}
+                              </button>
+                            </>
+                          )}
+
+                          {billingError && (
+                            <div className="mt-3 flex items-start gap-2 rounded-md bg-destructive/10 border border-destructive/30 px-3 py-2">
+                              <AlertCircle className="h-3.5 w-3.5 text-destructive flex-shrink-0 mt-0.5" />
+                              <p className="text-xs text-destructive">{billingError}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
                     <div className="mt-3 border-t border-border pt-3 dark:border-violet-500/30">
                       <p className="text-[10px] text-muted-foreground">
-                        Update payment method, view invoices, or cancel subscription
+                        {userProfile?.subscription_active && !userProfile?.in_grace_period
+                          ? 'Update payment method, view invoices, or cancel subscription'
+                          : 'Secure checkout powered by Stripe'}
                       </p>
                     </div>
                   </div>
