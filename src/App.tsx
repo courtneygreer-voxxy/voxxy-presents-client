@@ -45,9 +45,11 @@ const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
 const BetaPendingPage = lazy(() => import('./pages/BetaPendingPage'))
 
 // Lazy load: Payment Pages (load on-demand)
-const PaymentOnboardingPage = lazy(() => import('./pages/PaymentOnboardingPage'))
 const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'))
 const PaymentCanceledPage = lazy(() => import('./pages/PaymentCanceledPage'))
+
+// Lazy load: Google OAuth callback
+const GoogleOAuthCallback = lazy(() => import('./pages/GoogleOAuthCallback'))
 
 // Lazy load: Dashboards (load on-demand)
 const Dashboard = lazy(() => import('./pages/Dashboard'))
@@ -142,11 +144,11 @@ function RoleBasedDashboardRedirect() {
     }
     // V4.0: Check subscription_active instead of legacy paid field
     if (isProducer && !isPaid) {
-      console.log('💳 Producer without active subscription, redirecting to payment onboarding')
+      console.log('💳 Producer without active subscription, redirecting to pending')
       console.log('   - Role:', role)
       console.log('   - Subscription Active:', userProfile.subscription_active)
       console.log('   - Subscription Status:', userProfile.subscription_status)
-      return <Navigate to="/payment/onboarding" replace />
+      return <Navigate to="/pending" replace />
     }
   }
 
@@ -304,8 +306,10 @@ export default function App() {
             {/* Unified Account Setup Hub - Email verification & payment request */}
             <Route path="/pending" element={<BetaPendingPage />} />
 
+            {/* Google OAuth Callback */}
+            <Route path="/google/callback" element={<GoogleOAuthCallback />} />
+
             {/* Payment Flow */}
-            <Route path="/payment/onboarding" element={<PaymentOnboardingPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
             <Route path="/payment/canceled" element={<PaymentCanceledPage />} />
 
@@ -349,7 +353,8 @@ export default function App() {
             <Route path="/profile" element={<RoleBasedDashboardRedirect />} />
 
             {/* Unified Dashboard - Protected (verified + paid producers/admins only) */}
-            <Route path="/dashboard" element={<ProtectedDashboard />} />
+            {/* Wildcard: sub-views are routed inside Dashboard (/dashboard/events/:slug/... etc.) */}
+            <Route path="/dashboard/*" element={<ProtectedDashboard />} />
 
             {/* 404 - Redirect to home */}
             <Route path="*" element={<Navigate to="/" replace />} />

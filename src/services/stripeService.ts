@@ -18,6 +18,8 @@ export interface SubscriptionStatus {
   current_period_end: string | null
   stripe_customer_id: string | null
   stripe_subscription_id: string | null
+  in_grace_period: boolean
+  grace_period_days_remaining: number | null
 }
 
 export interface BillingPortalResponse {
@@ -47,6 +49,7 @@ async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Re
   const response = await fetch(url, {
     ...options,
     headers,
+    credentials: 'include',
   })
 
   if (!response.ok) {

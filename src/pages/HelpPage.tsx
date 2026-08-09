@@ -32,7 +32,7 @@ export default function HelpPage() {
     {
       question: "What's included in each pricing tier?",
       answer:
-        'Our Starter plan ($80/month) includes up to 10 events per year and 10k vendor contacts. Growth ($160/month) includes 50 events and 50k contacts with advanced features. Enterprise ($400/month) offers unlimited events and contacts with dedicated support.',
+        'For a limited time, our Producer plan is just $40/month and includes unlimited events, vendor management, automated email campaigns, analytics, and payment tracking. No long-term contracts. Cancel anytime.',
     },
     {
       question: 'Is there a contract or commitment?',

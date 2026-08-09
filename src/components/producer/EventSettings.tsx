@@ -12,6 +12,7 @@ import {
   AlertCircle,
   DollarSign,
   Save,
+  Sheet,
 } from 'lucide-react'
 import {
   Accordion,
@@ -39,6 +40,7 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { ConfirmationModal } from '@/components/ui/confirmation-modal'
 import { useAuth } from '@/hooks/useAuth'
+import GoogleSheetsSync from './GoogleSheets/GoogleSheetsSync'
 
 interface Event {
   id: number
@@ -1390,6 +1392,31 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                     : 'No categories configured yet.'}
                 </div>
               )}
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Google Sheets Payment Sync */}
+          <AccordionItem value="google-sheets-sync" className="border-border">
+            <AccordionTrigger className={triggerHoverClass}>
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-emerald-500/20 p-1.5">
+                  <Sheet className="h-4 w-4 text-emerald-700 dark:text-emerald-400" />
+                </div>
+                <div className="text-left">
+                  <span className="text-sm font-semibold text-foreground">
+                    Google Sheets Payment Sync
+                  </span>
+                  <p className="text-xs text-foreground/50 font-normal">
+                    Sync vendor payment status from your spreadsheet
+                  </p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4">
+              <GoogleSheetsSync
+                organizationId={currentUser?.organization_id || 0}
+                eventSlug={event.slug}
+              />
             </AccordionContent>
           </AccordionItem>
 

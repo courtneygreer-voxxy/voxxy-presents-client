@@ -117,6 +117,13 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
           errorData.message || errorData.error || `API request failed: ${response.status}`
       }
 
+      // 402 Payment Required — redirect to activation page
+      if (response.status === 402) {
+        console.warn('402 Payment Required — redirecting to activation')
+        window.location.href = '/pending'
+        return null as T
+      }
+
       throw new ApiError(errorMessage, response.status, errorData.errors)
     }
 
