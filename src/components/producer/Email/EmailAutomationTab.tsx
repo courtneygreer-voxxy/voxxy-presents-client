@@ -31,6 +31,7 @@ import {
 } from '@/components/shared/SearchFilterBar'
 import { getEmailTypeInfo } from '@/utils/emailTypeHelper'
 import { logger } from '@/utils/logger'
+import { ConfirmationModal } from '@/components/ui/confirmation-modal'
 
 interface EmailAutomationTabProps {
   eventSlug: string
@@ -75,6 +76,10 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
   // Navigation state
   const [viewState, setViewState] = useState<ViewState>({ view: 'table' })
+
+  // Retry modal state
+  const [retryEmailId, setRetryEmailId] = useState<number | null>(null)
+  const [isRetrying, setIsRetrying] = useState(false)
 
   // Auto-refresh state
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -231,6 +236,26 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       showSuccess(`Email sent to ${result.sent_count} recipients`)
     } catch (err: any) {
       setError(err.message || 'Failed to send email')
+    }
+  }
+
+  const handleRetryEmail = (emailId: number) => {
+    setRetryEmailId(emailId)
+  }
+
+  const confirmRetryEmail = async () => {
+    if (!retryEmailId) return
+    setIsRetrying(true)
+    try {
+      const result = await scheduledEmailsApi.sendNow(eventSlug, retryEmailId)
+      await loadEmails()
+      setRetryEmailId(null)
+      showSuccess(`Retry successful! Email sent to ${result.sent_count} recipients.`)
+    } catch (err: any) {
+      setRetryEmailId(null)
+      setError(err.message || 'Retry failed. Please try again or contact support.')
+    } finally {
+      setIsRetrying(false)
     }
   }
 
@@ -840,6 +865,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             onResume={isEventCancelled ? undefined : handleResume}
             onSendNow={isEventLive && !isEventCancelled ? handleSendNow : undefined}
             onRetryFailed={isEventCancelled ? undefined : handleRetryFailed}
+            onRetryEmail={isEventLive && !isEventCancelled ? handleRetryEmail : undefined}
             onDelete={isEventCancelled ? undefined : handleDelete}
             onViewAuditLog={(filters) => setViewState({ view: 'audit-log', filters })}
             sortColumn={sortColumn}
@@ -861,6 +887,18 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
           successMessage,
         }}
         isAdmin={isAdmin}
+      />
+
+      {/* Retry Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={retryEmailId !== null}
+        onClose={() => !isRetrying && setRetryEmailId(null)}
+        onConfirm={confirmRetryEmail}
+        title="Retry Failed Email"
+        description="This will attempt to resend the email to all eligible recipients. Recipients who already received this email will not be sent duplicates."
+        confirmText={isRetrying ? 'Sending...' : 'Retry'}
+        cancelText="Cancel"
+        isLoading={isRetrying}
       />
     </div>
   )
