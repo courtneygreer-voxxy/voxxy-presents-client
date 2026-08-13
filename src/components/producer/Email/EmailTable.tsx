@@ -25,6 +25,7 @@ interface EmailTableProps {
   onResume?: (emailId: number) => Promise<void>
   onSendNow?: (emailId: number) => Promise<void>
   onRetryFailed?: (emailId: number) => Promise<void>
+  onRetryEmail?: (emailId: number) => Promise<void>
   onDelete?: (emailId: number) => Promise<void>
   onViewAuditLog?: (filters: AuditFilters) => void
   sortColumn?: SortColumn | null
@@ -58,6 +59,7 @@ export default function EmailTable({
   onResume,
   onSendNow,
   onRetryFailed,
+  onRetryEmail,
   onDelete,
   onViewAuditLog,
   sortColumn,
@@ -168,6 +170,7 @@ export default function EmailTable({
                   onResume={onResume}
                   onSendNow={onSendNow}
                   onRetryFailed={onRetryFailed}
+                  onRetryEmail={onRetryEmail}
                   onDelete={onDelete}
                   onViewAuditLog={onViewAuditLog}
                 />
@@ -225,6 +228,7 @@ export default function EmailTable({
                   onResume={onResume}
                   onSendNow={onSendNow}
                   onRetryFailed={onRetryFailed}
+                  onRetryEmail={onRetryEmail}
                   onDelete={onDelete}
                   onViewAuditLog={onViewAuditLog}
                 />

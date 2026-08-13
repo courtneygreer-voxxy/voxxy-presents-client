@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import FailedEmailsPanel from './FailedEmailsPanel'
 
 interface OrganizationSubscription {
   id: number
@@ -300,6 +301,9 @@ export default function AdminPanel({
             </div>
           </div>
         </div>
+
+        {/* Failed Emails Monitoring */}
+        <FailedEmailsPanel />
 
         {/* Organization System Info - Developer Style */}
         <div className="rounded-lg border-2 border-cyan-500/50 bg-card/90 p-4 shadow-lg shadow-cyan-500/20 backdrop-blur-sm dark:bg-black/40 lg:p-6">

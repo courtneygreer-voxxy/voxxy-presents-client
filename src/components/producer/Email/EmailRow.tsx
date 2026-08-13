@@ -44,6 +44,7 @@ interface EmailRowProps {
   onResume?: (emailId: number) => Promise<void>
   onSendNow?: (emailId: number) => Promise<void>
   onRetryFailed?: (emailId: number) => Promise<void>
+  onRetryEmail?: (emailId: number) => Promise<void>
   onDelete?: (emailId: number) => Promise<void>
   onViewAuditLog?: (filters: AuditFilters) => void
 }
@@ -56,6 +57,7 @@ export default function EmailRow({
   onResume,
   onSendNow,
   onRetryFailed,
+  onRetryEmail,
   onDelete,
   onViewAuditLog,
 }: EmailRowProps) {
@@ -418,6 +420,18 @@ export default function EmailRow({
                     Retry Failed
                   </button>
                 )}
+                {isFailed && onRetryEmail && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleAction(() => onRetryEmail(email.id))
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-background/10 flex items-center gap-2 transition-colors"
+                  >
+                    <RefreshCcw className="w-3.5 h-3.5" />
+                    Retry
+                  </button>
+                )}
                 {!isSent && !isSystemEmail && onDelete && (
                   <button
                     onClick={(e) => {
@@ -440,7 +454,9 @@ export default function EmailRow({
       {/* Error message row (spans full width) */}
       {isFailed && email.error_message && (
         <div className="col-span-9 -mt-1 mb-1 px-3 py-2 rounded bg-red-500/10 border border-red-500/20">
-          <p className="text-red-400 text-xs">{email.error_message}</p>
+          <p className="text-red-400 text-xs">
+            Sorry, an internal error occurred while sending this email. Please retry using the actions menu above.
+          </p>
         </div>
       )}
 
