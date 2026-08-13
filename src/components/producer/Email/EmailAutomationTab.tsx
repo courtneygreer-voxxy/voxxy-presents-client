@@ -79,7 +79,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
   // Retry modal state
   const [retryEmailId, setRetryEmailId] = useState<number | null>(null)
-  const [isRetrying, setIsRetrying] = useState(false)
 
   // Auto-refresh state
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -245,17 +244,14 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
   const confirmRetryEmail = async () => {
     if (!retryEmailId) return
-    setIsRetrying(true)
+    const emailId = retryEmailId
+    setRetryEmailId(null)
     try {
-      const result = await scheduledEmailsApi.sendNow(eventSlug, retryEmailId)
+      const result = await scheduledEmailsApi.sendNow(eventSlug, emailId)
       await loadEmails()
-      setRetryEmailId(null)
       showSuccess(`Retry successful! Email sent to ${result.sent_count} recipients.`)
     } catch (err: any) {
-      setRetryEmailId(null)
       setError(err.message || 'Retry failed. Please try again or contact support.')
-    } finally {
-      setIsRetrying(false)
     }
   }
 
@@ -892,13 +888,12 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       {/* Retry Confirmation Modal */}
       <ConfirmationModal
         isOpen={retryEmailId !== null}
-        onClose={() => !isRetrying && setRetryEmailId(null)}
+        onClose={() => setRetryEmailId(null)}
         onConfirm={confirmRetryEmail}
         title="Retry Failed Email"
         description="This will attempt to resend the email to all eligible recipients. Recipients who already received this email will not be sent duplicates."
-        confirmText={isRetrying ? 'Sending...' : 'Retry'}
+        confirmText="Retry"
         cancelText="Cancel"
-        isLoading={isRetrying}
       />
     </div>
   )
