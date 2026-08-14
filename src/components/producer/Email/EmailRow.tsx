@@ -153,15 +153,17 @@ export default function EmailRow({
       scheduled: 'tintBlueSoft',
       paused: 'tintYellowSoft',
       active: 'tintGreenSoft',
+      processing: 'tintBlueSoft',
       failed: 'tintRedSoft',
       cancelled: 'tintMutedSoft',
     }
 
     const variant = statusVariants[email.status] ?? 'tintMutedSoft'
+    const isProcessing = email.status === 'processing'
 
     return (
-      <Badge variant={variant} className="rounded px-2 py-0.5 text-[10px] font-medium">
-        {email.status.charAt(0).toUpperCase() + email.status.slice(1)}
+      <Badge variant={variant} className={`rounded px-2 py-0.5 text-[10px] font-medium ${isProcessing ? 'animate-pulse' : ''}`}>
+        {isProcessing ? 'Sending...' : email.status.charAt(0).toUpperCase() + email.status.slice(1)}
       </Badge>
     )
   }
