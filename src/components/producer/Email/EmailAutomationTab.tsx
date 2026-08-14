@@ -238,7 +238,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     }
   }
 
-  const handleRetryEmail = (emailId: number) => {
+  const handleRetryEmail = async (emailId: number) => {
     setRetryEmailId(emailId)
   }
 
@@ -246,11 +246,19 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     if (!retryEmailId) return
     const emailId = retryEmailId
     setRetryEmailId(null)
+
+    // Optimistic update — show "processing" immediately instead of waiting 60+ seconds
+    setEmails((prev) =>
+      prev.map((e) => (e.id === emailId ? { ...e, status: 'processing' as ScheduledEmailStatus } : e)),
+    )
+
     try {
       const result = await scheduledEmailsApi.sendNow(eventSlug, emailId)
       await loadEmails()
       showSuccess(`Retry successful! Email sent to ${result.sent_count} recipients.`)
     } catch (err: any) {
+      // Revert optimistic update on failure
+      await loadEmails()
       setError(err.message || 'Retry failed. Please try again or contact support.')
     }
   }
