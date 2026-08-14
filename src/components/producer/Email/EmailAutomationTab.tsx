@@ -239,7 +239,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     }
   }
 
-  const handleRetryEmail = (emailId: number) => {
+  const handleRetryEmail = async (emailId: number) => {
     setRetryEmailId(emailId)
   }
 
