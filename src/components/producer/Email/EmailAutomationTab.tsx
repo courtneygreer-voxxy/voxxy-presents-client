@@ -79,6 +79,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
   // Retry modal state
   const [retryEmailId, setRetryEmailId] = useState<number | null>(null)
+  const [isRetrying, setIsRetrying] = useState(false)
 
   // Auto-refresh state
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -245,7 +246,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
   const confirmRetryEmail = async () => {
     if (!retryEmailId) return
     const emailId = retryEmailId
-    setRetryEmailId(null)
+    setIsRetrying(true)
 
     // Optimistic update — show "processing" immediately instead of waiting 60+ seconds
     setEmails((prev) =>
@@ -260,6 +261,9 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       // Revert optimistic update on failure
       await loadEmails()
       setError(err.message || 'Retry failed. Please try again or contact support.')
+    } finally {
+      setIsRetrying(false)
+      setRetryEmailId(null)
     }
   }
 
@@ -902,6 +906,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         description="This will attempt to resend the email to all eligible recipients. Recipients who already received this email will not be sent duplicates."
         confirmText="Retry"
         cancelText="Cancel"
+        isLoading={isRetrying}
       />
     </div>
   )
