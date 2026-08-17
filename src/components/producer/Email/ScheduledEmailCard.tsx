@@ -11,6 +11,7 @@ import {
   Eye,
   MoreVertical,
   AlertTriangle,
+  RotateCcw,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import type { ScheduledEmail, DeliveryStatus } from '@/types/email'
@@ -85,13 +86,13 @@ export default function ScheduledEmailCard({
           : isFailed
             ? 'bg-red-500/10 text-red-400'
             : isProcessingStatus
-              ? 'bg-green-500/10 text-green-400'
+              ? 'bg-blue-500/10 text-blue-400 animate-pulse'
               : isScheduled
                 ? 'bg-blue-500/10 text-blue-400'
                 : 'bg-muted/10 text-muted-foreground'
       }`}
     >
-      {email.status.charAt(0).toUpperCase() + email.status.slice(1)}
+      {isProcessingStatus ? 'Sending...' : email.status.charAt(0).toUpperCase() + email.status.slice(1)}
     </span>
   )
 
@@ -200,6 +201,15 @@ export default function ScheduledEmailCard({
                 Pause
               </DropdownMenuItem>
             )}
+            {isFailed && onSendNow && (
+              <DropdownMenuItem
+                onClick={() => handleAction(() => onSendNow(email.id))}
+                disabled={isProcessing}
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Retry
+              </DropdownMenuItem>
+            )}
             {isPaused && onResume && (
               <DropdownMenuItem
                 onClick={() => handleAction(() => onResume(email.id))}
@@ -229,7 +239,9 @@ export default function ScheduledEmailCard({
       {/* Error message if failed */}
       {isFailed && email.error_message && (
         <div className="mt-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-          <p className="text-red-400 text-xs">{email.error_message}</p>
+          <p className="text-red-400 text-xs">
+            Sorry, an internal error occurred while sending this email. Please retry using the menu above.
+          </p>
         </div>
       )}
     </div>

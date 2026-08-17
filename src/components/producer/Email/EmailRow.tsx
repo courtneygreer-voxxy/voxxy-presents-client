@@ -44,6 +44,7 @@ interface EmailRowProps {
   onResume?: (emailId: number) => Promise<void>
   onSendNow?: (emailId: number) => Promise<void>
   onRetryFailed?: (emailId: number) => Promise<void>
+  onRetryEmail?: (emailId: number) => Promise<void>
   onDelete?: (emailId: number) => Promise<void>
   onViewAuditLog?: (filters: AuditFilters) => void
 }
@@ -56,6 +57,7 @@ export default function EmailRow({
   onResume,
   onSendNow,
   onRetryFailed,
+  onRetryEmail,
   onDelete,
   onViewAuditLog,
 }: EmailRowProps) {
@@ -151,15 +153,17 @@ export default function EmailRow({
       scheduled: 'tintBlueSoft',
       paused: 'tintYellowSoft',
       active: 'tintGreenSoft',
+      processing: 'tintBlueSoft',
       failed: 'tintRedSoft',
       cancelled: 'tintMutedSoft',
     }
 
     const variant = statusVariants[email.status] ?? 'tintMutedSoft'
+    const isProcessing = email.status === 'processing'
 
     return (
-      <Badge variant={variant} className="rounded px-2 py-0.5 text-[10px] font-medium">
-        {email.status.charAt(0).toUpperCase() + email.status.slice(1)}
+      <Badge variant={variant} className={`rounded px-2 py-0.5 text-[10px] font-medium ${isProcessing ? 'animate-pulse' : ''}`}>
+        {isProcessing ? 'Sending...' : email.status.charAt(0).toUpperCase() + email.status.slice(1)}
       </Badge>
     )
   }
@@ -418,6 +422,18 @@ export default function EmailRow({
                     Retry Failed
                   </button>
                 )}
+                {isFailed && onRetryEmail && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleAction(() => onRetryEmail(email.id))
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-background/10 flex items-center gap-2 transition-colors"
+                  >
+                    <RefreshCcw className="w-3.5 h-3.5" />
+                    Retry
+                  </button>
+                )}
                 {!isSent && !isSystemEmail && onDelete && (
                   <button
                     onClick={(e) => {
@@ -440,7 +456,9 @@ export default function EmailRow({
       {/* Error message row (spans full width) */}
       {isFailed && email.error_message && (
         <div className="col-span-9 -mt-1 mb-1 px-3 py-2 rounded bg-red-500/10 border border-red-500/20">
-          <p className="text-red-400 text-xs">{email.error_message}</p>
+          <p className="text-red-400 text-xs">
+            Sorry, an internal error occurred while sending this email. Please retry using the actions menu above.
+          </p>
         </div>
       )}
 

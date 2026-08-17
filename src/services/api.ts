@@ -2096,6 +2096,27 @@ export const adminApi = {
 
     return await response.json()
   },
+
+  async getFailedEmails(limit?: number) {
+    const queryString = limit ? `?limit=${limit}` : ''
+    const response = await fetch(
+      `${API_BASE_URL.replace('/api', '')}/admin/failed_emails${queryString}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
+        credentials: 'include',
+      },
+    )
+
+    if (!response.ok) {
+      throw new ApiError('Failed to fetch failed emails', response.status)
+    }
+
+    return await response.json()
+  },
 }
 
 // Budget API
