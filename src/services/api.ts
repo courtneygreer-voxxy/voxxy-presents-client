@@ -2105,6 +2105,7 @@ export const adminApi = {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
         },
         credentials: 'include',
       },
