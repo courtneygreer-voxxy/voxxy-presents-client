@@ -87,6 +87,15 @@ export const googleSheetsOauthApi = {
     return response.json()
   },
 
+  tokenHealth: async (
+    organizationId: number,
+  ): Promise<{ healthy: boolean; reconnect_required: boolean; error?: string }> => {
+    const response = await fetchWithAuth(
+      `${API_BASE_URL}/v1/presents/organizations/${organizationId}/google_sheets/token_health`,
+    )
+    return response.json()
+  },
+
   disconnect: async (organizationId: number): Promise<{ message: string }> => {
     const response = await fetchWithAuth(
       `${API_BASE_URL}/v1/presents/organizations/${organizationId}/google_sheets/disconnect`,
