@@ -167,7 +167,19 @@ export default function EventsList({
             const applicantCount = event.capacity?.registered || event.registered_count || 0
 
             return (
-              <div key={event.id} className="glass-card voxxy-hover-panel event-list-card p-4">
+              <div
+                key={event.id}
+                className="glass-card voxxy-hover-panel event-list-card p-4 cursor-pointer"
+                onClick={() => onCommandCenter(event.slug)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    onCommandCenter(event.slug)
+                  }
+                }}
+              >
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
                   {/* Event Info */}
                   <div className="flex-1">
@@ -210,15 +222,8 @@ export default function EventsList({
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => onCommandCenter(event.slug)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:shadow-primary/30 transition-smooth text-sm whitespace-nowrap"
-                    >
-                      Command Center
-                    </button>
-
+                  {/* Action Buttons — stopPropagation prevents card click */}
+                  <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                     {/* Admin Quick Delete Button - Only in Dev/Staging */}
                     {isAdmin && onDeleteEvent && import.meta.env.MODE !== 'production' && (
                       <button
@@ -231,7 +236,7 @@ export default function EventsList({
                           <span className="text-sm">Delete</span>
                         </div>
                         <span className="text-[9px] text-red-200 font-bold uppercase tracking-wide">
-                          ⚠️ Immediate
+                          Immediate
                         </span>
                       </button>
                     )}

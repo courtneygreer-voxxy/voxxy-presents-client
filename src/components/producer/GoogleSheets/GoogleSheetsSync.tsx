@@ -60,6 +60,9 @@ export default function GoogleSheetsSync({
   const [headers, setHeaders] = useState<string[]>([])
   const [autoDetected, setAutoDetected] = useState(false)
 
+  // Token health state
+  const [reconnectRequired, setReconnectRequired] = useState(false)
+
   // Save/sync state
   const [saving, setSaving] = useState(false)
   const [syncing, setSyncing] = useState(false)
@@ -78,6 +81,16 @@ export default function GoogleSheetsSync({
         setConnectionStatus(status)
 
         if (status.connected) {
+          // Check token health — detect expired/revoked Google tokens
+          try {
+            const health = await googleSheetsOauthApi.tokenHealth(organizationId)
+            if (health.reconnect_required) {
+              setReconnectRequired(true)
+            }
+          } catch {
+            // Token health check failed — don't block UI
+          }
+
           try {
             const existingConfig = await paymentSyncConfigApi.get(eventSlug)
             loadConfigIntoState(existingConfig)
@@ -401,6 +414,30 @@ export default function GoogleSheetsSync({
           </button>
         </div>
       </div>
+
+      {/* Reconnect Required Banner */}
+      {reconnectRequired && (
+        <div className="flex items-start gap-2 text-xs text-amber-500 bg-amber-500/10 rounded-lg p-3">
+          <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-medium">Google connection expired</p>
+            <p className="text-amber-500/80 mt-0.5">
+              Your Google authorization has expired or been revoked. Disconnect and reconnect to restore syncing.
+            </p>
+            <button
+              type="button"
+              onClick={async () => {
+                await handleDisconnect()
+                setReconnectRequired(false)
+              }}
+              className="mt-1.5 text-xs underline hover:no-underline inline-flex items-center gap-1"
+            >
+              <RefreshCw className="w-3 h-3" />
+              Reconnect Now
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Sheet URL Input */}
       <div>

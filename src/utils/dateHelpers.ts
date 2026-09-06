@@ -98,7 +98,9 @@ export const isDatePast = (dateString: string | null | undefined, timezone?: str
   if (!dt || !dt.isValid) return false
 
   const now = DateTime.now().setZone(timezone || 'America/Los_Angeles')
-  return dt < now
+  // Event stays "active" until the END of its date (23:59:59)
+  const endOfEventDay = dt.endOf('day')
+  return endOfEventDay < now
 }
 
 /**
